@@ -1,9 +1,31 @@
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Download } from "lucide-react";
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { GuidePDF } from "@/components/GuidePDF";
 
 const GuidePage = () => {
   return (
     <div className="min-h-screen bg-background">
+      {/* Fixed Download Button */}
+      <div className="fixed top-24 right-6 z-40">
+        <PDFDownloadLink
+          document={<GuidePDF />}
+          fileName="Realtor-Business-Credit-Guide.pdf"
+        >
+          {({ loading }) => (
+            <Button 
+              variant="default" 
+              size="lg"
+              className="shadow-lg"
+              disabled={loading}
+            >
+              <Download className="mr-2 h-5 w-5" />
+              {loading ? 'Generating...' : 'Download PDF'}
+            </Button>
+          )}
+        </PDFDownloadLink>
+      </div>
+
       {/* Cover Section */}
       <section className="bg-gradient-to-br from-navy to-navy-light text-white py-20 md:py-32">
         <div className="container mx-auto px-4 text-center">
@@ -390,6 +412,22 @@ const GuidePage = () => {
                 Schedule Your One-on-One Consultation →
               </a>
             </Button>
+            <PDFDownloadLink
+              document={<GuidePDF />}
+              fileName="Realtor-Business-Credit-Guide.pdf"
+            >
+              {({ loading }) => (
+                <Button 
+                  size="lg" 
+                  variant="secondary"
+                  className="text-lg"
+                  disabled={loading}
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  {loading ? 'Generating...' : 'Download PDF Guide'}
+                </Button>
+              )}
+            </PDFDownloadLink>
           </div>
           
           <p className="text-base opacity-90">
