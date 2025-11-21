@@ -1,1 +1,7 @@
 project_id = "pquuigfgbplwbksijlxl"
+
+[functions.setup-admin]
+verify_jwt = true
+
+[functions.process-mls-import]
+verify_jwt = true

@@ -7,6 +7,7 @@ import LandingPage from "./pages/LandingPage";
 import GuidePage from "./pages/GuidePage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import MLSImport from "./pages/MLSImport";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/mls-import" 
+            element={
+              <ProtectedRoute>
+                <MLSImport />
               </ProtectedRoute>
             } 
           />
