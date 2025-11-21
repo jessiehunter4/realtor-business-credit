@@ -1,5 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -159,7 +158,7 @@ Deno.serve(async (req) => {
         .from('import_batches')
         .update({
           status: 'failed',
-          error_message: processingError.message,
+          error_message: processingError instanceof Error ? processingError.message : String(processingError),
         })
         .eq('id', batch.id);
 
@@ -168,7 +167,7 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Error in process-mls-import:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
