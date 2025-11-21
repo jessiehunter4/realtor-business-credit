@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [settingUpAdmin, setSettingUpAdmin] = useState(false);
 
   useEffect(() => {
     checkAdminStatus();
@@ -50,6 +51,27 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSetupAdmin = async () => {
+    setSettingUpAdmin(true);
+    try {
+      const { error } = await supabase.functions.invoke('setup-admin');
+      
+      if (error) {
+        toast.error("Failed to setup admin access");
+        console.error("Setup admin error:", error);
+      } else {
+        toast.success("Admin access granted!");
+        // Refresh admin status
+        await checkAdminStatus();
+      }
+    } catch (error) {
+      console.error("Error setting up admin:", error);
+      toast.error("An error occurred");
+    } finally {
+      setSettingUpAdmin(false);
+    }
+  };
+
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -73,12 +95,26 @@ export default function AdminDashboard() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
+            <CardTitle>Admin Access Setup</CardTitle>
             <CardDescription>
-              You don't have admin permissions. Please contact the administrator to get access.
+              Click the button below to grant yourself admin access. This is a one-time setup for the first administrator.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
+            <Button 
+              onClick={handleSetupAdmin} 
+              className="w-full"
+              disabled={settingUpAdmin}
+            >
+              {settingUpAdmin ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                  Setting up...
+                </>
+              ) : (
+                "Setup Admin Access"
+              )}
+            </Button>
             <Button onClick={handleSignOut} variant="outline" className="w-full">
               Sign Out
             </Button>
