@@ -12,6 +12,11 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [settingUpAdmin, setSettingUpAdmin] = useState(false);
+  const [stats, setStats] = useState({
+    agents: 0,
+    leads: 0,
+    transactions: 0,
+  });
 
   useEffect(() => {
     checkAdminStatus();
@@ -42,12 +47,36 @@ export default function AdminDashboard() {
         return;
       }
 
-      setIsAdmin(!!roles);
+      const hasAdmin = !!roles;
+      setIsAdmin(hasAdmin);
+
+      // Fetch stats if admin
+      if (hasAdmin) {
+        await fetchStats();
+      }
     } catch (error) {
       console.error("Error in checkAdminStatus:", error);
       toast.error("An error occurred");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const [agentsResult, leadsResult, transactionsResult] = await Promise.all([
+        supabase.from("agents").select("id", { count: "exact", head: true }),
+        supabase.from("leads").select("id", { count: "exact", head: true }),
+        supabase.from("transactions").select("id", { count: "exact", head: true }),
+      ]);
+
+      setStats({
+        agents: agentsResult.count || 0,
+        leads: leadsResult.count || 0,
+        transactions: transactionsResult.count || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
     }
   };
 
@@ -128,7 +157,12 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Realtor Business Credit Admin</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold">Realtor Business Credit Admin</h1>
+            <Button variant="ghost" onClick={() => navigate("/")}>
+              View Landing Page
+            </Button>
+          </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
             <Button onClick={handleSignOut} variant="outline">
@@ -152,7 +186,7 @@ export default function AdminDashboard() {
               <CardDescription>Agents from MLS imports</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">0</p>
+              <p className="text-3xl font-bold">{stats.agents}</p>
             </CardContent>
           </Card>
 
@@ -162,7 +196,7 @@ export default function AdminDashboard() {
               <CardDescription>From landing page</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">0</p>
+              <p className="text-3xl font-bold">{stats.leads}</p>
             </CardContent>
           </Card>
 
@@ -172,7 +206,7 @@ export default function AdminDashboard() {
               <CardDescription>Total closings tracked</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">0</p>
+              <p className="text-3xl font-bold">{stats.transactions}</p>
             </CardContent>
           </Card>
         </div>
