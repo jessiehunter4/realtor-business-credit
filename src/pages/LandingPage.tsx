@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Shield, Mail, CreditCard, Target } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const LandingPage = () => {
     fundabilityScan: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.optIn) {
@@ -29,9 +30,31 @@ const LandingPage = () => {
       return;
     }
 
-    // TODO: Integrate with backend and GoHighLevel
-    toast.success("Thank you! Your guide is on the way!");
-    navigate("/guide");
+    try {
+      const { data, error } = await supabase.functions.invoke('submit-lead', {
+        body: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          agentType: formData.agentType,
+          state: formData.state,
+          wantsFundabilityScan: formData.fundabilityScan,
+        }
+      });
+
+      if (error) {
+        console.error('Error submitting lead:', error);
+        toast.error("Failed to submit form. Please try again.");
+        return;
+      }
+
+      toast.success("Thank you! Your guide is on the way!");
+      navigate("/guide");
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   return (
