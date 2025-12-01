@@ -17,6 +17,13 @@ export default function AdminDashboard() {
     leads: 0,
     transactions: 0,
   });
+  const [syncStats, setSyncStats] = useState({
+    pending: 0,
+    success: 0,
+    failed: 0,
+  });
+  const [syncing, setSyncing] = useState(false);
+  const [lastSyncResult, setLastSyncResult] = useState<string | null>(null);
 
   useEffect(() => {
     checkAdminStatus();
@@ -75,8 +82,60 @@ export default function AdminDashboard() {
         leads: leadsResult.count || 0,
         transactions: transactionsResult.count || 0,
       });
+
+      await fetchSyncStats();
     } catch (error) {
       console.error("Error fetching stats:", error);
+    }
+  };
+
+  const fetchSyncStats = async () => {
+    try {
+      const [pendingResult, successResult, failedResult] = await Promise.all([
+        supabase.from("contact_syncs").select("id", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("contact_syncs").select("id", { count: "exact", head: true }).eq("status", "success"),
+        supabase.from("contact_syncs").select("id", { count: "exact", head: true }).eq("status", "failed"),
+      ]);
+
+      setSyncStats({
+        pending: pendingResult.count || 0,
+        success: successResult.count || 0,
+        failed: failedResult.count || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching sync stats:", error);
+    }
+  };
+
+  const handleManualSync = async () => {
+    setSyncing(true);
+    setLastSyncResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-to-ghl', {
+        body: { manual: true }
+      });
+      
+      if (error) {
+        toast.error("Failed to trigger sync");
+        console.error("Sync error:", error);
+        setLastSyncResult(`Error: ${error.message}`);
+      } else {
+        const result = data as { processed?: number; successful?: number; failed?: number; message?: string };
+        if (result.message === 'No pending syncs') {
+          toast.info("No pending contacts to sync");
+          setLastSyncResult("No pending syncs found");
+        } else {
+          toast.success(`Synced ${result.successful || 0} contacts successfully`);
+          setLastSyncResult(`Processed: ${result.processed || 0}, Success: ${result.successful || 0}, Failed: ${result.failed || 0}`);
+        }
+        await fetchSyncStats();
+      }
+    } catch (error) {
+      console.error("Error triggering sync:", error);
+      toast.error("An error occurred during sync");
+      setLastSyncResult("Error occurred");
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -210,6 +269,63 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>GoHighLevel Sync Status</CardTitle>
+            <CardDescription>
+              Contact synchronization with GoHighLevel CRM
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold text-amber-600">{syncStats.pending}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Synced</p>
+                <p className="text-2xl font-bold text-green-600">{syncStats.success}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Failed</p>
+                <p className="text-2xl font-bold text-red-600">{syncStats.failed}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button 
+                onClick={handleManualSync}
+                disabled={syncing || syncStats.pending === 0}
+              >
+                {syncing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                    Syncing...
+                  </>
+                ) : (
+                  `Sync Now (${syncStats.pending} pending)`
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={fetchSyncStats}
+              >
+                Refresh Stats
+              </Button>
+            </div>
+
+            {lastSyncResult && (
+              <div className="p-3 bg-muted rounded-md">
+                <p className="text-sm font-mono">{lastSyncResult}</p>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground">
+              Automatic sync runs every 5 minutes. Manual sync processes up to 20 contacts at a time.
+            </p>
+          </CardContent>
+        </Card>
 
         <Card className="mt-6">
           <CardHeader>
