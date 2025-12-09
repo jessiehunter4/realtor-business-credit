@@ -107,7 +107,10 @@ async function syncContactToGHL(
               // Merge tags - add new tags to existing
               tags: [...new Set([...(existingContact.tags || []), ...(contact.tags || [])])],
               // Update custom fields with new property data
-              customField: contact.customFields || {},
+              customFields: contact.customFields ? Object.entries(contact.customFields).map(([key, value]) => ({
+                key,
+                field_value: value,
+              })) : [],
             }),
           }
         );
@@ -139,7 +142,10 @@ async function syncContactToGHL(
         locationId: locationId,
         source: contact.source || 'RealtorBusinessCredit',
         tags: contact.tags || [],
-        customField: contact.customFields || {},
+        customFields: contact.customFields ? Object.entries(contact.customFields).map(([key, value]) => ({
+          key,
+          field_value: value,
+        })) : [],
       }),
     });
 
