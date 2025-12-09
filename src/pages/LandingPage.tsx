@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Shield, Mail, CreditCard, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
 const LandingPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -19,19 +18,19 @@ const LandingPage = () => {
     agentType: "",
     state: "",
     optIn: false,
-    fundabilityScan: false,
+    fundabilityScan: false
   });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!formData.optIn) {
       toast.error("Please consent to be contacted to continue.");
       return;
     }
-
     try {
-      const { data, error } = await supabase.functions.invoke('submit-lead', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('submit-lead', {
         body: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -39,16 +38,14 @@ const LandingPage = () => {
           phone: formData.phone,
           agentType: formData.agentType,
           state: formData.state,
-          wantsFundabilityScan: formData.fundabilityScan,
+          wantsFundabilityScan: formData.fundabilityScan
         }
       });
-
       if (error) {
         console.error('Error submitting lead:', error);
         toast.error("Failed to submit form. Please try again.");
         return;
       }
-
       toast.success("Thank you! Your guide is on the way!");
       navigate("/guide");
     } catch (error) {
@@ -56,9 +53,7 @@ const LandingPage = () => {
       toast.error("An error occurred. Please try again.");
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20">
         <div className="text-center max-w-4xl mx-auto">
@@ -249,51 +244,44 @@ const LandingPage = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name *</Label>
-                <Input
-                  id="firstName"
-                  required
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                />
+                <Input id="firstName" required value={formData.firstName} onChange={e => setFormData({
+                ...formData,
+                firstName: e.target.value
+              })} />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  required
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                />
+                <Input id="lastName" required value={formData.lastName} onChange={e => setFormData({
+                ...formData,
+                lastName: e.target.value
+              })} />
               </div>
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="email">Email Address *</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
+              <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({
+              ...formData,
+              email: e.target.value
+            })} />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number *</Label>
-              <Input
-                id="phone"
-                type="tel"
-                required
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
+              <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({
+              ...formData,
+              phone: e.target.value
+            })} />
             </div>
             
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="agentType">I am a: *</Label>
-                <Select required value={formData.agentType} onValueChange={(value) => setFormData({ ...formData, agentType: value })}>
+                <Select required value={formData.agentType} onValueChange={value => setFormData({
+                ...formData,
+                agentType: value
+              })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
@@ -309,35 +297,29 @@ const LandingPage = () => {
               
               <div className="space-y-2">
                 <Label htmlFor="state">State of License *</Label>
-                <Input
-                  id="state"
-                  required
-                  placeholder="e.g., California, Georgia"
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                />
+                <Input id="state" required placeholder="e.g., California, Georgia" value={formData.state} onChange={e => setFormData({
+                ...formData,
+                state: e.target.value
+              })} />
               </div>
             </div>
             
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <Checkbox
-                  id="optIn"
-                  checked={formData.optIn}
-                  onCheckedChange={(checked) => setFormData({ ...formData, optIn: checked as boolean })}
-                  required
-                />
+                <Checkbox id="optIn" checked={formData.optIn} onCheckedChange={checked => setFormData({
+                ...formData,
+                optIn: checked as boolean
+              })} required />
                 <label htmlFor="optIn" className="text-sm leading-relaxed cursor-pointer">
                   Yes! Send me the complete guide with action plan and information about the launch special. I consent to be contacted by My Better Business Credit via email, phone, or text message. *
                 </label>
               </div>
               
               <div className="flex items-start space-x-3">
-                <Checkbox
-                  id="fundabilityScan"
-                  checked={formData.fundabilityScan}
-                  onCheckedChange={(checked) => setFormData({ ...formData, fundabilityScan: checked as boolean })}
-                />
+                <Checkbox id="fundabilityScan" checked={formData.fundabilityScan} onCheckedChange={checked => setFormData({
+                ...formData,
+                fundabilityScan: checked as boolean
+              })} />
                 <label htmlFor="fundabilityScan" className="text-sm leading-relaxed cursor-pointer">
                   I also want a free fundability scan to see where my business stands right now.
                 </label>
@@ -375,9 +357,7 @@ const LandingPage = () => {
       <section className="bg-navy py-16">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto text-white">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Don't Wait Another 10 Years Like I Did
-            </h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Don't Wait Another 15 Years Like I Did</h2>
             <p className="text-lg md:text-xl italic mb-4">
               "I wish someone had told me about business credit when I got my license in 2010. It would have saved me tens of thousands of dollars and protected my family's financial security. That's why I created this guide—so you don't have to learn the hard way."
             </p>
@@ -387,8 +367,6 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
