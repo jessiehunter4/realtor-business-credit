@@ -9,6 +9,31 @@ interface CSVRow {
   [key: string]: string;
 }
 
+interface PropertyData {
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  country: string | null;
+  county: string | null;
+  price: number | null;
+  closeDate: string | null;
+  daysOnMarket: number | null;
+  streetNumber: string | null;
+  streetDirPrefix: string | null;
+  streetName: string | null;
+  streetSuffix: string | null;
+  fullAddress: string | null;
+}
+
+interface AgentData {
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  phone: string | null;
+  type: string;
+  property: PropertyData;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -54,6 +79,8 @@ Deno.serve(async (req) => {
       agentsCreated: 0,
       agentsUpdated: 0,
       transactionsCreated: 0,
+      coListingAgentsCreated: 0,
+      syncRecordsCreated: 0,
     };
 
     try {
@@ -62,62 +89,81 @@ Deno.serve(async (req) => {
       stats.rowsProcessed = rows.length;
 
       console.log(`Processing ${rows.length} rows from ${filename}`);
+      console.log('Sample headers:', Object.keys(rows[0] || {}).slice(0, 10));
 
       // Process each row
       for (const row of rows) {
         try {
-          // Extract listing agent data
-          const listingAgent = await findOrCreateAgent(supabaseClient, {
-            firstName: row['Listing Agent First Name'] || row['listing_agent_first_name'],
-            lastName: row['Listing Agent Last Name'] || row['listing_agent_last_name'],
-            email: row['Listing Agent Email'] || row['listing_agent_email'],
-            phone: row['Listing Agent Phone'] || row['listing_agent_phone'],
-            officeName: row['Listing Office'] || row['listing_office'],
-            officePhone: row['Listing Office Phone'] || row['listing_office_phone'],
-            state: row['State'] || row['state'] || row['Property State'] || row['property_state'],
-            type: 'listing_agent',
-          });
+          // Extract property data from specific MLS columns
+          const propertyData = extractPropertyData(row);
 
-          if (listingAgent.created) stats.agentsCreated++;
-          else if (listingAgent.updated) stats.agentsUpdated++;
+          // Extract Listing Agent data
+          const listingAgentData: AgentData = {
+            firstName: row['ListAgentFirstName'] || null,
+            lastName: row['ListAgentLastName'] || null,
+            email: row['ListAgentEmail'] || null,
+            phone: row['ListAgentMobilePhone'] || null,
+            type: 'Listing Agent',
+            property: propertyData,
+          };
 
-          // Extract buyer agent data
-          let buyerAgentId = null;
-          if (row['Buyer Agent First Name'] || row['buyer_agent_first_name']) {
-            const buyerAgent = await findOrCreateAgent(supabaseClient, {
-              firstName: row['Buyer Agent First Name'] || row['buyer_agent_first_name'],
-              lastName: row['Buyer Agent Last Name'] || row['buyer_agent_last_name'],
-              email: row['Buyer Agent Email'] || row['buyer_agent_email'],
-              phone: row['Buyer Agent Phone'] || row['buyer_agent_phone'],
-              officeName: row['Buyer Office'] || row['buyer_office'],
-              officePhone: row['Buyer Office Phone'] || row['buyer_office_phone'],
-              state: row['State'] || row['state'] || row['Property State'] || row['property_state'],
-              type: 'buyer_agent',
-            });
+          // Create/update Listing Agent
+          const listingAgent = await findOrCreateAgent(supabaseClient, listingAgentData);
+          if (listingAgent.created) {
+            stats.agentsCreated++;
+            // Create contact_syncs record for new agent
+            if (listingAgentData.email) {
+              await createContactSync(supabaseClient, listingAgent.id);
+              stats.syncRecordsCreated++;
+            }
+          } else if (listingAgent.updated) {
+            stats.agentsUpdated++;
+          }
 
-            buyerAgentId = buyerAgent.id;
-            if (buyerAgent.created) stats.agentsCreated++;
-            else if (buyerAgent.updated) stats.agentsUpdated++;
+          // Check for Co-Listing Agent
+          const hasCoListingAgent = row['CoListAgentEmail'] || row['CoListAgentFirstName'];
+          let coListingAgentId: string | null = null;
+
+          if (hasCoListingAgent) {
+            const coListingAgentData: AgentData = {
+              firstName: row['CoListAgentFirstName'] || null,
+              lastName: row['CoListAgentLastName'] || null,
+              email: row['CoListAgentEmail'] || null,
+              phone: row['CoListAgentMobilePhone'] || null,
+              type: 'Co-Listing Agent',
+              property: propertyData,
+            };
+
+            const coListingAgent = await findOrCreateAgent(supabaseClient, coListingAgentData);
+            coListingAgentId = coListingAgent.id;
+            
+            if (coListingAgent.created) {
+              stats.coListingAgentsCreated++;
+              stats.agentsCreated++;
+              // Create contact_syncs record for new co-listing agent
+              if (coListingAgentData.email) {
+                await createContactSync(supabaseClient, coListingAgent.id);
+                stats.syncRecordsCreated++;
+              }
+            } else if (coListingAgent.updated) {
+              stats.agentsUpdated++;
+            }
           }
 
           // Create transaction
-          const closeDate = row['Close Date'] || row['close_date'] || row['Closing Date'] || row['closing_date'];
-          const price = row['Price'] || row['price'] || row['Sale Price'] || row['sale_price'];
-
           const { error: txError } = await supabaseClient
             .from('transactions')
             .insert({
               import_batch_id: batch.id,
               listing_agent_id: listingAgent.id,
-              buyer_agent_id: buyerAgentId,
-              close_date: closeDate ? new Date(closeDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-              price: price ? parseFloat(price.replace(/[^0-9.-]+/g, '')) : null,
-              property_address: row['Address'] || row['address'] || row['Property Address'] || row['property_address'],
-              property_city: row['City'] || row['city'] || row['Property City'] || row['property_city'],
-              property_state: row['State'] || row['state'] || row['Property State'] || row['property_state'],
-              property_zip: row['ZIP'] || row['zip'] || row['Property ZIP'] || row['property_zip'],
-              property_type: row['Property Type'] || row['property_type'],
-              mls_id: row['MLS ID'] || row['mls_id'] || row['MLS #'] || row['mls_number'],
+              buyer_agent_id: coListingAgentId, // Using buyer_agent_id field for co-listing agent
+              close_date: propertyData.closeDate || new Date().toISOString().split('T')[0],
+              price: propertyData.price,
+              property_address: propertyData.fullAddress,
+              property_city: propertyData.city,
+              property_state: propertyData.state,
+              property_zip: propertyData.zip,
+              mls_id: row['ListingId'] || null,
             });
 
           if (!txError) {
@@ -141,6 +187,8 @@ Deno.serve(async (req) => {
           transactions_created: stats.transactionsCreated,
         })
         .eq('id', batch.id);
+
+      console.log('Import completed:', stats);
 
       return new Response(JSON.stringify({ 
         success: true, 
@@ -174,15 +222,90 @@ Deno.serve(async (req) => {
   }
 });
 
+function extractPropertyData(row: CSVRow): PropertyData {
+  // Extract only the 12 specific property fields from MLS
+  const streetNumber = row['StreetNumberNumeric'] || null;
+  const streetDirPrefix = row['StreetDirPrefix'] || null;
+  const streetName = row['StreetName'] || null;
+  const streetSuffix = row['StreetSuffix'] || null;
+  
+  // Build full address from components
+  const addressParts = [streetNumber, streetDirPrefix, streetName, streetSuffix].filter(Boolean);
+  const fullAddress = addressParts.length > 0 ? addressParts.join(' ') : null;
+
+  // Parse price - remove any non-numeric characters
+  const rawPrice = row['CurrentPrice'] || row['ClosePrice'] || null;
+  const price = rawPrice ? parseFloat(rawPrice.replace(/[^0-9.-]+/g, '')) : null;
+
+  // Parse close date
+  const rawCloseDate = row['CloseDate'] || null;
+  let closeDate: string | null = null;
+  if (rawCloseDate) {
+    try {
+      const parsed = new Date(rawCloseDate);
+      if (!isNaN(parsed.getTime())) {
+        closeDate = parsed.toISOString().split('T')[0];
+      }
+    } catch {
+      closeDate = null;
+    }
+  }
+
+  // Parse days on market
+  const rawDaysOnMarket = row['DaysOnMarket'] || null;
+  const daysOnMarket = rawDaysOnMarket ? parseInt(rawDaysOnMarket, 10) : null;
+
+  return {
+    city: row['City'] || null,
+    state: row['StateOrProvince'] || null,
+    zip: row['PostalCode'] || null,
+    country: row['Country'] || null,
+    county: row['CountyOrParish'] || null,
+    price: isNaN(price as number) ? null : price,
+    closeDate,
+    daysOnMarket: isNaN(daysOnMarket as number) ? null : daysOnMarket,
+    streetNumber,
+    streetDirPrefix,
+    streetName,
+    streetSuffix,
+    fullAddress,
+  };
+}
+
 function parseCSV(content: string): CSVRow[] {
   const lines = content.split('\n').filter(line => line.trim());
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+  // Handle quoted values properly
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    
+    return result;
+  };
+
+  const headers = parseCSVLine(lines[0]);
+  console.log('CSV Headers found:', headers.length, 'columns');
+  
   const rows: CSVRow[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+    const values = parseCSVLine(lines[i]);
     const row: CSVRow = {};
     
     headers.forEach((header, index) => {
@@ -195,98 +318,132 @@ function parseCSV(content: string): CSVRow[] {
   return rows;
 }
 
-async function findOrCreateAgent(supabaseClient: any, agentData: {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  officeName?: string;
-  officePhone?: string;
-  state?: string;
-  type?: string;
-}): Promise<{ id: string; created: boolean; updated: boolean }> {
-  const { firstName, lastName, email, phone, officeName, officePhone, state, type } = agentData;
+async function createContactSync(supabaseClient: any, agentId: string): Promise<void> {
+  try {
+    const { error } = await supabaseClient
+      .from('contact_syncs')
+      .insert({
+        agent_id: agentId,
+        status: 'pending',
+        retry_count: 0,
+      });
+    
+    if (error) {
+      console.error('Error creating contact_sync:', error);
+    }
+  } catch (err) {
+    console.error('Exception creating contact_sync:', err);
+  }
+}
+
+async function findOrCreateAgent(supabaseClient: any, agentData: AgentData): Promise<{ id: string; created: boolean; updated: boolean }> {
+  const { firstName, lastName, email, phone, type, property } = agentData;
   
-  // Try to find existing agent by email or phone
-  let query = supabaseClient.from('agents').select('*');
+  // Try to find existing agent by email first
+  let existing = null;
   
   if (email) {
-    query = query.eq('email', email);
-  } else if (phone) {
-    query = query.eq('phone', phone);
-  } else if (firstName && lastName) {
-    query = query.eq('first_name', firstName).eq('last_name', lastName);
-  } else {
-    // Can't identify agent, create a new one
-    const fullName = [firstName, lastName].filter(Boolean).join(' ');
-    const { data, error } = await supabaseClient
+    const { data } = await supabaseClient
       .from('agents')
-      .insert({
-        first_name: firstName,
-        last_name: lastName,
-        full_name: fullName,
-        email,
-        phone,
-        office_name: officeName,
-        office_phone: officePhone,
-        state,
-        type,
-        source: 'MLS_Just_Closed_Import',
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return { id: data.id, created: true, updated: false };
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
+    existing = data;
+  }
+  
+  // If no email match, try phone
+  if (!existing && phone) {
+    const { data } = await supabaseClient
+      .from('agents')
+      .select('*')
+      .eq('phone', phone)
+      .maybeSingle();
+    existing = data;
+  }
+  
+  // If no phone match, try name
+  if (!existing && firstName && lastName) {
+    const { data } = await supabaseClient
+      .from('agents')
+      .select('*')
+      .eq('first_name', firstName)
+      .eq('last_name', lastName)
+      .maybeSingle();
+    existing = data;
   }
 
-  const { data: existing } = await query.maybeSingle();
+  const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
   if (existing) {
-    // Update agent if we have new info
-    const updates: any = {};
+    // Update agent with new property info (upsert behavior)
+    // Always update property details for existing agents
+    const updates: any = {
+      // Update property details (overwrite with latest)
+      property_address: property.fullAddress,
+      property_city: property.city,
+      property_state: property.state,
+      property_zip: property.zip,
+      property_country: property.country,
+      property_county: property.county,
+      property_price: property.price,
+      property_close_date: property.closeDate,
+      property_days_on_market: property.daysOnMarket,
+      property_street_number: property.streetNumber,
+      property_street_dir_prefix: property.streetDirPrefix,
+      property_street_name: property.streetName,
+      property_street_suffix: property.streetSuffix,
+      updated_at: new Date().toISOString(),
+    };
+    
+    // Only update contact info if we have new data and existing is empty
     if (firstName && !existing.first_name) updates.first_name = firstName;
     if (lastName && !existing.last_name) updates.last_name = lastName;
     if (email && !existing.email) updates.email = email;
     if (phone && !existing.phone) updates.phone = phone;
-    if (officeName && !existing.office_name) updates.office_name = officeName;
-    if (officePhone && !existing.office_phone) updates.office_phone = officePhone;
-    if (state && !existing.state) updates.state = state;
-    
-    const fullName = [firstName || existing.first_name, lastName || existing.last_name].filter(Boolean).join(' ');
     if (fullName && fullName !== existing.full_name) updates.full_name = fullName;
+    if (type && !existing.type) updates.type = type;
 
-    const hasUpdates = Object.keys(updates).length > 0;
-    
-    if (hasUpdates) {
-      await supabaseClient
-        .from('agents')
-        .update(updates)
-        .eq('id', existing.id);
-    }
+    await supabaseClient
+      .from('agents')
+      .update(updates)
+      .eq('id', existing.id);
 
-    return { id: existing.id, created: false, updated: hasUpdates };
+    return { id: existing.id, created: false, updated: true };
   }
 
-  // Create new agent
-  const fullName = [firstName, lastName].filter(Boolean).join(' ');
+  // Create new agent with property data
   const { data, error } = await supabaseClient
     .from('agents')
     .insert({
       first_name: firstName,
       last_name: lastName,
-      full_name: fullName,
+      full_name: fullName || null,
       email,
       phone,
-      office_name: officeName,
-      office_phone: officePhone,
-      state,
       type,
       source: 'MLS_Just_Closed_Import',
+      // Property fields
+      property_address: property.fullAddress,
+      property_city: property.city,
+      property_state: property.state,
+      property_zip: property.zip,
+      property_country: property.country,
+      property_county: property.county,
+      property_price: property.price,
+      property_close_date: property.closeDate,
+      property_days_on_market: property.daysOnMarket,
+      property_street_number: property.streetNumber,
+      property_street_dir_prefix: property.streetDirPrefix,
+      property_street_name: property.streetName,
+      property_street_suffix: property.streetSuffix,
     })
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error creating agent:', error);
+    throw error;
+  }
+  
   return { id: data.id, created: true, updated: false };
 }

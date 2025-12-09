@@ -12,13 +12,7 @@ interface GHLContact {
   phone: string;
   source?: string;
   tags?: string[];
-  customFields?: {
-    agent_type?: string;
-    state?: string;
-    office_name?: string;
-    license_number?: string;
-    wants_fundability_scan?: string;
-  };
+  customFields?: Record<string, string | number | null>;
 }
 
 interface ContactSync {
@@ -40,6 +34,20 @@ interface Agent {
   license_number?: string;
   type?: string;
   source: string;
+  // Property fields
+  property_address?: string;
+  property_city?: string;
+  property_state?: string;
+  property_zip?: string;
+  property_country?: string;
+  property_county?: string;
+  property_price?: number;
+  property_close_date?: string;
+  property_days_on_market?: number;
+  property_street_number?: string;
+  property_street_dir_prefix?: string;
+  property_street_name?: string;
+  property_street_suffix?: string;
 }
 
 interface Lead {
@@ -61,11 +69,62 @@ async function syncContactToGHL(
   contact: GHLContact,
   apiKey: string,
   locationId: string
-): Promise<{ success: boolean; contactId?: string; error?: string }> {
+): Promise<{ success: boolean; contactId?: string; error?: string; isUpdate?: boolean }> {
   try {
     console.log('Syncing contact to GHL:', contact.email);
 
-    const response = await fetch(`https://services.leadconnectorhq.com/contacts/`, {
+    // First, check if contact already exists by email (upsert logic)
+    const searchResponse = await fetch(
+      `https://services.leadconnectorhq.com/contacts/?email=${encodeURIComponent(contact.email)}&locationId=${locationId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Version': '2021-07-28',
+        },
+      }
+    );
+
+    if (searchResponse.ok) {
+      const searchData = await searchResponse.json();
+      if (searchData.contacts && searchData.contacts.length > 0) {
+        // Contact exists - UPDATE with new property details
+        const existingContact = searchData.contacts[0];
+        console.log('Contact exists in GHL, updating:', existingContact.id);
+
+        const updateResponse = await fetch(
+          `https://services.leadconnectorhq.com/contacts/${existingContact.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              'Version': '2021-07-28',
+            },
+            body: JSON.stringify({
+              firstName: contact.firstName,
+              lastName: contact.lastName,
+              phone: contact.phone || existingContact.phone,
+              // Merge tags - add new tags to existing
+              tags: [...new Set([...(existingContact.tags || []), ...(contact.tags || [])])],
+              // Update custom fields with new property data
+              customField: contact.customFields || {},
+            }),
+          }
+        );
+
+        if (!updateResponse.ok) {
+          const errorText = await updateResponse.text();
+          console.error('GHL update error:', updateResponse.status, errorText);
+          throw new Error(`GHL API update error: ${updateResponse.status} - ${errorText}`);
+        }
+
+        console.log('Contact updated successfully:', existingContact.id);
+        return { success: true, contactId: existingContact.id, isUpdate: true };
+      }
+    }
+
+    // Contact doesn't exist - CREATE new contact
+    const createResponse = await fetch(`https://services.leadconnectorhq.com/contacts/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -84,56 +143,16 @@ async function syncContactToGHL(
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('GHL API error:', response.status, errorText);
-      
-      // Check if contact already exists
-      if (response.status === 422 || errorText.includes('already exists')) {
-        // Try to find existing contact by email
-        const searchResponse = await fetch(
-          `https://services.leadconnectorhq.com/contacts/?email=${encodeURIComponent(contact.email)}&locationId=${locationId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-              'Version': '2021-07-28',
-            },
-          }
-        );
-
-        if (searchResponse.ok) {
-          const searchData = await searchResponse.json();
-          if (searchData.contacts && searchData.contacts.length > 0) {
-            const existingContact = searchData.contacts[0];
-            console.log('Contact already exists in GHL:', existingContact.id);
-            
-            // Update existing contact with new tags
-            if (contact.tags && contact.tags.length > 0) {
-              await fetch(`https://services.leadconnectorhq.com/contacts/${existingContact.id}`, {
-                method: 'PUT',
-                headers: {
-                  'Authorization': `Bearer ${apiKey}`,
-                  'Content-Type': 'application/json',
-                  'Version': '2021-07-28',
-                },
-                body: JSON.stringify({
-                  tags: [...new Set([...(existingContact.tags || []), ...contact.tags])],
-                }),
-              });
-            }
-            
-            return { success: true, contactId: existingContact.id };
-          }
-        }
-      }
-      
-      throw new Error(`GHL API error: ${response.status} - ${errorText}`);
+    if (!createResponse.ok) {
+      const errorText = await createResponse.text();
+      console.error('GHL API create error:', createResponse.status, errorText);
+      throw new Error(`GHL API error: ${createResponse.status} - ${errorText}`);
     }
 
-    const data = await response.json();
-    console.log('Contact synced successfully:', data.contact?.id);
+    const data = await createResponse.json();
+    console.log('Contact created successfully:', data.contact?.id);
     
-    return { success: true, contactId: data.contact?.id };
+    return { success: true, contactId: data.contact?.id, isUpdate: false };
   } catch (error) {
     console.error('Error syncing to GHL:', error);
     return { 
@@ -148,19 +167,46 @@ function buildContactFromAgent(agent: Agent): GHLContact {
   const firstName = agent.first_name || names[0] || 'Unknown';
   const lastName = agent.last_name || names.slice(1).join(' ') || '';
 
+  // Determine tags based on agent type
+  const tags = ['JustClosed', 'RealtorBusinessCredit', 'FromMLSImport'];
+  
+  // Add specific agent type tag
+  if (agent.type === 'Listing Agent') {
+    tags.push('Listing Agent');
+  } else if (agent.type === 'Co-Listing Agent') {
+    tags.push('Co-Listing Agent');
+  }
+
+  // Build GHL custom fields mapping
+  const customFields: Record<string, string | number | null> = {
+    // Agent info
+    agent_type: agent.type || 'unknown',
+    state: agent.state || '',
+    office_name: agent.office_name || '',
+    license_number: agent.license_number || '',
+    // Property fields - mapped to GHL field names
+    property_city: agent.property_city || '',
+    property_stateprovince: agent.property_state || '',
+    property_postal_code: agent.property_zip || '',
+    property_country: agent.property_country || '',
+    property_countyparish: agent.property_county || '',
+    property_current_price: agent.property_price || null,
+    property_close_date: agent.property_close_date || '',
+    property_days_on_market: agent.property_days_on_market || null,
+    property_street_number_numeric: agent.property_street_number || '',
+    property_street_dir_prefix: agent.property_street_dir_prefix || '',
+    property_street_name: agent.property_street_name || '',
+    property_street_suffix: agent.property_street_suffix || '',
+  };
+
   return {
     firstName,
     lastName,
-    email: agent.email || `agent-${agent.id}@placeholder.com`,
+    email: agent.email || '',
     phone: agent.phone || '',
     source: agent.source,
-    tags: ['JustClosed', 'RealtorBusinessCredit', 'FromMLSImport'],
-    customFields: {
-      agent_type: agent.type || 'unknown',
-      state: agent.state || '',
-      office_name: agent.office_name || '',
-      license_number: agent.license_number || '',
-    },
+    tags,
+    customFields,
   };
 }
 
@@ -205,7 +251,7 @@ Deno.serve(async (req) => {
 
     console.log('Starting GHL sync process...');
 
-    // Fetch pending syncs with retry logic
+    // Fetch pending syncs with retry logic - include new property fields
     const { data: pendingSyncs, error: syncError } = await supabaseClient
       .from('contact_syncs')
       .select(`
@@ -215,7 +261,11 @@ Deno.serve(async (req) => {
         retry_count,
         agents:agent_id (
           id, first_name, last_name, full_name, email, phone, 
-          state, office_name, license_number, type, source
+          state, office_name, license_number, type, source,
+          property_address, property_city, property_state, property_zip,
+          property_country, property_county, property_price, property_close_date,
+          property_days_on_market, property_street_number, property_street_dir_prefix,
+          property_street_name, property_street_suffix
         ),
         leads:lead_id (
           id, first_name, last_name, email, phone, 
@@ -243,6 +293,7 @@ Deno.serve(async (req) => {
 
     let successCount = 0;
     let failureCount = 0;
+    let updateCount = 0;
 
     // Process each sync
     for (const sync of pendingSyncs) {
@@ -270,6 +321,21 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // Skip contacts without valid email
+        if (!contact.email || contact.email.includes('placeholder')) {
+          console.log('Skipping contact without valid email:', sync.id);
+          await supabaseClient
+            .from('contact_syncs')
+            .update({
+              status: 'failed',
+              last_error_message: 'No valid email address',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', sync.id);
+          failureCount++;
+          continue;
+        }
+
         // Sync to GHL
         const result = await syncContactToGHL(contact, ghlApiKey, ghlLocationId);
 
@@ -280,7 +346,7 @@ Deno.serve(async (req) => {
             .update({
               status: 'success',
               ghl_contact_id: result.contactId,
-              first_synced_at: new Date().toISOString(),
+              first_synced_at: result.isUpdate ? undefined : new Date().toISOString(),
               last_synced_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             })
@@ -305,7 +371,8 @@ Deno.serve(async (req) => {
           }
 
           successCount++;
-          console.log(`Successfully synced contact: ${contact.email}`);
+          if (result.isUpdate) updateCount++;
+          console.log(`Successfully ${result.isUpdate ? 'updated' : 'created'} contact: ${contact.email}`);
         } else {
           // Update sync record with retry
           const retryCount = (sync.retry_count || 0) + 1;
@@ -331,13 +398,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`Sync complete: ${successCount} successful, ${failureCount} failed`);
+    console.log(`Sync complete: ${successCount} successful (${updateCount} updates), ${failureCount} failed`);
 
     return new Response(
       JSON.stringify({
         success: true,
         processed: pendingSyncs.length,
         successful: successCount,
+        updated: updateCount,
         failed: failureCount,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

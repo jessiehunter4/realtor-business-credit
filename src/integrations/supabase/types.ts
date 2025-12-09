@@ -26,6 +26,19 @@ export type Database = {
           office_name: string | null
           office_phone: string | null
           phone: string | null
+          property_address: string | null
+          property_city: string | null
+          property_close_date: string | null
+          property_country: string | null
+          property_county: string | null
+          property_days_on_market: number | null
+          property_price: number | null
+          property_state: string | null
+          property_street_dir_prefix: string | null
+          property_street_name: string | null
+          property_street_number: string | null
+          property_street_suffix: string | null
+          property_zip: string | null
           source: string
           state: string | null
           type: string | null
@@ -42,6 +55,19 @@ export type Database = {
           office_name?: string | null
           office_phone?: string | null
           phone?: string | null
+          property_address?: string | null
+          property_city?: string | null
+          property_close_date?: string | null
+          property_country?: string | null
+          property_county?: string | null
+          property_days_on_market?: number | null
+          property_price?: number | null
+          property_state?: string | null
+          property_street_dir_prefix?: string | null
+          property_street_name?: string | null
+          property_street_number?: string | null
+          property_street_suffix?: string | null
+          property_zip?: string | null
           source: string
           state?: string | null
           type?: string | null
@@ -58,6 +84,19 @@ export type Database = {
           office_name?: string | null
           office_phone?: string | null
           phone?: string | null
+          property_address?: string | null
+          property_city?: string | null
+          property_close_date?: string | null
+          property_country?: string | null
+          property_county?: string | null
+          property_days_on_market?: number | null
+          property_price?: number | null
+          property_state?: string | null
+          property_street_dir_prefix?: string | null
+          property_street_name?: string | null
+          property_street_number?: string | null
+          property_street_suffix?: string | null
+          property_zip?: string | null
           source?: string
           state?: string | null
           type?: string | null
