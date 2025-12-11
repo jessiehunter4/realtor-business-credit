@@ -110,7 +110,8 @@ Deno.serve(async (req) => {
             phone,
             tags,
             customFields: [
-              { key: 'state_of_license', field_value: state }
+              { key: 'state_of_license', field_value: state },
+              { key: 'realtor_type', field_value: agentType }
             ]
           };
 
