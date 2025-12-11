@@ -19,6 +19,7 @@ const LandingPage = () => {
   const urlEmail = searchParams.get("email") || "";
   const urlPhone = searchParams.get("phone") || "";
   const urlState = searchParams.get("state") || "";
+  const urlContactId = searchParams.get("contactId") || "";
   
   const [formData, setFormData] = useState({
     firstName: urlFirstName,
@@ -37,10 +38,7 @@ const LandingPage = () => {
       return;
     }
     try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('submit-lead', {
+      const { error } = await supabase.functions.invoke('submit-lead', {
         body: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -48,7 +46,8 @@ const LandingPage = () => {
           phone: formData.phone,
           agentType: formData.agentType,
           state: formData.state,
-          wantsFundabilityScan: formData.fundabilityScan
+          wantsFundabilityScan: formData.fundabilityScan,
+          ghlContactId: urlContactId || undefined
         }
       });
       if (error) {
