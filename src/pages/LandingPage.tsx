@@ -3,20 +3,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Shield, Mail, CreditCard, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Get URL parameters for personalization
+  const urlFirstName = searchParams.get("firstName") || "";
+  const urlLastName = searchParams.get("lastName") || "";
+  const urlEmail = searchParams.get("email") || "";
+  const urlPhone = searchParams.get("phone") || "";
+  const urlState = searchParams.get("state") || "";
+  
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    agentType: "",
-    state: "",
+    firstName: urlFirstName,
+    lastName: urlLastName,
+    email: urlEmail,
+    phone: urlPhone,
+    agentType: "residential-agent",
+    state: urlState,
     optIn: false,
     fundabilityScan: false
   });
@@ -66,7 +76,7 @@ const LandingPage = () => {
           </p>
           
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-navy mb-6 leading-tight">
-            Congratulations on Your Recent Closing!<br />
+            Congratulations{urlFirstName ? ` ${urlFirstName}` : ""} on Your Recent Closing!<br />
             <span className="text-primary">Now Is the Perfect Time to Build Your Business Credit</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
