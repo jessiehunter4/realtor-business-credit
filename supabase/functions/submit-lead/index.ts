@@ -132,6 +132,31 @@ Deno.serve(async (req) => {
             console.error('GHL update failed:', ghlResponse.status, errorText);
           } else {
             console.log('GHL contact updated successfully');
+            
+            // Apply tags in a separate call
+            const tagsToApply = ['a-rbc-optin'];
+            if (wantsFundabilityScan) {
+              tagsToApply.push('a-fund-scan');
+            }
+            
+            console.log('Applying tags to GHL contact:', tagsToApply);
+            
+            const tagsResponse = await fetch(`https://services.leadconnectorhq.com/contacts/${ghlContactId}/tags`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${ghlApiKey}`,
+                'Content-Type': 'application/json',
+                'Version': '2021-07-28',
+              },
+              body: JSON.stringify({ tags: tagsToApply }),
+            });
+
+            if (!tagsResponse.ok) {
+              const tagsErrorText = await tagsResponse.text();
+              console.error('GHL tags update failed:', tagsResponse.status, tagsErrorText);
+            } else {
+              console.log('GHL tags applied successfully');
+            }
           }
         } catch (ghlError) {
           console.error('Error updating GHL:', ghlError);
