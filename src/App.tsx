@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import GuidePage from "./pages/GuidePage";
+import GetStartedPage from "./pages/GetStartedPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import MLSImport from "./pages/MLSImport";
@@ -22,6 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/guide" element={<GuidePage />} />
+          <Route path="/get_started" element={<GetStartedPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route 
             path="/admin" 
