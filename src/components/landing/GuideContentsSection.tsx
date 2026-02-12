@@ -1,5 +1,3 @@
-import roadmapImage from "@/assets/seven-step-roadmap.jpg";
-
 const guideItems = [
   { bold: "Why 90% of Realtors Don't Have Business Credit", rest: " (and what it's costing them)" },
   { bold: "7-Step Checklist to Build Business Credit", rest: " – simplified for busy real estate professionals" },
@@ -19,7 +17,7 @@ const GuideContentsSection = () => {
           📖 What's Inside Your Free Guide + Action Plan
         </h2>
 
-        <ul className="space-y-4 text-lg mb-12">
+        <ul className="space-y-4 text-lg">
           {guideItems.map((item) => (
             <li key={item.bold} className="flex items-start gap-3">
               <span className="text-primary text-xl flex-shrink-0">✓</span>
@@ -29,15 +27,6 @@ const GuideContentsSection = () => {
             </li>
           ))}
         </ul>
-
-        {/* 7-Step Roadmap Visual */}
-        <div className="rounded-xl overflow-hidden shadow-lg">
-          <img
-            src={roadmapImage}
-            alt="7-Step Roadmap to build business credit: Form Entity, Get EIN, Business Bank Account, Business Phone and Address, Credit Profile, Trade Lines, Business Credit Cards"
-            className="w-full h-auto"
-          />
-        </div>
       </div>
     </section>
   );
