@@ -16,6 +16,7 @@ import GuideChapter9 from "@/components/guide/GuideChapter9";
 import GuideConclusion from "@/components/guide/GuideConclusion";
 import GuideResources from "@/components/guide/GuideResources";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
+import GuideProgressBar from "@/components/guide/GuideProgressBar";
 
 const GuidePage = () => {
   return (
@@ -50,6 +51,7 @@ const GuidePage = () => {
       <GuideConclusion />
       <GuideResources />
 
+      <GuideProgressBar />
       <GuideFloatingTOC />
     </div>
   );
