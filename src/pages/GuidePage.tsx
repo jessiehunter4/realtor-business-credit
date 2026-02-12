@@ -1,6 +1,9 @@
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, Download, Loader2 } from "lucide-react";
+import { pdf } from "@react-pdf/renderer";
+import { GuidePDF } from "@/components/GuidePDF";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
@@ -19,6 +22,25 @@ import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 
 const GuidePage = () => {
+  const [generating, setGenerating] = useState(false);
+
+  const handleDownload = useCallback(async () => {
+    setGenerating(true);
+    try {
+      const blob = await pdf(<GuidePDF />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Realtor-Business-Credit-Guide.pdf";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("PDF generation failed:", e);
+    } finally {
+      setGenerating(false);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background scroll-smooth">
       {/* Sticky CTA Bar */}
@@ -27,12 +49,29 @@ const GuidePage = () => {
           <span className="text-secondary-foreground font-semibold text-sm md:text-base">
             Realtor Business Credit
           </span>
-          <Button asChild size="sm" className="text-sm">
-            <Link to="/get_started">
-              <Calendar className="mr-2 h-4 w-4" />
-              Book a One-on-One Session
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-sm border-primary/40 text-primary hover:bg-primary/10"
+              onClick={handleDownload}
+              disabled={generating}
+            >
+              {generating ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
+            </Button>
+            <Button asChild size="sm" className="text-sm">
+              <Link to="/get_started">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Book a One-on-One Session</span>
+                <span className="sm:hidden">Book Session</span>
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 
