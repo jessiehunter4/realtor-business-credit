@@ -9,6 +9,7 @@ import GetStartedPage from "./pages/GetStartedPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import MLSImport from "./pages/MLSImport";
+import OneOnOnePage from "./pages/OneOnOnePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/" element={<LandingPage />} />
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/get_started" element={<GetStartedPage />} />
+          <Route path="/one-on-one" element={<OneOnOnePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route 
             path="/admin" 
