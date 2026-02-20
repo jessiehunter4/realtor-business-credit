@@ -15,7 +15,7 @@ const GuideResources = () => (
             <Paragraph><strong>Realtor-Specific Resources:</strong> realtorbusinesscredit.com</Paragraph>
             <Paragraph>
               <strong>Free Fundability Scan & Session Booking:</strong>{" "}
-              <Link to="/get_started" className="text-primary hover:underline font-bold">
+              <Link to="/one-on-one" className="text-primary hover:underline font-bold">
                 Book Here →
               </Link>
             </Paragraph>
@@ -50,8 +50,8 @@ const GuideResources = () => (
 
         <div className="mt-10 inline-block bg-primary/10 border-2 border-primary rounded-xl p-8">
           <p className="text-xl font-bold text-primary mb-2">Book Your One-on-One Session</p>
-          <Link to="/get_started" className="text-secondary-foreground hover:text-primary transition-colors font-semibold">
-            RealtorBusinessCredit.com/get_started
+          <Link to="/one-on-one" className="text-secondary-foreground hover:text-primary transition-colors font-semibold">
+            RealtorBusinessCredit.com/one-on-one
           </Link>
           <p className="text-sm text-secondary-foreground/60 mt-2">Limited availability. Complete clarity. No pressure.</p>
         </div>

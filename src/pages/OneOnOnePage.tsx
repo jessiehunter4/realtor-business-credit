@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import planMockup from "@/assets/plan-mockup.jpg";
 
-const BOOKING_URL = import.meta.env.VITE_BOOKING_URL || "/get_started";
+const BOOKING_URL = import.meta.env.VITE_BOOKING_URL || "/one-on-one";
 
 const OneOnOnePage = () => {
   return (

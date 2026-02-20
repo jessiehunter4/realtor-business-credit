@@ -75,7 +75,7 @@ const GuideConclusion = () => (
       <ActionStep>
         <h4 className="font-bold text-foreground mt-0 mb-2">Step 1: Schedule Your One-on-One Session</h4>
         <Paragraph>Schedule a time to talk with me directly.</Paragraph>
-        <p className="mt-2"><Link to="/get_started" className="font-bold text-primary hover:underline">Book your session →</Link></p>
+        <p className="mt-2"><Link to="/one-on-one" className="font-bold text-primary hover:underline">Book your session →</Link></p>
       </ActionStep>
       <ActionStep>
         <h4 className="font-bold text-foreground mt-0 mb-2">Step 2: Complete Your Free Fundability Scan</h4>

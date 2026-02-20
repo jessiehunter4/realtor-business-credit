@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from '@react-pdf/renderer';
 
-const CTA_URL = 'https://realtorbusinesscredit.com/get_started';
+const CTA_URL = 'https://realtorbusinesscredit.com/one-on-one';
 const SCAN_URL = 'https://mybetterbusinesscredit.fundabilityscan.com/';
 const MAIN_URL = 'https://mybetterbusinesscredit.com';
 const REALTOR_URL = 'https://realtorbusinesscredit.com';
@@ -166,7 +166,7 @@ const BookSessionCTA = () => (
     </Text>
     <Text style={[s.calloutText, { marginTop: 8 }]}>
       <Text style={s.bold}>Book your session: </Text>
-      <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/get_started</Link>
+      <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link>
     </Text>
   </View>
 );
@@ -178,7 +178,7 @@ const BookCTA = () => (
       5 minutes for the Fundability Scan. 30 minutes for our conversation.{'\n'}Complete clarity on YOUR path forward.
     </Text>
     <Link src={CTA_URL} style={[s.link, { textAlign: 'center', fontSize: 12, marginTop: 6 }]}>
-      RealtorBusinessCredit.com/get_started →
+      RealtorBusinessCredit.com/one-on-one →
     </Link>
     <Text style={[s.calloutText, { textAlign: 'center', marginTop: 6, fontSize: 9, color: '#6c757d' }]}>
       Limited availability. No obligation. No pressure.
@@ -336,7 +336,7 @@ export const GuidePDF = () => (
         </Text>
         <Text style={[s.calloutText, { marginTop: 8 }]}>
           <Text style={{ fontFamily: 'Helvetica-Bold' }}>Book your one-on-one session: </Text>
-          <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/get_started</Link>
+          <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link>
         </Text>
         <Text style={[s.calloutText, { marginTop: 8, fontSize: 9, fontStyle: 'italic' }]}>
           For everyone else—keep reading. By the end of this guide, you'll understand exactly why this matters for your business.
@@ -1326,7 +1326,7 @@ export const GuidePDF = () => (
         <Text style={s.calloutText}>Schedule a time to talk with me directly.</Text>
         <Text style={[s.calloutText, { marginTop: 4 }]}>
           <Text style={s.bold}>Book your session: </Text>
-          <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/get_started</Link>
+          <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link>
         </Text>
       </View>
 
@@ -1385,7 +1385,7 @@ export const GuidePDF = () => (
         <Text style={s.importantTitle}>Book Your One-on-One Session Now</Text>
         <Text style={s.calloutText}>
           <Text style={s.bold}>Book your session: </Text>
-          <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/get_started</Link>
+          <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link>
         </Text>
         <Text style={[s.calloutText, { marginTop: 6 }]}>5 minutes for the scan. 30 minutes for our conversation. Complete clarity on YOUR path forward.</Text>
         <Text style={[s.calloutText, { marginTop: 8, fontStyle: 'italic' }]}>Your future self will thank you.</Text>
@@ -1405,7 +1405,7 @@ export const GuidePDF = () => (
         <Text style={s.calloutTitle}>Realtor Business Credit</Text>
         <Text style={s.calloutText}><Text style={s.bold}>Main Website:</Text> <Link src={MAIN_URL} style={s.link}>mybetterbusinesscredit.com</Link></Text>
         <Text style={s.calloutText}><Text style={s.bold}>Realtor-Specific Resources:</Text> <Link src={REALTOR_URL} style={s.link}>realtorbusinesscredit.com</Link></Text>
-        <Text style={s.calloutText}><Text style={s.bold}>Free Fundability Scan & Session Booking:</Text> <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/get_started</Link></Text>
+        <Text style={s.calloutText}><Text style={s.bold}>Free Fundability Scan & Session Booking:</Text> <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link></Text>
       </View>
 
       <Text style={s.h2}>About the Author</Text>
@@ -1441,7 +1441,7 @@ export const GuidePDF = () => (
       <View style={[s.bigCtaBox, { marginTop: 40 }]} wrap={false}>
         <Text style={s.bigCtaTitle}>Book Your One-on-One Session</Text>
         <Link src={CTA_URL} style={[s.link, { textAlign: 'center', fontSize: 13, marginTop: 4 }]}>
-          RealtorBusinessCredit.com/get_started
+          RealtorBusinessCredit.com/one-on-one
         </Link>
         <Text style={[s.calloutText, { textAlign: 'center', marginTop: 8, color: '#6c757d' }]}>
           Limited availability. Complete clarity. No pressure.
