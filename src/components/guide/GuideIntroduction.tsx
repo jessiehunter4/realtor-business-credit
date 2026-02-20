@@ -61,7 +61,7 @@ const GuideIntroduction = () => (
         </ul>
         <Paragraph>No obligation. No pressure. Just a straightforward business conversation between two professionals. I guarantee it will be worthwhile.</Paragraph>
         <p className="mt-3 mb-0">
-          <Link to="/get_started" className="font-bold text-primary hover:underline">Book your one-on-one session →</Link>
+          <Link to="/one-on-one" className="font-bold text-primary hover:underline">Book your one-on-one session →</Link>
         </p>
         <p className="text-xs italic text-muted-foreground mt-3">For everyone else—keep reading. By the end of this guide, you'll understand exactly why this matters for your business.</p>
       </Callout>
