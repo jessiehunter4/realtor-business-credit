@@ -52,11 +52,11 @@ const OneOnOnePage = () => {
         </div>
       </section>
 
-      {/* Why 1:1 vs the Guide */}
+      {/* Why One-On-One vs the Guide */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-4 text-center">
-            Why a 1:1 Session — Not Just the Guide
+            Why a One-On-One Session — Not Just the Guide
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
             The free guide gives you the knowledge. A session gives you the{" "}
@@ -133,7 +133,7 @@ const OneOnOnePage = () => {
                 {
                   step: 5,
                   title: "Discuss the Best Fit for You",
-                  desc: "We'll explore whether 1:1 coaching, a small Realtor cohort, or self-paced work with Credit Suite tools is the right path. No pressure — just options.",
+                  desc: "We'll explore whether one-on-one coaching, a small Realtor cohort, or self-paced work with Credit Suite tools is the right path. No pressure — just options.",
                 },
               ].map((item) => (
                 <div key={item.step} className="flex gap-5 items-start">
@@ -357,7 +357,7 @@ const OneOnOnePage = () => {
               >
                 <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
                   <Calendar className="mr-2 h-5 w-5" />
-                  Schedule My Free 1:1 Session
+                  Schedule My Free One-On-One Session
                 </a>
               </Button>
               <Button
