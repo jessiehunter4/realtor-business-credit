@@ -17,7 +17,7 @@ import {
   MessageSquare,
   ArrowRight,
 } from "lucide-react";
-import planMockup from "@/assets/plan-mockup.jpg";
+import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
 
 const BOOKING_URL = import.meta.env.VITE_BOOKING_URL || "/one-on-one";
 
@@ -195,12 +195,7 @@ const OneOnOnePage = () => {
             </div>
 
             <div className="rounded-xl overflow-hidden border border-border shadow-lg">
-              <img
-                src={planMockup}
-                alt="Preview of a custom Realtor Business Credit Plan document"
-                className="w-full h-auto"
-                loading="lazy"
-              />
+              <PlanMockupCard />
               <div className="bg-muted p-4 text-center">
                 <p className="text-sm text-muted-foreground italic">
                   Sample custom plan — yours will be tailored to your specific
