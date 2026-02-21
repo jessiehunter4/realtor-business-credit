@@ -24,7 +24,7 @@ const CTASection = () => {
             <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
               <Link to="/one-on-one">
                 <Calendar className="mr-2 h-5 w-5" />
-                Free 1:1 Business Credit Session
+                Free One-On-One Business Credit Session
               </Link>
             </Button>
           </div>
