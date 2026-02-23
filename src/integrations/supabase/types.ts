@@ -191,6 +191,76 @@ export type Database = {
           },
         ]
       }
+      custom_plans: {
+        Row: {
+          agent_id: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          created_by: string
+          id: string
+          intake_survey_id: string
+          lead_id: string | null
+          plan_data: Json | null
+          plan_html: string | null
+          published_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          intake_survey_id: string
+          lead_id?: string | null
+          plan_data?: Json | null
+          plan_html?: string | null
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          intake_survey_id?: string
+          lead_id?: string | null
+          plan_data?: Json | null
+          plan_html?: string | null
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_plans_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_plans_intake_survey_id_fkey"
+            columns: ["intake_survey_id"]
+            isOneToOne: false
+            referencedRelation: "intake_surveys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_plans_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       import_batches: {
         Row: {
           agents_created: number | null
@@ -235,6 +305,197 @@ export type Database = {
           uploaded_by?: string
         }
         Relationships: []
+      }
+      intake_coach_notes: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          intake_survey_id: string
+          note: string
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          intake_survey_id: string
+          note: string
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          intake_survey_id?: string
+          note?: string
+          section?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_coach_notes_intake_survey_id_fkey"
+            columns: ["intake_survey_id"]
+            isOneToOne: false
+            referencedRelation: "intake_surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intake_surveys: {
+        Row: {
+          access_token: string
+          accounting_software_name: string | null
+          additional_notes: string | null
+          address_type: string | null
+          agent_id: string | null
+          brokerage_name: string | null
+          business_credit_cards: string | null
+          city: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          credit_reporting_bureaus: string[] | null
+          desired_funding_types: string[] | null
+          desired_monthly_credit_capacity: string | null
+          entity_type: string | null
+          filled_by: string
+          funding_gap_methods: string[] | null
+          gci_last_12_months: string | null
+          has_business_address: string | null
+          has_business_bank_account: string | null
+          has_business_email: boolean | null
+          has_business_entity: string | null
+          has_business_phone: boolean | null
+          has_business_website: boolean | null
+          id: string
+          interest_in_cohort: string | null
+          investment_readiness: string | null
+          lead_id: string | null
+          license_type: string | null
+          personal_credit_score_range: string | null
+          personal_guarantee_comfort: string | null
+          preferred_cohort_days: string | null
+          preferred_support_format: string | null
+          sides_closed_last_12_months: string | null
+          state: string | null
+          status: string
+          submitted_at: string | null
+          top_financial_goal: string | null
+          top_financial_need: string | null
+          updated_at: string
+          uses_accounting_software: string | null
+          vendor_tradelines: string | null
+          years_in_real_estate: string | null
+        }
+        Insert: {
+          access_token?: string
+          accounting_software_name?: string | null
+          additional_notes?: string | null
+          address_type?: string | null
+          agent_id?: string | null
+          brokerage_name?: string | null
+          business_credit_cards?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          credit_reporting_bureaus?: string[] | null
+          desired_funding_types?: string[] | null
+          desired_monthly_credit_capacity?: string | null
+          entity_type?: string | null
+          filled_by?: string
+          funding_gap_methods?: string[] | null
+          gci_last_12_months?: string | null
+          has_business_address?: string | null
+          has_business_bank_account?: string | null
+          has_business_email?: boolean | null
+          has_business_entity?: string | null
+          has_business_phone?: boolean | null
+          has_business_website?: boolean | null
+          id?: string
+          interest_in_cohort?: string | null
+          investment_readiness?: string | null
+          lead_id?: string | null
+          license_type?: string | null
+          personal_credit_score_range?: string | null
+          personal_guarantee_comfort?: string | null
+          preferred_cohort_days?: string | null
+          preferred_support_format?: string | null
+          sides_closed_last_12_months?: string | null
+          state?: string | null
+          status?: string
+          submitted_at?: string | null
+          top_financial_goal?: string | null
+          top_financial_need?: string | null
+          updated_at?: string
+          uses_accounting_software?: string | null
+          vendor_tradelines?: string | null
+          years_in_real_estate?: string | null
+        }
+        Update: {
+          access_token?: string
+          accounting_software_name?: string | null
+          additional_notes?: string | null
+          address_type?: string | null
+          agent_id?: string | null
+          brokerage_name?: string | null
+          business_credit_cards?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          credit_reporting_bureaus?: string[] | null
+          desired_funding_types?: string[] | null
+          desired_monthly_credit_capacity?: string | null
+          entity_type?: string | null
+          filled_by?: string
+          funding_gap_methods?: string[] | null
+          gci_last_12_months?: string | null
+          has_business_address?: string | null
+          has_business_bank_account?: string | null
+          has_business_email?: boolean | null
+          has_business_entity?: string | null
+          has_business_phone?: boolean | null
+          has_business_website?: boolean | null
+          id?: string
+          interest_in_cohort?: string | null
+          investment_readiness?: string | null
+          lead_id?: string | null
+          license_type?: string | null
+          personal_credit_score_range?: string | null
+          personal_guarantee_comfort?: string | null
+          preferred_cohort_days?: string | null
+          preferred_support_format?: string | null
+          sides_closed_last_12_months?: string | null
+          state?: string | null
+          status?: string
+          submitted_at?: string | null
+          top_financial_goal?: string | null
+          top_financial_need?: string | null
+          updated_at?: string
+          uses_accounting_software?: string | null
+          vendor_tradelines?: string | null
+          years_in_real_estate?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_surveys_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_surveys_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {
