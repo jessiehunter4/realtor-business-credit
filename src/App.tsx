@@ -11,6 +11,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import MLSImport from "./pages/MLSImport";
 import OneOnOnePage from "./pages/OneOnOnePage";
 import IntakeSurveyPage from "./pages/IntakeSurveyPage";
+import AdminIntakeList from "./pages/AdminIntakeList";
+import AdminIntakeCoachView from "./pages/AdminIntakeCoachView";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +44,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <MLSImport />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/intake" 
+            element={
+              <ProtectedRoute>
+                <AdminIntakeList />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/intake/:id" 
+            element={
+              <ProtectedRoute>
+                <AdminIntakeCoachView />
               </ProtectedRoute>
             } 
           />
