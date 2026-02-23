@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.sync-to-ghl]
 verify_jwt = false
+
+[functions.intake-survey]
+verify_jwt = false
