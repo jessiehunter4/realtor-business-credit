@@ -232,9 +232,12 @@ export default function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-6 flex gap-3">
           <Button onClick={() => navigate("/admin/mls-import")}>
             Import MLS Data
+          </Button>
+          <Button variant="outline" onClick={() => navigate("/admin/intake")}>
+            Intake Surveys
           </Button>
         </div>
 
