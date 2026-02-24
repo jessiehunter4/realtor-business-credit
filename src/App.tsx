@@ -13,6 +13,8 @@ import OneOnOnePage from "./pages/OneOnOnePage";
 import IntakeSurveyPage from "./pages/IntakeSurveyPage";
 import AdminIntakeList from "./pages/AdminIntakeList";
 import AdminIntakeCoachView from "./pages/AdminIntakeCoachView";
+import AdminPlanView from "./pages/AdminPlanView";
+import PortalPlanView from "./pages/PortalPlanView";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -63,6 +65,15 @@ const App = () => (
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/admin/plan/:id" 
+            element={
+              <ProtectedRoute>
+                <AdminPlanView />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/portal/plan/:id" element={<PortalPlanView />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
