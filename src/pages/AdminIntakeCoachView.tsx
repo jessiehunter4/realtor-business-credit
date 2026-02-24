@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
   ArrowLeft, Loader2, Save, StickyNote, CheckCircle, AlertCircle,
-  User, Target, Building, CreditCard, Handshake,
+  User, Target, Building, CreditCard, Handshake, Sparkles, FileText,
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -56,12 +56,15 @@ export default function AdminIntakeCoachView() {
   // Notes state per section
   const [noteTexts, setNoteTexts] = useState<Record<string, string>>({});
   const [savingNote, setSavingNote] = useState<string | null>(null);
+  const [generatingPlan, setGeneratingPlan] = useState(false);
+  const [existingPlanId, setExistingPlanId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
-    const [surveyRes, notesRes] = await Promise.all([
+    const [surveyRes, notesRes, planRes] = await Promise.all([
       supabase.from("intake_surveys").select("*").eq("id", id).single(),
       supabase.from("intake_coach_notes").select("*").eq("intake_survey_id", id).order("created_at", { ascending: false }),
+      supabase.from("custom_plans").select("id").eq("intake_survey_id", id).order("created_at", { ascending: false }).limit(1),
     ]);
 
     if (surveyRes.error) {
@@ -73,6 +76,7 @@ export default function AdminIntakeCoachView() {
     setSurvey(surveyRes.data);
     setForm(surveyRes.data);
     setNotes(notesRes.data || []);
+    setExistingPlanId(planRes.data?.[0]?.id || null);
     setLoading(false);
   }, [id, navigate]);
 
@@ -143,6 +147,23 @@ export default function AdminIntakeCoachView() {
 
   const sectionNotes = (section: string) => notes.filter((n) => n.section === section);
 
+  const handleGeneratePlan = async () => {
+    if (!id) return;
+    setGeneratingPlan(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-plan", {
+        body: { intake_survey_id: id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Plan generated!");
+      navigate(`/admin/plan/${data.plan_id}`);
+    } catch (e: any) {
+      toast.error(e.message || "Failed to generate plan");
+    }
+    setGeneratingPlan(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -185,6 +206,19 @@ export default function AdminIntakeCoachView() {
             </div>
           </div>
           <div className="flex gap-2">
+            {existingPlanId && (
+              <Button variant="outline" onClick={() => navigate(`/admin/plan/${existingPlanId}`)}>
+                <FileText className="h-4 w-4 mr-1" /> View Plan
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              onClick={handleGeneratePlan}
+              disabled={generatingPlan}
+            >
+              {generatingPlan ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 mr-1" />}
+              {existingPlanId ? "Regenerate Plan" : "Generate Plan"}
+            </Button>
             {survey.status === "submitted" && (
               <Button variant="outline" onClick={handleMarkReviewed}>
                 <CheckCircle className="h-4 w-4 mr-1" /> Mark Reviewed
