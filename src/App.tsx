@@ -15,6 +15,7 @@ import AdminIntakeList from "./pages/AdminIntakeList";
 import AdminIntakeCoachView from "./pages/AdminIntakeCoachView";
 import AdminPlanView from "./pages/AdminPlanView";
 import PortalPlanView from "./pages/PortalPlanView";
+import BookingConfirmedPage from "./pages/BookingConfirmedPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -74,6 +75,7 @@ const App = () => (
             } 
           />
           <Route path="/portal/plan/:id" element={<PortalPlanView />} />
+          <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
