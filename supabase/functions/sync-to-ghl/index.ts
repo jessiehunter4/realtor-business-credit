@@ -71,94 +71,45 @@ async function syncContactToGHL(
   locationId: string
 ): Promise<{ success: boolean; contactId?: string; error?: string; isUpdate?: boolean }> {
   try {
-    console.log('Syncing contact to GHL:', contact.email);
+    console.log('Syncing contact to GHL via upsert:', contact.email);
 
-    // First, check if contact already exists by email (upsert logic)
-    const searchResponse = await fetch(
-      `https://services.leadconnectorhq.com/contacts/?email=${encodeURIComponent(contact.email)}&locationId=${locationId}`,
+    const upsertResponse = await fetch(
+      `https://services.leadconnectorhq.com/contacts/upsert`,
       {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
           'Version': '2021-07-28',
         },
+        body: JSON.stringify({
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          email: contact.email,
+          phone: contact.phone,
+          locationId: locationId,
+          source: contact.source || 'RealtorBusinessCredit',
+          tags: contact.tags || [],
+          customFields: contact.customFields ? Object.entries(contact.customFields).map(([key, value]) => ({
+            key,
+            field_value: value,
+          })) : [],
+        }),
       }
     );
 
-    if (searchResponse.ok) {
-      const searchData = await searchResponse.json();
-      if (searchData.contacts && searchData.contacts.length > 0) {
-        // Contact exists - UPDATE with new property details
-        const existingContact = searchData.contacts[0];
-        console.log('Contact exists in GHL, updating:', existingContact.id);
-
-        const updateResponse = await fetch(
-          `https://services.leadconnectorhq.com/contacts/${existingContact.id}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-              'Content-Type': 'application/json',
-              'Version': '2021-07-28',
-            },
-            body: JSON.stringify({
-              firstName: contact.firstName,
-              lastName: contact.lastName,
-              phone: contact.phone || existingContact.phone,
-              // Merge tags - add new tags to existing
-              tags: [...new Set([...(existingContact.tags || []), ...(contact.tags || [])])],
-              // Update custom fields with new property data
-              customFields: contact.customFields ? Object.entries(contact.customFields).map(([key, value]) => ({
-                key,
-                field_value: value,
-              })) : [],
-            }),
-          }
-        );
-
-        if (!updateResponse.ok) {
-          const errorText = await updateResponse.text();
-          console.error('GHL update error:', updateResponse.status, errorText);
-          throw new Error(`GHL API update error: ${updateResponse.status} - ${errorText}`);
-        }
-
-        console.log('Contact updated successfully:', existingContact.id);
-        return { success: true, contactId: existingContact.id, isUpdate: true };
-      }
+    if (!upsertResponse.ok) {
+      const errorText = await upsertResponse.text();
+      console.error('GHL upsert error:', upsertResponse.status, errorText);
+      throw new Error(`GHL API upsert error: ${upsertResponse.status} - ${errorText}`);
     }
 
-    // Contact doesn't exist - CREATE new contact
-    const createResponse = await fetch(`https://services.leadconnectorhq.com/contacts/`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Version': '2021-07-28',
-      },
-      body: JSON.stringify({
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        email: contact.email,
-        phone: contact.phone,
-        locationId: locationId,
-        source: contact.source || 'RealtorBusinessCredit',
-        tags: contact.tags || [],
-        customFields: contact.customFields ? Object.entries(contact.customFields).map(([key, value]) => ({
-          key,
-          field_value: value,
-        })) : [],
-      }),
-    });
+    const data = await upsertResponse.json();
+    const contactId = data.contact?.id;
+    const isNew = data.new === true;
 
-    if (!createResponse.ok) {
-      const errorText = await createResponse.text();
-      console.error('GHL API create error:', createResponse.status, errorText);
-      throw new Error(`GHL API error: ${createResponse.status} - ${errorText}`);
-    }
-
-    const data = await createResponse.json();
-    console.log('Contact created successfully:', data.contact?.id);
-    
-    return { success: true, contactId: data.contact?.id, isUpdate: false };
+    console.log(`Contact ${isNew ? 'created' : 'updated'} successfully via upsert:`, contactId);
+    return { success: true, contactId, isUpdate: !isNew };
   } catch (error) {
     console.error('Error syncing to GHL:', error);
     return { 
