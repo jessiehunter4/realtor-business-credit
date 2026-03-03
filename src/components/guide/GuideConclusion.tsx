@@ -115,7 +115,7 @@ const GuideConclusion = () => (
 
       <div className="text-center mt-12">
         <Button asChild size="lg" className="text-lg px-8 py-6">
-          <Link to="/get_started">
+          <Link to="/one-on-one">
             <Calendar className="mr-2 h-5 w-5" />
             Book Your Free One-on-One Session
           </Link>

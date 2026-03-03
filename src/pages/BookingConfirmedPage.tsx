@@ -1,11 +1,6 @@
-import { useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Calendar, ClipboardList, Search, UserCheck, BookOpen, ArrowRight } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, ClipboardList, Search, UserCheck, BookOpen, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const EMBED_SCRIPT_URL = "https://link.everycatch.com/js/form_embed.js";
-const IFRAME_SRC = "https://link.everycatch.com/widget/booking/Xt32XcNcmKgm7vaJaR9o";
 
 const BookingConfirmedPage = () => {
   const [searchParams] = useSearchParams();
@@ -14,21 +9,11 @@ const BookingConfirmedPage = () => {
 
   const intakeLink = `/intake${email || token ? `?${email ? `email=${encodeURIComponent(email)}` : ""}${email && token ? "&" : ""}${token ? `token=${token}` : ""}` : ""}`;
 
-  useEffect(() => {
-    if (!document.querySelector(`script[src="${EMBED_SCRIPT_URL}"]`)) {
-      const script = document.createElement("script");
-      script.src = EMBED_SCRIPT_URL;
-      script.type = "text/javascript";
-      script.async = true;
-      document.head.appendChild(script);
-    }
-  }, []);
-
   const steps = [
     {
-      icon: Calendar,
-      title: "Pick a Time",
-      description: "Choose a convenient slot on the calendar above for your free strategy session.",
+      icon: CheckCircle,
+      title: "Session Booked ✓",
+      description: "Your session is confirmed — check your email for the details and calendar invite.",
     },
     {
       icon: ClipboardList,
@@ -55,32 +40,15 @@ const BookingConfirmedPage = () => {
       <section className="bg-secondary text-secondary-foreground py-16 md:py-24">
         <div className="container max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-            <Calendar className="w-4 h-4" />
-            Free Strategy Session
+            <CheckCircle className="w-4 h-4" />
+            Session Confirmed
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Book Your Free One-on-One Business Credit Session
+            Your Session Is Booked — Here's What to Do Next
           </h1>
           <p className="text-lg md:text-xl text-secondary-foreground/80 max-w-2xl mx-auto">
-            A 30–45 minute strategy call with Jessie Hunter to review your business credit readiness and build a personalized action plan.
+            Complete the steps below before your call so Jessie can prepare a personalized action plan just for you.
           </p>
-        </div>
-      </section>
-
-      {/* Calendar Embed */}
-      <section className="py-12 md:py-16">
-        <div className="container max-w-4xl mx-auto px-4">
-          <Card className="overflow-hidden border-2">
-            <CardContent className="p-0">
-              <iframe
-                src={IFRAME_SRC}
-                style={{ width: "100%", border: "none", overflow: "hidden", minHeight: "700px" }}
-                scrolling="no"
-                id="Xt32XcNcmKgm7vaJaR9o_booking"
-                title="Book your session"
-              />
-            </CardContent>
-          </Card>
         </div>
       </section>
 
