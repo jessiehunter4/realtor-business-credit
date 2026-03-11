@@ -351,8 +351,8 @@ export default function AdminDashboard() {
                 )}
               </div>
             )}
-              </Button>
-            </div>
+
+
 
             {lastSyncResult && (
               <div className="p-3 bg-muted rounded-md">
