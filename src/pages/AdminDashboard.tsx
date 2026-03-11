@@ -141,6 +141,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTestGHLConnection = async () => {
+    setTestingConnection(true);
+    setConnectionResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('test-ghl-connection');
+      if (error) {
+        setConnectionResult({ connected: false, error: error.message });
+      } else {
+        setConnectionResult(data as { connected: boolean; location_name?: string; error?: string; details?: string });
+      }
+    } catch (error) {
+      setConnectionResult({ connected: false, error: 'Request failed' });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   const handleSetupAdmin = async () => {
     setSettingUpAdmin(true);
     try {
@@ -151,7 +168,6 @@ export default function AdminDashboard() {
         console.error("Setup admin error:", error);
       } else {
         toast.success("Admin access granted!");
-        // Refresh admin status
         await checkAdminStatus();
       }
     } catch (error) {
