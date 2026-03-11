@@ -330,9 +330,27 @@ export default function AdminDashboard() {
               </Button>
               <Button 
                 variant="outline" 
-                onClick={fetchSyncStats}
+                onClick={handleTestGHLConnection}
+                disabled={testingConnection}
               >
-                Refresh Stats
+                {testingConnection ? "Testing..." : "Test GHL Connection"}
+              </Button>
+            </div>
+
+            {connectionResult && (
+              <div className={`p-3 rounded-md ${connectionResult.connected ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                {connectionResult.connected ? (
+                  <p className="text-sm text-green-800">
+                    ✅ Connected to GHL — Location: <strong>{connectionResult.location_name}</strong>
+                  </p>
+                ) : (
+                  <div className="text-sm text-red-800">
+                    <p>❌ Connection failed: {connectionResult.error}</p>
+                    {connectionResult.details && <p className="mt-1 font-mono text-xs">{connectionResult.details}</p>}
+                  </div>
+                )}
+              </div>
+            )}
               </Button>
             </div>
 
