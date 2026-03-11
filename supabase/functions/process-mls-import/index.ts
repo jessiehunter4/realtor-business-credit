@@ -111,13 +111,13 @@ Deno.serve(async (req) => {
           const listingAgent = await findOrCreateAgent(supabaseClient, listingAgentData);
           if (listingAgent.created) {
             stats.agentsCreated++;
-            // Create contact_syncs record for new agent
-            if (listingAgentData.email) {
-              await createContactSync(supabaseClient, listingAgent.id);
-              stats.syncRecordsCreated++;
-            }
           } else if (listingAgent.updated) {
             stats.agentsUpdated++;
+          }
+          // Create/update contact_syncs for both new and updated agents
+          if (listingAgentData.email) {
+            await upsertContactSync(supabaseClient, listingAgent.id);
+            stats.syncRecordsCreated++;
           }
 
           // Check for Co-Listing Agent
