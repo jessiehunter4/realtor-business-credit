@@ -111,13 +111,13 @@ Deno.serve(async (req) => {
           const listingAgent = await findOrCreateAgent(supabaseClient, listingAgentData);
           if (listingAgent.created) {
             stats.agentsCreated++;
-            // Create contact_syncs record for new agent
-            if (listingAgentData.email) {
-              await createContactSync(supabaseClient, listingAgent.id);
-              stats.syncRecordsCreated++;
-            }
           } else if (listingAgent.updated) {
             stats.agentsUpdated++;
+          }
+          // Create/update contact_syncs for both new and updated agents
+          if (listingAgentData.email) {
+            await upsertContactSync(supabaseClient, listingAgent.id);
+            stats.syncRecordsCreated++;
           }
 
           // Check for Co-Listing Agent
@@ -140,13 +140,13 @@ Deno.serve(async (req) => {
             if (coListingAgent.created) {
               stats.coListingAgentsCreated++;
               stats.agentsCreated++;
-              // Create contact_syncs record for new co-listing agent
-              if (coListingAgentData.email) {
-                await createContactSync(supabaseClient, coListingAgent.id);
-                stats.syncRecordsCreated++;
-              }
             } else if (coListingAgent.updated) {
               stats.agentsUpdated++;
+            }
+            // Create/update contact_syncs for both new and updated co-listing agents
+            if (coListingAgentData.email) {
+              await upsertContactSync(supabaseClient, coListingAgent.id);
+              stats.syncRecordsCreated++;
             }
           }
 
@@ -318,21 +318,38 @@ function parseCSV(content: string): CSVRow[] {
   return rows;
 }
 
-async function createContactSync(supabaseClient: any, agentId: string): Promise<void> {
+async function upsertContactSync(supabaseClient: any, agentId: string): Promise<void> {
   try {
-    const { error } = await supabaseClient
+    // Check if a sync record already exists for this agent
+    const { data: existing } = await supabaseClient
       .from('contact_syncs')
-      .insert({
-        agent_id: agentId,
-        status: 'pending',
-        retry_count: 0,
-      });
-    
-    if (error) {
-      console.error('Error creating contact_sync:', error);
+      .select('id')
+      .eq('agent_id', agentId)
+      .maybeSingle();
+
+    if (existing) {
+      // Reset to pending so sync-to-ghl picks it up again with updated data
+      await supabaseClient
+        .from('contact_syncs')
+        .update({
+          status: 'pending',
+          retry_count: 0,
+          last_error_message: null,
+          next_retry_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id);
+    } else {
+      await supabaseClient
+        .from('contact_syncs')
+        .insert({
+          agent_id: agentId,
+          status: 'pending',
+          retry_count: 0,
+        });
     }
   } catch (err) {
-    console.error('Exception creating contact_sync:', err);
+    console.error('Exception upserting contact_sync:', err);
   }
 }
 
