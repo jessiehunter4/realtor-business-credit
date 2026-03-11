@@ -24,6 +24,8 @@ export default function AdminDashboard() {
   });
   const [syncing, setSyncing] = useState(false);
   const [lastSyncResult, setLastSyncResult] = useState<string | null>(null);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionResult, setConnectionResult] = useState<{ connected: boolean; location_name?: string; error?: string; details?: string } | null>(null);
 
   useEffect(() => {
     checkAdminStatus();
