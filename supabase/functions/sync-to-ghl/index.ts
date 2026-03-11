@@ -73,6 +73,7 @@ async function syncContactToGHL(
   try {
     console.log('Syncing contact to GHL via upsert:', contact.email);
 
+    // Step 1: Upsert contact WITHOUT tags (to avoid overwriting existing tags)
     const upsertResponse = await fetch(
       `https://services.leadconnectorhq.com/contacts/upsert`,
       {
@@ -89,7 +90,6 @@ async function syncContactToGHL(
           phone: contact.phone,
           locationId: locationId,
           source: contact.source || 'RealtorBusinessCredit',
-          tags: contact.tags || [],
           customFields: contact.customFields ? Object.entries(contact.customFields).map(([key, value]) => ({
             key,
             field_value: value,
@@ -109,6 +109,34 @@ async function syncContactToGHL(
     const isNew = data.new === true;
 
     console.log(`Contact ${isNew ? 'created' : 'updated'} successfully via upsert:`, contactId);
+
+    // Step 2: Apply tags separately (additive, won't overwrite existing tags)
+    if (contactId && contact.tags && contact.tags.length > 0) {
+      const tagsResponse = await fetch(
+        `https://services.leadconnectorhq.com/contacts/${contactId}/tags`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'Version': '2021-07-28',
+          },
+          body: JSON.stringify({
+            tags: contact.tags,
+          }),
+        }
+      );
+
+      if (!tagsResponse.ok) {
+        const tagsError = await tagsResponse.text();
+        console.error('GHL tags error:', tagsResponse.status, tagsError);
+        // Don't fail the whole sync for a tags error, just log it
+        console.warn('Contact was upserted but tags failed to apply');
+      } else {
+        console.log(`Tags applied to contact ${contactId}:`, contact.tags);
+      }
+    }
+
     return { success: true, contactId, isUpdate: !isNew };
   } catch (error) {
     console.error('Error syncing to GHL:', error);
