@@ -318,21 +318,38 @@ function parseCSV(content: string): CSVRow[] {
   return rows;
 }
 
-async function createContactSync(supabaseClient: any, agentId: string): Promise<void> {
+async function upsertContactSync(supabaseClient: any, agentId: string): Promise<void> {
   try {
-    const { error } = await supabaseClient
+    // Check if a sync record already exists for this agent
+    const { data: existing } = await supabaseClient
       .from('contact_syncs')
-      .insert({
-        agent_id: agentId,
-        status: 'pending',
-        retry_count: 0,
-      });
-    
-    if (error) {
-      console.error('Error creating contact_sync:', error);
+      .select('id')
+      .eq('agent_id', agentId)
+      .maybeSingle();
+
+    if (existing) {
+      // Reset to pending so sync-to-ghl picks it up again with updated data
+      await supabaseClient
+        .from('contact_syncs')
+        .update({
+          status: 'pending',
+          retry_count: 0,
+          last_error_message: null,
+          next_retry_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id);
+    } else {
+      await supabaseClient
+        .from('contact_syncs')
+        .insert({
+          agent_id: agentId,
+          status: 'pending',
+          retry_count: 0,
+        });
     }
   } catch (err) {
-    console.error('Exception creating contact_sync:', err);
+    console.error('Exception upserting contact_sync:', err);
   }
 }
 
