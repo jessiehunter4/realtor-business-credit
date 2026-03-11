@@ -24,6 +24,8 @@ export default function AdminDashboard() {
   });
   const [syncing, setSyncing] = useState(false);
   const [lastSyncResult, setLastSyncResult] = useState<string | null>(null);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionResult, setConnectionResult] = useState<{ connected: boolean; location_name?: string; error?: string; details?: string } | null>(null);
 
   useEffect(() => {
     checkAdminStatus();
@@ -139,6 +141,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTestGHLConnection = async () => {
+    setTestingConnection(true);
+    setConnectionResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('test-ghl-connection');
+      if (error) {
+        setConnectionResult({ connected: false, error: error.message });
+      } else {
+        setConnectionResult(data as { connected: boolean; location_name?: string; error?: string; details?: string });
+      }
+    } catch (error) {
+      setConnectionResult({ connected: false, error: 'Request failed' });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   const handleSetupAdmin = async () => {
     setSettingUpAdmin(true);
     try {
@@ -149,7 +168,6 @@ export default function AdminDashboard() {
         console.error("Setup admin error:", error);
       } else {
         toast.success("Admin access granted!");
-        // Refresh admin status
         await checkAdminStatus();
       }
     } catch (error) {
@@ -312,11 +330,29 @@ export default function AdminDashboard() {
               </Button>
               <Button 
                 variant="outline" 
-                onClick={fetchSyncStats}
+                onClick={handleTestGHLConnection}
+                disabled={testingConnection}
               >
-                Refresh Stats
+                {testingConnection ? "Testing..." : "Test GHL Connection"}
               </Button>
             </div>
+
+            {connectionResult && (
+              <div className={`p-3 rounded-md ${connectionResult.connected ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                {connectionResult.connected ? (
+                  <p className="text-sm text-green-800">
+                    ✅ Connected to GHL — Location: <strong>{connectionResult.location_name}</strong>
+                  </p>
+                ) : (
+                  <div className="text-sm text-red-800">
+                    <p>❌ Connection failed: {connectionResult.error}</p>
+                    {connectionResult.details && <p className="mt-1 font-mono text-xs">{connectionResult.details}</p>}
+                  </div>
+                )}
+              </div>
+            )}
+
+
 
             {lastSyncResult && (
               <div className="p-3 bg-muted rounded-md">
