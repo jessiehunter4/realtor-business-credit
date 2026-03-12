@@ -306,14 +306,16 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Skip contacts without valid email
-        if (!contact.email || contact.email.includes('placeholder')) {
-          console.log('Skipping contact without valid email:', sync.id);
+        // Skip contacts without any valid contact method (need email OR phone)
+        const hasEmail = contact.email && !contact.email.includes('placeholder') && contact.email.trim() !== '';
+        const hasPhone = contact.phone && contact.phone.trim() !== '';
+        if (!hasEmail && !hasPhone) {
+          console.log('Skipping contact without valid email or phone:', sync.id);
           await supabaseClient
             .from('contact_syncs')
             .update({
               status: 'failed',
-              last_error_message: 'No valid email address',
+              last_error_message: 'No valid email or phone number',
               updated_at: new Date().toISOString(),
             })
             .eq('id', sync.id);

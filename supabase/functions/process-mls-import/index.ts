@@ -34,6 +34,56 @@ interface AgentData {
   property: PropertyData;
 }
 
+/** Returns true if the agent has at least one usable contact method */
+function hasContactMethod(email: string | null, phone: string | null): boolean {
+  return Boolean(email?.trim()) || Boolean(phone?.trim());
+}
+
+/** Normalize phone to digits-only for matching */
+function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
+
+/** Normalize email to lowercase trimmed for matching */
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/**
+ * Check if a transaction is a duplicate based on property identity + 30-day close date window.
+ * Property identity = normalized full address + city + state + zip.
+ */
+async function isDuplicateTransaction(
+  supabaseClient: any,
+  propertyData: PropertyData
+): Promise<boolean> {
+  if (!propertyData.fullAddress || !propertyData.closeDate) {
+    // Without address or close date we can't deduplicate reliably; allow the import
+    return false;
+  }
+
+  const closeDate = new Date(propertyData.closeDate);
+  const windowStart = new Date(closeDate);
+  windowStart.setDate(windowStart.getDate() - 30);
+  const windowEnd = new Date(closeDate);
+  windowEnd.setDate(windowEnd.getDate() + 30);
+
+  const { data, error } = await supabaseClient
+    .from('transactions')
+    .select('id')
+    .eq('property_address', propertyData.fullAddress)
+    .gte('close_date', windowStart.toISOString().split('T')[0])
+    .lte('close_date', windowEnd.toISOString().split('T')[0])
+    .limit(1);
+
+  if (error) {
+    console.error('Error checking for duplicate transaction:', error);
+    return false; // On error, allow import rather than silently dropping
+  }
+
+  return data && data.length > 0;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -79,8 +129,10 @@ Deno.serve(async (req) => {
       agentsCreated: 0,
       agentsUpdated: 0,
       transactionsCreated: 0,
+      transactionsSkippedDuplicate: 0,
       coListingAgentsCreated: 0,
       syncRecordsCreated: 0,
+      agentsSkippedNoContact: 0,
     };
 
     try {
@@ -96,6 +148,15 @@ Deno.serve(async (req) => {
         try {
           // Extract property data from specific MLS columns
           const propertyData = extractPropertyData(row);
+
+          // --- TRANSACTION DEDUPLICATION ---
+          // Check for duplicate: same property + close date within ±30 days
+          const isDupe = await isDuplicateTransaction(supabaseClient, propertyData);
+          if (isDupe) {
+            console.log(`Skipping duplicate transaction: ${propertyData.fullAddress} closing ${propertyData.closeDate}`);
+            stats.transactionsSkippedDuplicate++;
+            continue; // Skip entire row — no agent upsert or sync for duplicates
+          }
 
           // Extract Listing Agent data
           const listingAgentData: AgentData = {
@@ -114,22 +175,28 @@ Deno.serve(async (req) => {
           } else if (listingAgent.updated) {
             stats.agentsUpdated++;
           }
-          // Create/update contact_syncs for both new and updated agents
-          if (listingAgentData.email) {
+
+          // Queue sync if agent has at least one contact method (email OR phone)
+          if (hasContactMethod(listingAgentData.email, listingAgentData.phone)) {
             await upsertContactSync(supabaseClient, listingAgent.id);
             stats.syncRecordsCreated++;
+          } else {
+            stats.agentsSkippedNoContact++;
           }
 
-          // Check for Co-Listing Agent
-          const hasCoListingAgent = row['CoListAgentEmail'] || row['CoListAgentFirstName'];
+          // --- CO-LISTING AGENT ---
+          // Only process co-listing agent if they have a real contact method (email or phone).
+          // A first name alone is NOT sufficient.
+          const coListEmail = row['CoListAgentEmail'] || null;
+          const coListPhone = row['CoListAgentMobilePhone'] || null;
           let coListingAgentId: string | null = null;
 
-          if (hasCoListingAgent) {
+          if (hasContactMethod(coListEmail, coListPhone)) {
             const coListingAgentData: AgentData = {
               firstName: row['CoListAgentFirstName'] || null,
               lastName: row['CoListAgentLastName'] || null,
-              email: row['CoListAgentEmail'] || null,
-              phone: row['CoListAgentMobilePhone'] || null,
+              email: coListEmail,
+              phone: coListPhone,
               type: 'Co-Listing Agent',
               property: propertyData,
             };
@@ -143,11 +210,10 @@ Deno.serve(async (req) => {
             } else if (coListingAgent.updated) {
               stats.agentsUpdated++;
             }
-            // Create/update contact_syncs for both new and updated co-listing agents
-            if (coListingAgentData.email) {
-              await upsertContactSync(supabaseClient, coListingAgent.id);
-              stats.syncRecordsCreated++;
-            }
+
+            // Queue sync — we already confirmed contact method exists
+            await upsertContactSync(supabaseClient, coListingAgent.id);
+            stats.syncRecordsCreated++;
           }
 
           // Create transaction
@@ -353,49 +419,65 @@ async function upsertContactSync(supabaseClient: any, agentId: string): Promise<
   }
 }
 
+/**
+ * Find or create an agent record.
+ * 
+ * DEDUPLICATION RULES (hard rules — no name-only matching):
+ * 1. If email exists → match by normalized email
+ * 2. If phone exists → match by normalized phone (digits-only)
+ * 3. Never fall back to name-only matching
+ * 4. If no match found by email or phone, create a new record
+ */
 async function findOrCreateAgent(supabaseClient: any, agentData: AgentData): Promise<{ id: string; created: boolean; updated: boolean }> {
   const { firstName, lastName, email, phone, type, property } = agentData;
   
-  // Try to find existing agent by email first
   let existing = null;
   
-  if (email) {
+  // Match by normalized email
+  if (email?.trim()) {
+    const normalized = normalizeEmail(email);
     const { data } = await supabaseClient
       .from('agents')
       .select('*')
-      .eq('email', email)
+      .eq('email', normalized)
       .maybeSingle();
     existing = data;
   }
   
-  // If no email match, try phone
-  if (!existing && phone) {
+  // If no email match, try normalized phone
+  if (!existing && phone?.trim()) {
+    const normalized = normalizePhone(phone);
+    // Query agents and compare normalized phone values
     const { data } = await supabaseClient
       .from('agents')
       .select('*')
-      .eq('phone', phone)
+      .eq('phone', phone.trim())
       .maybeSingle();
-    existing = data;
+    
+    // If exact match didn't work, try normalized digits comparison
+    if (!data && normalized.length >= 10) {
+      const { data: allAgentsWithPhone } = await supabaseClient
+        .from('agents')
+        .select('*')
+        .not('phone', 'is', null);
+      
+      if (allAgentsWithPhone) {
+        existing = allAgentsWithPhone.find((a: any) => 
+          a.phone && normalizePhone(a.phone) === normalized
+        ) || null;
+      }
+    } else {
+      existing = data;
+    }
   }
-  
-  // If no phone match, try name
-  if (!existing && firstName && lastName) {
-    const { data } = await supabaseClient
-      .from('agents')
-      .select('*')
-      .eq('first_name', firstName)
-      .eq('last_name', lastName)
-      .maybeSingle();
-    existing = data;
-  }
+
+  // NO NAME-ONLY MATCHING — this is intentionally omitted
 
   const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
   if (existing) {
-    // Update agent with new property info (upsert behavior)
-    // Always update property details for existing agents
+    // Update agent with new property info (always overwrite property details)
     const updates: any = {
-      // Update property details (overwrite with latest)
       property_address: property.fullAddress,
       property_city: property.city,
       property_state: property.state,
@@ -435,11 +517,10 @@ async function findOrCreateAgent(supabaseClient: any, agentData: AgentData): Pro
       first_name: firstName,
       last_name: lastName,
       full_name: fullName || null,
-      email,
-      phone,
+      email: email?.trim() || null,
+      phone: phone?.trim() || null,
       type,
       source: 'MLS_Just_Closed_Import',
-      // Property fields
       property_address: property.fullAddress,
       property_city: property.city,
       property_state: property.state,
