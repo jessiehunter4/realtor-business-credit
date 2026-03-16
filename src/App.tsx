@@ -76,6 +76,7 @@ const App = () => (
             } 
           />
           <Route path="/portal/plan/:id" element={<PortalPlanView />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
