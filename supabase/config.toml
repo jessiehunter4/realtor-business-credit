@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.test-ghl-connection]
 verify_jwt = false
+
+[functions.tag-ghl-contact]
+verify_jwt = false
