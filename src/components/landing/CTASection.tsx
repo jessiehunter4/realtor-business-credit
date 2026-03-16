@@ -2,7 +2,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Calendar } from "lucide-react";
 
-const CTASection = () => {
+interface CTASectionProps {
+  guideLink?: string;
+}
+
+const CTASection = ({ guideLink = "/guide" }: CTASectionProps) => {
   return (
     <section className="bg-primary/10 py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -16,7 +20,7 @@ const CTASection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8 py-6">
-              <Link to="/guide">
+              <Link to={guideLink}>
                 <BookOpen className="mr-2 h-5 w-5" />
                 Read the Free Guide
               </Link>
