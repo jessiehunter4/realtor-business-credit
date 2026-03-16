@@ -16,6 +16,7 @@ import AdminIntakeCoachView from "./pages/AdminIntakeCoachView";
 import AdminPlanView from "./pages/AdminPlanView";
 import PortalPlanView from "./pages/PortalPlanView";
 import BookingConfirmedPage from "./pages/BookingConfirmedPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
