@@ -1,43 +1,99 @@
 
 
-# Move Calendar Embed to /one-on-one and Update Booking Links
+# URL Parameter Capture, Guide Gating, and GHL Tagging — Updated Plan
 
-## Overview
-Move the EveryCatch calendar widget from `/booking-confirmed` to `/one-on-one` (just below the hero), update all "Book" CTAs to scroll/link to the embedded calendar on `/one-on-one`, and strip the calendar from `/booking-confirmed` without deleting the page.
+## Summary of Change from Previous Plan
 
-## Changes
+**Edge case #6 update**: When an unknown visitor submits the opt-in form, the `submit-lead` function (or a new code path) will upsert the contact to GHL. The GHL upsert response returns a `contactId`. We will capture this contactId and:
+1. Store it on the `leads` record (`ghl_contact_id`)
+2. Return it to the client
+3. Use it immediately to apply the `c-clicked-rbc-guide` tag — so the visitor is tagged on the spot, not left untagged
 
-### 1. `src/pages/OneOnOnePage.tsx` -- Add calendar embed + post-booking content
+This eliminates the gap identified in the earlier plan where opt-in visitors would not be tagged until async sync ran.
 
-- Add the `useEffect` hook to load the EveryCatch `form_embed.js` script (moved from BookingConfirmedPage)
-- Add `useSearchParams` to capture `email`/`token` query params for the intake link
-- Insert a new **Calendar Embed section** immediately after the hero, containing the iframe in a Card (same markup as BookingConfirmedPage currently has)
-- Add the **"What Happens Next"** steps section (from BookingConfirmedPage) below the calendar
-- Add the **"Why Complete the Intake First?"** section (from BookingConfirmedPage) after the steps
-- Change the two existing CTA buttons (hero + bottom) from `<a href={BOOKING_URL} target="_blank">` to anchor-scroll links (e.g., `<a href="#book">`) that smooth-scroll to the calendar embed section, keeping users on-page
-- Add `id="book"` to the calendar section so anchor links work
+---
 
-### 2. `src/pages/BookingConfirmedPage.tsx` -- Remove calendar, keep the rest
+## Full Implementation Plan
 
-- Remove the `useEffect` script loader
-- Remove the Calendar Embed section (the iframe Card)
-- Remove the `EMBED_SCRIPT_URL` and `IFRAME_SRC` constants
-- Keep the hero, "What Happens Next" steps, "Why Complete the Intake" section, and footer CTAs intact so the page still functions as a post-booking reference if needed
-- Update the hero headline/subheadline to reflect it's now a confirmation/next-steps page (e.g., "Your Session Is Booked -- Here's What to Do Next")
-- Update step 1 text from "Pick a Time" to "Session Booked" (or similar confirmation language)
+### 1. Propagate URL Params — Landing Page to Guide
 
-### 3. `src/components/landing/CTASection.tsx` -- Already links to `/one-on-one`, no change needed
+**Files**: `LandingPage.tsx`, `HeroSection.tsx`, `CTASection.tsx`
 
-### 4. `src/components/landing/HeroSection.tsx` -- Already links to `/one-on-one`, no change needed
+- Read `contactId`, `firstName`, `lastName`, `email`, `phone` from URL search params
+- Forward all params as query string when linking to `/guide`
 
-### 5. `src/components/guide/GuideConclusion.tsx` -- Fix stale link
-- Change `Link to="/get_started"` to `Link to="/one-on-one"` (line 118)
+### 2. Guide Page Gating Logic
 
-### 6. No route changes -- both `/one-on-one` and `/booking-confirmed` remain in `App.tsx`
+**File**: `GuidePage.tsx`
 
-## Technical Notes
-- The EveryCatch script loader `useEffect` is idempotent (checks if script already exists before appending), so it works safely on the new page.
-- The calendar iframe ID stays the same (`Xt32XcNcmKgm7vaJaR9o_booking`).
-- Smooth-scroll to `#book` uses standard browser anchor behavior; no extra library needed.
-- Query params (`email`, `token`) on `/one-on-one` will be forwarded to the intake survey link, same as BookingConfirmedPage does today.
+- Read `contactId` from URL params
+- **Known visitor** (`contactId` present): Show guide immediately. On mount, call `tag-ghl-contact` with tags `l-visited-rbc-site` and `c-clicked-rbc-guide`
+- **Unknown visitor** (no `contactId`): Show `GuideOptInGate` overlay requiring name, email, phone
+
+### 3. New Component: `GuideOptInGate`
+
+**File**: `src/components/guide/GuideOptInGate.tsx`
+
+- Simple form: first name, last name, email, mobile phone
+- On submit: call `submit-lead` edge function (which already handles GHL upsert)
+- **Key change**: `submit-lead` will be updated to upsert the contact to GHL inline (not just queue a `contact_syncs` record) and return the `contactId` from the GHL response
+- On success: store the returned `contactId`, reveal the guide, then immediately call `tag-ghl-contact` with `c-clicked-rbc-guide`
+
+### 4. Update `submit-lead` Edge Function
+
+**File**: `supabase/functions/submit-lead/index.ts`
+
+Currently, when no `ghlContactId` is provided, it creates an async `contact_syncs` record. Change this path to:
+
+- Upsert the contact to GHL directly (same two-step pattern: upsert fields, then apply `a-rbc-optin` tag separately)
+- Extract `contactId` from the GHL upsert response (`data.contact.id`)
+- Save `ghl_contact_id` on the `leads` record
+- Return `contactId` in the response JSON to the client
+
+This way both paths (known contactId via URL, and new contact via opt-in) result in the client having a usable `contactId`.
+
+### 5. New Edge Function: `tag-ghl-contact`
+
+**File**: `supabase/functions/tag-ghl-contact/index.ts`
+
+- Accepts `{ contactId, tags }` 
+- Calls `POST /contacts/{contactId}/tags` with additive tags
+- Used by the client to fire `l-visited-rbc-site` and `c-clicked-rbc-guide`
+- Register in `supabase/config.toml` with `verify_jwt = false`
+
+### 6. Landing Page Tagging
+
+**File**: `LandingPage.tsx`
+
+- If `contactId` is present in URL params, call `tag-ghl-contact` on mount with tag `l-visited-rbc-site`
+
+---
+
+## Tagging Flow Summary
+
+| Visitor Type | Arrives on Landing | Opens Guide |
+|---|---|---|
+| Known (contactId in URL) | Tag `l-visited-rbc-site` on mount | Tag `c-clicked-rbc-guide` on mount |
+| Unknown (no contactId) | No tag (no identity yet) | Submits opt-in → `submit-lead` upserts to GHL → gets `contactId` back → immediately tags `c-clicked-rbc-guide` |
+
+## Files Changed/Created
+
+| File | Action |
+|---|---|
+| `src/pages/LandingPage.tsx` | Modified — read params, forward to /guide, tag on mount |
+| `src/pages/GuidePage.tsx` | Modified — gating logic, tagging |
+| `src/components/landing/HeroSection.tsx` | Modified — forward params |
+| `src/components/landing/CTASection.tsx` | Modified — forward params |
+| `src/components/guide/GuideOptInGate.tsx` | New — opt-in form |
+| `supabase/functions/submit-lead/index.ts` | Modified — inline GHL upsert for no-contactId path |
+| `supabase/functions/tag-ghl-contact/index.ts` | New — lightweight tagging endpoint |
+| `supabase/config.toml` | Modified — register tag-ghl-contact |
+
+## What Is NOT Changed
+
+- Two-step GHL sync (upsert then tags) — preserved
+- `sync-to-ghl` function — untouched
+- Additive tag behavior — preserved
+- Custom field mapping — preserved
+- MLS import logic — untouched
 
