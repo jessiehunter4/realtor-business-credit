@@ -1,26 +1,18 @@
 
 
-# Clear Imported Data from Database
+# Add EveryCatch Tracking Script
 
-## What will be deleted
+Add the external tracking script to `index.html` in the `<head>` section, right before the closing `</head>` tag.
 
-All data from these tables (in dependency order):
+**File**: `index.html`
 
-1. **contact_syncs** — all rows (linked to agents/leads)
-2. **transactions** — all rows (linked to agents and import_batches)
-3. **import_batches** — all rows
-4. **agents** — all rows
-5. **leads** — all rows
-6. **opt_outs** — all rows
+Add:
+```html
+<script 
+  src="https://link.everycatch.com/js/external-tracking.js"
+  data-tracking-id="tk_455acad88a084ab786fcaa303c856da1">
+</script>
+```
 
-## What will be preserved
-
-- **auth.users** — jessie@goodtenants.com account untouched
-- **user_roles** — admin role for jessie preserved
-- **app_settings** — untouched
-- **intake_surveys**, **intake_coach_notes**, **custom_plans** — these will also be cleared unless you want to keep them (let me know)
-
-## How
-
-Run DELETE statements via the data tool against each table in the correct order (child tables first to respect any implicit relationships).
+Single file change, no other modifications needed.
 
