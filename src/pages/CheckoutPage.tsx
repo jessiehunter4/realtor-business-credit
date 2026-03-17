@@ -9,7 +9,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/cNifZg1Vo5JNaLi49NfYY01";
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
 
 const CheckoutPage = () => {
   return (
