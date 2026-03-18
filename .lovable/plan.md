@@ -1,43 +1,38 @@
 
 
-# Move Calendar Embed to /one-on-one and Update Booking Links
+# Persist contactId Across Sessions
 
-## Overview
-Move the EveryCatch calendar widget from `/booking-confirmed` to `/one-on-one` (just below the hero), update all "Book" CTAs to scroll/link to the embedded calendar on `/one-on-one`, and strip the calendar from `/booking-confirmed` without deleting the page.
+## Problem
+If a visitor arrives with `contactId` in the URL but later navigates to checkout or intake without it (e.g., via a bookmark, direct link, or Stripe redirect), the app loses the ability to associate that visit with the GHL contact.
 
-## Changes
+## Solution
+Use `localStorage` to persist the contactId (and other identity params) when they first appear in the URL. On every tracked page, check URL params first, then fall back to stored values.
 
-### 1. `src/pages/OneOnOnePage.tsx` -- Add calendar embed + post-booking content
+A custom hook `useContactIdentity` centralizes this logic.
 
-- Add the `useEffect` hook to load the EveryCatch `form_embed.js` script (moved from BookingConfirmedPage)
-- Add `useSearchParams` to capture `email`/`token` query params for the intake link
-- Insert a new **Calendar Embed section** immediately after the hero, containing the iframe in a Card (same markup as BookingConfirmedPage currently has)
-- Add the **"What Happens Next"** steps section (from BookingConfirmedPage) below the calendar
-- Add the **"Why Complete the Intake First?"** section (from BookingConfirmedPage) after the steps
-- Change the two existing CTA buttons (hero + bottom) from `<a href={BOOKING_URL} target="_blank">` to anchor-scroll links (e.g., `<a href="#book">`) that smooth-scroll to the calendar embed section, keeping users on-page
-- Add `id="book"` to the calendar section so anchor links work
+## Implementation
 
-### 2. `src/pages/BookingConfirmedPage.tsx` -- Remove calendar, keep the rest
+### New file: `src/hooks/useContactIdentity.ts`
+- On mount, reads `contactId`, `firstName`, `lastName`, `email`, `phone` from URL search params
+- If `contactId` is present in URL, stores all params to `localStorage` under a key like `rbc_contact`
+- If `contactId` is NOT in URL, reads from `localStorage` as fallback
+- Returns `{ contactId, firstName, lastName, email, phone }` — always the best available values
+- Also exposes a `buildForwardParams()` helper that returns a URLSearchParams string for link forwarding
 
-- Remove the `useEffect` script loader
-- Remove the Calendar Embed section (the iframe Card)
-- Remove the `EMBED_SCRIPT_URL` and `IFRAME_SRC` constants
-- Keep the hero, "What Happens Next" steps, "Why Complete the Intake" section, and footer CTAs intact so the page still functions as a post-booking reference if needed
-- Update the hero headline/subheadline to reflect it's now a confirmation/next-steps page (e.g., "Your Session Is Booked -- Here's What to Do Next")
-- Update step 1 text from "Pick a Time" to "Session Booked" (or similar confirmation language)
+### Modified files
+- `LandingPage.tsx` — replace manual param reading with `useContactIdentity()`
+- `GuidePage.tsx` — use `useContactIdentity()` for tagging and engagement tracking
+- `CheckoutPage.tsx` — use `useContactIdentity()` so contactId is available even without URL params
+- `IntakeSurveyPage.tsx` — same
+- `OneOnOnePage.tsx` — same
 
-### 3. `src/components/landing/CTASection.tsx` -- Already links to `/one-on-one`, no change needed
+### Why localStorage over cookies
+- No server-side rendering, so cookies offer no advantage
+- localStorage is simpler, doesn't expire per-session, and avoids cookie size/header concerns
+- Persists across tabs and browser restarts until explicitly cleared
+- If the visitor returns days later with no params, we still have their identity
 
-### 4. `src/components/landing/HeroSection.tsx` -- Already links to `/one-on-one`, no change needed
-
-### 5. `src/components/guide/GuideConclusion.tsx` -- Fix stale link
-- Change `Link to="/get_started"` to `Link to="/one-on-one"` (line 118)
-
-### 6. No route changes -- both `/one-on-one` and `/booking-confirmed` remain in `App.tsx`
-
-## Technical Notes
-- The EveryCatch script loader `useEffect` is idempotent (checks if script already exists before appending), so it works safely on the new page.
-- The calendar iframe ID stays the same (`Xt32XcNcmKgm7vaJaR9o_booking`).
-- Smooth-scroll to `#book` uses standard browser anchor behavior; no extra library needed.
-- Query params (`email`, `token`) on `/one-on-one` will be forwarded to the intake survey link, same as BookingConfirmedPage does today.
+### Edge case handling
+- If a new `contactId` arrives via URL that differs from stored, the stored value is overwritten (latest wins)
+- Pages that already have contactId in URL continue to work identically — localStorage is only a fallback
 
