@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2 } from "lucide-react";
@@ -6,6 +6,7 @@ import { pdf } from "@react-pdf/renderer";
 import { GuidePDF } from "@/components/GuidePDF";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
@@ -24,29 +25,82 @@ import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
 
+const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
+  25: { add: "g-guide-25pct" },
+  50: { add: "g-guide-50pct", remove: "g-guide-25pct" },
+  75: { add: "g-guide-75pct", remove: "g-guide-50pct" },
+  100: { add: "g-guide-complete", remove: "g-guide-75pct" },
+};
+
+const GUIDE_EVENT_MAP: Record<number, string> = {
+  25: "guide_read_25",
+  50: "guide_read_50",
+  75: "guide_read_75",
+  100: "guide_read_100",
+};
+
 const GuidePage = () => {
   const { contactId, buildForwardParams } = useContactIdentity();
   const [accessGranted, setAccessGranted] = useState(!!contactId);
   const [generating, setGenerating] = useState(false);
-  const [tagged, setTagged] = useState(false);
+  const taggedMount = useRef(false);
 
-  // Tag known visitor on guide page mount
-  useEffect(() => {
-    if (!contactId || tagged) return;
-    setTagged(true);
-    const tagGuideVisitor = async () => {
-      try {
-        await supabase.functions.invoke("tag-ghl-contact", {
-          body: { contactId, tags: ["c-clicked-rbc-guide"] },
-        });
-      } catch (e) {
-        console.error("Failed to tag guide visitor:", e);
+  const handleThreshold = useCallback(
+    async (pct: number) => {
+      const tagInfo = GUIDE_TAG_MAP[pct];
+      const eventType = GUIDE_EVENT_MAP[pct];
+      if (eventType) {
+        // logEvent is called automatically by the tracker for session summary,
+        // but we also log threshold events explicitly
+        try {
+          await supabase.functions.invoke("log-funnel-event", {
+            body: { contactId: contactId || undefined, eventType },
+          });
+        } catch (e) {
+          console.error(`Failed to log ${eventType}:`, e);
+        }
       }
-    };
-    tagGuideVisitor();
-  }, [contactId, tagged]);
+      if (contactId && tagInfo) {
+        try {
+          await supabase.functions.invoke("tag-ghl-contact", {
+            body: {
+              contactId,
+              tags: [tagInfo.add],
+              ...(tagInfo.remove ? { removeTags: [tagInfo.remove] } : {}),
+            },
+          });
+        } catch (e) {
+          console.error(`Failed to tag at ${pct}%:`, e);
+        }
+      }
+    },
+    [contactId],
+  );
 
-  const handleAccessGranted = (contactId: string) => {
+  const { logEvent } = useEngagementTracker({
+    contactId,
+    pageName: "guide",
+    scrollThresholds: [25, 50, 75, 100],
+    onThreshold: handleThreshold,
+  });
+
+  // Tag known visitor + log guide_view on mount
+  useEffect(() => {
+    if (taggedMount.current) return;
+    taggedMount.current = true;
+
+    logEvent("guide_view");
+
+    if (contactId) {
+      supabase.functions
+        .invoke("tag-ghl-contact", {
+          body: { contactId, tags: ["c-clicked-rbc-guide"] },
+        })
+        .catch((e) => console.error("Failed to tag guide visitor:", e));
+    }
+  }, [contactId, logEvent]);
+
+  const handleAccessGranted = () => {
     setAccessGranted(true);
   };
 

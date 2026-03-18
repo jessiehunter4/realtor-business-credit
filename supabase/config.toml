@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.tag-ghl-contact]
 verify_jwt = false
+
+[functions.log-funnel-event]
+verify_jwt = false
