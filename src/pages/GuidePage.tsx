@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { GuidePDF } from "@/components/GuidePDF";
 import { supabase } from "@/integrations/supabase/client";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
@@ -24,9 +25,8 @@ import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
 
 const GuidePage = () => {
-  const [searchParams] = useSearchParams();
-  const urlContactId = searchParams.get("contactId") || "";
-  const [accessGranted, setAccessGranted] = useState(!!urlContactId);
+  const { contactId, buildForwardParams } = useContactIdentity();
+  const [accessGranted, setAccessGranted] = useState(!!contactId);
   const [generating, setGenerating] = useState(false);
   const [tagged, setTagged] = useState(false);
 
