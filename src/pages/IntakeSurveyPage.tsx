@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
-
+import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { supabase } from "@/integrations/supabase/client";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -71,7 +72,10 @@ interface SurveyData {
 export default function IntakeSurveyPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const { contactId } = useContactIdentity();
   const { toast } = useToast();
+  const mountLogged = useRef(false);
+  const mountTime = useRef(Date.now());
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -79,6 +83,40 @@ export default function IntakeSurveyPage() {
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
+
+  // Log intake_started on mount
+  useEffect(() => {
+    if (mountLogged.current || !token) return;
+    mountLogged.current = true;
+
+    supabase.functions
+      .invoke("log-funnel-event", {
+        body: { contactId: contactId || undefined, eventType: "intake_started" },
+      })
+      .catch((e) => console.error("Failed to log intake_started:", e));
+
+    if (contactId) {
+      supabase.functions
+        .invoke("tag-ghl-contact", {
+          body: { contactId, tags: ["f-intake-started"] },
+        })
+        .catch((e) => console.error("Failed to tag intake start:", e));
+    }
+
+    // Log session on unmount
+    return () => {
+      const seconds = Math.round((Date.now() - mountTime.current) / 1000);
+      supabase.functions
+        .invoke("log-funnel-event", {
+          body: {
+            contactId: contactId || undefined,
+            eventType: "intake_session",
+            metadata: { time_on_page_seconds: seconds },
+          },
+        })
+        .catch(() => {});
+    };
+  }, [contactId, token]);
 
   useEffect(() => {
     if (!token) { setNotFound(true); setLoading(false); return; }
@@ -126,6 +164,21 @@ export default function IntakeSurveyPage() {
       );
       if (!res.ok) throw new Error("Failed to submit");
       setSubmitted(true);
+
+      // Log intake_submitted event + tag
+      supabase.functions
+        .invoke("log-funnel-event", {
+          body: { contactId: contactId || undefined, eventType: "intake_submitted" },
+        })
+        .catch(() => {});
+      if (contactId) {
+        supabase.functions
+          .invoke("tag-ghl-contact", {
+            body: { contactId, tags: ["f-intake-submitted"] },
+          })
+          .catch(() => {});
+      }
+
       toast({ title: "Survey Submitted", description: "Thank you! We'll review your answers before our session." });
     } catch {
       toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });

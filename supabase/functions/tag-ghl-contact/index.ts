@@ -9,10 +9,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { contactId, tags } = await req.json();
+    const { contactId, tags, removeTags } = await req.json();
 
-    if (!contactId || !Array.isArray(tags) || tags.length === 0) {
-      return new Response(JSON.stringify({ error: 'contactId and tags[] are required' }), {
+    if (!contactId) {
+      return new Response(JSON.stringify({ error: 'contactId is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const hasTags = Array.isArray(tags) && tags.length > 0;
+    const hasRemoveTags = Array.isArray(removeTags) && removeTags.length > 0;
+
+    if (!hasTags && !hasRemoveTags) {
+      return new Response(JSON.stringify({ error: 'tags[] or removeTags[] required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -27,31 +37,65 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log(`Applying tags ${JSON.stringify(tags)} to GHL contact ${contactId}`);
+    const results: { added?: string[]; removed?: string[]; errors?: string[] } = {};
+    const errors: string[] = [];
 
-    const response = await fetch(`https://services.leadconnectorhq.com/contacts/${contactId}/tags`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${ghlApiKey}`,
-        'Content-Type': 'application/json',
-        'Version': '2021-07-28',
-      },
-      body: JSON.stringify({ tags }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`GHL tags API failed [${response.status}]:`, errorText);
-      return new Response(JSON.stringify({ error: 'Failed to apply tags', details: errorText }), {
-        status: 502,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    // Remove tags first (so add takes precedence if same tag in both)
+    if (hasRemoveTags) {
+      console.log(`Removing tags ${JSON.stringify(removeTags)} from GHL contact ${contactId}`);
+      const removeRes = await fetch(`https://services.leadconnectorhq.com/contacts/${contactId}/tags`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${ghlApiKey}`,
+          'Content-Type': 'application/json',
+          'Version': '2021-07-28',
+        },
+        body: JSON.stringify({ tags: removeTags }),
       });
+
+      if (!removeRes.ok) {
+        const errText = await removeRes.text();
+        console.error(`GHL remove tags failed [${removeRes.status}]:`, errText);
+        errors.push(`Remove failed: ${errText}`);
+      } else {
+        const removeData = await removeRes.json();
+        results.removed = removeData.tags || removeTags;
+        console.log('Tags removed successfully:', JSON.stringify(removeData));
+      }
     }
 
-    const data = await response.json();
-    console.log('Tags applied successfully:', JSON.stringify(data));
+    // Add tags
+    if (hasTags) {
+      console.log(`Applying tags ${JSON.stringify(tags)} to GHL contact ${contactId}`);
+      const addRes = await fetch(`https://services.leadconnectorhq.com/contacts/${contactId}/tags`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${ghlApiKey}`,
+          'Content-Type': 'application/json',
+          'Version': '2021-07-28',
+        },
+        body: JSON.stringify({ tags }),
+      });
 
-    return new Response(JSON.stringify({ success: true, tags: data.tags }), {
+      if (!addRes.ok) {
+        const errText = await addRes.text();
+        console.error(`GHL add tags failed [${addRes.status}]:`, errText);
+        errors.push(`Add failed: ${errText}`);
+      } else {
+        const addData = await addRes.json();
+        results.added = addData.tags || tags;
+        console.log('Tags applied successfully:', JSON.stringify(addData));
+      }
+    }
+
+    if (errors.length > 0) {
+      results.errors = errors;
+    }
+
+    const allFailed = (hasTags && !results.added) && (hasRemoveTags && !results.removed);
+
+    return new Response(JSON.stringify({ success: !allFailed, ...results }), {
+      status: allFailed ? 502 : 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

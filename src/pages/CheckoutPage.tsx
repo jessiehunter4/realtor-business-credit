@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,12 +10,46 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useEngagementTracker } from "@/hooks/useEngagementTracker";
+import { supabase } from "@/integrations/supabase/client";
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
 
 const CheckoutPage = () => {
-  // contactId available even without URL params via localStorage fallback
   const { contactId } = useContactIdentity();
+  const taggedMount = useRef(false);
+
+  const { logEvent } = useEngagementTracker({
+    contactId,
+    pageName: "checkout",
+  });
+
+  // Log visit + tag on mount
+  useEffect(() => {
+    if (taggedMount.current) return;
+    taggedMount.current = true;
+
+    logEvent("checkout_visited");
+
+    if (contactId) {
+      supabase.functions
+        .invoke("tag-ghl-contact", {
+          body: { contactId, tags: ["f-checkout-visited"] },
+        })
+        .catch((e) => console.error("Failed to tag checkout visit:", e));
+    }
+  }, [contactId, logEvent]);
+
+  const handlePaymentClick = () => {
+    logEvent("checkout_clicked");
+    if (contactId) {
+      supabase.functions
+        .invoke("tag-ghl-contact", {
+          body: { contactId, tags: ["f-checkout-clicked"] },
+        })
+        .catch((e) => console.error("Failed to tag checkout click:", e));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-secondary text-secondary-foreground">
@@ -82,7 +117,12 @@ const CheckoutPage = () => {
           </Card>
 
           {/* CTA Button */}
-          <a href={STRIPE_PAYMENT_LINK} target="_blank" rel="noopener noreferrer">
+          <a
+            href={STRIPE_PAYMENT_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handlePaymentClick}
+          >
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-6 rounded-lg font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30"

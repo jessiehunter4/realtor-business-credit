@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import HeroSection from "@/components/landing/HeroSection";
@@ -14,20 +14,27 @@ const LandingPage = () => {
   const { contactId, firstName, buildForwardParams } = useContactIdentity();
   const fwd = buildForwardParams();
   const guideLink = `/guide${fwd ? `?${fwd}` : ""}`;
+  const logged = useRef(false);
 
-  // Tag known visitors on landing page mount
   useEffect(() => {
-    if (!contactId) return;
-    const tagVisitor = async () => {
-      try {
-        await supabase.functions.invoke("tag-ghl-contact", {
+    if (logged.current) return;
+    logged.current = true;
+
+    // Log site visit for all visitors
+    supabase.functions
+      .invoke("log-funnel-event", {
+        body: { contactId: contactId || undefined, eventType: "site_visit" },
+      })
+      .catch((e) => console.error("Failed to log site_visit:", e));
+
+    // Tag known visitors
+    if (contactId) {
+      supabase.functions
+        .invoke("tag-ghl-contact", {
           body: { contactId, tags: ["l-visited-rbc-site"] },
-        });
-      } catch (e) {
-        console.error("Failed to tag landing visitor:", e);
-      }
-    };
-    tagVisitor();
+        })
+        .catch((e) => console.error("Failed to tag landing visitor:", e));
+    }
   }, [contactId]);
 
   return (
