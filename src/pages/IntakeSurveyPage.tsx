@@ -72,7 +72,10 @@ interface SurveyData {
 export default function IntakeSurveyPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const { contactId } = useContactIdentity();
   const { toast } = useToast();
+  const mountLogged = useRef(false);
+  const mountTime = useRef(Date.now());
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -80,6 +83,40 @@ export default function IntakeSurveyPage() {
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
+
+  // Log intake_started on mount
+  useEffect(() => {
+    if (mountLogged.current || !token) return;
+    mountLogged.current = true;
+
+    supabase.functions
+      .invoke("log-funnel-event", {
+        body: { contactId: contactId || undefined, eventType: "intake_started" },
+      })
+      .catch((e) => console.error("Failed to log intake_started:", e));
+
+    if (contactId) {
+      supabase.functions
+        .invoke("tag-ghl-contact", {
+          body: { contactId, tags: ["f-intake-started"] },
+        })
+        .catch((e) => console.error("Failed to tag intake start:", e));
+    }
+
+    // Log session on unmount
+    return () => {
+      const seconds = Math.round((Date.now() - mountTime.current) / 1000);
+      supabase.functions
+        .invoke("log-funnel-event", {
+          body: {
+            contactId: contactId || undefined,
+            eventType: "intake_session",
+            metadata: { time_on_page_seconds: seconds },
+          },
+        })
+        .catch(() => {});
+    };
+  }, [contactId, token]);
 
   useEffect(() => {
     if (!token) { setNotFound(true); setLoading(false); return; }
