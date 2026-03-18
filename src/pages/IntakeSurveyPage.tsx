@@ -164,6 +164,21 @@ export default function IntakeSurveyPage() {
       );
       if (!res.ok) throw new Error("Failed to submit");
       setSubmitted(true);
+
+      // Log intake_submitted event + tag
+      supabase.functions
+        .invoke("log-funnel-event", {
+          body: { contactId: contactId || undefined, eventType: "intake_submitted" },
+        })
+        .catch(() => {});
+      if (contactId) {
+        supabase.functions
+          .invoke("tag-ghl-contact", {
+            body: { contactId, tags: ["f-intake-submitted"] },
+          })
+          .catch(() => {});
+      }
+
       toast({ title: "Survey Submitted", description: "Thank you! We'll review your answers before our session." });
     } catch {
       toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
