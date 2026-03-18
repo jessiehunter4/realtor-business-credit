@@ -13,6 +13,9 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
 
 const CheckoutPage = () => {
+  // contactId available even without URL params via localStorage fallback
+  const { contactId } = useContactIdentity();
+
   return (
     <div className="min-h-screen bg-secondary text-secondary-foreground">
       {/* Header */}

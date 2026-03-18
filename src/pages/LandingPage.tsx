@@ -32,7 +32,7 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <HeroSection firstName={urlFirstName} guideLink={guideLink} />
+      <HeroSection firstName={firstName} guideLink={guideLink} />
       <TimingSection />
       <TruthSection />
       <ComparisonSection />

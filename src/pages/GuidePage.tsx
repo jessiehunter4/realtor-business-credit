@@ -95,7 +95,7 @@ const GuidePage = () => {
               <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
             </Button>
             <Button asChild size="sm" className="text-sm">
-              <Link to="/one-on-one">
+              <Link to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}>
                 <Calendar className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Book a One-on-One Session</span>
                 <span className="sm:hidden">Book Session</span>
