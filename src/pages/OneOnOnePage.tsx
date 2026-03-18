@@ -23,13 +23,14 @@ import {
   UserCheck,
 } from "lucide-react";
 import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 const EMBED_SCRIPT_URL = "https://link.everycatch.com/js/form_embed.js";
 const IFRAME_SRC = "https://link.everycatch.com/widget/booking/Xt32XcNcmKgm7vaJaR9o";
 
 const OneOnOnePage = () => {
   const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || "";
+  const { contactId, email, buildForwardParams } = useContactIdentity();
   const token = searchParams.get("token") || "";
 
   const intakeLink = `/intake${email || token ? `?${email ? `email=${encodeURIComponent(email)}` : ""}${email && token ? "&" : ""}${token ? `token=${token}` : ""}` : ""}`;

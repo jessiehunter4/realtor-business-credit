@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { GuidePDF } from "@/components/GuidePDF";
 import { supabase } from "@/integrations/supabase/client";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
@@ -24,27 +25,26 @@ import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
 
 const GuidePage = () => {
-  const [searchParams] = useSearchParams();
-  const urlContactId = searchParams.get("contactId") || "";
-  const [accessGranted, setAccessGranted] = useState(!!urlContactId);
+  const { contactId, buildForwardParams } = useContactIdentity();
+  const [accessGranted, setAccessGranted] = useState(!!contactId);
   const [generating, setGenerating] = useState(false);
   const [tagged, setTagged] = useState(false);
 
   // Tag known visitor on guide page mount
   useEffect(() => {
-    if (!urlContactId || tagged) return;
+    if (!contactId || tagged) return;
     setTagged(true);
     const tagGuideVisitor = async () => {
       try {
         await supabase.functions.invoke("tag-ghl-contact", {
-          body: { contactId: urlContactId, tags: ["c-clicked-rbc-guide"] },
+          body: { contactId, tags: ["c-clicked-rbc-guide"] },
         });
       } catch (e) {
         console.error("Failed to tag guide visitor:", e);
       }
     };
     tagGuideVisitor();
-  }, [urlContactId, tagged]);
+  }, [contactId, tagged]);
 
   const handleAccessGranted = (contactId: string) => {
     setAccessGranted(true);
@@ -95,7 +95,7 @@ const GuidePage = () => {
               <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
             </Button>
             <Button asChild size="sm" className="text-sm">
-              <Link to="/one-on-one">
+              <Link to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}>
                 <Calendar className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Book a One-on-One Session</span>
                 <span className="sm:hidden">Book Session</span>
