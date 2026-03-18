@@ -261,6 +261,33 @@ export type Database = {
           },
         ]
       }
+      funnel_events: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          ghl_contact_id: string | null
+          id: string
+          lead_id: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          ghl_contact_id?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          ghl_contact_id?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       import_batches: {
         Row: {
           agents_created: number | null
