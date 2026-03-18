@@ -32,19 +32,19 @@ const GuidePage = () => {
 
   // Tag known visitor on guide page mount
   useEffect(() => {
-    if (!urlContactId || tagged) return;
+    if (!contactId || tagged) return;
     setTagged(true);
     const tagGuideVisitor = async () => {
       try {
         await supabase.functions.invoke("tag-ghl-contact", {
-          body: { contactId: urlContactId, tags: ["c-clicked-rbc-guide"] },
+          body: { contactId, tags: ["c-clicked-rbc-guide"] },
         });
       } catch (e) {
         console.error("Failed to tag guide visitor:", e);
       }
     };
     tagGuideVisitor();
-  }, [urlContactId, tagged]);
+  }, [contactId, tagged]);
 
   const handleAccessGranted = (contactId: string) => {
     setAccessGranted(true);
