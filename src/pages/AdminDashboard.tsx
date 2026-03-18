@@ -3,8 +3,71 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { User } from "@supabase/supabase-js";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Users, FileText, TrendingUp, Activity, RefreshCw } from "lucide-react";
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+interface FunnelCount {
+  event_type: string;
+  count: number;
+}
+
+interface RecentEvent {
+  id: string;
+  event_type: string;
+  ghl_contact_id: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+const FUNNEL_ORDER = [
+  "site_visit",
+  "guide_view",
+  "guide_read_25",
+  "guide_read_50",
+  "guide_read_75",
+  "guide_read_100",
+  "checkout_visited",
+  "checkout_clicked",
+  "intake_started",
+  "intake_submitted",
+];
+
+const FUNNEL_LABELS: Record<string, string> = {
+  site_visit: "Site Visit",
+  guide_view: "Guide View",
+  guide_read_25: "Guide 25%",
+  guide_read_50: "Guide 50%",
+  guide_read_75: "Guide 75%",
+  guide_read_100: "Guide 100%",
+  checkout_visited: "Checkout Visit",
+  checkout_clicked: "Checkout Click",
+  intake_started: "Intake Start",
+  intake_submitted: "Intake Submit",
+};
+
+const BAR_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--primary))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--chart-5))",
+];
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -12,37 +75,54 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [settingUpAdmin, setSettingUpAdmin] = useState(false);
-  const [stats, setStats] = useState({
-    agents: 0,
-    leads: 0,
-    transactions: 0,
-  });
-  const [syncStats, setSyncStats] = useState({
-    pending: 0,
-    success: 0,
-    failed: 0,
-  });
+
+  // Overview stats
+  const [stats, setStats] = useState({ agents: 0, leads: 0, transactions: 0 });
+  const [syncStats, setSyncStats] = useState({ pending: 0, success: 0, failed: 0 });
   const [syncing, setSyncing] = useState(false);
   const [lastSyncResult, setLastSyncResult] = useState<string | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
-  const [connectionResult, setConnectionResult] = useState<{ connected: boolean; location_name?: string; error?: string; details?: string } | null>(null);
+  const [connectionResult, setConnectionResult] = useState<{
+    connected: boolean;
+    location_name?: string;
+    error?: string;
+    details?: string;
+  } | null>(null);
+
+  // Funnel analytics
+  const [funnelData, setFunnelData] = useState<FunnelCount[]>([]);
+  const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
+
+  // Engagement
+  const [engagementStats, setEngagementStats] = useState({
+    guideAvgScroll: 0,
+    guideAvgTime: 0,
+    checkoutVisits: 0,
+    checkoutClicks: 0,
+    checkoutAvgTime: 0,
+    intakeStarted: 0,
+    intakeSubmitted: 0,
+    intakeAvgTime: 0,
+  });
 
   useEffect(() => {
     checkAdminStatus();
   }, []);
 
+  /* ---------- Auth / Admin Check ---------- */
+
   const checkAdminStatus = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth");
         return;
       }
-
       setUser(user);
 
-      // Check if user has admin role
       const { data: roles, error } = await supabase
         .from("user_roles")
         .select("role")
@@ -58,10 +138,8 @@ export default function AdminDashboard() {
 
       const hasAdmin = !!roles;
       setIsAdmin(hasAdmin);
-
-      // Fetch stats if admin
       if (hasAdmin) {
-        await fetchStats();
+        await Promise.all([fetchStats(), fetchFunnelData("30d"), fetchEngagement()]);
       }
     } catch (error) {
       console.error("Error in checkAdminStatus:", error);
@@ -71,6 +149,8 @@ export default function AdminDashboard() {
     }
   };
 
+  /* ---------- Overview ---------- */
+
   const fetchStats = async () => {
     try {
       const [agentsResult, leadsResult, transactionsResult] = await Promise.all([
@@ -78,13 +158,11 @@ export default function AdminDashboard() {
         supabase.from("leads").select("id", { count: "exact", head: true }),
         supabase.from("transactions").select("id", { count: "exact", head: true }),
       ]);
-
       setStats({
         agents: agentsResult.count || 0,
         leads: leadsResult.count || 0,
         transactions: transactionsResult.count || 0,
       });
-
       await fetchSyncStats();
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -98,7 +176,6 @@ export default function AdminDashboard() {
         supabase.from("contact_syncs").select("id", { count: "exact", head: true }).eq("status", "success"),
         supabase.from("contact_syncs").select("id", { count: "exact", head: true }).eq("status", "failed"),
       ]);
-
       setSyncStats({
         pending: pendingResult.count || 0,
         success: successResult.count || 0,
@@ -113,17 +190,13 @@ export default function AdminDashboard() {
     setSyncing(true);
     setLastSyncResult(null);
     try {
-      const { data, error } = await supabase.functions.invoke('sync-to-ghl', {
-        body: { manual: true }
-      });
-      
+      const { data, error } = await supabase.functions.invoke("sync-to-ghl", { body: { manual: true } });
       if (error) {
         toast.error("Failed to trigger sync");
-        console.error("Sync error:", error);
         setLastSyncResult(`Error: ${error.message}`);
       } else {
         const result = data as { processed?: number; successful?: number; failed?: number; message?: string };
-        if (result.message === 'No pending syncs') {
+        if (result.message === "No pending syncs") {
           toast.info("No pending contacts to sync");
           setLastSyncResult("No pending syncs found");
         } else {
@@ -145,33 +218,162 @@ export default function AdminDashboard() {
     setTestingConnection(true);
     setConnectionResult(null);
     try {
-      const { data, error } = await supabase.functions.invoke('test-ghl-connection');
+      const { data, error } = await supabase.functions.invoke("test-ghl-connection");
       if (error) {
         setConnectionResult({ connected: false, error: error.message });
       } else {
         setConnectionResult(data as { connected: boolean; location_name?: string; error?: string; details?: string });
       }
-    } catch (error) {
-      setConnectionResult({ connected: false, error: 'Request failed' });
+    } catch {
+      setConnectionResult({ connected: false, error: "Request failed" });
     } finally {
       setTestingConnection(false);
     }
   };
 
+  /* ---------- Funnel Analytics ---------- */
+
+  const fetchFunnelData = async (range: "7d" | "30d" | "90d" | "all") => {
+    setDateRange(range);
+    try {
+      let query = supabase.from("funnel_events").select("event_type, created_at");
+
+      if (range !== "all") {
+        const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
+        const since = new Date(Date.now() - days * 86400000).toISOString();
+        query = query.gte("created_at", since);
+      }
+
+      const { data, error } = await query;
+      if (error) {
+        console.error("Error fetching funnel data:", error);
+        return;
+      }
+
+      // Count by event_type
+      const counts: Record<string, number> = {};
+      for (const row of data || []) {
+        counts[row.event_type] = (counts[row.event_type] || 0) + 1;
+      }
+
+      const ordered = FUNNEL_ORDER.map((et) => ({
+        event_type: et,
+        count: counts[et] || 0,
+      }));
+      setFunnelData(ordered);
+
+      // Recent events (last 50)
+      const { data: recent, error: recentErr } = await supabase
+        .from("funnel_events")
+        .select("id, event_type, ghl_contact_id, metadata, created_at")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!recentErr && recent) {
+        setRecentEvents(recent as unknown as RecentEvent[]);
+      }
+    } catch (error) {
+      console.error("Error fetching funnel data:", error);
+    }
+  };
+
+  /* ---------- Engagement ---------- */
+
+  const fetchEngagement = async () => {
+    try {
+      // Guide sessions
+      const { data: guideSessions } = await supabase
+        .from("funnel_events")
+        .select("metadata")
+        .eq("event_type", "guide_session");
+
+      let guideAvgScroll = 0;
+      let guideAvgTime = 0;
+      if (guideSessions && guideSessions.length > 0) {
+        const scrolls = guideSessions.map((r) => {
+          const m = r.metadata as Record<string, number> | null;
+          return m?.max_scroll_pct ?? 0;
+        });
+        const times = guideSessions.map((r) => {
+          const m = r.metadata as Record<string, number> | null;
+          return m?.time_on_page_seconds ?? 0;
+        });
+        guideAvgScroll = Math.round(scrolls.reduce((a, b) => a + b, 0) / scrolls.length);
+        guideAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      }
+
+      // Checkout
+      const { count: checkoutVisits } = await supabase
+        .from("funnel_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "checkout_visited");
+      const { count: checkoutClicks } = await supabase
+        .from("funnel_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "checkout_clicked");
+      const { data: checkoutSessions } = await supabase
+        .from("funnel_events")
+        .select("metadata")
+        .eq("event_type", "checkout_session");
+      let checkoutAvgTime = 0;
+      if (checkoutSessions && checkoutSessions.length > 0) {
+        const times = checkoutSessions.map((r) => {
+          const m = r.metadata as Record<string, number> | null;
+          return m?.time_on_page_seconds ?? 0;
+        });
+        checkoutAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      }
+
+      // Intake
+      const { count: intakeStarted } = await supabase
+        .from("funnel_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "intake_started");
+      const { count: intakeSubmitted } = await supabase
+        .from("funnel_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "intake_submitted");
+      const { data: intakeSessions } = await supabase
+        .from("funnel_events")
+        .select("metadata")
+        .eq("event_type", "intake_session");
+      let intakeAvgTime = 0;
+      if (intakeSessions && intakeSessions.length > 0) {
+        const times = intakeSessions.map((r) => {
+          const m = r.metadata as Record<string, number> | null;
+          return m?.time_on_page_seconds ?? 0;
+        });
+        intakeAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      }
+
+      setEngagementStats({
+        guideAvgScroll,
+        guideAvgTime,
+        checkoutVisits: checkoutVisits || 0,
+        checkoutClicks: checkoutClicks || 0,
+        checkoutAvgTime,
+        intakeStarted: intakeStarted || 0,
+        intakeSubmitted: intakeSubmitted || 0,
+        intakeAvgTime,
+      });
+    } catch (error) {
+      console.error("Error fetching engagement:", error);
+    }
+  };
+
+  /* ---------- Admin Setup ---------- */
+
   const handleSetupAdmin = async () => {
     setSettingUpAdmin(true);
     try {
-      const { error } = await supabase.functions.invoke('setup-admin');
-      
+      const { error } = await supabase.functions.invoke("setup-admin");
       if (error) {
         toast.error("Failed to setup admin access");
-        console.error("Setup admin error:", error);
       } else {
         toast.success("Admin access granted!");
         await checkAdminStatus();
       }
-    } catch (error) {
-      console.error("Error setting up admin:", error);
+    } catch {
       toast.error("An error occurred");
     } finally {
       setSettingUpAdmin(false);
@@ -180,18 +382,19 @@ export default function AdminDashboard() {
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("Error signing out");
-    } else {
+    if (error) toast.error("Error signing out");
+    else {
       toast.success("Signed out successfully");
       navigate("/auth");
     }
   };
 
+  /* ---------- Render ---------- */
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
@@ -203,23 +406,12 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle>Admin Access Setup</CardTitle>
             <CardDescription>
-              Click the button below to grant yourself admin access. This is a one-time setup for the first administrator.
+              Click below to grant yourself admin access. One-time setup for the first administrator.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button 
-              onClick={handleSetupAdmin} 
-              className="w-full"
-              disabled={settingUpAdmin}
-            >
-              {settingUpAdmin ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
-                  Setting up...
-                </>
-              ) : (
-                "Setup Admin Access"
-              )}
+            <Button onClick={handleSetupAdmin} className="w-full" disabled={settingUpAdmin}>
+              {settingUpAdmin ? "Setting up..." : "Setup Admin Access"}
             </Button>
             <Button onClick={handleSignOut} variant="outline" className="w-full">
               Sign Out
@@ -230,19 +422,25 @@ export default function AdminDashboard() {
     );
   }
 
+  const formatSeconds = (s: number) => {
+    if (s < 60) return `${s}s`;
+    return `${Math.floor(s / 60)}m ${s % 60}s`;
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      {/* Header */}
+      <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold">Realtor Business Credit Admin</h1>
-            <Button variant="ghost" onClick={() => navigate("/")}>
-              View Landing Page
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+              View Site
             </Button>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button onClick={handleSignOut} variant="outline">
+            <Button onClick={handleSignOut} variant="outline" size="sm">
               Sign Out
             </Button>
           </div>
@@ -250,136 +448,362 @@ export default function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Quick actions */}
         <div className="mb-6 flex gap-3">
-          <Button onClick={() => navigate("/admin/mls-import")}>
-            Import MLS Data
-          </Button>
+          <Button onClick={() => navigate("/admin/mls-import")}>Import MLS Data</Button>
           <Button variant="outline" onClick={() => navigate("/admin/intake")}>
             Intake Surveys
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Agents</CardTitle>
-              <CardDescription>Agents from MLS imports</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{stats.agents}</p>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="overview" className="gap-1.5">
+              <Users className="h-4 w-4" /> Overview
+            </TabsTrigger>
+            <TabsTrigger value="funnel" className="gap-1.5">
+              <TrendingUp className="h-4 w-4" /> Funnel Analytics
+            </TabsTrigger>
+            <TabsTrigger value="engagement" className="gap-1.5">
+              <Activity className="h-4 w-4" /> Engagement
+            </TabsTrigger>
+          </TabsList>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Leads</CardTitle>
-              <CardDescription>From landing page</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{stats.leads}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Transactions</CardTitle>
-              <CardDescription>Total closings tracked</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{stats.transactions}</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>GoHighLevel Sync Status</CardTitle>
-            <CardDescription>
-              Contact synchronization with GoHighLevel CRM
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold text-amber-600">{syncStats.pending}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Synced</p>
-                <p className="text-2xl font-bold text-green-600">{syncStats.success}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Failed</p>
-                <p className="text-2xl font-bold text-red-600">{syncStats.failed}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <Button 
-                onClick={handleManualSync}
-                disabled={syncing || syncStats.pending === 0}
-              >
-                {syncing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
-                    Syncing...
-                  </>
-                ) : (
-                  `Sync Now (${syncStats.pending} pending)`
-                )}
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleTestGHLConnection}
-                disabled={testingConnection}
-              >
-                {testingConnection ? "Testing..." : "Test GHL Connection"}
-              </Button>
+          {/* ======== OVERVIEW TAB ======== */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-3">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Agents</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold">{stats.agents}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Leads</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold">{stats.leads}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Transactions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold">{stats.transactions}</p>
+                </CardContent>
+              </Card>
             </div>
 
-            {connectionResult && (
-              <div className={`p-3 rounded-md ${connectionResult.connected ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                {connectionResult.connected ? (
-                  <p className="text-sm text-green-800">
-                    ✅ Connected to GHL — Location: <strong>{connectionResult.location_name}</strong>
-                  </p>
-                ) : (
-                  <div className="text-sm text-red-800">
-                    <p>❌ Connection failed: {connectionResult.error}</p>
-                    {connectionResult.details && <p className="mt-1 font-mono text-xs">{connectionResult.details}</p>}
+            {/* GHL Sync */}
+            <Card>
+              <CardHeader>
+                <CardTitle>GoHighLevel Sync Status</CardTitle>
+                <CardDescription>Contact synchronization with CRM</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Pending</p>
+                    <p className="text-2xl font-bold text-amber-600">{syncStats.pending}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Synced</p>
+                    <p className="text-2xl font-bold text-green-600">{syncStats.success}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Failed</p>
+                    <p className="text-2xl font-bold text-red-600">{syncStats.failed}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <Button onClick={handleManualSync} disabled={syncing || syncStats.pending === 0}>
+                    {syncing ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Syncing...
+                      </>
+                    ) : (
+                      `Sync Now (${syncStats.pending} pending)`
+                    )}
+                  </Button>
+                  <Button variant="outline" onClick={handleTestGHLConnection} disabled={testingConnection}>
+                    {testingConnection ? "Testing..." : "Test GHL Connection"}
+                  </Button>
+                </div>
+
+                {connectionResult && (
+                  <div
+                    className={`p-3 rounded-md ${
+                      connectionResult.connected
+                        ? "bg-green-50 border border-green-200"
+                        : "bg-red-50 border border-red-200"
+                    }`}
+                  >
+                    {connectionResult.connected ? (
+                      <p className="text-sm text-green-800">
+                        ✅ Connected — Location: <strong>{connectionResult.location_name}</strong>
+                      </p>
+                    ) : (
+                      <div className="text-sm text-red-800">
+                        <p>❌ Connection failed: {connectionResult.error}</p>
+                        {connectionResult.details && (
+                          <p className="mt-1 font-mono text-xs">{connectionResult.details}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
+
+                {lastSyncResult && (
+                  <div className="p-3 bg-muted rounded-md">
+                    <p className="text-sm font-mono">{lastSyncResult}</p>
+                  </div>
+                )}
+
+                <p className="text-xs text-muted-foreground">
+                  Automatic sync runs every 5 minutes. Manual sync processes up to 20 contacts at a time.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ======== FUNNEL ANALYTICS TAB ======== */}
+          <TabsContent value="funnel" className="space-y-6">
+            <div className="flex items-center gap-2">
+              {(["7d", "30d", "90d", "all"] as const).map((r) => (
+                <Button
+                  key={r}
+                  size="sm"
+                  variant={dateRange === r ? "default" : "outline"}
+                  onClick={() => fetchFunnelData(r)}
+                >
+                  {r === "all" ? "All Time" : `Last ${r.replace("d", " days")}`}
+                </Button>
+              ))}
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Funnel Progression</CardTitle>
+                <CardDescription>Event counts across funnel stages</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {funnelData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis
+                        dataKey="event_type"
+                        tickFormatter={(v) => FUNNEL_LABELS[v] || v}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        className="text-xs fill-muted-foreground"
+                      />
+                      <YAxis className="text-xs fill-muted-foreground" />
+                      <Tooltip
+                        labelFormatter={(v) => FUNNEL_LABELS[v as string] || v}
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                        {funnelData.map((_, i) => (
+                          <Cell key={i} fill={BAR_COLORS[i] || "hsl(var(--primary))"} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="text-muted-foreground text-center py-12">
+                    No funnel events recorded yet. Events will appear as visitors interact with your site.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Conversion rates */}
+            {funnelData.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Conversion Rates</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {[
+                      { label: "Visit → Guide View", from: "site_visit", to: "guide_view" },
+                      { label: "Guide View → 50%+", from: "guide_view", to: "guide_read_50" },
+                      { label: "Guide View → Complete", from: "guide_view", to: "guide_read_100" },
+                      { label: "Visit → Checkout", from: "site_visit", to: "checkout_visited" },
+                      { label: "Checkout → Click", from: "checkout_visited", to: "checkout_clicked" },
+                      { label: "Intake Start → Submit", from: "intake_started", to: "intake_submitted" },
+                    ].map(({ label, from, to }) => {
+                      const fromCount = funnelData.find((f) => f.event_type === from)?.count || 0;
+                      const toCount = funnelData.find((f) => f.event_type === to)?.count || 0;
+                      const rate = fromCount > 0 ? Math.round((toCount / fromCount) * 100) : 0;
+                      return (
+                        <div key={label} className="p-3 bg-muted rounded-lg">
+                          <p className="text-xs text-muted-foreground mb-1">{label}</p>
+                          <p className="text-2xl font-bold">{rate}%</p>
+                          <p className="text-xs text-muted-foreground">
+                            {toCount} / {fromCount}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
+            {/* Recent events */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Events</CardTitle>
+                <CardDescription>Last 50 funnel events</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {recentEvents.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Time</th>
+                          <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Event</th>
+                          <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Contact</th>
+                          <th className="text-left py-2 font-medium text-muted-foreground">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentEvents.map((ev) => (
+                          <tr key={ev.id} className="border-b border-border/50">
+                            <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">
+                              {new Date(ev.created_at).toLocaleString()}
+                            </td>
+                            <td className="py-2 pr-4 font-medium">
+                              {FUNNEL_LABELS[ev.event_type] || ev.event_type}
+                            </td>
+                            <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
+                              {ev.ghl_contact_id ? ev.ghl_contact_id.slice(0, 12) + "…" : "—"}
+                            </td>
+                            <td className="py-2 text-muted-foreground text-xs">
+                              {ev.metadata && Object.keys(ev.metadata).length > 0
+                                ? JSON.stringify(ev.metadata)
+                                : "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-6">No events yet.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
+          {/* ======== ENGAGEMENT TAB ======== */}
+          <TabsContent value="engagement" className="space-y-6">
+            {/* Guide */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" /> Guide Engagement
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Avg Scroll Depth</p>
+                    <p className="text-3xl font-bold">{engagementStats.guideAvgScroll}%</p>
+                    <div className="w-full bg-muted rounded-full h-2 mt-2">
+                      <div
+                        className="bg-primary rounded-full h-2 transition-all"
+                        style={{ width: `${engagementStats.guideAvgScroll}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Avg Time on Page</p>
+                    <p className="text-3xl font-bold">{formatSeconds(engagementStats.guideAvgTime)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {lastSyncResult && (
-              <div className="p-3 bg-muted rounded-md">
-                <p className="text-sm font-mono">{lastSyncResult}</p>
-              </div>
-            )}
+            {/* Checkout */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Checkout Engagement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Visits</p>
+                    <p className="text-3xl font-bold">{engagementStats.checkoutVisits}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Payment Clicks</p>
+                    <p className="text-3xl font-bold">{engagementStats.checkoutClicks}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Avg Time on Page</p>
+                    <p className="text-3xl font-bold">{formatSeconds(engagementStats.checkoutAvgTime)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <p className="text-xs text-muted-foreground">
-              Automatic sync runs every 5 minutes. Manual sync processes up to 20 contacts at a time.
-            </p>
-          </CardContent>
-        </Card>
+            {/* Intake */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Intake Survey Engagement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Started</p>
+                    <p className="text-3xl font-bold">{engagementStats.intakeStarted}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Submitted</p>
+                    <p className="text-3xl font-bold">{engagementStats.intakeSubmitted}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Avg Completion Time</p>
+                    <p className="text-3xl font-bold">{formatSeconds(engagementStats.intakeAvgTime)}</p>
+                  </div>
+                </div>
+                {engagementStats.intakeStarted > 0 && (
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      Completion Rate:{" "}
+                      <span className="font-bold text-foreground">
+                        {Math.round((engagementStats.intakeSubmitted / engagementStats.intakeStarted) * 100)}%
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Welcome to the Admin Dashboard</CardTitle>
-            <CardDescription>
-              This is the foundation of your Realtor Business Credit management system.
-              The full dashboard features will be implemented in subsequent phases.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Phase 1 Complete: Database schema, authentication, and admin role system are now in place.
-            </p>
-          </CardContent>
-        </Card>
+            <Button
+              variant="outline"
+              onClick={() => fetchEngagement()}
+              className="gap-2"
+            >
+              <RefreshCw className="h-4 w-4" /> Refresh Engagement Data
+            </Button>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
