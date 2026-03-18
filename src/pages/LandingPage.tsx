@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 import HeroSection from "@/components/landing/HeroSection";
 import TimingSection from "@/components/landing/TimingSection";
 import TruthSection from "@/components/landing/TruthSection";
@@ -11,17 +11,9 @@ import CTASection from "@/components/landing/CTASection";
 import FounderQuoteSection from "@/components/landing/FounderQuoteSection";
 
 const LandingPage = () => {
-  const [searchParams] = useSearchParams();
-  const urlFirstName = searchParams.get("firstName") || "";
-  const contactId = searchParams.get("contactId") || "";
-
-  // Build query string to forward to /guide
-  const forwardParams = new URLSearchParams();
-  for (const key of ["contactId", "firstName", "lastName", "email", "phone"]) {
-    const val = searchParams.get(key);
-    if (val) forwardParams.set(key, val);
-  }
-  const guideLink = `/guide${forwardParams.toString() ? `?${forwardParams.toString()}` : ""}`;
+  const { contactId, firstName, buildForwardParams } = useContactIdentity();
+  const fwd = buildForwardParams();
+  const guideLink = `/guide${fwd ? `?${fwd}` : ""}`;
 
   // Tag known visitors on landing page mount
   useEffect(() => {
