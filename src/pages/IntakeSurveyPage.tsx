@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
+import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -89,11 +90,10 @@ export default function IntakeSurveyPage() {
     if (mountLogged.current || !token) return;
     mountLogged.current = true;
 
-    supabase.functions
-      .invoke("log-funnel-event", {
-        body: { contactId: contactId || undefined, eventType: "intake_started" },
-      })
-      .catch((e) => console.error("Failed to log intake_started:", e));
+    void postFunnelEvent({
+      contactId: contactId || undefined,
+      eventType: "intake_started",
+    }).catch((e) => console.error("Failed to log intake_started:", e));
 
     if (contactId) {
       supabase.functions
@@ -106,15 +106,15 @@ export default function IntakeSurveyPage() {
     // Log session on unmount
     return () => {
       const seconds = Math.round((Date.now() - mountTime.current) / 1000);
-      supabase.functions
-        .invoke("log-funnel-event", {
-          body: {
-            contactId: contactId || undefined,
-            eventType: "intake_session",
-            metadata: { time_on_page_seconds: seconds },
-          },
-        })
-        .catch(() => {});
+      const payload = {
+        contactId: contactId || undefined,
+        eventType: "intake_session",
+        metadata: { time_on_page_seconds: seconds },
+      };
+      const sent = beaconFunnelEvent(payload);
+      if (!sent) {
+        void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
+      }
     };
   }, [contactId, token]);
 
@@ -166,11 +166,10 @@ export default function IntakeSurveyPage() {
       setSubmitted(true);
 
       // Log intake_submitted event + tag
-      supabase.functions
-        .invoke("log-funnel-event", {
-          body: { contactId: contactId || undefined, eventType: "intake_submitted" },
-        })
-        .catch(() => {});
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "intake_submitted",
+      }).catch(() => {});
       if (contactId) {
         supabase.functions
           .invoke("tag-ghl-contact", {
