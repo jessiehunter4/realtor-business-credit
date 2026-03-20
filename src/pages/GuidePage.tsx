@@ -49,6 +49,7 @@ const GuidePage = () => {
 
   const handleThreshold = useCallback(
     async (pct: number) => {
+      console.log(`[Guide] Scroll threshold reached: ${pct}%`);
       const tagInfo = GUIDE_TAG_MAP[pct];
       const eventType = GUIDE_EVENT_MAP[pct];
 
