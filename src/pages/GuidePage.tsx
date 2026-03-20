@@ -7,6 +7,7 @@ import { GuidePDF } from "@/components/GuidePDF";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
@@ -53,13 +54,13 @@ const GuidePage = () => {
       const tagInfo = GUIDE_TAG_MAP[pct];
       const eventType = GUIDE_EVENT_MAP[pct];
 
-      // Log funnel event directly (not via hook's logEvent to avoid indirection)
       if (eventType) {
         try {
-          const { error } = await supabase.functions.invoke("log-funnel-event", {
-            body: { contactId: contactId || undefined, eventType, metadata: {} },
+          await postFunnelEvent({
+            contactId: contactId || undefined,
+            eventType,
+            metadata: {},
           });
-          if (error) console.error(`log-funnel-event error for ${eventType}:`, error);
         } catch (e) {
           console.error(`Failed to log ${eventType}:`, e);
         }
