@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2 } from "lucide-react";
@@ -39,6 +39,8 @@ const GUIDE_EVENT_MAP: Record<number, string> = {
   100: "guide_read_100",
 };
 
+const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
+
 const GuidePage = () => {
   const { contactId, buildForwardParams } = useContactIdentity();
   const [accessGranted, setAccessGranted] = useState(!!contactId);
@@ -49,17 +51,20 @@ const GuidePage = () => {
     async (pct: number) => {
       const tagInfo = GUIDE_TAG_MAP[pct];
       const eventType = GUIDE_EVENT_MAP[pct];
+
+      // Log funnel event directly (not via hook's logEvent to avoid indirection)
       if (eventType) {
-        // logEvent is called automatically by the tracker for session summary,
-        // but we also log threshold events explicitly
         try {
-          await supabase.functions.invoke("log-funnel-event", {
-            body: { contactId: contactId || undefined, eventType },
+          const { error } = await supabase.functions.invoke("log-funnel-event", {
+            body: { contactId: contactId || undefined, eventType, metadata: {} },
           });
+          if (error) console.error(`log-funnel-event error for ${eventType}:`, error);
         } catch (e) {
           console.error(`Failed to log ${eventType}:`, e);
         }
       }
+
+      // Apply/replace GHL tags
       if (contactId && tagInfo) {
         try {
           await supabase.functions.invoke("tag-ghl-contact", {
@@ -77,10 +82,13 @@ const GuidePage = () => {
     [contactId],
   );
 
+  // Stable thresholds array
+  const thresholds = useMemo(() => [...SCROLL_THRESHOLDS], []);
+
   const { logEvent } = useEngagementTracker({
     contactId,
     pageName: "guide",
-    scrollThresholds: [25, 50, 75, 100],
+    scrollThresholds: thresholds,
     onThreshold: handleThreshold,
   });
 
@@ -89,8 +97,10 @@ const GuidePage = () => {
     if (taggedMount.current) return;
     taggedMount.current = true;
 
+    // Log guide_view event
     logEvent("guide_view");
 
+    // Tag known visitors
     if (contactId) {
       supabase.functions
         .invoke("tag-ghl-contact", {
