@@ -33,6 +33,7 @@ const FUNNEL_ORDER = [
   "guide_read_50",
   "guide_read_75",
   "guide_read_100",
+  "one_on_one_visited",
   "checkout_visited",
   "checkout_clicked",
   "intake_started",
@@ -46,6 +47,7 @@ const FUNNEL_LABELS: Record<string, string> = {
   guide_read_50: "Guide 50%",
   guide_read_75: "Guide 75%",
   guide_read_100: "Guide 100%",
+  one_on_one_visited: "1:1 Page Visit",
   checkout_visited: "Checkout Visit",
   checkout_clicked: "Checkout Click",
   intake_started: "Intake Start",
@@ -58,6 +60,7 @@ const BAR_COLORS = [
   "hsl(var(--chart-2))",
   "hsl(var(--chart-2))",
   "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
   "hsl(var(--chart-3))",
   "hsl(var(--chart-4))",
   "hsl(var(--chart-4))",
@@ -98,6 +101,8 @@ export default function AdminDashboard() {
   const [engagementStats, setEngagementStats] = useState({
     guideAvgScroll: 0,
     guideAvgTime: 0,
+    oneOnOneVisits: 0,
+    oneOnOneAvgTime: 0,
     checkoutVisits: 0,
     checkoutClicks: 0,
     checkoutAvgTime: 0,
@@ -303,6 +308,24 @@ export default function AdminDashboard() {
       }
 
       // Checkout
+      const { count: oneOnOneVisits } = await supabase
+        .from("funnel_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "one_on_one_visited");
+      const { data: oneOnOneSessions } = await supabase
+        .from("funnel_events")
+        .select("metadata")
+        .eq("event_type", "one_on_one_session");
+      let oneOnOneAvgTime = 0;
+      if (oneOnOneSessions && oneOnOneSessions.length > 0) {
+        const times = oneOnOneSessions.map((r) => {
+          const m = r.metadata as Record<string, number> | null;
+          return m?.time_on_page_seconds ?? 0;
+        });
+        oneOnOneAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      }
+
+      // Checkout
       const { count: checkoutVisits } = await supabase
         .from("funnel_events")
         .select("id", { count: "exact", head: true })
@@ -349,6 +372,8 @@ export default function AdminDashboard() {
       setEngagementStats({
         guideAvgScroll,
         guideAvgTime,
+        oneOnOneVisits: oneOnOneVisits || 0,
+        oneOnOneAvgTime,
         checkoutVisits: checkoutVisits || 0,
         checkoutClicks: checkoutClicks || 0,
         checkoutAvgTime,
@@ -641,6 +666,7 @@ export default function AdminDashboard() {
                       { label: "Visit → Guide View", from: "site_visit", to: "guide_view" },
                       { label: "Guide View → 50%+", from: "guide_view", to: "guide_read_50" },
                       { label: "Guide View → Complete", from: "guide_view", to: "guide_read_100" },
+                      { label: "Guide Complete → 1:1", from: "guide_read_100", to: "one_on_one_visited" },
                       { label: "Visit → Checkout", from: "site_visit", to: "checkout_visited" },
                       { label: "Checkout → Click", from: "checkout_visited", to: "checkout_clicked" },
                       { label: "Intake Start → Submit", from: "intake_started", to: "intake_submitted" },
@@ -691,7 +717,7 @@ export default function AdminDashboard() {
                               {FUNNEL_LABELS[ev.event_type] || ev.event_type}
                             </td>
                             <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
-                              {ev.ghl_contact_id ? ev.ghl_contact_id.slice(0, 12) + "…" : "—"}
+                              {ev.ghl_contact_id || "—"}
                             </td>
                             <td className="py-2 text-muted-foreground text-xs">
                               {ev.metadata && Object.keys(ev.metadata).length > 0
@@ -734,6 +760,25 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Time on Page</p>
                     <p className="text-3xl font-bold">{formatSeconds(engagementStats.guideAvgTime)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Checkout */}
+            <Card>
+              <CardHeader>
+                <CardTitle>One-on-One Engagement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Visits</p>
+                    <p className="text-3xl font-bold">{engagementStats.oneOnOneVisits}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Avg Time on Page</p>
+                    <p className="text-3xl font-bold">{formatSeconds(engagementStats.oneOnOneAvgTime)}</p>
                   </div>
                 </div>
               </CardContent>

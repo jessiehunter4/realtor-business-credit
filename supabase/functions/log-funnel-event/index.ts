@@ -16,6 +16,8 @@ const ALLOWED_EVENTS = [
   'checkout_visited',
   'checkout_clicked',
   'checkout_session',
+  'one_on_one_visited',
+  'one_on_one_session',
   'intake_started',
   'intake_submitted',
   'intake_session',
@@ -27,7 +29,16 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { contactId, eventType, metadata } = await req.json();
+    const body = await req.json();
+    const eventType = body?.eventType;
+    const rawContactId =
+      body?.contactId ??
+      body?.contactID ??
+      body?.ContactId ??
+      body?.ghl_contact_id ??
+      null;
+    const contactId = typeof rawContactId === 'string' ? rawContactId.trim() : null;
+    const metadata = body?.metadata && typeof body.metadata === 'object' ? body.metadata : {};
 
     if (!eventType || !ALLOWED_EVENTS.includes(eventType)) {
       return new Response(JSON.stringify({ error: `Invalid eventType. Allowed: ${ALLOWED_EVENTS.join(', ')}` }), {

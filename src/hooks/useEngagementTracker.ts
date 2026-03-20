@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 
 interface EngagementConfig {
   contactId: string;
@@ -29,15 +29,12 @@ export function useEngagementTracker({
   const logEvent = useCallback(
     async (eventType: string, metadata: Record<string, unknown> = {}) => {
       try {
-        console.log(`[Engagement] Logging event: ${eventType}`, { contactId, metadata });
-        const { data, error } = await supabase.functions.invoke("log-funnel-event", {
-          body: { contactId: contactId || undefined, eventType, metadata },
+        const data = await postFunnelEvent({
+          contactId: contactId || undefined,
+          eventType,
+          metadata,
         });
-        if (error) {
-          console.error(`[Engagement] invoke error for ${eventType}:`, error);
-        } else {
-          console.log(`[Engagement] Successfully logged: ${eventType}`, data);
-        }
+        console.log(`[Engagement] Successfully logged: ${eventType}`, data);
       } catch (e) {
         console.error(`[Engagement] Failed to log ${eventType}:`, e);
       }
@@ -81,29 +78,17 @@ export function useEngagementTracker({
         time_on_page_seconds: seconds,
       };
 
-      // sendBeacon cannot set custom headers, so pass apikey as query param
-      const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-funnel-event`;
-      const url = `${baseUrl}?apikey=${encodeURIComponent(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)}`;
-      const payload = JSON.stringify({
+      const payload = {
         contactId: cId || undefined,
         eventType,
         metadata,
-      });
+      };
 
-      // Use plain string payload for better cross-origin beacon compatibility.
-      const sent = navigator.sendBeacon?.(url, payload);
+      const sent = beaconFunnelEvent(payload);
 
       // Fallback to fetch if sendBeacon isn't available or fails
       if (!sent) {
-        fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: payload,
-          keepalive: true,
-        }).catch(() => {});
+        void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
       }
     };
     // Only run cleanup on unmount — stable deps
