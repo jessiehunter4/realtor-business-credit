@@ -90,14 +90,12 @@ export function useEngagementTracker({
         metadata,
       });
 
-      const sent = navigator.sendBeacon?.(
-        url,
-        new Blob([payload], { type: "application/json" }),
-      );
+      // Use plain string payload for better cross-origin beacon compatibility.
+      const sent = navigator.sendBeacon?.(url, payload);
 
       // Fallback to fetch if sendBeacon isn't available or fails
       if (!sent) {
-        fetch(baseUrl, {
+        fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
