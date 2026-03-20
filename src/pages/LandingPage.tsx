@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import HeroSection from "@/components/landing/HeroSection";
 import TimingSection from "@/components/landing/TimingSection";
 import TruthSection from "@/components/landing/TruthSection";
@@ -20,17 +21,10 @@ const LandingPage = () => {
     if (logged.current) return;
     logged.current = true;
 
-    console.log("[Landing] Logging site_visit, contactId:", contactId);
-    // Log site visit for all visitors
-    supabase.functions
-      .invoke("log-funnel-event", {
-        body: { contactId: contactId || undefined, eventType: "site_visit" },
-      })
-      .then(({ data, error }) => {
-        if (error) console.error("[Landing] site_visit error:", error);
-        else console.log("[Landing] site_visit logged:", data);
-      })
-      .catch((e) => console.error("[Landing] Failed to log site_visit:", e));
+    void postFunnelEvent({
+      contactId: contactId || undefined,
+      eventType: "site_visit",
+    }).catch((e) => console.error("[Landing] Failed to log site_visit:", e));
 
     // Tag known visitors
     if (contactId) {
