@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 
 const EMBED_SCRIPT_URL = "https://link.everycatch.com/js/form_embed.js";
 const IFRAME_SRC = "https://link.everycatch.com/widget/booking/Xt32XcNcmKgm7vaJaR9o";
@@ -32,8 +33,32 @@ const OneOnOnePage = () => {
   const [searchParams] = useSearchParams();
   const { contactId, email, buildForwardParams } = useContactIdentity();
   const token = searchParams.get("token") || "";
+  const mountLogged = useRef(false);
+  const forwardParams = buildForwardParams();
 
-  const intakeLink = `/intake${email || token ? `?${email ? `email=${encodeURIComponent(email)}` : ""}${email && token ? "&" : ""}${token ? `token=${token}` : ""}` : ""}`;
+  const intakeLink = useMemo(() => {
+    const params = new URLSearchParams();
+    if (email) params.set("email", email);
+    if (token) params.set("token", token);
+    if (forwardParams) {
+      const forwarded = new URLSearchParams(forwardParams);
+      forwarded.forEach((value, key) => {
+        if (!params.has(key)) params.set(key, value);
+      });
+    }
+    return `/intake${params.toString() ? `?${params.toString()}` : ""}`;
+  }, [email, token, forwardParams]);
+
+  const { logEvent } = useEngagementTracker({
+    contactId,
+    pageName: "one_on_one",
+  });
+
+  useEffect(() => {
+    if (mountLogged.current) return;
+    mountLogged.current = true;
+    void logEvent("one_on_one_visited");
+  }, [logEvent]);
 
   useEffect(() => {
     if (!document.querySelector(`script[src="${EMBED_SCRIPT_URL}"]`)) {
@@ -489,7 +514,7 @@ const OneOnOnePage = () => {
                 variant="outline"
                 className="text-lg px-8 py-6 border-primary/40 text-primary hover:bg-primary/10"
               >
-                <Link to="/guide">
+                <Link to={`/guide${forwardParams ? `?${forwardParams}` : ""}`}>
                   <BookOpen className="mr-2 h-5 w-5" />
                   Read the Guide First
                 </Link>
