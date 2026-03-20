@@ -19,6 +19,32 @@ const IDENTITY_KEYS: (keyof ContactIdentity)[] = [
   "phone",
 ];
 
+const URL_KEY_ALIASES: Record<keyof ContactIdentity, string[]> = {
+  contactId: [
+    "contactId",
+    "contactID",
+    "contactid",
+    "contactiD",
+    "ContactId",
+    "ContactID",
+    "contact_id",
+    "ghl_contact_id",
+    "ghlContactId",
+  ],
+  firstName: ["firstName", "firstname", "first_name", "FirstName"],
+  lastName: ["lastName", "lastname", "last_name", "LastName"],
+  email: ["email", "Email"],
+  phone: ["phone", "Phone"],
+};
+
+function getFirstSearchParam(searchParams: URLSearchParams, candidates: string[]): string | null {
+  for (const key of candidates) {
+    const val = searchParams.get(key);
+    if (val) return val;
+  }
+  return null;
+}
+
 function readStored(): Partial<ContactIdentity> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -53,7 +79,7 @@ export function useContactIdentity() {
   const identity = useMemo<ContactIdentity>(() => {
     const fromUrl: Partial<ContactIdentity> = {};
     for (const key of IDENTITY_KEYS) {
-      const val = searchParams.get(key);
+      const val = getFirstSearchParam(searchParams, URL_KEY_ALIASES[key]);
       if (val) fromUrl[key] = val;
     }
 
