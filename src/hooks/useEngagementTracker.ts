@@ -78,8 +78,9 @@ export function useEngagementTracker({
         time_on_page_seconds: seconds,
       };
 
-      // Use sendBeacon for reliable delivery on page unload/navigation
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-funnel-event`;
+      // sendBeacon cannot set custom headers, so pass apikey as query param
+      const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-funnel-event`;
+      const url = `${baseUrl}?apikey=${encodeURIComponent(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)}`;
       const payload = JSON.stringify({
         contactId: cId || undefined,
         eventType,
@@ -93,7 +94,7 @@ export function useEngagementTracker({
 
       // Fallback to fetch if sendBeacon isn't available or fails
       if (!sent) {
-        fetch(url, {
+        fetch(baseUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
