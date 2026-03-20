@@ -36,9 +36,11 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Use service role key to bypass RLS — this function is public (verify_jwt = false)
+    // and accepts lightweight tracking pings including sendBeacon requests without auth headers
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
     const { error } = await supabase.from('funnel_events').insert({
