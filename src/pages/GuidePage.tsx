@@ -49,6 +49,7 @@ const GuidePage = () => {
 
   const handleThreshold = useCallback(
     async (pct: number) => {
+      console.log(`[Guide] Scroll threshold reached: ${pct}%`);
       const tagInfo = GUIDE_TAG_MAP[pct];
       const eventType = GUIDE_EVENT_MAP[pct];
 
@@ -97,6 +98,7 @@ const GuidePage = () => {
     if (taggedMount.current) return;
     taggedMount.current = true;
 
+    console.log("[Guide] Logging guide_view, contactId:", contactId);
     // Log guide_view event
     logEvent("guide_view");
 
@@ -106,7 +108,10 @@ const GuidePage = () => {
         .invoke("tag-ghl-contact", {
           body: { contactId, tags: ["c-clicked-rbc-guide"] },
         })
-        .catch((e) => console.error("Failed to tag guide visitor:", e));
+        .then(({ error }) => {
+          if (error) console.error("[Guide] tag error:", error);
+        })
+        .catch((e) => console.error("[Guide] Failed to tag guide visitor:", e));
     }
   }, [contactId, logEvent]);
 

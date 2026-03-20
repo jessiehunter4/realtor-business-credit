@@ -29,14 +29,17 @@ export function useEngagementTracker({
   const logEvent = useCallback(
     async (eventType: string, metadata: Record<string, unknown> = {}) => {
       try {
-        const { error } = await supabase.functions.invoke("log-funnel-event", {
+        console.log(`[Engagement] Logging event: ${eventType}`, { contactId, metadata });
+        const { data, error } = await supabase.functions.invoke("log-funnel-event", {
           body: { contactId: contactId || undefined, eventType, metadata },
         });
         if (error) {
-          console.error(`log-funnel-event invoke error for ${eventType}:`, error);
+          console.error(`[Engagement] invoke error for ${eventType}:`, error);
+        } else {
+          console.log(`[Engagement] Successfully logged: ${eventType}`, data);
         }
       } catch (e) {
-        console.error(`Failed to log ${eventType}:`, e);
+        console.error(`[Engagement] Failed to log ${eventType}:`, e);
       }
     },
     [contactId],
@@ -78,8 +81,9 @@ export function useEngagementTracker({
         time_on_page_seconds: seconds,
       };
 
-      // Use sendBeacon for reliable delivery on page unload/navigation
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-funnel-event`;
+      // sendBeacon cannot set custom headers, so pass apikey as query param
+      const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-funnel-event`;
+      const url = `${baseUrl}?apikey=${encodeURIComponent(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)}`;
       const payload = JSON.stringify({
         contactId: cId || undefined,
         eventType,
@@ -93,7 +97,7 @@ export function useEngagementTracker({
 
       // Fallback to fetch if sendBeacon isn't available or fails
       if (!sent) {
-        fetch(url, {
+        fetch(baseUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
