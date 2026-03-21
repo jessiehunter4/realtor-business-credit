@@ -449,7 +449,7 @@ export default function AdminDashboard() {
   ) => {
     if (showLoading) setRefreshingDashboard(true);
     try {
-      await Promise.all([fetchStats(), fetchFunnelData(range, selectedHost), fetchEngagement(selectedHost)]);
+      await Promise.all([fetchStats(), fetchFunnelData(range, selectedHost), fetchEngagement(selectedHost, range)]);
       setLastRefreshAt(new Date().toISOString());
     } finally {
       if (showLoading) setRefreshingDashboard(false);
