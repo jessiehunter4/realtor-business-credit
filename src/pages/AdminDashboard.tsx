@@ -384,114 +384,55 @@ export default function AdminDashboard() {
       const matchesHost = (metadata: unknown) =>
         selectedHost === "all" ? true : getEventHostname(metadata) === selectedHost;
 
-      const { data: guideSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "guide_session");
+      // Fetch ALL funnel events at once to avoid many small queries
+      let query = supabase.from("funnel_events").select("event_type, metadata");
 
-      const scopedGuideSessions = (guideSessions || []).filter((row) => matchesHost(row.metadata));
-
-      let guideAvgScroll = 0;
-      let guideAvgTime = 0;
-      if (scopedGuideSessions.length > 0) {
-        const scrolls = scopedGuideSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.max_scroll_pct ?? 0;
-        });
-        const times = scopedGuideSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        guideAvgScroll = Math.round(scrolls.reduce((a, b) => a + b, 0) / scrolls.length);
-        guideAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      if (dateRange !== "all") {
+        const days = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : 90;
+        const since = new Date(Date.now() - days * 86400000).toISOString();
+        query = query.gte("created_at", since);
       }
 
-      const { data: oneOnOneVisitRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "one_on_one_visited");
-      const oneOnOneVisits = (oneOnOneVisitRows || []).filter((row) => matchesHost(row.metadata)).length;
+      const { data: allEvents } = await query;
+      const events = (allEvents || []).filter((row) => matchesHost(row.metadata));
 
-      const { data: oneOnOneSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "one_on_one_session");
-
-      const scopedOneOnOneSessions = (oneOnOneSessions || []).filter((row) => matchesHost(row.metadata));
-      let oneOnOneAvgTime = 0;
-      if (scopedOneOnOneSessions.length > 0) {
-        const times = scopedOneOnOneSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        oneOnOneAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      // Bucket events by type
+      const byType: Record<string, Array<Record<string, unknown>>> = {};
+      for (const ev of events) {
+        if (!byType[ev.event_type]) byType[ev.event_type] = [];
+        byType[ev.event_type].push(ev.metadata as Record<string, unknown> || {});
       }
 
-      const { data: checkoutVisitRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "checkout_visited");
-      const checkoutVisits = (checkoutVisitRows || []).filter((row) => matchesHost(row.metadata)).length;
+      const count = (type: string) => (byType[type] || []).length;
 
-      const { data: checkoutClickRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "checkout_clicked");
-      const checkoutClicks = (checkoutClickRows || []).filter((row) => matchesHost(row.metadata)).length;
-
-      const { data: checkoutSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "checkout_session");
-
-      const scopedCheckoutSessions = (checkoutSessions || []).filter((row) => matchesHost(row.metadata));
-      let checkoutAvgTime = 0;
-      if (scopedCheckoutSessions.length > 0) {
-        const times = scopedCheckoutSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        checkoutAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-      }
-
-      const { data: intakeStartedRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "intake_started");
-      const intakeStarted = (intakeStartedRows || []).filter((row) => matchesHost(row.metadata)).length;
-
-      const { data: intakeSubmittedRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "intake_submitted");
-      const intakeSubmitted = (intakeSubmittedRows || []).filter((row) => matchesHost(row.metadata)).length;
-
-      const { data: intakeSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "intake_session");
-
-      const scopedIntakeSessions = (intakeSessions || []).filter((row) => matchesHost(row.metadata));
-      let intakeAvgTime = 0;
-      if (scopedIntakeSessions.length > 0) {
-        const times = scopedIntakeSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        intakeAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-      }
+      const avgMetric = (type: string, key: string) => {
+        const rows = byType[type] || [];
+        if (rows.length === 0) return 0;
+        const vals = rows.map((m) => (typeof m?.[key] === "number" ? (m[key] as number) : 0));
+        return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+      };
 
       setEngagementStats({
-        guideAvgScroll,
-        guideAvgTime,
-        oneOnOneVisits,
-        oneOnOneAvgTime,
-        checkoutVisits,
-        checkoutClicks,
-        checkoutAvgTime,
-        intakeStarted,
-        intakeSubmitted,
-        intakeAvgTime,
+        siteVisits: count("site_visit"),
+        guideViews: count("guide_view"),
+        guideRead25: count("guide_read_25"),
+        guideRead50: count("guide_read_50"),
+        guideRead75: count("guide_read_75"),
+        guideRead100: count("guide_read_100"),
+        guideSessions: count("guide_session"),
+        guideAvgScroll: avgMetric("guide_session", "max_scroll_pct"),
+        guideAvgTime: avgMetric("guide_session", "time_on_page_seconds"),
+        oneOnOneVisits: count("one_on_one_visited"),
+        oneOnOneSessions: count("one_on_one_session"),
+        oneOnOneAvgTime: avgMetric("one_on_one_session", "time_on_page_seconds"),
+        checkoutVisits: count("checkout_visited"),
+        checkoutClicks: count("checkout_clicked"),
+        checkoutSessions: count("checkout_session"),
+        checkoutAvgTime: avgMetric("checkout_session", "time_on_page_seconds"),
+        intakeStarted: count("intake_started"),
+        intakeSubmitted: count("intake_submitted"),
+        intakeSessions: count("intake_session"),
+        intakeAvgTime: avgMetric("intake_session", "time_on_page_seconds"),
       });
     } catch (error) {
       console.error("Error fetching engagement:", error);
