@@ -266,6 +266,7 @@ export type Database = {
           created_at: string | null
           event_type: string
           ghl_contact_id: string | null
+          ghl_contact_name: string | null
           id: string
           lead_id: string | null
           metadata: Json | null
@@ -274,6 +275,7 @@ export type Database = {
           created_at?: string | null
           event_type: string
           ghl_contact_id?: string | null
+          ghl_contact_name?: string | null
           id?: string
           lead_id?: string | null
           metadata?: Json | null
@@ -282,6 +284,7 @@ export type Database = {
           created_at?: string | null
           event_type?: string
           ghl_contact_id?: string | null
+          ghl_contact_name?: string | null
           id?: string
           lead_id?: string | null
           metadata?: Json | null
