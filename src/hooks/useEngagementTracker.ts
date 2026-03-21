@@ -63,34 +63,33 @@ export function useEngagementTracker({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [stableThresholds, onThreshold]);
 
-  // Session summary on unmount — use fetch with keepalive for reliability
-  // (sendBeacon cannot set custom headers, so Supabase gateway rejects it)
+  // Fire session summary — called on both React unmount AND beforeunload
+  const sendSession = useCallback(() => {
+    if (unmountLogged.current) return;
+    unmountLogged.current = true;
+    const seconds = Math.round((Date.now() - mountTime.current) / 1000);
+    void postFunnelEvent(
+      {
+        contactId: contactId || undefined,
+        eventType: `${pageName}_session`,
+        metadata: {
+          max_scroll_pct: maxScroll.current,
+          time_on_page_seconds: seconds,
+        },
+      },
+      { keepalive: true },
+    ).catch(() => {});
+  }, [contactId, pageName]);
+
+  // beforeunload ensures session fires even when user closes tab
   useEffect(() => {
-    const cId = contactId;
-    const pName = pageName;
-
+    const handleUnload = () => sendSession();
+    window.addEventListener("beforeunload", handleUnload);
     return () => {
-      if (unmountLogged.current) return;
-      unmountLogged.current = true;
-      const seconds = Math.round((Date.now() - mountTime.current) / 1000);
-      const eventType = `${pName}_session`;
-      const metadata = {
-        max_scroll_pct: maxScroll.current,
-        time_on_page_seconds: seconds,
-      };
-
-      const payload = {
-        contactId: cId || undefined,
-        eventType,
-        metadata,
-      };
-
-      // Always use fetch with keepalive — it supports headers and outlives the page
-      void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
+      window.removeEventListener("beforeunload", handleUnload);
+      sendSession(); // also fire on React unmount (in-app navigation)
     };
-    // Only run cleanup on unmount — stable deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sendSession]);
 
   return { logEvent };
 }
