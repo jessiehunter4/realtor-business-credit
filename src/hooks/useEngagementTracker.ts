@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
-import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
 
 interface EngagementConfig {
   contactId: string;
