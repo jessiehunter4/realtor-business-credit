@@ -213,7 +213,7 @@ export default function AdminDashboard() {
       const hasAdmin = !!roles;
       setIsAdmin(hasAdmin);
       if (hasAdmin) {
-        await Promise.all([fetchStats(), fetchFunnelData("30d", "all"), fetchEngagement("all")]);
+        await Promise.all([fetchStats(), fetchFunnelData("30d", "all"), fetchEngagement("all", "30d")]);
         setLastRefreshAt(new Date().toISOString());
       }
     } catch (error) {
@@ -379,7 +379,10 @@ export default function AdminDashboard() {
 
   /* ---------- Engagement ---------- */
 
-  const fetchEngagement = async (selectedHost: string = hostFilter) => {
+  const fetchEngagement = async (
+    selectedHost: string = hostFilter,
+    range: "7d" | "30d" | "90d" | "all" = dateRange,
+  ) => {
     try {
       const matchesHost = (metadata: unknown) =>
         selectedHost === "all" ? true : getEventHostname(metadata) === selectedHost;
@@ -387,8 +390,8 @@ export default function AdminDashboard() {
       // Fetch ALL funnel events at once to avoid many small queries
       let query = supabase.from("funnel_events").select("event_type, metadata");
 
-      if (dateRange !== "all") {
-        const days = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : 90;
+      if (range !== "all") {
+        const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
         const since = new Date(Date.now() - days * 86400000).toISOString();
         query = query.gte("created_at", since);
       }
@@ -446,7 +449,7 @@ export default function AdminDashboard() {
   ) => {
     if (showLoading) setRefreshingDashboard(true);
     try {
-      await Promise.all([fetchStats(), fetchFunnelData(range, selectedHost), fetchEngagement(selectedHost)]);
+      await Promise.all([fetchStats(), fetchFunnelData(range, selectedHost), fetchEngagement(selectedHost, range)]);
       setLastRefreshAt(new Date().toISOString());
     } finally {
       if (showLoading) setRefreshingDashboard(false);

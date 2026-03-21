@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
-import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
 
 interface EngagementConfig {
   contactId: string;
@@ -63,7 +63,8 @@ export function useEngagementTracker({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [stableThresholds, onThreshold]);
 
-  // Session summary on unmount — use sendBeacon for reliability
+  // Session summary on unmount — use fetch with keepalive for reliability
+  // (sendBeacon cannot set custom headers, so Supabase gateway rejects it)
   useEffect(() => {
     const cId = contactId;
     const pName = pageName;
@@ -84,12 +85,8 @@ export function useEngagementTracker({
         metadata,
       };
 
-      const sent = beaconFunnelEvent(payload);
-
-      // Fallback to fetch if sendBeacon isn't available or fails
-      if (!sent) {
-        void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
-      }
+      // Always use fetch with keepalive — it supports headers and outlives the page
+      void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
     };
     // Only run cleanup on unmount — stable deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
