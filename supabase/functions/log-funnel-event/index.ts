@@ -26,7 +26,6 @@ const ALLOWED_EVENTS = [
 const parseRequestBody = async (req: Request) => {
   const raw = await req.text();
   if (!raw) return {};
-
   try {
     return JSON.parse(raw);
   } catch {
@@ -39,6 +38,45 @@ const asNonEmptyString = (value: unknown) => {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
 };
+
+/**
+ * Look up contact name from GHL, return null on any failure.
+ */
+async function lookupGHLContactName(contactId: string): Promise<string | null> {
+  try {
+    const apiKey = Deno.env.get('GHL_API_KEY');
+    if (!apiKey) return null;
+
+    const resp = await fetch(
+      `https://services.leadconnectorhq.com/contacts/${contactId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Version: '2021-07-28',
+          Accept: 'application/json',
+        },
+      },
+    );
+
+    if (!resp.ok) {
+      console.warn(`GHL contact lookup failed: ${resp.status}`);
+      return null;
+    }
+
+    const data = await resp.json();
+    const contact = data?.contact;
+    if (!contact) return null;
+
+    const parts = [contact.firstName, contact.lastName].filter(Boolean);
+    if (parts.length > 0) return parts.join(' ');
+    if (contact.name) return contact.name;
+    if (contact.email) return contact.email;
+    return null;
+  } catch (err) {
+    console.warn('GHL contact lookup error:', err);
+    return null;
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -78,15 +116,34 @@ Deno.serve(async (req) => {
       tracker_version: metadataRecord.tracker_version ?? null,
     });
 
-    // Use service role key to bypass RLS — this function is public (verify_jwt = false)
-    // and accepts lightweight tracking pings including sendBeacon requests without auth headers
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
+    // Try to resolve contact name: first check DB cache, then GHL lookup
+    let contactName: string | null = null;
+    if (contactId) {
+      // Check if we already have a name cached for this contact
+      const { data: cached } = await supabase
+        .from('funnel_events')
+        .select('ghl_contact_name')
+        .eq('ghl_contact_id', contactId)
+        .not('ghl_contact_name', 'is', null)
+        .limit(1)
+        .maybeSingle();
+
+      if (cached?.ghl_contact_name) {
+        contactName = cached.ghl_contact_name;
+      } else {
+        // Look up from GHL
+        contactName = await lookupGHLContactName(contactId);
+      }
+    }
+
     const { error } = await supabase.from('funnel_events').insert({
       ghl_contact_id: contactId || null,
+      ghl_contact_name: contactName,
       event_type: eventType,
       metadata: metadata || {},
     });

@@ -7,7 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { User } from "@supabase/supabase-js";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { Users, FileText, TrendingUp, Activity, RefreshCw } from "lucide-react";
+import { Users, FileText, TrendingUp, Activity, RefreshCw, ExternalLink, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -22,6 +34,7 @@ interface RecentEvent {
   id: string;
   event_type: string;
   ghl_contact_id: string | null;
+  ghl_contact_name: string | null;
   metadata: Record<string, unknown>;
   created_at: string;
 }
@@ -69,6 +82,8 @@ const BAR_COLORS = [
 ];
 
 const AUTO_REFRESH_MS = 15000;
+
+const GHL_CONTACT_URL_PREFIX = "https://app.everycatch.com/v2/location/zcT6eHcjb9quBLB8dUdw/contacts/detail/";
 
 const asMetadataRecord = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
@@ -132,6 +147,9 @@ export default function AdminDashboard() {
     latestEventAt: "—",
     latestTrackerVersion: "—",
   });
+
+  // Detail modal
+  const [detailModal, setDetailModal] = useState<{ title: string; content: string } | null>(null);
 
   // Engagement
   const [engagementStats, setEngagementStats] = useState({
@@ -319,7 +337,7 @@ export default function AdminDashboard() {
       // Recent events (last 50)
       const { data: recent, error: recentErr } = await supabase
         .from("funnel_events")
-        .select("id, event_type, ghl_contact_id, metadata, created_at")
+        .select("id, event_type, ghl_contact_id, ghl_contact_name, metadata, created_at")
         .order("created_at", { ascending: false })
         .limit(50);
 
@@ -356,7 +374,6 @@ export default function AdminDashboard() {
       const matchesHost = (metadata: unknown) =>
         selectedHost === "all" ? true : getEventHostname(metadata) === selectedHost;
 
-      // Guide sessions
       const { data: guideSessions } = await supabase
         .from("funnel_events")
         .select("metadata")
@@ -379,7 +396,6 @@ export default function AdminDashboard() {
         guideAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
       }
 
-      // One-on-one
       const { data: oneOnOneVisitRows } = await supabase
         .from("funnel_events")
         .select("id, metadata")
@@ -401,7 +417,6 @@ export default function AdminDashboard() {
         oneOnOneAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
       }
 
-      // Checkout
       const { data: checkoutVisitRows } = await supabase
         .from("funnel_events")
         .select("id, metadata")
@@ -429,7 +444,6 @@ export default function AdminDashboard() {
         checkoutAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
       }
 
-      // Intake
       const { data: intakeStartedRows } = await supabase
         .from("funnel_events")
         .select("id, metadata")
@@ -566,6 +580,54 @@ export default function AdminDashboard() {
   };
 
   const lastRefreshLabel = lastRefreshAt ? new Date(lastRefreshAt).toLocaleTimeString() : "—";
+
+  /** Render the Contact cell: name (or id), EveryCatch link */
+  const renderContactCell = (ev: RecentEvent) => {
+    const contactId = ev.ghl_contact_id;
+    const contactName = ev.ghl_contact_name;
+
+    if (!contactId) return <span className="text-muted-foreground">—</span>;
+
+    return (
+      <div className="flex items-center gap-1.5">
+        <span className="truncate max-w-[140px]" title={contactName || contactId}>
+          {contactName || contactId.substring(0, 10) + "…"}
+        </span>
+        <a
+          href={`${GHL_CONTACT_URL_PREFIX}${contactId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open in EveryCatch"
+          className="inline-flex items-center justify-center rounded p-0.5 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+        </a>
+      </div>
+    );
+  };
+
+  /** Render a compact info button with hover preview and click modal */
+  const renderInfoButton = (label: string, content: string) => {
+    if (!content || content === "—") return <span className="text-muted-foreground">—</span>;
+
+    return (
+      <HoverCard openDelay={200}>
+        <HoverCardTrigger asChild>
+          <button
+            onClick={() => setDetailModal({ title: label, content })}
+            className="inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title={`View ${label}`}
+          >
+            <Info className="h-3.5 w-3.5" />
+          </button>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-80 text-xs font-mono break-all whitespace-pre-wrap" side="left">
+          <p className="font-sans font-medium text-sm mb-1 text-foreground">{label}</p>
+          <p className="text-muted-foreground">{content}</p>
+        </HoverCardContent>
+      </HoverCard>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -879,35 +941,41 @@ export default function AdminDashboard() {
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Event</th>
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Contact</th>
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Host</th>
-                          <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Tracker</th>
-                          <th className="text-left py-2 font-medium text-muted-foreground">Details</th>
+                          <th className="text-center py-2 pr-4 font-medium text-muted-foreground">Tracker</th>
+                          <th className="text-center py-2 font-medium text-muted-foreground">Details</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {recentEvents.map((ev) => (
-                          <tr key={ev.id} className="border-b border-border/50">
-                            <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">
-                              {new Date(ev.created_at).toLocaleString()}
-                            </td>
-                            <td className="py-2 pr-4 font-medium">
-                              {FUNNEL_LABELS[ev.event_type] || ev.event_type}
-                            </td>
-                            <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
-                              {ev.ghl_contact_id || "—"}
-                            </td>
-                            <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
-                              {getEventHostname(ev.metadata) || "—"}
-                            </td>
-                            <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
-                              {getTrackerVersion(ev.metadata) || "—"}
-                            </td>
-                            <td className="py-2 text-muted-foreground text-xs">
-                              {ev.metadata && Object.keys(ev.metadata).length > 0
-                                ? JSON.stringify(ev.metadata)
-                                : "—"}
-                            </td>
-                          </tr>
-                        ))}
+                        {recentEvents.map((ev) => {
+                          const trackerContent = getTrackerVersion(ev.metadata) || "—";
+                          const detailsContent =
+                            ev.metadata && Object.keys(ev.metadata).length > 0
+                              ? JSON.stringify(ev.metadata, null, 2)
+                              : "—";
+
+                          return (
+                            <tr key={ev.id} className="border-b border-border/50">
+                              <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">
+                                {new Date(ev.created_at).toLocaleString()}
+                              </td>
+                              <td className="py-2 pr-4 font-medium">
+                                {FUNNEL_LABELS[ev.event_type] || ev.event_type}
+                              </td>
+                              <td className="py-2 pr-4 text-sm">
+                                {renderContactCell(ev)}
+                              </td>
+                              <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
+                                {getEventHostname(ev.metadata) || "—"}
+                              </td>
+                              <td className="py-2 pr-4 text-center">
+                                {renderInfoButton("Tracker Version", trackerContent)}
+                              </td>
+                              <td className="py-2 text-center">
+                                {renderInfoButton("Event Metadata", detailsContent)}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -920,7 +988,6 @@ export default function AdminDashboard() {
 
           {/* ======== ENGAGEMENT TAB ======== */}
           <TabsContent value="engagement" className="space-y-6">
-            {/* Guide */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -947,7 +1014,6 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Checkout */}
             <Card>
               <CardHeader>
                 <CardTitle>One-on-One Engagement</CardTitle>
@@ -966,7 +1032,6 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Checkout */}
             <Card>
               <CardHeader>
                 <CardTitle>Checkout Engagement</CardTitle>
@@ -989,7 +1054,6 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Intake */}
             <Card>
               <CardHeader>
                 <CardTitle>Intake Survey Engagement</CardTitle>
@@ -1033,6 +1097,19 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Detail Modal */}
+      <Dialog open={!!detailModal} onOpenChange={(open) => !open && setDetailModal(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{detailModal?.title}</DialogTitle>
+            <DialogDescription>Technical detail for this event</DialogDescription>
+          </DialogHeader>
+          <pre className="text-xs font-mono bg-muted p-4 rounded-md overflow-auto max-h-[400px] whitespace-pre-wrap break-all">
+            {detailModal?.content}
+          </pre>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
