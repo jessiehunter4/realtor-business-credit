@@ -153,16 +153,26 @@ export default function AdminDashboard() {
 
   // Engagement
   const [engagementStats, setEngagementStats] = useState({
+    siteVisits: 0,
+    guideViews: 0,
+    guideRead25: 0,
+    guideRead50: 0,
+    guideRead75: 0,
+    guideRead100: 0,
     guideAvgScroll: 0,
     guideAvgTime: 0,
+    guideSessions: 0,
     oneOnOneVisits: 0,
     oneOnOneAvgTime: 0,
+    oneOnOneSessions: 0,
     checkoutVisits: 0,
     checkoutClicks: 0,
     checkoutAvgTime: 0,
+    checkoutSessions: 0,
     intakeStarted: 0,
     intakeSubmitted: 0,
     intakeAvgTime: 0,
+    intakeSessions: 0,
   });
 
   const currentHostname = useMemo(
