@@ -1,0 +1,1 @@
+ALTER TABLE public.funnel_events ADD COLUMN IF NOT EXISTS ghl_contact_name text;
