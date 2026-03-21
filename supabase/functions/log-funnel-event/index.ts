@@ -23,21 +23,43 @@ const ALLOWED_EVENTS = [
   'intake_session',
 ];
 
+const parseRequestBody = async (req: Request) => {
+  const raw = await req.text();
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error('Invalid JSON body');
+  }
+};
+
+const asNonEmptyString = (value: unknown) => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const body = await req.json();
-    const eventType = body?.eventType;
+    const body = await parseRequestBody(req);
+    const eventType = asNonEmptyString(body?.eventType);
     const rawContactId =
       body?.contactId ??
       body?.contactID ??
+      body?.contactiD ??
+      body?.contactid ??
       body?.ContactId ??
+      body?.ContactID ??
+      body?.contact_id ??
       body?.ghl_contact_id ??
+      body?.ghlContactId ??
       null;
-    const contactId = typeof rawContactId === 'string' ? rawContactId.trim() : null;
+    const contactId = asNonEmptyString(rawContactId);
     const metadata = body?.metadata && typeof body.metadata === 'object' ? body.metadata : {};
 
     if (!eventType || !ALLOWED_EVENTS.includes(eventType)) {
@@ -46,6 +68,15 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const metadataRecord = metadata as Record<string, unknown>;
+    console.info('Incoming funnel event', {
+      eventType,
+      contactId,
+      hostname: metadataRecord.hostname ?? null,
+      pathname: metadataRecord.pathname ?? null,
+      tracker_version: metadataRecord.tracker_version ?? null,
+    });
 
     // Use service role key to bypass RLS — this function is public (verify_jwt = false)
     // and accepts lightweight tracking pings including sendBeacon requests without auth headers
@@ -73,8 +104,11 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in log-funnel-event:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const status = message === 'Invalid JSON body' ? 400 : 500;
+
     return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
-      status: 500,
+      status,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
