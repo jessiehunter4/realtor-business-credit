@@ -11,6 +11,7 @@ interface PostOptions {
 const BASE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-funnel-event`;
 const API_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const TRACKING_URL = `${BASE_URL}?apikey=${encodeURIComponent(API_KEY)}`;
+const TRACKER_VERSION = "rbc-tracker-2026-03-21-02";
 
 const normalizeContactId = (contactId?: string) => {
   const value = contactId?.trim();
@@ -30,12 +31,19 @@ const buildPayload = ({ contactId, eventType, metadata = {} }: FunnelEventPayloa
   contactId: normalizeContactId(contactId),
   eventType,
   metadata: {
+    tracker_version: TRACKER_VERSION,
+    event_source: "web_app",
+    sent_at_iso: new Date().toISOString(),
     ...getPageContext(),
     ...metadata,
   },
 });
 
 export async function postFunnelEvent(payload: FunnelEventPayload, options: PostOptions = {}) {
+  if (!API_KEY) {
+    throw new Error("Tracking request blocked: publishable key is missing");
+  }
+
   const response = await fetch(TRACKING_URL, {
     method: "POST",
     headers: {
@@ -56,5 +64,7 @@ export async function postFunnelEvent(payload: FunnelEventPayload, options: Post
 
 export function beaconFunnelEvent(payload: FunnelEventPayload) {
   if (typeof navigator === "undefined" || typeof navigator.sendBeacon !== "function") return false;
-  return navigator.sendBeacon(TRACKING_URL, JSON.stringify(buildPayload(payload)));
+
+  const body = JSON.stringify(buildPayload(payload));
+  return navigator.sendBeacon(TRACKING_URL, new Blob([body], { type: "application/json" }));
 }
