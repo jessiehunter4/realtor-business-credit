@@ -153,16 +153,26 @@ export default function AdminDashboard() {
 
   // Engagement
   const [engagementStats, setEngagementStats] = useState({
+    siteVisits: 0,
+    guideViews: 0,
+    guideRead25: 0,
+    guideRead50: 0,
+    guideRead75: 0,
+    guideRead100: 0,
     guideAvgScroll: 0,
     guideAvgTime: 0,
+    guideSessions: 0,
     oneOnOneVisits: 0,
     oneOnOneAvgTime: 0,
+    oneOnOneSessions: 0,
     checkoutVisits: 0,
     checkoutClicks: 0,
     checkoutAvgTime: 0,
+    checkoutSessions: 0,
     intakeStarted: 0,
     intakeSubmitted: 0,
     intakeAvgTime: 0,
+    intakeSessions: 0,
   });
 
   const currentHostname = useMemo(
@@ -374,114 +384,55 @@ export default function AdminDashboard() {
       const matchesHost = (metadata: unknown) =>
         selectedHost === "all" ? true : getEventHostname(metadata) === selectedHost;
 
-      const { data: guideSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "guide_session");
+      // Fetch ALL funnel events at once to avoid many small queries
+      let query = supabase.from("funnel_events").select("event_type, metadata");
 
-      const scopedGuideSessions = (guideSessions || []).filter((row) => matchesHost(row.metadata));
-
-      let guideAvgScroll = 0;
-      let guideAvgTime = 0;
-      if (scopedGuideSessions.length > 0) {
-        const scrolls = scopedGuideSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.max_scroll_pct ?? 0;
-        });
-        const times = scopedGuideSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        guideAvgScroll = Math.round(scrolls.reduce((a, b) => a + b, 0) / scrolls.length);
-        guideAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      if (dateRange !== "all") {
+        const days = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : 90;
+        const since = new Date(Date.now() - days * 86400000).toISOString();
+        query = query.gte("created_at", since);
       }
 
-      const { data: oneOnOneVisitRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "one_on_one_visited");
-      const oneOnOneVisits = (oneOnOneVisitRows || []).filter((row) => matchesHost(row.metadata)).length;
+      const { data: allEvents } = await query;
+      const events = (allEvents || []).filter((row) => matchesHost(row.metadata));
 
-      const { data: oneOnOneSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "one_on_one_session");
-
-      const scopedOneOnOneSessions = (oneOnOneSessions || []).filter((row) => matchesHost(row.metadata));
-      let oneOnOneAvgTime = 0;
-      if (scopedOneOnOneSessions.length > 0) {
-        const times = scopedOneOnOneSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        oneOnOneAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+      // Bucket events by type
+      const byType: Record<string, Array<Record<string, unknown>>> = {};
+      for (const ev of events) {
+        if (!byType[ev.event_type]) byType[ev.event_type] = [];
+        byType[ev.event_type].push(ev.metadata as Record<string, unknown> || {});
       }
 
-      const { data: checkoutVisitRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "checkout_visited");
-      const checkoutVisits = (checkoutVisitRows || []).filter((row) => matchesHost(row.metadata)).length;
+      const count = (type: string) => (byType[type] || []).length;
 
-      const { data: checkoutClickRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "checkout_clicked");
-      const checkoutClicks = (checkoutClickRows || []).filter((row) => matchesHost(row.metadata)).length;
-
-      const { data: checkoutSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "checkout_session");
-
-      const scopedCheckoutSessions = (checkoutSessions || []).filter((row) => matchesHost(row.metadata));
-      let checkoutAvgTime = 0;
-      if (scopedCheckoutSessions.length > 0) {
-        const times = scopedCheckoutSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        checkoutAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-      }
-
-      const { data: intakeStartedRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "intake_started");
-      const intakeStarted = (intakeStartedRows || []).filter((row) => matchesHost(row.metadata)).length;
-
-      const { data: intakeSubmittedRows } = await supabase
-        .from("funnel_events")
-        .select("id, metadata")
-        .eq("event_type", "intake_submitted");
-      const intakeSubmitted = (intakeSubmittedRows || []).filter((row) => matchesHost(row.metadata)).length;
-
-      const { data: intakeSessions } = await supabase
-        .from("funnel_events")
-        .select("metadata")
-        .eq("event_type", "intake_session");
-
-      const scopedIntakeSessions = (intakeSessions || []).filter((row) => matchesHost(row.metadata));
-      let intakeAvgTime = 0;
-      if (scopedIntakeSessions.length > 0) {
-        const times = scopedIntakeSessions.map((r) => {
-          const m = r.metadata as Record<string, number> | null;
-          return m?.time_on_page_seconds ?? 0;
-        });
-        intakeAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-      }
+      const avgMetric = (type: string, key: string) => {
+        const rows = byType[type] || [];
+        if (rows.length === 0) return 0;
+        const vals = rows.map((m) => (typeof m?.[key] === "number" ? (m[key] as number) : 0));
+        return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+      };
 
       setEngagementStats({
-        guideAvgScroll,
-        guideAvgTime,
-        oneOnOneVisits,
-        oneOnOneAvgTime,
-        checkoutVisits,
-        checkoutClicks,
-        checkoutAvgTime,
-        intakeStarted,
-        intakeSubmitted,
-        intakeAvgTime,
+        siteVisits: count("site_visit"),
+        guideViews: count("guide_view"),
+        guideRead25: count("guide_read_25"),
+        guideRead50: count("guide_read_50"),
+        guideRead75: count("guide_read_75"),
+        guideRead100: count("guide_read_100"),
+        guideSessions: count("guide_session"),
+        guideAvgScroll: avgMetric("guide_session", "max_scroll_pct"),
+        guideAvgTime: avgMetric("guide_session", "time_on_page_seconds"),
+        oneOnOneVisits: count("one_on_one_visited"),
+        oneOnOneSessions: count("one_on_one_session"),
+        oneOnOneAvgTime: avgMetric("one_on_one_session", "time_on_page_seconds"),
+        checkoutVisits: count("checkout_visited"),
+        checkoutClicks: count("checkout_clicked"),
+        checkoutSessions: count("checkout_session"),
+        checkoutAvgTime: avgMetric("checkout_session", "time_on_page_seconds"),
+        intakeStarted: count("intake_started"),
+        intakeSubmitted: count("intake_submitted"),
+        intakeSessions: count("intake_session"),
+        intakeAvgTime: avgMetric("intake_session", "time_on_page_seconds"),
       });
     } catch (error) {
       console.error("Error fetching engagement:", error);
@@ -988,29 +939,98 @@ export default function AdminDashboard() {
 
           {/* ======== ENGAGEMENT TAB ======== */}
           <TabsContent value="engagement" className="space-y-6">
+            {/* Date & host filters (shared with funnel) */}
+            <div className="flex flex-wrap gap-3 items-center">
+              {(["7d", "30d", "90d", "all"] as const).map((r) => (
+                <Button
+                  key={r}
+                  variant={dateRange === r ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => void refreshDashboardData(r, hostFilter, true)}
+                >
+                  {r === "all" ? "All Time" : `Last ${r.replace("d", " days")}`}
+                </Button>
+              ))}
+              {knownHosts.length > 0 && (
+                <select
+                  value={hostFilter}
+                  onChange={(e) => {
+                    setHostFilter(e.target.value);
+                    void refreshDashboardData(dateRange, e.target.value, true);
+                  }}
+                  className="text-sm border rounded px-2 py-1 bg-background text-foreground"
+                >
+                  <option value="all">All Hosts</option>
+                  {knownHosts.map((h) => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Site-level summary */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Site Visits</CardDescription></CardHeader>
+                <CardContent><p className="text-3xl font-bold">{engagementStats.siteVisits}</p></CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Guide Views</CardDescription></CardHeader>
+                <CardContent><p className="text-3xl font-bold">{engagementStats.guideViews}</p></CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Guide Completions</CardDescription></CardHeader>
+                <CardContent><p className="text-3xl font-bold">{engagementStats.guideRead100}</p></CardContent>
+              </Card>
+            </div>
+
+            {/* Guide reading progress */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" /> Guide Engagement
+                  <FileText className="h-5 w-5" /> Guide Reading Progress
                 </CardTitle>
+                <CardDescription>How far visitors read through the guide</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Avg Scroll Depth</p>
-                    <p className="text-3xl font-bold">{engagementStats.guideAvgScroll}%</p>
-                    <div className="w-full bg-muted rounded-full h-2 mt-2">
-                      <div
-                        className="bg-primary rounded-full h-2 transition-all"
-                        style={{ width: `${engagementStats.guideAvgScroll}%` }}
-                      />
+                <div className="space-y-3">
+                  {[
+                    { label: "Viewed Guide", count: engagementStats.guideViews, color: "bg-primary/30" },
+                    { label: "Read 25%", count: engagementStats.guideRead25, color: "bg-primary/50" },
+                    { label: "Read 50%", count: engagementStats.guideRead50, color: "bg-primary/65" },
+                    { label: "Read 75%", count: engagementStats.guideRead75, color: "bg-primary/80" },
+                    { label: "Read 100%", count: engagementStats.guideRead100, color: "bg-primary" },
+                  ].map(({ label, count, color }) => {
+                    const pct = engagementStats.guideViews > 0 ? Math.round((count / engagementStats.guideViews) * 100) : 0;
+                    return (
+                      <div key={label} className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground w-24">{label}</span>
+                        <div className="flex-1 bg-muted rounded-full h-4 relative overflow-hidden">
+                          <div className={`${color} rounded-full h-4 transition-all`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-sm font-medium w-20 text-right">{count} ({pct}%)</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Session-based metrics if available */}
+                {engagementStats.guideSessions > 0 && (
+                  <div className="grid gap-6 md:grid-cols-3 mt-6 pt-4 border-t">
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Sessions Recorded</p>
+                      <p className="text-2xl font-bold">{engagementStats.guideSessions}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Avg Scroll Depth</p>
+                      <p className="text-2xl font-bold">{engagementStats.guideAvgScroll}%</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Avg Time on Page</p>
+                      <p className="text-2xl font-bold">{formatSeconds(engagementStats.guideAvgTime)}</p>
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Avg Time on Page</p>
-                    <p className="text-3xl font-bold">{formatSeconds(engagementStats.guideAvgTime)}</p>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -1019,10 +1039,14 @@ export default function AdminDashboard() {
                 <CardTitle>One-on-One Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-3">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Visits</p>
                     <p className="text-3xl font-bold">{engagementStats.oneOnOneVisits}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    <p className="text-3xl font-bold">{engagementStats.oneOnOneSessions}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Time on Page</p>
@@ -1037,7 +1061,7 @@ export default function AdminDashboard() {
                 <CardTitle>Checkout Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Visits</p>
                     <p className="text-3xl font-bold">{engagementStats.checkoutVisits}</p>
@@ -1045,6 +1069,10 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Payment Clicks</p>
                     <p className="text-3xl font-bold">{engagementStats.checkoutClicks}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    <p className="text-3xl font-bold">{engagementStats.checkoutSessions}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Time on Page</p>
@@ -1059,7 +1087,7 @@ export default function AdminDashboard() {
                 <CardTitle>Intake Survey Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Started</p>
                     <p className="text-3xl font-bold">{engagementStats.intakeStarted}</p>
@@ -1067,6 +1095,10 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Submitted</p>
                     <p className="text-3xl font-bold">{engagementStats.intakeSubmitted}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    <p className="text-3xl font-bold">{engagementStats.intakeSessions}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Completion Time</p>
