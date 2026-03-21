@@ -213,7 +213,7 @@ export default function AdminDashboard() {
       const hasAdmin = !!roles;
       setIsAdmin(hasAdmin);
       if (hasAdmin) {
-        await Promise.all([fetchStats(), fetchFunnelData("30d", "all"), fetchEngagement("all")]);
+        await Promise.all([fetchStats(), fetchFunnelData("30d", "all"), fetchEngagement("all", "30d")]);
         setLastRefreshAt(new Date().toISOString());
       }
     } catch (error) {
