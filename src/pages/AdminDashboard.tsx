@@ -939,29 +939,98 @@ export default function AdminDashboard() {
 
           {/* ======== ENGAGEMENT TAB ======== */}
           <TabsContent value="engagement" className="space-y-6">
+            {/* Date & host filters (shared with funnel) */}
+            <div className="flex flex-wrap gap-3 items-center">
+              {(["7d", "30d", "90d", "all"] as const).map((r) => (
+                <Button
+                  key={r}
+                  variant={dateRange === r ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => void refreshDashboardData(r, hostFilter, true)}
+                >
+                  {r === "all" ? "All Time" : `Last ${r.replace("d", " days")}`}
+                </Button>
+              ))}
+              {knownHosts.length > 0 && (
+                <select
+                  value={hostFilter}
+                  onChange={(e) => {
+                    setHostFilter(e.target.value);
+                    void refreshDashboardData(dateRange, e.target.value, true);
+                  }}
+                  className="text-sm border rounded px-2 py-1 bg-background text-foreground"
+                >
+                  <option value="all">All Hosts</option>
+                  {knownHosts.map((h) => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Site-level summary */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Site Visits</CardDescription></CardHeader>
+                <CardContent><p className="text-3xl font-bold">{engagementStats.siteVisits}</p></CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Guide Views</CardDescription></CardHeader>
+                <CardContent><p className="text-3xl font-bold">{engagementStats.guideViews}</p></CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardDescription>Guide Completions</CardDescription></CardHeader>
+                <CardContent><p className="text-3xl font-bold">{engagementStats.guideRead100}</p></CardContent>
+              </Card>
+            </div>
+
+            {/* Guide reading progress */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" /> Guide Engagement
+                  <FileText className="h-5 w-5" /> Guide Reading Progress
                 </CardTitle>
+                <CardDescription>How far visitors read through the guide</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Avg Scroll Depth</p>
-                    <p className="text-3xl font-bold">{engagementStats.guideAvgScroll}%</p>
-                    <div className="w-full bg-muted rounded-full h-2 mt-2">
-                      <div
-                        className="bg-primary rounded-full h-2 transition-all"
-                        style={{ width: `${engagementStats.guideAvgScroll}%` }}
-                      />
+                <div className="space-y-3">
+                  {[
+                    { label: "Viewed Guide", count: engagementStats.guideViews, color: "bg-primary/30" },
+                    { label: "Read 25%", count: engagementStats.guideRead25, color: "bg-primary/50" },
+                    { label: "Read 50%", count: engagementStats.guideRead50, color: "bg-primary/65" },
+                    { label: "Read 75%", count: engagementStats.guideRead75, color: "bg-primary/80" },
+                    { label: "Read 100%", count: engagementStats.guideRead100, color: "bg-primary" },
+                  ].map(({ label, count, color }) => {
+                    const pct = engagementStats.guideViews > 0 ? Math.round((count / engagementStats.guideViews) * 100) : 0;
+                    return (
+                      <div key={label} className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground w-24">{label}</span>
+                        <div className="flex-1 bg-muted rounded-full h-4 relative overflow-hidden">
+                          <div className={`${color} rounded-full h-4 transition-all`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-sm font-medium w-20 text-right">{count} ({pct}%)</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Session-based metrics if available */}
+                {engagementStats.guideSessions > 0 && (
+                  <div className="grid gap-6 md:grid-cols-3 mt-6 pt-4 border-t">
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Sessions Recorded</p>
+                      <p className="text-2xl font-bold">{engagementStats.guideSessions}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Avg Scroll Depth</p>
+                      <p className="text-2xl font-bold">{engagementStats.guideAvgScroll}%</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Avg Time on Page</p>
+                      <p className="text-2xl font-bold">{formatSeconds(engagementStats.guideAvgTime)}</p>
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Avg Time on Page</p>
-                    <p className="text-3xl font-bold">{formatSeconds(engagementStats.guideAvgTime)}</p>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -970,10 +1039,14 @@ export default function AdminDashboard() {
                 <CardTitle>One-on-One Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-3">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Visits</p>
                     <p className="text-3xl font-bold">{engagementStats.oneOnOneVisits}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    <p className="text-3xl font-bold">{engagementStats.oneOnOneSessions}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Time on Page</p>
@@ -988,7 +1061,7 @@ export default function AdminDashboard() {
                 <CardTitle>Checkout Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Visits</p>
                     <p className="text-3xl font-bold">{engagementStats.checkoutVisits}</p>
@@ -996,6 +1069,10 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Payment Clicks</p>
                     <p className="text-3xl font-bold">{engagementStats.checkoutClicks}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    <p className="text-3xl font-bold">{engagementStats.checkoutSessions}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Time on Page</p>
@@ -1010,7 +1087,7 @@ export default function AdminDashboard() {
                 <CardTitle>Intake Survey Engagement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-4">
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Started</p>
                     <p className="text-3xl font-bold">{engagementStats.intakeStarted}</p>
@@ -1018,6 +1095,10 @@ export default function AdminDashboard() {
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Submitted</p>
                     <p className="text-3xl font-bold">{engagementStats.intakeSubmitted}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    <p className="text-3xl font-bold">{engagementStats.intakeSessions}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Completion Time</p>
