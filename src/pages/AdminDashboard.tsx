@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,27 @@ const BAR_COLORS = [
   "hsl(var(--chart-5))",
 ];
 
+const AUTO_REFRESH_MS = 15000;
+
+const asMetadataRecord = (value: unknown): Record<string, unknown> => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+};
+
+const getEventHostname = (metadata: unknown): string | null => {
+  const hostname = asMetadataRecord(metadata).hostname;
+  if (typeof hostname !== "string") return null;
+  const trimmed = hostname.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+const getTrackerVersion = (metadata: unknown): string | null => {
+  const version = asMetadataRecord(metadata).tracker_version;
+  if (typeof version !== "string") return null;
+  const trimmed = version.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
@@ -96,6 +117,21 @@ export default function AdminDashboard() {
   const [funnelData, setFunnelData] = useState<FunnelCount[]>([]);
   const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
   const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
+  const [hostFilter, setHostFilter] = useState<string>("all");
+  const [knownHosts, setKnownHosts] = useState<string[]>([]);
+  const [refreshingDashboard, setRefreshingDashboard] = useState(false);
+  const [lastRefreshAt, setLastRefreshAt] = useState<string | null>(null);
+  const [diagnostics, setDiagnostics] = useState<{
+    latestEventType: string;
+    latestEventHost: string;
+    latestEventAt: string;
+    latestTrackerVersion: string;
+  }>({
+    latestEventType: "—",
+    latestEventHost: "—",
+    latestEventAt: "—",
+    latestTrackerVersion: "—",
+  });
 
   // Engagement
   const [engagementStats, setEngagementStats] = useState({
@@ -110,6 +146,11 @@ export default function AdminDashboard() {
     intakeSubmitted: 0,
     intakeAvgTime: 0,
   });
+
+  const currentHostname = useMemo(
+    () => (typeof window !== "undefined" ? window.location.hostname : "unknown"),
+    [],
+  );
 
   useEffect(() => {
     checkAdminStatus();
@@ -144,7 +185,8 @@ export default function AdminDashboard() {
       const hasAdmin = !!roles;
       setIsAdmin(hasAdmin);
       if (hasAdmin) {
-        await Promise.all([fetchStats(), fetchFunnelData("30d"), fetchEngagement()]);
+        await Promise.all([fetchStats(), fetchFunnelData("30d", "all"), fetchEngagement("all")]);
+        setLastRefreshAt(new Date().toISOString());
       }
     } catch (error) {
       console.error("Error in checkAdminStatus:", error);
@@ -238,10 +280,13 @@ export default function AdminDashboard() {
 
   /* ---------- Funnel Analytics ---------- */
 
-  const fetchFunnelData = async (range: "7d" | "30d" | "90d" | "all") => {
+  const fetchFunnelData = async (
+    range: "7d" | "30d" | "90d" | "all",
+    selectedHost: string = hostFilter,
+  ) => {
     setDateRange(range);
     try {
-      let query = supabase.from("funnel_events").select("event_type, created_at");
+      let query = supabase.from("funnel_events").select("event_type, created_at, metadata");
 
       if (range !== "all") {
         const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
@@ -255,9 +300,13 @@ export default function AdminDashboard() {
         return;
       }
 
+      const scopedRows = (data || []).filter((row) =>
+        selectedHost === "all" ? true : getEventHostname(row.metadata) === selectedHost,
+      );
+
       // Count by event_type
       const counts: Record<string, number> = {};
-      for (const row of data || []) {
+      for (const row of scopedRows) {
         counts[row.event_type] = (counts[row.event_type] || 0) + 1;
       }
 
@@ -275,7 +324,25 @@ export default function AdminDashboard() {
         .limit(50);
 
       if (!recentErr && recent) {
-        setRecentEvents(recent as unknown as RecentEvent[]);
+        const hosts = Array.from(
+          new Set(recent.map((ev) => getEventHostname(ev.metadata)).filter((h): h is string => Boolean(h))),
+        );
+        setKnownHosts(hosts);
+
+        const scopedRecent = recent.filter((ev) =>
+          selectedHost === "all" ? true : getEventHostname(ev.metadata) === selectedHost,
+        );
+        setRecentEvents(scopedRecent as unknown as RecentEvent[]);
+
+        const latest = scopedRecent[0] ?? recent[0];
+        if (latest) {
+          setDiagnostics({
+            latestEventType: FUNNEL_LABELS[latest.event_type] || latest.event_type,
+            latestEventHost: getEventHostname(latest.metadata) || "(unknown)",
+            latestEventAt: new Date(latest.created_at).toLocaleString(),
+            latestTrackerVersion: getTrackerVersion(latest.metadata) || "(not set)",
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching funnel data:", error);
@@ -284,22 +351,27 @@ export default function AdminDashboard() {
 
   /* ---------- Engagement ---------- */
 
-  const fetchEngagement = async () => {
+  const fetchEngagement = async (selectedHost: string = hostFilter) => {
     try {
+      const matchesHost = (metadata: unknown) =>
+        selectedHost === "all" ? true : getEventHostname(metadata) === selectedHost;
+
       // Guide sessions
       const { data: guideSessions } = await supabase
         .from("funnel_events")
         .select("metadata")
         .eq("event_type", "guide_session");
 
+      const scopedGuideSessions = (guideSessions || []).filter((row) => matchesHost(row.metadata));
+
       let guideAvgScroll = 0;
       let guideAvgTime = 0;
-      if (guideSessions && guideSessions.length > 0) {
-        const scrolls = guideSessions.map((r) => {
+      if (scopedGuideSessions.length > 0) {
+        const scrolls = scopedGuideSessions.map((r) => {
           const m = r.metadata as Record<string, number> | null;
           return m?.max_scroll_pct ?? 0;
         });
-        const times = guideSessions.map((r) => {
+        const times = scopedGuideSessions.map((r) => {
           const m = r.metadata as Record<string, number> | null;
           return m?.time_on_page_seconds ?? 0;
         });
@@ -307,18 +379,22 @@ export default function AdminDashboard() {
         guideAvgTime = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
       }
 
-      // Checkout
-      const { count: oneOnOneVisits } = await supabase
+      // One-on-one
+      const { data: oneOnOneVisitRows } = await supabase
         .from("funnel_events")
-        .select("id", { count: "exact", head: true })
+        .select("id, metadata")
         .eq("event_type", "one_on_one_visited");
+      const oneOnOneVisits = (oneOnOneVisitRows || []).filter((row) => matchesHost(row.metadata)).length;
+
       const { data: oneOnOneSessions } = await supabase
         .from("funnel_events")
         .select("metadata")
         .eq("event_type", "one_on_one_session");
+
+      const scopedOneOnOneSessions = (oneOnOneSessions || []).filter((row) => matchesHost(row.metadata));
       let oneOnOneAvgTime = 0;
-      if (oneOnOneSessions && oneOnOneSessions.length > 0) {
-        const times = oneOnOneSessions.map((r) => {
+      if (scopedOneOnOneSessions.length > 0) {
+        const times = scopedOneOnOneSessions.map((r) => {
           const m = r.metadata as Record<string, number> | null;
           return m?.time_on_page_seconds ?? 0;
         });
@@ -326,21 +402,27 @@ export default function AdminDashboard() {
       }
 
       // Checkout
-      const { count: checkoutVisits } = await supabase
+      const { data: checkoutVisitRows } = await supabase
         .from("funnel_events")
-        .select("id", { count: "exact", head: true })
+        .select("id, metadata")
         .eq("event_type", "checkout_visited");
-      const { count: checkoutClicks } = await supabase
+      const checkoutVisits = (checkoutVisitRows || []).filter((row) => matchesHost(row.metadata)).length;
+
+      const { data: checkoutClickRows } = await supabase
         .from("funnel_events")
-        .select("id", { count: "exact", head: true })
+        .select("id, metadata")
         .eq("event_type", "checkout_clicked");
+      const checkoutClicks = (checkoutClickRows || []).filter((row) => matchesHost(row.metadata)).length;
+
       const { data: checkoutSessions } = await supabase
         .from("funnel_events")
         .select("metadata")
         .eq("event_type", "checkout_session");
+
+      const scopedCheckoutSessions = (checkoutSessions || []).filter((row) => matchesHost(row.metadata));
       let checkoutAvgTime = 0;
-      if (checkoutSessions && checkoutSessions.length > 0) {
-        const times = checkoutSessions.map((r) => {
+      if (scopedCheckoutSessions.length > 0) {
+        const times = scopedCheckoutSessions.map((r) => {
           const m = r.metadata as Record<string, number> | null;
           return m?.time_on_page_seconds ?? 0;
         });
@@ -348,21 +430,27 @@ export default function AdminDashboard() {
       }
 
       // Intake
-      const { count: intakeStarted } = await supabase
+      const { data: intakeStartedRows } = await supabase
         .from("funnel_events")
-        .select("id", { count: "exact", head: true })
+        .select("id, metadata")
         .eq("event_type", "intake_started");
-      const { count: intakeSubmitted } = await supabase
+      const intakeStarted = (intakeStartedRows || []).filter((row) => matchesHost(row.metadata)).length;
+
+      const { data: intakeSubmittedRows } = await supabase
         .from("funnel_events")
-        .select("id", { count: "exact", head: true })
+        .select("id, metadata")
         .eq("event_type", "intake_submitted");
+      const intakeSubmitted = (intakeSubmittedRows || []).filter((row) => matchesHost(row.metadata)).length;
+
       const { data: intakeSessions } = await supabase
         .from("funnel_events")
         .select("metadata")
         .eq("event_type", "intake_session");
+
+      const scopedIntakeSessions = (intakeSessions || []).filter((row) => matchesHost(row.metadata));
       let intakeAvgTime = 0;
-      if (intakeSessions && intakeSessions.length > 0) {
-        const times = intakeSessions.map((r) => {
+      if (scopedIntakeSessions.length > 0) {
+        const times = scopedIntakeSessions.map((r) => {
           const m = r.metadata as Record<string, number> | null;
           return m?.time_on_page_seconds ?? 0;
         });
@@ -372,19 +460,44 @@ export default function AdminDashboard() {
       setEngagementStats({
         guideAvgScroll,
         guideAvgTime,
-        oneOnOneVisits: oneOnOneVisits || 0,
+        oneOnOneVisits,
         oneOnOneAvgTime,
-        checkoutVisits: checkoutVisits || 0,
-        checkoutClicks: checkoutClicks || 0,
+        checkoutVisits,
+        checkoutClicks,
         checkoutAvgTime,
-        intakeStarted: intakeStarted || 0,
-        intakeSubmitted: intakeSubmitted || 0,
+        intakeStarted,
+        intakeSubmitted,
         intakeAvgTime,
       });
     } catch (error) {
       console.error("Error fetching engagement:", error);
     }
   };
+
+  const refreshDashboardData = async (
+    range: "7d" | "30d" | "90d" | "all" = dateRange,
+    selectedHost: string = hostFilter,
+    showLoading = true,
+  ) => {
+    if (showLoading) setRefreshingDashboard(true);
+    try {
+      await Promise.all([fetchStats(), fetchFunnelData(range, selectedHost), fetchEngagement(selectedHost)]);
+      setLastRefreshAt(new Date().toISOString());
+    } finally {
+      if (showLoading) setRefreshingDashboard(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const timer = window.setInterval(() => {
+      void refreshDashboardData(dateRange, hostFilter, false);
+    }, AUTO_REFRESH_MS);
+
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin, dateRange, hostFilter]);
 
   /* ---------- Admin Setup ---------- */
 
@@ -452,6 +565,8 @@ export default function AdminDashboard() {
     return `${Math.floor(s / 60)}m ${s % 60}s`;
   };
 
+  const lastRefreshLabel = lastRefreshAt ? new Date(lastRefreshAt).toLocaleTimeString() : "—";
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -479,6 +594,18 @@ export default function AdminDashboard() {
           <Button variant="outline" onClick={() => navigate("/admin/intake")}>
             Intake Surveys
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => void refreshDashboardData(dateRange, hostFilter, true)}
+            disabled={refreshingDashboard}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshingDashboard ? "animate-spin" : ""}`} />
+            {refreshingDashboard ? "Refreshing..." : "Refresh Dashboard"}
+          </Button>
+          <p className="text-xs text-muted-foreground self-center">
+            Auto-refresh: {Math.floor(AUTO_REFRESH_MS / 1000)}s · Last refresh: {lastRefreshLabel}
+          </p>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
@@ -595,6 +722,36 @@ export default function AdminDashboard() {
                 </p>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Tracking Diagnostics</CardTitle>
+                <CardDescription>Live signal health and deployment visibility</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Admin Host</p>
+                    <p className="text-sm font-medium break-all">{currentHostname}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Latest Event</p>
+                    <p className="text-sm font-medium">{diagnostics.latestEventType}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Latest Event Host</p>
+                    <p className="text-sm font-medium break-all">{diagnostics.latestEventHost}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Tracker Version</p>
+                    <p className="text-sm font-medium">{diagnostics.latestTrackerVersion}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Latest event time: {diagnostics.latestEventAt}
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* ======== FUNNEL ANALYTICS TAB ======== */}
@@ -605,11 +762,28 @@ export default function AdminDashboard() {
                   key={r}
                   size="sm"
                   variant={dateRange === r ? "default" : "outline"}
-                  onClick={() => fetchFunnelData(r)}
+                  onClick={() => void refreshDashboardData(r, hostFilter, true)}
                 >
                   {r === "all" ? "All Time" : `Last ${r.replace("d", " days")}`}
                 </Button>
               ))}
+
+              <select
+                value={hostFilter}
+                onChange={(e) => {
+                  const nextHost = e.target.value;
+                  setHostFilter(nextHost);
+                  void refreshDashboardData(dateRange, nextHost, true);
+                }}
+                className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+              >
+                <option value="all">All hosts</option>
+                {knownHosts.map((host) => (
+                  <option key={host} value={host}>
+                    {host}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <Card>
@@ -704,6 +878,8 @@ export default function AdminDashboard() {
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Time</th>
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Event</th>
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Contact</th>
+                          <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Host</th>
+                          <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Tracker</th>
                           <th className="text-left py-2 font-medium text-muted-foreground">Details</th>
                         </tr>
                       </thead>
@@ -718,6 +894,12 @@ export default function AdminDashboard() {
                             </td>
                             <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
                               {ev.ghl_contact_id || "—"}
+                            </td>
+                            <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
+                              {getEventHostname(ev.metadata) || "—"}
+                            </td>
+                            <td className="py-2 pr-4 text-muted-foreground font-mono text-xs">
+                              {getTrackerVersion(ev.metadata) || "—"}
                             </td>
                             <td className="py-2 text-muted-foreground text-xs">
                               {ev.metadata && Object.keys(ev.metadata).length > 0
@@ -842,10 +1024,11 @@ export default function AdminDashboard() {
 
             <Button
               variant="outline"
-              onClick={() => fetchEngagement()}
+              onClick={() => void refreshDashboardData(dateRange, hostFilter, true)}
               className="gap-2"
             >
-              <RefreshCw className="h-4 w-4" /> Refresh Engagement Data
+              <RefreshCw className={`h-4 w-4 ${refreshingDashboard ? "animate-spin" : ""}`} />
+              {refreshingDashboard ? "Refreshing..." : "Refresh Engagement Data"}
             </Button>
           </TabsContent>
         </Tabs>
