@@ -342,6 +342,7 @@ export default function IntakeSurveyPage() {
                   </div>
                 </div>
               )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Brokerage / Team Name</Label>
                   <Input value={form.brokerage_name || ""} onChange={e => updateField("brokerage_name", e.target.value)} />
