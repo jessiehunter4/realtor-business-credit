@@ -661,7 +661,7 @@ export default function IntakeSurveyPage() {
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={saveDraft}>Save Progress</Button>
+            {!isDirectMode && <Button variant="ghost" onClick={saveDraft}>Save Progress</Button>}
             {step < steps.length - 1 ? (
               <Button onClick={() => setStep(s => s + 1)}>Next</Button>
             ) : (
