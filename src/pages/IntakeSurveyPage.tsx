@@ -73,10 +73,12 @@ interface SurveyData {
 export default function IntakeSurveyPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-  const { contactId } = useContactIdentity();
+  const { contactId, email: identityEmail, firstName, lastName } = useContactIdentity();
   const { toast } = useToast();
   const mountLogged = useRef(false);
   const mountTime = useRef(Date.now());
+
+  const isDirectMode = !token;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -87,7 +89,7 @@ export default function IntakeSurveyPage() {
 
   // Log intake_started on mount
   useEffect(() => {
-    if (mountLogged.current || !token) return;
+    if (mountLogged.current) return;
     mountLogged.current = true;
 
     void postFunnelEvent({
@@ -116,12 +118,22 @@ export default function IntakeSurveyPage() {
         void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
       }
     };
-  }, [contactId, token]);
+  }, [contactId]);
 
   useEffect(() => {
-    if (!token) { setNotFound(true); setLoading(false); return; }
+    if (isDirectMode) {
+      // Pre-populate from contact identity
+      const defaultName = [firstName, lastName].filter(Boolean).join(" ");
+      setForm(prev => ({
+        ...prev,
+        contact_name: prev.contact_name || defaultName || "",
+        contact_email: prev.contact_email || identityEmail || "",
+      }));
+      setLoading(false);
+      return;
+    }
     fetchSurvey();
-  }, [token]);
+  }, [token, isDirectMode, identityEmail, firstName, lastName]);
 
   const fetchSurvey = async () => {
     try {

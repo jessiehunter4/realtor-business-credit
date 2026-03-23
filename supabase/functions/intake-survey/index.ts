@@ -86,9 +86,51 @@ Deno.serve(async (req) => {
       });
     }
 
-    // POST: Create a new survey (admin only)
+    // POST: Create a new survey
     if (req.method === "POST") {
       const authHeader = req.headers.get("Authorization");
+      const mode = url.searchParams.get("mode");
+
+      // Public direct-submit mode (no auth required)
+      if (mode === "direct") {
+        const body = await req.json();
+
+        if (!body.contact_email || !body.contact_email.trim()) {
+          return new Response(
+            JSON.stringify({ error: "Email is required" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Strip fields that shouldn't be set publicly
+        const { id, access_token, created_at, created_by, status, ...surveyFields } = body;
+
+        const { data, error } = await supabaseAdmin
+          .from("intake_surveys")
+          .insert({
+            ...surveyFields,
+            contact_email: body.contact_email.trim(),
+            contact_name: body.contact_name?.trim() || null,
+            filled_by: "self",
+            status: "submitted",
+            submitted_at: new Date().toISOString(),
+          })
+          .select("id")
+          .single();
+
+        if (error) {
+          return new Response(
+            JSON.stringify({ error: error.message }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        return new Response(JSON.stringify({ success: true, id: data.id }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Admin mode (requires auth)
       if (!authHeader) {
         return new Response(
           JSON.stringify({ error: "Unauthorized" }),
