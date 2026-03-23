@@ -73,10 +73,12 @@ interface SurveyData {
 export default function IntakeSurveyPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-  const { contactId } = useContactIdentity();
+  const { contactId, email: identityEmail, firstName, lastName } = useContactIdentity();
   const { toast } = useToast();
   const mountLogged = useRef(false);
   const mountTime = useRef(Date.now());
+
+  const isDirectMode = !token;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -87,7 +89,7 @@ export default function IntakeSurveyPage() {
 
   // Log intake_started on mount
   useEffect(() => {
-    if (mountLogged.current || !token) return;
+    if (mountLogged.current) return;
     mountLogged.current = true;
 
     void postFunnelEvent({
@@ -116,12 +118,22 @@ export default function IntakeSurveyPage() {
         void postFunnelEvent(payload, { keepalive: true }).catch(() => {});
       }
     };
-  }, [contactId, token]);
+  }, [contactId]);
 
   useEffect(() => {
-    if (!token) { setNotFound(true); setLoading(false); return; }
+    if (isDirectMode) {
+      // Pre-populate from contact identity
+      const defaultName = [firstName, lastName].filter(Boolean).join(" ");
+      setForm(prev => ({
+        ...prev,
+        contact_name: prev.contact_name || defaultName || "",
+        contact_email: prev.contact_email || identityEmail || "",
+      }));
+      setLoading(false);
+      return;
+    }
     fetchSurvey();
-  }, [token]);
+  }, [token, isDirectMode, identityEmail, firstName, lastName]);
 
   const fetchSurvey = async () => {
     try {
@@ -152,17 +164,38 @@ export default function IntakeSurveyPage() {
   };
 
   const handleSubmit = async () => {
+    if (isDirectMode && (!form.contact_email || !form.contact_email.trim())) {
+      toast({ title: "Email Required", description: "Please enter your email address.", variant: "destructive" });
+      setStep(0);
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
-          body: JSON.stringify({ ...form, status: "submitted" }),
-        }
-      );
-      if (!res.ok) throw new Error("Failed to submit");
+      if (isDirectMode) {
+        // Public direct submit
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?mode=direct`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify(form),
+          }
+        );
+        if (!res.ok) throw new Error("Failed to submit");
+      } else {
+        // Token-based submit
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify({ ...form, status: "submitted" }),
+          }
+        );
+        if (!res.ok) throw new Error("Failed to submit");
+      }
+
       setSubmitted(true);
 
       // Log intake_submitted event + tag
@@ -187,6 +220,7 @@ export default function IntakeSurveyPage() {
   };
 
   const saveDraft = async () => {
+    if (isDirectMode) return; // No draft saving in direct mode
     try {
       await fetch(
         `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
@@ -210,7 +244,7 @@ export default function IntakeSurveyPage() {
     );
   }
 
-  if (notFound) {
+  if (notFound && !isDirectMode) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <Card className="max-w-md w-full">
@@ -286,6 +320,28 @@ export default function IntakeSurveyPage() {
               <CardDescription>Tell us about your real estate practice.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Name & Email fields (always shown in direct mode, read-only in token mode if pre-filled) */}
+              {isDirectMode && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Full Name <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={form.contact_name || ""}
+                      onChange={e => updateField("contact_name", e.target.value)}
+                      placeholder="Your full name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="email"
+                      value={form.contact_email || ""}
+                      onChange={e => updateField("contact_email", e.target.value)}
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Brokerage / Team Name</Label>
@@ -605,7 +661,7 @@ export default function IntakeSurveyPage() {
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={saveDraft}>Save Progress</Button>
+            {!isDirectMode && <Button variant="ghost" onClick={saveDraft}>Save Progress</Button>}
             {step < steps.length - 1 ? (
               <Button onClick={() => setStep(s => s + 1)}>Next</Button>
             ) : (
