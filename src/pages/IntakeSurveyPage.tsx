@@ -164,17 +164,38 @@ export default function IntakeSurveyPage() {
   };
 
   const handleSubmit = async () => {
+    if (isDirectMode && (!form.contact_email || !form.contact_email.trim())) {
+      toast({ title: "Email Required", description: "Please enter your email address.", variant: "destructive" });
+      setStep(0);
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
-          body: JSON.stringify({ ...form, status: "submitted" }),
-        }
-      );
-      if (!res.ok) throw new Error("Failed to submit");
+      if (isDirectMode) {
+        // Public direct submit
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?mode=direct`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify(form),
+          }
+        );
+        if (!res.ok) throw new Error("Failed to submit");
+      } else {
+        // Token-based submit
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify({ ...form, status: "submitted" }),
+          }
+        );
+        if (!res.ok) throw new Error("Failed to submit");
+      }
+
       setSubmitted(true);
 
       // Log intake_submitted event + tag
@@ -199,6 +220,7 @@ export default function IntakeSurveyPage() {
   };
 
   const saveDraft = async () => {
+    if (isDirectMode) return; // No draft saving in direct mode
     try {
       await fetch(
         `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
