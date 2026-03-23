@@ -320,7 +320,28 @@ export default function IntakeSurveyPage() {
               <CardDescription>Tell us about your real estate practice.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Name & Email fields (always shown in direct mode, read-only in token mode if pre-filled) */}
+              {isDirectMode && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Full Name <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={form.contact_name || ""}
+                      onChange={e => updateField("contact_name", e.target.value)}
+                      placeholder="Your full name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="email"
+                      value={form.contact_email || ""}
+                      onChange={e => updateField("contact_email", e.target.value)}
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                </div>
+              )}
                 <div className="space-y-2">
                   <Label>Brokerage / Team Name</Label>
                   <Input value={form.brokerage_name || ""} onChange={e => updateField("brokerage_name", e.target.value)} />
