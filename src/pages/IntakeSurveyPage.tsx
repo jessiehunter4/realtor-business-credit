@@ -244,7 +244,7 @@ export default function IntakeSurveyPage() {
     );
   }
 
-  if (notFound) {
+  if (notFound && !isDirectMode) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <Card className="max-w-md w-full">
