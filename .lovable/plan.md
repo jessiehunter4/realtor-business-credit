@@ -1,43 +1,42 @@
 
 
-# Move Calendar Embed to /one-on-one and Update Booking Links
+## Problem
 
-## Overview
-Move the EveryCatch calendar widget from `/booking-confirmed` to `/one-on-one` (just below the hero), update all "Book" CTAs to scroll/link to the embedded calendar on `/one-on-one`, and strip the calendar from `/booking-confirmed` without deleting the page.
+The intake survey page (`/intake`) **only works with a pre-generated admin token**. When a visitor clicks "Start the Intake Survey" from the one-on-one page without a token, they hit the "Survey Not Found" dead end. This breaks the self-service funnel.
 
-## Changes
+## Solution
 
-### 1. `src/pages/OneOnOnePage.tsx` -- Add calendar embed + post-booking content
+Add a **direct-access mode** to the intake survey so it works both ways:
+- **With token**: existing behavior (loads pre-created survey)
+- **Without token**: shows a blank form with name/email fields at the top, creates a new survey record on submit
 
-- Add the `useEffect` hook to load the EveryCatch `form_embed.js` script (moved from BookingConfirmedPage)
-- Add `useSearchParams` to capture `email`/`token` query params for the intake link
-- Insert a new **Calendar Embed section** immediately after the hero, containing the iframe in a Card (same markup as BookingConfirmedPage currently has)
-- Add the **"What Happens Next"** steps section (from BookingConfirmedPage) below the calendar
-- Add the **"Why Complete the Intake First?"** section (from BookingConfirmedPage) after the steps
-- Change the two existing CTA buttons (hero + bottom) from `<a href={BOOKING_URL} target="_blank">` to anchor-scroll links (e.g., `<a href="#book">`) that smooth-scroll to the calendar embed section, keeping users on-page
-- Add `id="book"` to the calendar section so anchor links work
+### Changes
 
-### 2. `src/pages/BookingConfirmedPage.tsx` -- Remove calendar, keep the rest
+**1. Edge function (`supabase/functions/intake-survey/index.ts`)**
 
-- Remove the `useEffect` script loader
-- Remove the Calendar Embed section (the iframe Card)
-- Remove the `EMBED_SCRIPT_URL` and `IFRAME_SRC` constants
-- Keep the hero, "What Happens Next" steps, "Why Complete the Intake" section, and footer CTAs intact so the page still functions as a post-booking reference if needed
-- Update the hero headline/subheadline to reflect it's now a confirmation/next-steps page (e.g., "Your Session Is Booked -- Here's What to Do Next")
-- Update step 1 text from "Pick a Time" to "Session Booked" (or similar confirmation language)
+Add a new `POST` path that does NOT require admin auth -- a "public submit" endpoint. When called without a token:
+- Accepts the full form payload plus `contact_name` and `contact_email`
+- Inserts a new `intake_surveys` row with `filled_by: 'self'` and `status: 'submitted'`
+- Returns the new record ID
+- Protected from abuse by requiring at minimum a non-empty `contact_email`
 
-### 3. `src/components/landing/CTASection.tsx` -- Already links to `/one-on-one`, no change needed
+This is a separate route from the existing admin POST (which creates blank surveys with tokens). The distinction: admin POST requires auth header; public POST uses a different path indicator (e.g., query param `?mode=direct` or a distinct request body shape).
 
-### 4. `src/components/landing/HeroSection.tsx` -- Already links to `/one-on-one`, no change needed
+**2. Intake survey page (`src/pages/IntakeSurveyPage.tsx`)**
 
-### 5. `src/components/guide/GuideConclusion.tsx` -- Fix stale link
-- Change `Link to="/get_started"` to `Link to="/one-on-one"` (line 118)
+- When no `token` is present, instead of showing "Survey Not Found", show the full survey form in "direct mode"
+- Add `contact_name` and `contact_email` input fields to Step 1 (required)
+- On submit, POST to the edge function's public endpoint instead of PUT-by-token
+- Save Draft is disabled in direct mode (no token to reference)
+- Pre-populate `contact_email` from the `useContactIdentity` hook if available
 
-### 6. No route changes -- both `/one-on-one` and `/booking-confirmed` remain in `App.tsx`
+**3. One-on-one page link (`src/pages/OneOnOnePage.tsx`)**
 
-## Technical Notes
-- The EveryCatch script loader `useEffect` is idempotent (checks if script already exists before appending), so it works safely on the new page.
-- The calendar iframe ID stays the same (`Xt32XcNcmKgm7vaJaR9o_booking`).
-- Smooth-scroll to `#book` uses standard browser anchor behavior; no extra library needed.
-- Query params (`email`, `token`) on `/one-on-one` will be forwarded to the intake survey link, same as BookingConfirmedPage does today.
+- The intake link already falls back to `/intake` without params when no token/email exists -- no change needed here, it will just work once the intake page supports direct mode.
+
+### What stays the same
+- Token-based flow remains fully intact
+- Admin can still generate tokens and send personalized links
+- All tracking (funnel events, GHL tagging) continues to fire
+- RLS policies unchanged -- edge function uses service role for inserts
 
