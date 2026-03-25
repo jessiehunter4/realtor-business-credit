@@ -36,7 +36,10 @@ const parseRequestBody = async (req: Request) => {
 const asNonEmptyString = (value: unknown) => {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
+  if (trimmed.length === 0) return null;
+  // Reject unresolved template variables like {{contact.id}}
+  if (/^\{\{.*\}\}$/.test(trimmed)) return null;
+  return trimmed;
 };
 
 /**
