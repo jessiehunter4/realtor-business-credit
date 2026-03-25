@@ -1,0 +1,1 @@
+DELETE FROM public.funnel_events WHERE ghl_contact_id LIKE '%{{%}}%';
