@@ -133,12 +133,19 @@ const GuidePage = () => {
       a.download = "Realtor-Business-Credit-Guide.pdf";
       a.click();
       URL.revokeObjectURL(url);
+
+      // Log guide download
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "guide_download",
+        metadata: { source: "sticky_cta_bar" },
+      }).catch((e) => console.error("[Guide] Failed to log guide_download:", e));
     } catch (e) {
       console.error("PDF generation failed:", e);
     } finally {
       setGenerating(false);
     }
-  }, []);
+  }, [contactId]);
 
   if (!accessGranted) {
     return <GuideOptInGate onAccessGranted={handleAccessGranted} />;
