@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import {
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 
@@ -77,6 +80,19 @@ const faqs = [
 ];
 
 const BusinessCreditCardsForRealtorsPage = () => {
+  const { contactId } = useContactIdentity();
+  const logged = useRef(false);
+
+  useEffect(() => {
+    if (logged.current) return;
+    logged.current = true;
+
+    void postFunnelEvent({
+      contactId: contactId || undefined,
+      eventType: "comparison_page_view",
+    }).catch((e) => console.error("[Comparison] Failed to log comparison_page_view:", e));
+  }, [contactId]);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
