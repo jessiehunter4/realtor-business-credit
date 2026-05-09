@@ -13,6 +13,7 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
+import SiteFooter from "@/components/shared/SiteFooter";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -308,9 +309,16 @@ export default function IntakeSurveyPage() {
             />
           ))}
         </div>
-        <p className="text-sm font-medium text-center text-foreground">
-          Section {step + 1} of {steps.length}: {steps[step].title}
-        </p>
+        <div className="text-center space-y-1">
+          <p className="text-sm font-medium text-foreground">
+            Step {step + 1} of {steps.length}: {steps[step].title}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {isDirectMode
+              ? "About 3–5 minutes total. Your answers save when you submit at the end."
+              : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically when you click Save Draft.`}
+          </p>
+        </div>
 
         {/* Step A */}
         {step === 0 && (

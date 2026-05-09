@@ -10,6 +10,7 @@ import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
+import GuideSkim from "@/components/guide/GuideSkim";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
 import GuideChapter1 from "@/components/guide/GuideChapter1";
 import GuideChapter2 from "@/components/guide/GuideChapter2";
@@ -25,6 +26,7 @@ import GuideResources from "@/components/guide/GuideResources";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
+import SiteFooter from "@/components/shared/SiteFooter";
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
   25: { add: "g-guide-25pct" },
@@ -176,6 +178,7 @@ const GuidePage = () => {
       </div>
 
       <GuideCover />
+      <GuideSkim />
       <GuideTOC />
       <GuideIntroduction />
       <GuideChapter1 />
@@ -192,6 +195,7 @@ const GuidePage = () => {
 
       <GuideProgressBar />
       <GuideFloatingTOC />
+      <SiteFooter />
     </div>
   );
 };

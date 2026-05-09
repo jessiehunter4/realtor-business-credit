@@ -3,9 +3,26 @@ import heroImage from "@/assets/hero-closing.jpg";
 interface HeroSectionProps {
   firstName?: string;
   guideLink?: string;
+  /** True when visitor arrived from MLS just-closed flow (contactId or ?closing=1). */
+  closingContext?: boolean;
 }
 
-const HeroSection = ({ firstName, guideLink = "/guide" }: HeroSectionProps) => {
+const HeroSection = ({ firstName, guideLink = "/guide", closingContext = false }: HeroSectionProps) => {
+  const heading = closingContext ? (
+    <>
+      Congratulations{firstName ? ` ${firstName}` : ""} on Your Recent Closing!<br />
+      <span className="text-primary">Now Is the Perfect Time to Build Your Business Credit</span>
+    </>
+  ) : (
+    <>
+      Stop Floating Your Real Estate Business{" "}
+      <span className="text-primary">on Personal Credit</span>
+    </>
+  );
+
+  const subhead = closingContext
+    ? "You just earned a commission. Don't let it all go to expenses on your personal credit. Discover how to separate your business finances and unlock growth capital."
+    : "Build a separate business credit profile for your real estate practice — protect your personal scores and unlock the capital you need between closings.";
   return (
     <section className="relative overflow-hidden">
       {/* Background image with overlay */}
@@ -29,11 +46,10 @@ const HeroSection = ({ firstName, guideLink = "/guide" }: HeroSectionProps) => {
           </p>
 
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-            Congratulations{firstName ? ` ${firstName}` : ""} on Your Recent Closing!<br />
-            <span className="text-primary">Now Is the Perfect Time to Build Your Business Credit</span>
+            {heading}
           </h1>
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mb-10">
-            You just earned a commission. Don't let it all go to expenses on your personal credit. Discover how to separate your business finances and unlock growth capital.
+            {subhead}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">

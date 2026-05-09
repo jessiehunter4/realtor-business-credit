@@ -25,6 +25,7 @@ import {
 import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
+import SiteFooter from "@/components/shared/SiteFooter";
 
 const EMBED_SCRIPT_URL = "https://link.everycatch.com/js/form_embed.js";
 const IFRAME_SRC = "https://link.everycatch.com/widget/booking/Xt32XcNcmKgm7vaJaR9o";
@@ -128,9 +129,24 @@ const OneOnOnePage = () => {
       {/* Calendar Embed */}
       <section id="book" className="py-12 md:py-16 scroll-mt-4">
         <div className="container max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
             Pick a Time That Works for You
           </h2>
+          <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-6">
+            30 minutes. No pressure. No pitch deck. Here's exactly what we'll cover:
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
+            {[
+              { icon: Target, text: "Your top 3 financial goals & gaps" },
+              { icon: FileText, text: "A 90-day action plan tailored to your state" },
+              { icon: CheckCircle, text: "Clear next steps — yours to keep, no obligation" },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex gap-3 items-start bg-muted/50 border border-border rounded-lg p-4">
+                <Icon className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground/90 leading-snug">{text}</p>
+              </div>
+            ))}
+          </div>
           <Card className="overflow-hidden border-2">
             <CardContent className="p-0">
               <iframe
@@ -543,6 +559,7 @@ const OneOnOnePage = () => {
           </div>
         </div>
       </section>
+      <SiteFooter />
     </div>
   );
 };

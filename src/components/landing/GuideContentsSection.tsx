@@ -11,7 +11,7 @@ const guideItems = [
 
 const GuideContentsSection = () => {
   return (
-    <section className="container mx-auto px-4 py-16 md:py-24">
+    <section id="guide-contents" className="container mx-auto px-4 py-16 md:py-24 scroll-mt-16">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-8 flex items-center gap-2">
           📖 What's Inside Your Free Guide + Action Plan
