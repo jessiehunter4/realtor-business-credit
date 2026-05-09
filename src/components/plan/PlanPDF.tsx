@@ -11,17 +11,47 @@ const s = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "#FFFFFF",
-    paddingTop: 48,
-    paddingBottom: 64,
+    paddingTop: 56,
+    paddingBottom: 72,
     paddingHorizontal: 56,
     fontSize: 10,
     lineHeight: 1.7,
     fontFamily: "Helvetica",
   },
+  coverPage: {
+    backgroundColor: "#0d1b2a",
+    color: "#FFFFFF",
+    padding: 56,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    fontFamily: "Helvetica",
+  },
+  coverBrand: { fontSize: 9, color: "#3eaf7c", letterSpacing: 3, fontFamily: "Helvetica-Bold", textTransform: "uppercase" },
+  coverDivider: { height: 3, width: 60, backgroundColor: "#3eaf7c", marginTop: 24, marginBottom: 24 },
+  coverTitle: { fontSize: 32, color: "#FFFFFF", fontFamily: "Helvetica-Bold", lineHeight: 1.2 },
+  coverSubtitle: { fontSize: 13, color: "#cbd5e1", marginTop: 14, lineHeight: 1.5 },
+  coverPreparedLabel: { fontSize: 8, color: "#94a3b8", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6 },
+  coverPreparedName: { fontSize: 18, color: "#FFFFFF", fontFamily: "Helvetica-Bold" },
+  coverPreparedMeta: { fontSize: 10, color: "#cbd5e1", marginTop: 4 },
+  coverFooter: { fontSize: 8, color: "#64748b", borderTopWidth: 1, borderTopColor: "#1e3a5f", paddingTop: 12 },
+  runningHeader: {
+    position: "absolute",
+    top: 24,
+    left: 56,
+    right: 56,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    fontSize: 8,
+    color: "#94a3b8",
+    paddingBottom: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e2e8f0",
+  },
+  runningHeaderBrand: { color: "#1e3a5f", fontFamily: "Helvetica-Bold" },
   header: {
     backgroundColor: "#0d1b2a",
     marginHorizontal: -56,
-    marginTop: -48,
+    marginTop: -56,
     paddingHorizontal: 56,
     paddingVertical: 28,
     flexDirection: "row",
@@ -44,18 +74,23 @@ const s = StyleSheet.create({
     marginBottom: 10,
     marginTop: 18,
   },
+  sectionEyebrow: { fontSize: 7, letterSpacing: 1.5, color: "#3eaf7c", fontFamily: "Helvetica-Bold", textTransform: "uppercase", marginTop: 18 },
   narrative: { fontSize: 10, color: "#444444", lineHeight: 1.7, marginBottom: 8 },
   fundRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
   fundIcon: { width: 12, height: 12, borderRadius: 6, marginRight: 6, justifyContent: "center", alignItems: "center" },
   fundLabel: { fontSize: 10, color: "#333333", flex: 1 },
   fundStatus: { fontSize: 8, fontFamily: "Helvetica-Bold" },
-  actionRow: { flexDirection: "row", marginBottom: 8, alignItems: "flex-start" },
+  actionRow: { flexDirection: "row", marginBottom: 10, alignItems: "flex-start" },
+  actionCheckbox: {
+    width: 14, height: 14, borderRadius: 2, borderWidth: 1, borderColor: "#3eaf7c",
+    marginRight: 8, marginTop: 2,
+  },
   actionBadge: {
-    width: 18, height: 18, borderRadius: 9, backgroundColor: "#3eaf7c",
+    width: 16, height: 16, borderRadius: 8, backgroundColor: "#3eaf7c",
     justifyContent: "center", alignItems: "center", marginRight: 8, marginTop: 1,
   },
   actionNum: { fontSize: 8, color: "#FFFFFF", fontFamily: "Helvetica-Bold" },
-  actionText: { fontSize: 10, color: "#333333", flex: 1 },
+  actionText: { fontSize: 10, color: "#333333", flex: 1, fontFamily: "Helvetica-Bold" },
   actionEffort: { fontSize: 8, color: "#999999", marginTop: 2 },
   milestoneRow: { flexDirection: "row", marginBottom: 8, alignItems: "flex-start" },
   milestoneBadge: {
@@ -75,17 +110,19 @@ const s = StyleSheet.create({
   programDesc: { fontSize: 8, color: "#666666", marginTop: 2 },
   programGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
   disclaimer: { fontSize: 7, color: "#999999", fontStyle: "italic", marginTop: 10 },
-  footer: {
-    backgroundColor: "#0d1b2a",
-    marginHorizontal: -56,
-    marginBottom: -64,
-    paddingHorizontal: 56,
-    paddingVertical: 12,
+  pageFooter: {
+    position: "absolute",
+    bottom: 24,
+    left: 56,
+    right: 56,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: "auto",
+    paddingTop: 8,
+    borderTopWidth: 0.5,
+    borderTopColor: "#e2e8f0",
   },
-  footerText: { fontSize: 7, color: "#666666" },
+  footerText: { fontSize: 7, color: "#94a3b8" },
+  pageNumber: { fontSize: 7, color: "#94a3b8" },
 });
 
 const statusColor = (status: string) =>
@@ -99,11 +136,57 @@ const statusSymbol = (status: string) =>
 
 export default function PlanPDF({ planData }: { planData: PlanData }) {
   const { sections } = planData;
+  const preparedDate = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const locationLine = [planData.city, planData.state].filter(Boolean).join(", ");
 
   return (
     <Document title={`Business Credit Plan – ${planData.contact_name || "Agent"}`}>
+      {/* Cover Page */}
+      <Page size="LETTER" style={s.coverPage}>
+        <View>
+          <Text style={s.coverBrand}>Realtor Business Credit</Text>
+          <View style={s.coverDivider} />
+          <Text style={s.coverTitle}>Your Custom{"\n"}Business Credit Plan</Text>
+          <Text style={s.coverSubtitle}>
+            A Realtor-specific roadmap to build separate business credit, protect your personal finances, and unlock funding capacity for your real estate business.
+          </Text>
+        </View>
+        <View>
+          <Text style={s.coverPreparedLabel}>Prepared for</Text>
+          <Text style={s.coverPreparedName}>{planData.contact_name || "Agent"}</Text>
+          <Text style={s.coverPreparedMeta}>
+            {locationLine}
+            {planData.license_type ? ` · ${planData.license_type}` : ""}
+          </Text>
+          <Text style={[s.coverPreparedMeta, { marginTop: 2 }]}>Prepared {preparedDate}</Text>
+        </View>
+        <Text style={s.coverFooter}>
+          My Better Business Credit · RealtorBusinessCredit.com{"\n"}
+          Educational only — not legal, tax, or financial advice.
+        </Text>
+      </Page>
+
       <Page size="LETTER" style={s.page}>
-        {/* Header */}
+        {/* Running header */}
+        <View style={s.runningHeader} fixed>
+          <Text style={s.runningHeaderBrand}>Realtor Business Credit Plan</Text>
+          <Text>{planData.contact_name || "Agent"}</Text>
+        </View>
+
+        {/* Page footer with page numbers */}
+        <View style={s.pageFooter} fixed>
+          <Text style={s.footerText}>© 2026 RealtorBusinessCredit.com</Text>
+          <Text
+            style={s.pageNumber}
+            render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
+          />
+        </View>
+
+        {/* Header band */}
         <View style={s.header}>
           <View>
             <Text style={s.headerBrand}>Realtor Business Credit</Text>
@@ -113,18 +196,20 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
             <Text style={s.headerLabel}>Prepared for</Text>
             <Text style={s.headerName}>{planData.contact_name || "Agent"}</Text>
             <Text style={s.headerMeta}>
-              {[planData.city, planData.state].filter(Boolean).join(", ")}
+              {locationLine}
               {planData.license_type ? ` · ${planData.license_type}` : ""}
             </Text>
           </View>
         </View>
 
         {/* Section 1 */}
-        <Text style={s.sectionTitle}>1. Your Goals & Snapshot</Text>
+        <Text style={s.sectionEyebrow}>Section 01</Text>
+        <Text style={s.sectionTitle}>Your Goals & Snapshot</Text>
         <Text style={s.narrative}>{sections.goals_snapshot.narrative}</Text>
 
         {/* Section 2 */}
-        <Text style={s.sectionTitle}>2. Business Structure & Fundability</Text>
+        <Text style={s.sectionEyebrow}>Section 02</Text>
+        <Text style={s.sectionTitle}>Business Structure & Fundability</Text>
         {sections.fundability.items.map((item, i) => (
           <View key={i} style={s.fundRow}>
             <View style={[s.fundIcon, { backgroundColor: statusColor(item.status) + "22" }]}>
@@ -137,9 +222,14 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
         <Text style={[s.narrative, { marginTop: 8 }]}>{sections.fundability.narrative}</Text>
 
         {/* Section 3 */}
-        <Text style={s.sectionTitle}>3. 90-Day Action Plan</Text>
+        <Text style={s.sectionEyebrow}>Section 03</Text>
+        <Text style={s.sectionTitle}>90-Day Action Plan</Text>
+        <Text style={[s.narrative, { fontSize: 9, color: "#666666", marginBottom: 10 }]}>
+          Check each box as you complete it. Your portal also tracks progress automatically.
+        </Text>
         {sections.action_plan_90day.items.map((item, i) => (
-          <View key={i} style={s.actionRow}>
+          <View key={i} style={s.actionRow} wrap={false}>
+            <View style={s.actionCheckbox} />
             <View style={s.actionBadge}>
               <Text style={s.actionNum}>{item.step}</Text>
             </View>
@@ -151,9 +241,10 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
         ))}
 
         {/* Section 4 */}
-        <Text style={s.sectionTitle}>4. 6–12 Month Roadmap</Text>
+        <Text style={s.sectionEyebrow}>Section 04</Text>
+        <Text style={s.sectionTitle}>6–12 Month Roadmap</Text>
         {sections.roadmap.milestones.map((m, i) => (
-          <View key={i} style={s.milestoneRow}>
+          <View key={i} style={s.milestoneRow} wrap={false}>
             <View style={s.milestoneBadge}>
               <Text style={s.milestoneMonth}>{m.month}</Text>
             </View>
@@ -162,9 +253,10 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
         ))}
 
         {/* Section 5 */}
-        <Text style={s.sectionTitle}>5. Credit & Funding Opportunities</Text>
+        <Text style={s.sectionEyebrow}>Section 05</Text>
+        <Text style={s.sectionTitle}>Credit & Funding Opportunities</Text>
         {sections.funding_opportunities.items.map((f, i) => (
-          <View key={i} style={s.fundingItem}>
+          <View key={i} style={s.fundingItem} wrap={false}>
             <Text style={s.fundingType}>{f.type}</Text>
             <Text style={s.fundingDesc}>{f.description}</Text>
           </View>
@@ -174,21 +266,16 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
         </Text>
 
         {/* Section 6 */}
-        <Text style={s.sectionTitle}>6. Program Options & Next Steps</Text>
+        <Text style={s.sectionEyebrow}>Section 06</Text>
+        <Text style={s.sectionTitle}>Program Options & Next Steps</Text>
         <Text style={s.narrative}>{sections.next_steps.narrative}</Text>
         <View style={s.programGrid}>
           {sections.next_steps.program_options.map((opt, i) => (
-            <View key={i} style={s.programCard}>
+            <View key={i} style={s.programCard} wrap={false}>
               <Text style={s.programName}>{opt.name}</Text>
               <Text style={s.programDesc}>{opt.description}</Text>
             </View>
           ))}
-        </View>
-
-        {/* Footer */}
-        <View style={s.footer}>
-          <Text style={s.footerText}>© 2026 RealtorBusinessCredit.com · My Better Business Credit</Text>
-          <Text style={s.footerText}>This plan is for educational purposes only. Not legal, tax, or financial advice.</Text>
         </View>
       </Page>
     </Document>
