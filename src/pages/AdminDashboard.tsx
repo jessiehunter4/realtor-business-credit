@@ -1134,6 +1134,11 @@ export default function AdminDashboard() {
               {refreshingDashboard ? "Refreshing..." : "Refresh Engagement Data"}
             </Button>
           </TabsContent>
+
+          {/* ======== SEO FUNNEL TAB ======== */}
+          <TabsContent value="seo" className="space-y-6">
+            <SeoFunnelTab />
+          </TabsContent>
         </Tabs>
       </main>
 
