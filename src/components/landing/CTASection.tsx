@@ -32,6 +32,12 @@ const CTASection = ({ guideLink = "/guide" }: CTASectionProps) => {
               </Link>
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground mt-6">
+            Researching cards first?{" "}
+            <Link to="/business-credit-cards-for-realtors" className="text-primary underline underline-offset-2 hover:text-primary/80">
+              See our Realtor-specific business credit cards guide →
+            </Link>
+          </p>
         </div>
       </div>
     </section>
