@@ -27,6 +27,7 @@ import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
 import SiteFooter from "@/components/shared/SiteFooter";
+import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
@@ -203,6 +204,9 @@ const GuidePage = () => {
       <GuideChapter7 />
       <GuideChapter8 />
       <GuideChapter9 />
+      <section className="container mx-auto max-w-3xl px-4 py-12">
+        <StateEntityWidget />
+      </section>
       <GuideConclusion />
       <GuideResources />
 

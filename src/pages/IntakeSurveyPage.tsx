@@ -14,6 +14,7 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteFooter from "@/components/shared/SiteFooter";
+import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -515,6 +516,9 @@ export default function IntakeSurveyPage() {
                     </div>
                   ))}
                 </RadioGroup>
+              </div>
+              <div className="pt-4 border-t border-border/50">
+                <StateEntityWidget initialState={form.state} />
               </div>
             </CardContent>
           </Card>

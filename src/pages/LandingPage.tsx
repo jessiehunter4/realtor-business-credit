@@ -10,6 +10,7 @@ import TimingSection from "@/components/landing/TimingSection";
 import TruthSection from "@/components/landing/TruthSection";
 import ComparisonSection from "@/components/landing/ComparisonSection";
 import ProblemsSection from "@/components/landing/ProblemsSection";
+import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
 import GuideContentsSection from "@/components/landing/GuideContentsSection";
 import CTASection from "@/components/landing/CTASection";
 import FounderQuoteSection from "@/components/landing/FounderQuoteSection";
@@ -65,6 +66,7 @@ const LandingPage = () => {
       <TruthSection />
       <ComparisonSection />
       <ProblemsSection />
+      <CashFlowCalculator guideLink={guideLink} />
       <GuideContentsSection />
       <CTASection guideLink={guideLink} />
       <FounderQuoteSection />
