@@ -629,6 +629,39 @@ export type Database = {
           },
         ]
       }
+      plan_task_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          plan_id: string
+          task_key: string
+          task_label: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          plan_id: string
+          task_key: string
+          task_label?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          plan_id?: string
+          task_key?: string
+          task_label?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           buyer_agent_id: string | null
