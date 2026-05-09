@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { User } from "@supabase/supabase-js";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Users, FileText, TrendingUp, Activity, RefreshCw, ExternalLink, Info } from "lucide-react";
+import SeoFunnelTab from "@/components/admin/SeoFunnelTab";
 import {
   Dialog,
   DialogContent,
@@ -634,6 +635,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="engagement" className="gap-1.5">
               <Activity className="h-4 w-4" /> Engagement
+            </TabsTrigger>
+            <TabsTrigger value="seo" className="gap-1.5">
+              <TrendingUp className="h-4 w-4" /> SEO Funnel
             </TabsTrigger>
           </TabsList>
 
