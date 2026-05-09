@@ -80,6 +80,19 @@ const faqs = [
 ];
 
 const BusinessCreditCardsForRealtorsPage = () => {
+  const { contactId } = useContactIdentity();
+  const logged = useRef(false);
+
+  useEffect(() => {
+    if (logged.current) return;
+    logged.current = true;
+
+    void postFunnelEvent({
+      contactId: contactId || undefined,
+      eventType: "comparison_page_view",
+    }).catch((e) => console.error("[Comparison] Failed to log comparison_page_view:", e));
+  }, [contactId]);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
