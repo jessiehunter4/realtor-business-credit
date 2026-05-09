@@ -1,12 +1,24 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Calendar } from "lucide-react";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 interface CTASectionProps {
   guideLink?: string;
 }
 
 const CTASection = ({ guideLink = "/guide" }: CTASectionProps) => {
+  const { contactId } = useContactIdentity();
+
+  const handleComparisonClick = () => {
+    void postFunnelEvent({
+      contactId: contactId || undefined,
+      eventType: "comparison_page_click",
+      metadata: { source: "cta_section" },
+    }).catch(() => {});
+  };
+
   return (
     <section id="cta" className="bg-primary/10 py-16 md:py-24 scroll-mt-16">
       <div className="container mx-auto px-4">
@@ -34,7 +46,7 @@ const CTASection = ({ guideLink = "/guide" }: CTASectionProps) => {
           </div>
           <p className="text-sm text-muted-foreground mt-6">
             Researching cards first?{" "}
-            <Link to="/business-credit-cards-for-realtors" className="text-primary underline underline-offset-2 hover:text-primary/80">
+            <Link to="/business-credit-cards-for-realtors" className="text-primary underline underline-offset-2 hover:text-primary/80" onClick={handleComparisonClick}>
               See our Realtor-specific business credit cards guide →
             </Link>
           </p>
