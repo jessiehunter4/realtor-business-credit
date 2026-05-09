@@ -18,6 +18,8 @@ import PortalPlanView from "./pages/PortalPlanView";
 import BookingConfirmedPage from "./pages/BookingConfirmedPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -83,6 +85,8 @@ const App = () => (
             path="/business-credit-cards-for-realtors"
             element={<BusinessCreditCardsForRealtorsPage />}
           />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

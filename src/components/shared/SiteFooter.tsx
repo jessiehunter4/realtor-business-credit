@@ -34,6 +34,8 @@ const SiteFooter = () => {
           <a href="https://mybetterbusinesscredit.fundabilityscan.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
             Fundability Scan
           </a>
+          <Link to="/privacy" className="hover:text-primary">Privacy</Link>
+          <Link to="/terms" className="hover:text-primary">Terms</Link>
         </div>
       </div>
     </footer>
