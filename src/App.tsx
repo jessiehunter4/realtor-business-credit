@@ -17,6 +17,7 @@ import AdminPlanView from "./pages/AdminPlanView";
 import PortalPlanView from "./pages/PortalPlanView";
 import BookingConfirmedPage from "./pages/BookingConfirmedPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -78,6 +79,10 @@ const App = () => (
           <Route path="/portal/plan/:id" element={<PortalPlanView />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
+          <Route
+            path="/business-credit-cards-for-realtors"
+            element={<BusinessCreditCardsForRealtorsPage />}
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

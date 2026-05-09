@@ -14,6 +14,7 @@ import GuideContentsSection from "@/components/landing/GuideContentsSection";
 import CTASection from "@/components/landing/CTASection";
 import FounderQuoteSection from "@/components/landing/FounderQuoteSection";
 import SiteFooter from "@/components/shared/SiteFooter";
+import Seo from "@/components/shared/Seo";
 
 const LandingPage = () => {
   const { contactId, firstName, buildForwardParams } = useContactIdentity();
@@ -44,6 +45,19 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Realtor Business Credit: Stop Floating Your Business on Personal Credit"
+        description="Free guide and one-on-one help for real estate agents and brokers building separate business credit, fundability, and funding capacity for their real estate business."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Realtor Business Credit",
+          url: "https://realtorbusinesscredit.com",
+          parentOrganization: { "@type": "Organization", name: "My Better Business Credit" },
+          founder: { "@type": "Person", name: "Jessie Hunter" },
+        }}
+      />
       <HeroSection firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
       <TrustStrip />
       <AudienceSegmenter />

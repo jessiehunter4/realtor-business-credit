@@ -12,3 +12,12 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auth
+Disallow: /intake
+Disallow: /portal/
+Disallow: /checkout
+Disallow: /booking-confirmed
+
+Sitemap: https://realtorbusinesscredit.com/sitemap.xml

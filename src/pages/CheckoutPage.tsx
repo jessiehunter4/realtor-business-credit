@@ -12,6 +12,7 @@ import {
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import { supabase } from "@/integrations/supabase/client";
+import Seo from "@/components/shared/Seo";
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
 
@@ -53,6 +54,12 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-secondary text-secondary-foreground">
+      <Seo
+        title="Enroll · Realtor Business Credit Program"
+        description="Secure enrollment for the Realtor Business Credit program — coaching, cohort, and the implementation portal."
+        path="/checkout"
+        noindex
+      />
       {/* Header */}
       <header className="border-b border-border/20 bg-secondary/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">

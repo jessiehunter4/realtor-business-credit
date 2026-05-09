@@ -27,6 +27,7 @@ import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
 import SiteFooter from "@/components/shared/SiteFooter";
+import Seo from "@/components/shared/Seo";
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
   25: { add: "g-guide-25pct" },
@@ -145,6 +146,11 @@ const GuidePage = () => {
 
   return (
     <div className="min-h-screen bg-background scroll-smooth">
+      <Seo
+        title="Why Most Realtors Don't Establish Separate Business Credit (Free Guide)"
+        description="A 9-chapter guide for real estate agents and brokers: why business credit matters, the 7-step setup, timelines, and what it actually costs to keep using personal credit."
+        path="/guide"
+      />
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">

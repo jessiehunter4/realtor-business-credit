@@ -15,6 +15,9 @@ const SiteFooter = () => (
         <Link to="/" className="hover:text-primary">Home</Link>
         <Link to="/guide" className="hover:text-primary">Free Guide</Link>
         <Link to="/one-on-one" className="hover:text-primary">Book a Session</Link>
+        <Link to="/business-credit-cards-for-realtors" className="hover:text-primary">
+          Business Credit Cards for Realtors
+        </Link>
         <a href="https://mybetterbusinesscredit.fundabilityscan.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
           Fundability Scan
         </a>

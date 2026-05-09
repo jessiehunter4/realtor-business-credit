@@ -14,6 +14,7 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteFooter from "@/components/shared/SiteFooter";
+import Seo from "@/components/shared/Seo";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -285,6 +286,12 @@ export default function IntakeSurveyPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 py-8 px-4">
+      <Seo
+        title="Realtor Business Financial Needs Analysis"
+        description="A short intake to prepare for your one-on-one business credit session."
+        path="/intake"
+        noindex
+      />
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
