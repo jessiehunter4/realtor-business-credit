@@ -7,8 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { User } from "@supabase/supabase-js";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { Users, FileText, TrendingUp, Activity, RefreshCw, ExternalLink, Info } from "lucide-react";
+import { Users, FileText, TrendingUp, Activity, RefreshCw, ExternalLink, Info, CalendarClock } from "lucide-react";
 import SeoFunnelTab from "@/components/admin/SeoFunnelTab";
+import BookingsTab from "@/components/admin/BookingsTab";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ const FUNNEL_ORDER = [
   "guide_read_75",
   "guide_read_100",
   "one_on_one_visited",
+  "booking_confirmed",
   "checkout_visited",
   "checkout_clicked",
   "intake_started",
@@ -62,6 +64,7 @@ const FUNNEL_LABELS: Record<string, string> = {
   guide_read_75: "Guide 75%",
   guide_read_100: "Guide 100%",
   one_on_one_visited: "1:1 Page Visit",
+  booking_confirmed: "Booking Confirmed",
   checkout_visited: "Checkout Visit",
   checkout_clicked: "Checkout Click",
   intake_started: "Intake Start",
@@ -639,6 +642,9 @@ export default function AdminDashboard() {
             <TabsTrigger value="seo" className="gap-1.5">
               <TrendingUp className="h-4 w-4" /> SEO Funnel
             </TabsTrigger>
+            <TabsTrigger value="bookings" className="gap-1.5">
+              <CalendarClock className="h-4 w-4" /> Bookings
+            </TabsTrigger>
           </TabsList>
 
           {/* ======== OVERVIEW TAB ======== */}
@@ -1138,6 +1144,11 @@ export default function AdminDashboard() {
           {/* ======== SEO FUNNEL TAB ======== */}
           <TabsContent value="seo" className="space-y-6">
             <SeoFunnelTab />
+          </TabsContent>
+
+          {/* ======== BOOKINGS TAB ======== */}
+          <TabsContent value="bookings" className="space-y-6">
+            <BookingsTab />
           </TabsContent>
         </Tabs>
       </main>
