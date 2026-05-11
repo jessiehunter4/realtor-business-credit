@@ -1145,6 +1145,11 @@ export default function AdminDashboard() {
           <TabsContent value="seo" className="space-y-6">
             <SeoFunnelTab />
           </TabsContent>
+
+          {/* ======== BOOKINGS TAB ======== */}
+          <TabsContent value="bookings" className="space-y-6">
+            <BookingsTab />
+          </TabsContent>
         </Tabs>
       </main>
 
