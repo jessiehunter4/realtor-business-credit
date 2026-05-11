@@ -1,11 +1,30 @@
+import { useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Calendar, ClipboardList, Search, UserCheck, BookOpen, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 const BookingConfirmedPage = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
   const token = searchParams.get("token") || "";
+  const appointmentId = searchParams.get("appointment") || searchParams.get("appointmentId") || "";
+  const { contactId } = useContactIdentity();
+
+  useEffect(() => {
+    void postFunnelEvent({
+      eventType: "booking_confirmed",
+      contactId: contactId || undefined,
+      metadata: {
+        email: email || undefined,
+        appointment_id: appointmentId || undefined,
+        has_token: !!token,
+      },
+    }).catch((err) => console.error("[booking_confirmed] log failed:", err));
+    // fire once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const intakeLink = `/intake${email || token ? `?${email ? `email=${encodeURIComponent(email)}` : ""}${email && token ? "&" : ""}${token ? `token=${token}` : ""}` : ""}`;
 
