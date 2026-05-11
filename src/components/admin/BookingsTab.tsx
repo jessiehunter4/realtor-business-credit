@@ -57,12 +57,6 @@ const BookingsTab = () => {
       const now = Date.now();
       const startTime = now - r.pastDays * 86400_000;
       const endTime = now + r.futureDays * 86400_000;
-      const { data: resp, error: invErr } = await supabase.functions.invoke("list-ghl-appointments", {
-        body: null,
-        method: "GET" as never,
-        // supabase-js doesn't support GET query params via invoke cleanly; use REST instead
-      });
-      // Fallback: call function directly via fetch with query params
       const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/list-ghl-appointments?startTime=${startTime}&endTime=${endTime}`;
       const session = (await supabase.auth.getSession()).data.session;
       const token = session?.access_token;
@@ -79,8 +73,6 @@ const BookingsTab = () => {
       } else {
         setData(payload);
       }
-      // suppress unused warning
-      void resp; void invErr;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
