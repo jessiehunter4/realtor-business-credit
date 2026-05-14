@@ -6,6 +6,63 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const EDITABLE_SURVEY_FIELDS = [
+  "contact_name",
+  "contact_email",
+  "brokerage_name",
+  "city",
+  "state",
+  "license_type",
+  "years_in_real_estate",
+  "gci_last_12_months",
+  "sides_closed_last_12_months",
+  "top_financial_goal",
+  "top_financial_need",
+  "desired_monthly_credit_capacity",
+  "has_business_entity",
+  "entity_type",
+  "has_business_address",
+  "address_type",
+  "has_business_phone",
+  "has_business_email",
+  "has_business_website",
+  "has_business_bank_account",
+  "uses_accounting_software",
+  "accounting_software_name",
+  "business_credit_cards",
+  "vendor_tradelines",
+  "credit_reporting_bureaus",
+  "funding_gap_methods",
+  "desired_funding_types",
+  "personal_guarantee_comfort",
+  "personal_credit_score_range",
+  "preferred_support_format",
+  "interest_in_cohort",
+  "preferred_cohort_days",
+  "investment_readiness",
+  "additional_notes",
+] as const;
+
+const pickEditableSurveyFields = (body: Record<string, unknown>) => {
+  const picked: Record<string, unknown> = {};
+
+  for (const key of EDITABLE_SURVEY_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(body, key)) {
+      picked[key] = body[key] ?? null;
+    }
+  }
+
+  if (typeof picked.contact_email === "string") {
+    picked.contact_email = picked.contact_email.trim();
+  }
+
+  if (typeof picked.contact_name === "string") {
+    picked.contact_name = picked.contact_name.trim() || null;
+  }
+
+  return picked;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -60,15 +117,15 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Remove fields that shouldn't be set by the public user
-      const { id, access_token, created_at, created_by, ...updateFields } = body;
+      const updateFields = pickEditableSurveyFields(body);
+      const nextStatus = body.status === "submitted" ? "submitted" : "in_progress";
 
       const { data, error } = await supabaseAdmin
         .from("intake_surveys")
         .update({
           ...updateFields,
-          status: body.status || "submitted",
-          submitted_at: body.status === "submitted" ? new Date().toISOString() : undefined,
+          status: nextStatus,
+          submitted_at: nextStatus === "submitted" ? new Date().toISOString() : null,
         })
         .eq("access_token", token)
         .select()
@@ -102,8 +159,7 @@ Deno.serve(async (req) => {
           );
         }
 
-        // Strip fields that shouldn't be set publicly
-        const { id, access_token, created_at, created_by, status, ...surveyFields } = body;
+        const surveyFields = pickEditableSurveyFields(body);
 
         const { data, error } = await supabaseAdmin
           .from("intake_surveys")
