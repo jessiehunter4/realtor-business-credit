@@ -175,6 +175,8 @@ export default function IntakeSurveyPage() {
 
     setSubmitting(true);
     try {
+      let errorMessage = "Failed to submit";
+
       if (isDirectMode) {
         // Public direct submit
         const res = await fetch(
@@ -185,7 +187,11 @@ export default function IntakeSurveyPage() {
             body: JSON.stringify(form),
           }
         );
-        if (!res.ok) throw new Error("Failed to submit");
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          errorMessage = data?.error || errorMessage;
+          throw new Error(errorMessage);
+        }
       } else {
         // Token-based submit
         const res = await fetch(
@@ -196,7 +202,11 @@ export default function IntakeSurveyPage() {
             body: JSON.stringify({ ...form, status: "submitted" }),
           }
         );
-        if (!res.ok) throw new Error("Failed to submit");
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          errorMessage = data?.error || errorMessage;
+          throw new Error(errorMessage);
+        }
       }
 
       setSubmitted(true);
@@ -205,18 +215,19 @@ export default function IntakeSurveyPage() {
       void postFunnelEvent({
         contactId: contactId || undefined,
         eventType: "intake_submitted",
-      }).catch(() => {});
+      }).catch((err) => console.error("Failed to log intake_submitted:", err));
       if (contactId) {
         supabase.functions
           .invoke("tag-ghl-contact", {
             body: { contactId, tags: ["f-intake-submitted"] },
           })
-          .catch(() => {});
+          .catch((err) => console.error("Failed to tag intake submit:", err));
       }
 
       toast({ title: "Survey Submitted", description: "Thank you! We'll review your answers before our session." });
-    } catch {
-      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
@@ -225,7 +236,7 @@ export default function IntakeSurveyPage() {
   const saveDraft = async () => {
     if (isDirectMode) return; // No draft saving in direct mode
     try {
-      await fetch(
+      const res = await fetch(
         `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
         {
           method: "PUT",
@@ -233,9 +244,16 @@ export default function IntakeSurveyPage() {
           body: JSON.stringify({ ...form, status: "in_progress" }),
         }
       );
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Could not save progress.");
+      }
+
       toast({ title: "Progress Saved", description: "You can return to this link to finish later." });
-    } catch {
-      toast({ title: "Error", description: "Could not save progress.", variant: "destructive" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not save progress.";
+      toast({ title: "Error", description: message, variant: "destructive" });
     }
   };
 
