@@ -98,10 +98,28 @@ export default function AdminIntakeCoachView() {
   const handleSaveProxy = async () => {
     if (!id) return;
     setSaving(true);
-    const { id: _id, access_token, created_at, ...updateFields } = form as any;
+    const editableKeys: (keyof IntakeSurvey)[] = [
+      "contact_name", "contact_email", "brokerage_name", "city", "state",
+      "license_type", "years_in_real_estate", "gci_last_12_months",
+      "sides_closed_last_12_months", "top_financial_goal", "top_financial_need",
+      "desired_monthly_credit_capacity", "has_business_entity", "entity_type",
+      "has_business_address", "address_type", "has_business_phone",
+      "has_business_email", "has_business_website", "has_business_bank_account",
+      "uses_accounting_software", "accounting_software_name",
+      "business_credit_cards", "vendor_tradelines", "credit_reporting_bureaus",
+      "funding_gap_methods", "desired_funding_types", "personal_guarantee_comfort",
+      "personal_credit_score_range", "preferred_support_format",
+      "interest_in_cohort", "preferred_cohort_days", "investment_readiness",
+      "additional_notes",
+    ];
+    const updateFields: Record<string, any> = {};
+    for (const k of editableKeys) {
+      if (k in form) updateFields[k as string] = (form as any)[k] ?? null;
+    }
     const { error } = await supabase.from("intake_surveys").update(updateFields).eq("id", id);
     if (error) {
-      toast.error("Failed to save");
+      console.error("intake save error", error);
+      toast.error(`Failed to save: ${error.message}`);
     } else {
       toast.success("Survey updated");
       fetchData();
@@ -113,7 +131,8 @@ export default function AdminIntakeCoachView() {
     if (!id) return;
     const { error } = await supabase.from("intake_surveys").update({ status: "reviewed" }).eq("id", id);
     if (error) {
-      toast.error("Failed to update status");
+      console.error("intake status error", error);
+      toast.error(`Failed to update status: ${error.message}`);
     } else {
       toast.success("Marked as reviewed");
       fetchData();
@@ -136,7 +155,8 @@ export default function AdminIntakeCoachView() {
     });
 
     if (error) {
-      toast.error("Failed to save note");
+      console.error("intake note error", error);
+      toast.error(`Failed to save note: ${error.message}`);
     } else {
       toast.success("Note saved");
       setNoteTexts((prev) => ({ ...prev, [section]: "" }));
