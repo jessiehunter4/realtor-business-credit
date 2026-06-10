@@ -98,7 +98,6 @@ const HeroVideo = ({
     <video
       key={videoUrl}
       src={videoUrl}
-      poster={poster}
       controls
       playsInline
       preload="metadata"
