@@ -13,6 +13,7 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/shared/Seo";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
 
@@ -54,6 +55,7 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-secondary text-secondary-foreground">
+      <SiteHeader />
       <Seo
         title="Enroll · Realtor Business Credit Program"
         description="Secure enrollment for the Realtor Business Credit program — coaching, cohort, and the implementation portal."

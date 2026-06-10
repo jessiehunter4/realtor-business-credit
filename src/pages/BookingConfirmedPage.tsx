@@ -4,6 +4,7 @@ import { Calendar, ClipboardList, Search, UserCheck, BookOpen, ArrowRight, Check
 import { Button } from "@/components/ui/button";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const BookingConfirmedPage = () => {
   const [searchParams] = useSearchParams();
@@ -49,6 +50,7 @@ const BookingConfirmedPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SiteHeader />
       {/* Hero */}
       <section className="bg-secondary text-secondary-foreground py-16 md:py-24">
         <div className="container max-w-4xl mx-auto px-4 text-center">

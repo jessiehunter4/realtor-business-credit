@@ -16,6 +16,7 @@ import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const cardCategories = [
   {
@@ -105,6 +106,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SiteHeader />
       <Seo
         title="Business Credit Cards for Realtors: 2026 Buyer's Guide"
         description="A Realtor-specific look at the categories of business credit cards that actually fit real estate agents and brokers — and what to set up first so you qualify."

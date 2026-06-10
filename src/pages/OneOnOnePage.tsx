@@ -25,6 +25,7 @@ import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import SiteFooter from "@/components/shared/SiteFooter";
+import SiteHeader from "@/components/shared/SiteHeader";
 import Seo from "@/components/shared/Seo";
 
 const EMBED_SCRIPT_URL = "https://link.everycatch.com/js/form_embed.js";
@@ -92,6 +93,7 @@ const OneOnOnePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SiteHeader />
       <Seo
         title="Free One-on-One Business Credit Session for Realtors"
         description="30 minutes with Jessie Hunter, Realtor and Credit Suite Certified Partner. Walk away with a 90-day plan tailored to your state, your closings, and your goals."

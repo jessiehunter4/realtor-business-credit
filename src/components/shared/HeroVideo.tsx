@@ -75,7 +75,7 @@ const HeroVideo = ({
       <img
         src={poster}
         alt={alt}
-        className={className}
+        className={`${className} w-full h-full object-cover`}
         width={1408}
         height={896}
       />
@@ -87,7 +87,7 @@ const HeroVideo = ({
       <img
         src={poster}
         alt={alt}
-        className={className}
+        className={`${className} w-full h-full object-cover`}
         width={1408}
         height={896}
       />
@@ -101,7 +101,7 @@ const HeroVideo = ({
       controls
       playsInline
       preload="metadata"
-      className={className}
+      className={`${className} w-full h-full object-cover`}
       aria-label={alt}
       crossOrigin="anonymous"
     >

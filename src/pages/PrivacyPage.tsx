@@ -1,29 +1,18 @@
 import { Link } from "react-router-dom";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
-import { BookOpen } from "lucide-react";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const LAST_UPDATED = "May 9, 2026";
 
 const PrivacyPage = () => (
   <div className="min-h-screen bg-background">
+    <SiteHeader />
     <Seo
       title="Privacy Policy · Realtor Business Credit"
       description="How Realtor Business Credit and My Better Business Credit collect, use, store, and protect your information, including SMS and email communications."
       path="/privacy"
     />
-    <header className="border-b border-border bg-secondary text-secondary-foreground">
-      <div className="container mx-auto max-w-4xl px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-primary" />
-          <span className="font-semibold text-sm">Realtor Business Credit</span>
-        </Link>
-        <Link to="/terms" className="text-sm text-secondary-foreground/70 hover:text-primary">
-          Terms of Service
-        </Link>
-      </div>
-    </header>
-
     <main className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
       <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-2">Privacy Policy</h1>
       <p className="text-sm text-muted-foreground mb-10">Last updated: {LAST_UPDATED}</p>

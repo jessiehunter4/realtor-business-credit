@@ -16,6 +16,7 @@ import TestimonialsBright from "@/components/landing/TestimonialsBright";
 import FinalCTABright from "@/components/landing/FinalCTABright";
 import StickyMobileCTABar from "@/components/shared/StickyMobileCTABar";
 import SiteFooter from "@/components/shared/SiteFooter";
+import SiteHeader from "@/components/shared/SiteHeader";
 import Seo from "@/components/shared/Seo";
 
 const LandingPage = () => {
@@ -60,6 +61,7 @@ const LandingPage = () => {
           founder: { "@type": "Person", name: "Jessie Hunter" },
         }}
       />
+      <SiteHeader />
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
       <IsThisForMe />
       <MoneyWhenYouNeedItStrip />

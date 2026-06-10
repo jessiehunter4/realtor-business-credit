@@ -1,29 +1,18 @@
 import { Link } from "react-router-dom";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
-import { BookOpen } from "lucide-react";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const LAST_UPDATED = "May 9, 2026";
 
 const TermsPage = () => (
   <div className="min-h-screen bg-background">
+    <SiteHeader />
     <Seo
       title="Terms of Service · Realtor Business Credit"
       description="Terms of service for the Realtor Business Credit program by My Better Business Credit, including educational scope, payments, and limitations of liability."
       path="/terms"
     />
-    <header className="border-b border-border bg-secondary text-secondary-foreground">
-      <div className="container mx-auto max-w-4xl px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-primary" />
-          <span className="font-semibold text-sm">Realtor Business Credit</span>
-        </Link>
-        <Link to="/privacy" className="text-sm text-secondary-foreground/70 hover:text-primary">
-          Privacy Policy
-        </Link>
-      </div>
-    </header>
-
     <main className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
       <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-2">Terms of Service</h1>
       <p className="text-sm text-muted-foreground mb-10">Last updated: {LAST_UPDATED}</p>
