@@ -85,12 +85,6 @@ const OneOnOnePage = () => {
       link: { to: intakeLink, label: "Start the Intake Survey" },
     },
     {
-      icon: Search,
-      title: "Take the Fundability Scan (Optional)",
-      description: "Get a diagnostic snapshot of how fundable your business is today.",
-      link: { to: "https://mybetterbusinesscredit.fundabilityscan.com/", label: "Take Fundability Scan", external: true },
-    },
-    {
       icon: UserCheck,
       title: "Show Up to Your Session",
       description: "Jessie will review your intake responses and scan results to map out your next steps.",
