@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar, Sparkles, ShieldCheck, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, Calendar, ShieldCheck, FileText, GraduationCap } from "lucide-react";
 import heroImage from "@/assets/landing/hero-money-flow.jpg";
 import HeroVideo from "@/components/shared/HeroVideo";
 
@@ -11,8 +11,10 @@ interface Props {
 
 const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = false }: Props) => {
   const headline = closingContext
-    ? `Congrats${firstName ? `, ${firstName}` : ""} — now let's make sure you have money when you need it.`
-    : "Money when you need it — between closings, before your next client, and when opportunity knocks.";
+    ? `Congrats${firstName ? `, ${firstName}` : ""} — money when you need it.`
+    : "Money when you need it";
+
+  const tagline = "— between closings, before your next client, and when opportunity knocks.";
 
   const subhead =
     "Build the business structure, financial foundation, and separate business credit that funds your real estate practice the way commission income actually flows.";
@@ -33,21 +35,30 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
       </div>
 
       <div className="container mx-auto px-4 py-10 md:py-16 lg:py-20 relative z-10">
-        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-10 items-center max-w-6xl mx-auto">
-          <div className="text-center lg:text-left order-1">
-            <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-border rounded-full px-4 py-1.5 text-xs font-semibold text-secondary shadow-card">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Realtor Business Credit · My Plan. My Progress.
-            </span>
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary leading-tight tracking-tight">
+            {headline}
+          </h1>
+          <p className="mt-4 text-2xl md:text-3xl font-semibold text-secondary/90 leading-snug">
+            {tagline}
+          </p>
 
-            <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold text-secondary leading-tight tracking-tight">
-              {headline}
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl lg:max-w-none mx-auto lg:mx-0 leading-relaxed">
-              {subhead}
-            </p>
+          <div className="relative mt-8 w-full max-w-[640px] mx-auto">
+            <div className="absolute -inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
+            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
+              <HeroVideo
+                poster={heroImage}
+                alt="Jessie Hunter explains why Realtors need separate business credit"
+                className="rounded-3xl"
+              />
+            </div>
+          </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+          <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed">
+            {subhead}
+          </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/one-on-one"
                 data-analytics-id="cta-book-hero"
@@ -64,9 +75,9 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
                 <BookOpen className="h-5 w-5" />
                 Read the Free Guide
               </Link>
-            </div>
+          </div>
 
-            <ul className="mt-8 grid grid-cols-2 gap-3 max-w-xl mx-auto lg:mx-0">
+          <ul className="mt-8 grid grid-cols-2 gap-3 max-w-xl mx-auto">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -76,24 +87,12 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
                   <span className="font-medium leading-tight text-left">{label}</span>
                 </li>
               ))}
-            </ul>
+          </ul>
 
-            <p className="mt-5 text-xs text-muted-foreground flex items-center justify-center lg:justify-start gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-              14+ years brokering · Licensed CA &amp; GA · Certified Credit Suite Partner
-            </p>
-          </div>
-
-          <div className="relative order-2 w-full max-w-[520px] mx-auto lg:mx-0 lg:self-center">
-            <div className="absolute -inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
-            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
-              <HeroVideo
-                poster={heroImage}
-                alt="Jessie Hunter explains why Realtors need separate business credit"
-                className="rounded-3xl"
-              />
-            </div>
-          </div>
+          <p className="mt-5 text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            14+ years brokering · Licensed CA &amp; GA · Certified Credit Suite Partner
+          </p>
         </div>
       </div>
     </section>
