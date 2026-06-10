@@ -5,10 +5,12 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import HeroSectionBright from "@/components/landing/HeroSectionBright";
 import IsThisForMe from "@/components/landing/IsThisForMe";
-import WhyAfterClosingStrip from "@/components/landing/WhyAfterClosingStrip";
+import MoneyWhenYouNeedItStrip from "@/components/landing/MoneyWhenYouNeedItStrip";
+import ThreePillarsDiagram from "@/components/landing/ThreePillarsDiagram";
 import ComparisonBright from "@/components/landing/ComparisonBright";
 import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
 import GuideContentsBright from "@/components/landing/GuideContentsBright";
+import SamplePlanPreview from "@/components/landing/SamplePlanPreview";
 import OneOnOneStepsBlock from "@/components/landing/OneOnOneStepsBlock";
 import TestimonialsBright from "@/components/landing/TestimonialsBright";
 import FinalCTABright from "@/components/landing/FinalCTABright";
@@ -60,10 +62,12 @@ const LandingPage = () => {
       />
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
       <IsThisForMe />
-      <WhyAfterClosingStrip />
+      <MoneyWhenYouNeedItStrip />
+      <ThreePillarsDiagram />
       <ComparisonBright />
       <CashFlowCalculator guideLink={guideLink} />
       <GuideContentsBright guideLink={guideLink} />
+      <SamplePlanPreview />
       <OneOnOneStepsBlock />
       <TestimonialsBright />
       <FinalCTABright guideLink={guideLink} />

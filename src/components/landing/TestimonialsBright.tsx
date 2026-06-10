@@ -1,23 +1,29 @@
 import { Quote } from "lucide-react";
+import t1 from "@/assets/guide/testimonial-1.jpg";
+import t2 from "@/assets/guide/testimonial-2.jpg";
+import t3 from "@/assets/landing/testimonial-3.jpg";
 
 const quotes = [
   {
-    text: "I had no idea I could even build separate business credit for my real estate practice. The 1:1 made it click in 30 minutes.",
+    text: "I stopped putting marketing on my personal Visa. The business has its own line now — and my FICO finally stopped bouncing around.",
     name: "Residential Agent",
     where: "California",
     tone: "bg-primary/10 text-primary",
+    avatar: t1,
   },
   {
-    text: "Finally a plan that respects how Realtors actually get paid. The Needs Analysis showed me exactly what to fix first.",
+    text: "I had cash ready when a coaching opportunity came up mid-month. That never used to happen — I always had to wait on the next closing.",
     name: "Team Lead",
     where: "Georgia",
     tone: "bg-sky/15 text-sky",
+    avatar: t2,
   },
   {
-    text: "Jessie isn't selling anything on the call. He just walks through your situation. I left with a real plan, not a pitch.",
+    text: "Walked out of the 1:1 with a written plan. Not a pitch — a plan. I knew exactly what to do Monday morning.",
     name: "New Broker",
     where: "Texas",
     tone: "bg-accent/20 text-accent-foreground",
+    avatar: t3,
   },
 ];
 
@@ -37,8 +43,18 @@ const TestimonialsBright = () => (
             <Quote className="h-5 w-5" />
           </div>
           <blockquote className="mt-4 text-secondary leading-relaxed flex-1">"{q.text}"</blockquote>
-          <figcaption className="mt-4 text-sm text-muted-foreground border-t border-border pt-3">
-            <span className="font-semibold text-secondary">{q.name}</span> · {q.where}
+          <figcaption className="mt-4 text-sm text-muted-foreground border-t border-border pt-3 flex items-center gap-3">
+            <img
+              src={q.avatar}
+              alt={`${q.name} headshot`}
+              loading="lazy"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover border border-border"
+            />
+            <span>
+              <span className="font-semibold text-secondary">{q.name}</span> · {q.where}
+            </span>
           </figcaption>
         </figure>
       ))}

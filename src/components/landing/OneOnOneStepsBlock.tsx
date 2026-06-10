@@ -18,7 +18,7 @@ const steps = [
     icon: FileBadge,
     n: "3",
     title: "Get your custom plan",
-    desc: "You walk away with a personalized plan you can read online or download as a PDF.",
+    desc: "Walk away with a personalized Realtor Business Structure, Finance & Credit Plan — read online or download the PDF.",
   },
 ];
 

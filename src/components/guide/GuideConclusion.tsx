@@ -10,6 +10,12 @@ const GuideConclusion = () => (
         <ChapterHeader number="CONCLUSION" title="You have a map. Let's draw your route." />
         <Paragraph>You now have the framework — structure, finance, fundability, the credit ladder, and the 30/60/90 plan. The next step is making it specific to <em>you</em>.</Paragraph>
         <Paragraph>In your free 1:1 we complete the Realtor Business Financial Needs Analysis together, identify your top gaps, and generate your custom plan in one sitting.</Paragraph>
+        <p className="text-sm text-muted-foreground">
+          Curious what the output looks like?{" "}
+          <Link to="/sample-plan" className="font-semibold text-primary hover:underline">
+            See a sample plan →
+          </Link>
+        </p>
         <div className="mt-8">
           <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full" data-analytics-id="cta-book-guide-bottom">
             <Link to="/one-on-one">

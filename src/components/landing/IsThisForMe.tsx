@@ -7,9 +7,9 @@ const cards = [
     title: "Solo Agent",
     tone: "bg-primary/10 text-primary",
     bullets: [
-      "Floating marketing & tech on personal cards",
-      "Want a real cushion between closings",
-      "Ready to look like a real business to lenders",
+      "Floating business overhead on personal cards",
+      "Need a cushion that survives a slow month",
+      "Tired of FICO swings from utilization spikes",
     ],
   },
   {
@@ -17,9 +17,9 @@ const cards = [
     title: "Team Lead / Broker",
     tone: "bg-sky/15 text-sky",
     bullets: [
-      "Funding payroll, leads, and ad spend",
-      "Need higher limits without more personal risk",
-      "Want to scale without burning personal credit",
+      "Funding ads, payroll, and TC support",
+      "Higher limits without more personal-guarantee risk",
+      "Scaling without burning personal credit",
     ],
   },
   {
@@ -27,9 +27,9 @@ const cards = [
     title: "Newer Agent",
     tone: "bg-accent/20 text-accent-foreground",
     bullets: [
-      "Building your foundation the right way",
-      "Avoid mistakes that take years to undo",
-      "Set up entity, banking, and credit from day one",
+      "Wants money available before the first big closing",
+      "Building structure from day one — the right way",
+      "Skipping the $8,000 mistake most agents make",
     ],
   },
 ];
@@ -39,7 +39,7 @@ const IsThisForMe = () => (
     <div className="max-w-3xl mx-auto text-center mb-12">
       <h2 className="text-3xl md:text-4xl font-bold text-secondary">Is this for me?</h2>
       <p className="mt-3 text-muted-foreground text-lg">
-        Pick the path that sounds most like you today.
+        If any of these sound like you, the answer is yes.
       </p>
     </div>
 

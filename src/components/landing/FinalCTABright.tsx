@@ -12,10 +12,10 @@ const FinalCTABright = ({ guideLink = "/guide" }: Props) => (
       <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-sky/15 blur-3xl pointer-events-none" />
       <div className="relative">
         <h2 className="text-3xl md:text-5xl font-bold text-secondary tracking-tight">
-          Don't wait another 10 years.
+          Money when you need it isn't luck — it's a plan.
         </h2>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-          Get clarity and a plan — free.
+          Read the free guide, then book your free 1:1. Walk away with your Custom Realtor Business Structure, Finance &amp; Credit Plan in one sitting.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
@@ -34,6 +34,9 @@ const FinalCTABright = ({ guideLink = "/guide" }: Props) => (
             Read the Free Guide
           </Link>
         </div>
+        <p className="mt-6 text-sm text-secondary italic font-semibold">
+          Fail to plan — plan to fail.
+        </p>
       </div>
     </div>
   </section>
