@@ -59,6 +59,14 @@ export default {
           DEFAULT: "hsl(var(--amber))",
           dark: "hsl(var(--amber-dark))",
         },
+        sky: {
+          DEFAULT: "hsl(var(--sky))",
+          foreground: "#ffffff",
+        },
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          foreground: "#ffffff",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -74,6 +82,18 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "1.25rem",
+        "3xl": "1.75rem",
+      },
+      boxShadow: {
+        card: "0 8px 18px rgba(11,31,59,0.08)",
+        "card-hover": "0 10px 30px rgba(11,31,59,0.10)",
+      },
+      backgroundImage: {
+        "hero-grad":
+          "linear-gradient(135deg, rgba(18,184,134,.14) 0%, rgba(58,169,255,.14) 55%, rgba(255,176,32,.10) 100%)",
+        "accent-grad":
+          "linear-gradient(135deg, rgba(255,107,107,.18) 0%, rgba(255,176,32,.16) 100%)",
       },
       keyframes: {
         "accordion-down": {

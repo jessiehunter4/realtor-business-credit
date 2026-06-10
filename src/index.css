@@ -8,42 +8,62 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 90% 15%;
+    /* Brand (raw hex, from spec) */
+    --rbc-navy: #0B1F3B;
+    --rbc-teal: #12B886;
+    --rbc-sky:  #3AA9FF;
+    --rbc-coral:#FF6B6B;
+    --rbc-amber:#FFB020;
+    --rbc-bg:   #F7FAFC;
+    --rbc-card: #FFFFFF;
+    --rbc-border:#E6EEF5;
+    --rbc-text: #233044;
+    --rbc-hero-grad: linear-gradient(135deg, rgba(18,184,134,.14) 0%, rgba(58,169,255,.14) 55%, rgba(255,176,32,.10) 100%);
+    --rbc-accent-grad: linear-gradient(135deg, rgba(255,107,107,.18) 0%, rgba(255,176,32,.16) 100%);
+    --rbc-radius: 20px;
+    --rbc-shadow: 0 10px 30px rgba(11,31,59,.10);
+    --rbc-shadow-soft: 0 8px 18px rgba(11,31,59,.08);
+
+    /* shadcn HSL tokens mirrored onto the brand palette */
+    --background: 210 33% 98%;          /* #F7FAFC */
+    --foreground: 217 33% 20%;          /* #233044 */
 
     --card: 0 0% 100%;
-    --card-foreground: 220 90% 15%;
+    --card-foreground: 217 33% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 90% 15%;
+    --popover-foreground: 217 33% 20%;
 
-    --primary: 156 56% 47%;
+    --primary: 161 82% 39%;             /* teal #12B886 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 90% 15%;
+    --secondary: 215 70% 14%;           /* navy #0B1F3B */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 33% 96%;
+    --muted-foreground: 217 15% 45%;
 
-    --accent: 38 92% 50%;
-    --accent-foreground: 78 43% 15%;
+    --accent: 36 100% 56%;              /* amber #FFB020 */
+    --accent-foreground: 215 70% 14%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 100% 71%;          /* coral #FF6B6B */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 156 56% 47%;
+    --border: 206 41% 93%;              /* #E6EEF5 */
+    --input: 206 41% 93%;
+    --ring: 161 82% 39%;
 
-    --radius: 0.75rem;
-    
-    --navy: 220 90% 15%;
-    --navy-light: 220 50% 30%;
-    --success-green: 156 56% 47%;
-    --success-green-hover: 156 56% 40%;
-    --amber: 38 92% 50%;
-    --amber-dark: 38 92% 40%;
+    --radius: 1.25rem;
+
+    /* Brand aliases (legacy + new) in HSL */
+    --navy: 215 70% 14%;
+    --navy-light: 215 50% 30%;
+    --sky: 208 100% 62%;                /* #3AA9FF */
+    --coral: 0 100% 71%;                /* #FF6B6B */
+    --success-green: 161 82% 39%;
+    --success-green-hover: 161 82% 33%;
+    --amber: 36 100% 56%;
+    --amber-dark: 36 100% 46%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -121,3 +141,24 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Brand utility classes (from spec) */
+.site-header,
+.site-footer {
+  background: var(--rbc-navy);
+  color: #fff;
+}
+.btn-primary {
+  background: var(--rbc-teal);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: var(--rbc-shadow-soft);
+}
+.btn-secondary {
+  background: var(--rbc-sky);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: var(--rbc-shadow-soft);
+}
+.bg-hero-grad { background: var(--rbc-hero-grad); }
+.bg-accent-grad { background: var(--rbc-accent-grad); }
