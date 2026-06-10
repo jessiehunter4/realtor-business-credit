@@ -2,11 +2,13 @@ import { Link } from "react-router-dom";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 import { BookOpen } from "lucide-react";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const LAST_UPDATED = "May 9, 2026";
 
 const TermsPage = () => (
   <div className="min-h-screen bg-background">
+    <SiteHeader />
     <Seo
       title="Terms of Service · Realtor Business Credit"
       description="Terms of service for the Realtor Business Credit program by My Better Business Credit, including educational scope, payments, and limitations of liability."

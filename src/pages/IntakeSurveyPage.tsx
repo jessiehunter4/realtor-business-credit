@@ -13,6 +13,7 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
+import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
@@ -305,6 +306,7 @@ export default function IntakeSurveyPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 py-8 px-4">
+      <SiteHeader />
       <Seo
         title="Realtor Business Financial Needs Analysis"
         description="A short intake to prepare for your one-on-one business credit session."

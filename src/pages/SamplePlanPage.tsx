@@ -5,6 +5,7 @@ import { Calendar, Download, ArrowLeft, FileText } from "lucide-react";
 import PlanDocument from "@/components/plan/PlanDocument";
 import PlanPDF from "@/components/plan/PlanPDF";
 import SiteFooter from "@/components/shared/SiteFooter";
+import SiteHeader from "@/components/shared/SiteHeader";
 import Seo from "@/components/shared/Seo";
 import { SAMPLE_PLAN } from "@/data/samplePlan";
 
@@ -13,6 +14,7 @@ const SamplePlanPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SiteHeader />
       <Seo
         title="Sample Realtor Business Credit Plan — See What You'll Receive"
         description="A full sample of the personalized Realtor Business Structure, Finance & Credit Plan you receive after your free 1:1 session. Built for a fictional Sacramento broker so you know exactly what to expect."

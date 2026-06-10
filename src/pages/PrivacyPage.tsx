@@ -2,11 +2,13 @@ import { Link } from "react-router-dom";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 import { BookOpen } from "lucide-react";
+import SiteHeader from "@/components/shared/SiteHeader";
 
 const LAST_UPDATED = "May 9, 2026";
 
 const PrivacyPage = () => (
   <div className="min-h-screen bg-background">
+    <SiteHeader />
     <Seo
       title="Privacy Policy · Realtor Business Credit"
       description="How Realtor Business Credit and My Better Business Credit collect, use, store, and protect your information, including SMS and email communications."
