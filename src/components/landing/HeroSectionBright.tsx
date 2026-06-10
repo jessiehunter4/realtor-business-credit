@@ -34,31 +34,31 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
         <div className="absolute top-1/3 right-1/4 w-56 h-56 rounded-full bg-accent/15 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-10 md:py-16 lg:py-20 relative z-10">
+      <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16 lg:py-20 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary leading-tight tracking-tight">
+          <h1 className="text-[clamp(2rem,7vw,3.75rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance">
             {headline}
           </h1>
-          <p className="mt-4 text-2xl md:text-3xl font-semibold text-secondary/90 leading-snug">
+          <p className="mt-3 sm:mt-4 text-[clamp(1.125rem,3.4vw,1.875rem)] font-semibold text-secondary/90 leading-snug text-balance max-w-2xl mx-auto">
             {tagline}
           </p>
 
-          <div className="relative mt-8 w-full max-w-[640px] mx-auto">
-            <div className="absolute -inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
-            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
+          <div className="relative mt-6 sm:mt-8 w-full max-w-[min(640px,100%)] mx-auto">
+            <div className="absolute -inset-4 sm:-inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
+            <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
                 poster={heroImage}
                 alt="Jessie Hunter explains why Realtors need separate business credit"
-                className="rounded-3xl"
+                className="rounded-2xl sm:rounded-3xl"
               />
             </div>
           </div>
 
-          <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed">
+          <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty max-w-2xl mx-auto">
             {subhead}
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/one-on-one"
                 data-analytics-id="cta-book-hero"
@@ -77,7 +77,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               </Link>
           </div>
 
-          <ul className="mt-8 grid grid-cols-2 gap-3 max-w-xl mx-auto">
+          <ul className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 max-w-xl mx-auto">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -89,7 +89,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               ))}
           </ul>
 
-          <p className="mt-5 text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+          <p className="mt-5 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-primary" />
             14+ years brokering · Licensed CA &amp; GA · Certified Credit Suite Partner
           </p>
