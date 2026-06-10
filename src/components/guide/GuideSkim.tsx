@@ -1,13 +1,13 @@
 import { Zap } from "lucide-react";
 
 const takeaways = [
-  { id: "chapter-2", text: "Business credit is a separate financial profile for your real estate business — built on EIN, not SSN." },
-  { id: "chapter-3", text: "Every business expense on personal cards raises personal utilization and quietly damages your scores." },
-  { id: "chapter-4", text: "Yes, this applies to solo agents — even if your license is held under your name." },
-  { id: "chapter-5", text: "There's a 7-step process: entity, EIN, address/phone, bank, D-U-N-S, tradelines, then cards & lines." },
-  { id: "chapter-6", text: "Realistic timeline: foundation in 30 days, vendor tradelines reporting by month 3, business cards 6–12 months." },
-  { id: "chapter-7", text: "Doing this without guidance is the #1 way Realtors waste 6+ months on the wrong steps." },
-  { id: "conclusion", text: "Your next step: book a free 1:1 to map your specific gaps and 90-day plan." },
+  { id: "chapter-1",  text: "Real estate education skips business architecture — credit is downstream of structure." },
+  { id: "chapter-2",  text: "Lumpy income + steady expenses = fundability matters more than production." },
+  { id: "chapter-3",  text: "Sole Prop / LLC / S-Corp / C-Corp each serve a stage — your state and broker constrain the menu." },
+  { id: "chapter-6",  text: "The 3-account system (Operating · Tax Reserve · Opportunity) automates everything." },
+  { id: "chapter-8",  text: "Fundability is a pattern of consistent identity signals, not a single score." },
+  { id: "chapter-10", text: "The Realtor Credit Ladder: Foundation → Bureaus → Tradelines → Cards → Growth funding." },
+  { id: "chapter-13", text: "Next step: free 1:1, live Needs Analysis, free custom plan, optional program." },
 ];
 
 const GuideSkim = () => (

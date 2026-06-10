@@ -1,19 +1,20 @@
 import { Link } from "react-router-dom";
 
 interface CalloutProps {
-  variant?: "default" | "warning" | "important";
+  variant?: "default" | "warning" | "important" | "info";
   children: React.ReactNode;
 }
 
 export const Callout = ({ variant = "default", children }: CalloutProps) => {
   const styles = {
-    default: "bg-primary/10 border-l-4 border-primary",
-    warning: "bg-accent/10 border-l-4 border-accent",
+    default: "bg-primary/8 border-l-4 border-primary",
+    warning: "bg-accent/15 border-l-4 border-accent",
     important: "bg-destructive/10 border-l-4 border-destructive",
+    info: "bg-[hsl(var(--sky)/0.1)] border-l-4 border-[hsl(var(--sky))]",
   };
 
   return (
-    <div className={`${styles[variant]} p-5 md:p-6 my-6 rounded-r-lg break-inside-avoid`}>
+    <div className={`${styles[variant]} p-5 md:p-6 my-6 rounded-r-2xl break-inside-avoid`}>
       {children}
     </div>
   );
@@ -24,7 +25,7 @@ interface StoryBoxProps {
 }
 
 export const StoryBox = ({ children }: StoryBoxProps) => (
-  <div className="bg-primary/5 border-2 border-primary rounded-xl p-5 md:p-6 my-6 break-inside-avoid">
+  <div className="bg-card border border-border rounded-2xl p-5 md:p-6 my-6 shadow-[0_8px_18px_rgba(11,31,59,.06)] break-inside-avoid">
     {children}
   </div>
 );
@@ -34,7 +35,7 @@ interface KeyTakeawayProps {
 }
 
 export const KeyTakeaway = ({ children }: KeyTakeawayProps) => (
-  <div className="bg-accent/10 border-2 border-accent rounded-xl p-5 md:p-6 my-8 break-inside-avoid">
+  <div className="bg-primary/8 border-2 border-primary/30 rounded-2xl p-5 md:p-6 my-8 break-inside-avoid">
     {children}
   </div>
 );
@@ -44,7 +45,7 @@ interface ActionStepProps {
 }
 
 export const ActionStep = ({ children }: ActionStepProps) => (
-  <div className="bg-muted border-l-4 border-ring p-5 md:p-6 my-4 rounded-r-lg break-inside-avoid">
+  <div className="bg-card border border-border p-5 md:p-6 my-4 rounded-2xl shadow-[0_4px_14px_rgba(11,31,59,.05)] break-inside-avoid">
     {children}
   </div>
 );
@@ -55,7 +56,7 @@ interface QuoteBlockProps {
 }
 
 export const QuoteBlock = ({ attribution, children }: QuoteBlockProps) => (
-  <blockquote className="italic p-5 md:p-6 my-6 mx-4 md:mx-8 border-l-[3px] border-primary bg-muted/50 rounded-r-lg">
+  <blockquote className="italic p-5 md:p-6 my-6 mx-4 md:mx-8 border-l-[3px] border-primary bg-card rounded-r-2xl shadow-[0_4px_14px_rgba(11,31,59,.05)]">
     {children}
     {attribution && (
       <p className="not-italic font-bold mt-3 text-secondary">{attribution}</p>
@@ -64,13 +65,13 @@ export const QuoteBlock = ({ attribution, children }: QuoteBlockProps) => (
 );
 
 export const BookSessionCTA = () => (
-  <div className="mt-8 p-5 md:p-6 bg-primary/10 border-l-4 border-primary rounded-r-lg">
+  <div className="mt-8 p-5 md:p-6 bg-primary/8 border-l-4 border-primary rounded-r-2xl">
     <p className="m-0 italic text-foreground">
-      Want to discuss YOUR specific situation? Book a one-on-one session — realtor to realtor, no pressure.
+      Ready to put this into action? Book a free one-on-one. We'll walk through your Realtor Business Financial Needs Analysis together and you'll leave with a custom plan.
     </p>
     <p className="mt-3 mb-0">
-      <Link to="/get_started" className="font-bold text-primary hover:underline">
-        Book your session →
+      <Link to="/one-on-one" data-analytics-id="cta-book-guide-inline" className="font-bold text-primary hover:underline">
+        Book your free 1:1 →
       </Link>
     </p>
   </div>
@@ -83,14 +84,15 @@ export const ChapterHeader = ({ number, title }: { number?: string; title: strin
         {number}
       </p>
     )}
-    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-secondary border-b-[3px] border-primary pb-4">
+    <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-secondary leading-tight">
       {title}
     </h2>
+    <div className="mt-3 h-1 w-20 bg-primary rounded-full" />
   </div>
 );
 
 export const SectionHeading = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-xl md:text-2xl font-bold text-secondary mt-8 mb-4">
+  <h3 className="text-xl md:text-2xl font-bold text-secondary mt-10 mb-4">
     {children}
   </h3>
 );

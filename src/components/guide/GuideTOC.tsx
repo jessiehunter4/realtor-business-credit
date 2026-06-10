@@ -1,64 +1,19 @@
 const tocEntries = [
-  {
-    id: "introduction",
-    label: "Introduction: Congratulations on Your Recent Closing",
-    sections: [],
-  },
-  {
-    id: "chapter-1",
-    label: "Chapter 1: My Story—The $8,000 Mistake",
-    sections: ["The Wake-Up Call", "The Mistakes I Made", "What I Wish I'd Known"],
-  },
-  {
-    id: "chapter-2",
-    label: "Chapter 2: What Business Credit Actually Is",
-    sections: ["The Missing Piece in Real Estate Education", "Why Nobody Told You", "What It Means for YOUR Business"],
-  },
-  {
-    id: "chapter-3",
-    label: "Chapter 3: The True Cost of Using Personal Credit",
-    sections: ["Real Numbers from Real Situations", "What Waiting Another Year Will Cost", "The Commission Check Reality"],
-  },
-  {
-    id: "chapter-4",
-    label: "Chapter 4: Common Questions & Objections",
-    sections: ['"But I\'m Just an Agent, Not a Business"', '"My Broker Handles Everything"', '"I\'ll Do This When I\'m More Established"', "And More..."],
-  },
-  {
-    id: "chapter-5",
-    label: "Chapter 5: The Seven-Step Process",
-    sections: ["Understanding What's Involved", "Why This Isn't a DIY Project", "The Real Estate Transaction Analogy"],
-  },
-  {
-    id: "chapter-6",
-    label: "Chapter 6: The Emotional Journey",
-    sections: ["Month 1: The Relief Phase", "Months 2–3: The Waiting Game", "Months 4–5: The Momentum Shift", "Month 6+: The Freedom Feeling"],
-  },
-  {
-    id: "chapter-7",
-    label: "Chapter 7: Why You Need Professional Guidance",
-    sections: ["The Realtor-Client Analogy", "The Dual Coach System", "Customization Matters"],
-  },
-  {
-    id: "chapter-8",
-    label: "Chapter 8: Success Stories from Fellow Realtors",
-    sections: [],
-  },
-  {
-    id: "chapter-9",
-    label: "Chapter 9: What's Next—Advanced Strategies",
-    sections: [],
-  },
-  {
-    id: "conclusion",
-    label: "Conclusion: Your Next Steps",
-    sections: [],
-  },
-  {
-    id: "resources",
-    label: "Resources & Additional Information",
-    sections: [],
-  },
+  { id: "introduction", label: "Introduction: Who this guide is for", sections: [] },
+  { id: "chapter-1",  label: "1. Why most Realtors never build a real business foundation", sections: [] },
+  { id: "chapter-2",  label: "2. The Realtor business model: lumpy income, steady expenses, fundability", sections: [] },
+  { id: "chapter-3",  label: "3. Business structure options (Sole Prop · LLC · S-Corp · C-Corp)", sections: [] },
+  { id: "chapter-4",  label: "4. Compliance reality: commission-to-entity pathways", sections: [] },
+  { id: "chapter-5",  label: "5. Asset protection basics — and where trusts fit", sections: [] },
+  { id: "chapter-6",  label: "6. The 3-Account Financial Foundation for Realtors", sections: [] },
+  { id: "chapter-7",  label: "7. Bookkeeping & documentation lenders actually look for", sections: [] },
+  { id: "chapter-8",  label: "8. Fundability signals: the business identity checklist", sections: [] },
+  { id: "chapter-9",  label: "9. Business credit: how it really works", sections: [] },
+  { id: "chapter-10", label: "10. The Realtor Credit Ladder", sections: [] },
+  { id: "chapter-11", label: "11. Common mistakes that block approvals", sections: [] },
+  { id: "chapter-12", label: "12. Your 30 / 60 / 90-day action plan", sections: [] },
+  { id: "chapter-13", label: "13. The next step: Custom Plan + Program", sections: [] },
+  { id: "resources",  label: "Resources & Additional Information", sections: [] },
 ];
 
 const GuideTOC = () => (

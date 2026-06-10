@@ -12,15 +12,19 @@ import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideSkim from "@/components/guide/GuideSkim";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
-import GuideChapter1 from "@/components/guide/GuideChapter1";
-import GuideChapter2 from "@/components/guide/GuideChapter2";
-import GuideChapter3 from "@/components/guide/GuideChapter3";
-import GuideChapter4 from "@/components/guide/GuideChapter4";
-import GuideChapter5 from "@/components/guide/GuideChapter5";
-import GuideChapter6 from "@/components/guide/GuideChapter6";
-import GuideChapter7 from "@/components/guide/GuideChapter7";
-import GuideChapter8 from "@/components/guide/GuideChapter8";
-import GuideChapter9 from "@/components/guide/GuideChapter9";
+import Ch01 from "@/components/guide/chapters/Ch01";
+import Ch02 from "@/components/guide/chapters/Ch02";
+import Ch03 from "@/components/guide/chapters/Ch03";
+import Ch04 from "@/components/guide/chapters/Ch04";
+import Ch05 from "@/components/guide/chapters/Ch05";
+import Ch06 from "@/components/guide/chapters/Ch06";
+import Ch07 from "@/components/guide/chapters/Ch07";
+import Ch08 from "@/components/guide/chapters/Ch08";
+import Ch09 from "@/components/guide/chapters/Ch09";
+import Ch10 from "@/components/guide/chapters/Ch10";
+import Ch11 from "@/components/guide/chapters/Ch11";
+import Ch12 from "@/components/guide/chapters/Ch12";
+import Ch13 from "@/components/guide/chapters/Ch13";
 import GuideConclusion from "@/components/guide/GuideConclusion";
 import GuideResources from "@/components/guide/GuideResources";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
@@ -155,8 +159,8 @@ const GuidePage = () => {
   return (
     <div className="min-h-screen bg-background scroll-smooth">
       <Seo
-        title="Why Most Realtors Don't Establish Separate Business Credit (Free Guide)"
-        description="A 9-chapter guide for real estate agents and brokers: why business credit matters, the 7-step setup, timelines, and what it actually costs to keep using personal credit."
+        title="Realtor Business Structure, Finance & Credit Guide (Free)"
+        description="A bright, comprehensive guide for Realtors and brokers: business entity structure, the 3-account financial foundation, fundability signals, and the credit ladder — with a free 1:1 and custom plan."
         path="/guide"
       />
       {/* Sticky CTA Bar */}
@@ -195,15 +199,19 @@ const GuidePage = () => {
       <GuideSkim />
       <GuideTOC />
       <GuideIntroduction />
-      <GuideChapter1 />
-      <GuideChapter2 />
-      <GuideChapter3 />
-      <GuideChapter4 />
-      <GuideChapter5 />
-      <GuideChapter6 />
-      <GuideChapter7 />
-      <GuideChapter8 />
-      <GuideChapter9 />
+      <Ch01 />
+      <Ch02 />
+      <Ch03 />
+      <Ch04 />
+      <Ch05 />
+      <Ch06 />
+      <Ch07 />
+      <Ch08 />
+      <Ch09 />
+      <Ch10 />
+      <Ch11 />
+      <Ch12 />
+      <Ch13 />
       <section className="container mx-auto max-w-3xl px-4 py-12">
         <StateEntityWidget />
       </section>
