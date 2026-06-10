@@ -87,7 +87,7 @@ const OneOnOnePage = () => {
     {
       icon: UserCheck,
       title: "Show Up to Your Session",
-      description: "Jessie will review your intake responses and scan results to map out your next steps.",
+      description: "Jessie will review your intake responses and map out your next steps with you on the call.",
     },
   ];
 
@@ -180,23 +180,12 @@ const OneOnOnePage = () => {
                   </h3>
                   <p className="text-muted-foreground mb-2">{step.description}</p>
                   {step.link && (
-                    step.link.external ? (
-                      <a
-                        href={step.link.to}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
-                      >
-                        {step.link.label} <ArrowRight className="w-4 h-4" />
-                      </a>
-                    ) : (
-                      <Link
-                        to={step.link.to}
-                        className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
-                      >
-                        {step.link.label} <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    )
+                    <Link
+                      to={step.link.to}
+                      className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
+                    >
+                      {step.link.label} <ArrowRight className="w-4 h-4" />
+                    </Link>
                   )}
                 </div>
               </div>
