@@ -19,7 +19,6 @@ import {
   Sparkles,
   MessageSquare,
   ArrowRight,
-  Search,
   UserCheck,
 } from "lucide-react";
 import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
