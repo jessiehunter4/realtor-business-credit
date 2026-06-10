@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { BookOpen, Calendar, Sparkles, ShieldCheck, FileText, GraduationCap } from "lucide-react";
 import heroImage from "@/assets/landing/hero-money-flow.jpg";
+import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
   firstName?: string;
@@ -85,12 +86,10 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
           <div className="relative order-first lg:order-last">
             <div className="absolute -inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
-            <img
-              src={heroImage}
-              alt="Confident realtor at desk with upward cash-flow chart overlay"
-              width={1408}
-              height={896}
-              className="relative w-full h-auto rounded-3xl shadow-card-hover border border-border"
+            <HeroVideo
+              poster={heroImage}
+              alt="Jessie Hunter explains why Realtors need separate business credit"
+              className="relative w-full h-auto rounded-3xl shadow-card-hover border border-border bg-secondary"
             />
           </div>
         </div>
