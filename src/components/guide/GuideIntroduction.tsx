@@ -6,7 +6,9 @@ const GuideIntroduction = () => (
     <div className="max-w-4xl mx-auto">
       <ChapterHeader title="Introduction: Who this guide is for" />
 
-      <Paragraph>This guide is for Realtors and brokers who want to:</Paragraph>
+      <Paragraph>This guide exists for one reason — to help you have <strong>money when you need it</strong> in your real estate business. Between closings. Before your next client. The day an opportunity shows up that you'd kick yourself for missing.</Paragraph>
+
+      <Paragraph>It's for Realtors and brokers who want to:</Paragraph>
       <ul className="list-disc pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
         <li>Stop funding business growth with personal credit.</li>
         <li>Build a legitimate business structure that matches their state and brokerage rules.</li>

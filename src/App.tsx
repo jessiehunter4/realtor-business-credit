@@ -17,6 +17,7 @@ import AdminPlanView from "./pages/AdminPlanView";
 import PortalPlanView from "./pages/PortalPlanView";
 import BookingConfirmedPage from "./pages/BookingConfirmedPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import SamplePlanPage from "./pages/SamplePlanPage";
 import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
@@ -81,6 +82,7 @@ const App = () => (
           <Route path="/portal/plan/:id" element={<PortalPlanView />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
+          <Route path="/sample-plan" element={<SamplePlanPage />} />
           <Route
             path="/business-credit-cards-for-realtors"
             element={<BusinessCreditCardsForRealtorsPage />}

@@ -108,8 +108,8 @@ const OneOnOnePage = () => {
             <span className="text-primary">Changes Everything</span>
           </h1>
           <p className="text-lg md:text-xl text-secondary-foreground/80 max-w-2xl mx-auto mb-10">
-            Turn your recent closings into a real business credit strategy — not
-            just another expense on your personal cards.
+            In 30 minutes we map exactly where your <em>money when you need it</em>
+            is leaking — and what to fix first.
           </p>
           <Button
             asChild
@@ -122,6 +122,12 @@ const OneOnOnePage = () => {
               Book My Free One-on-One Session
             </a>
           </Button>
+          <p className="mt-6 text-sm text-secondary-foreground/70">
+            Want to see what you'll receive first?{" "}
+            <Link to="/sample-plan" className="font-semibold text-primary hover:underline">
+              Preview a sample custom plan →
+            </Link>
+          </p>
         </div>
       </section>
 

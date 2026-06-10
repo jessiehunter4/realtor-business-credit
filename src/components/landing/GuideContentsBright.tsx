@@ -6,14 +6,14 @@ interface Props {
 }
 
 const items = [
-  { icon: Lightbulb, bold: "Why 90% of Realtors don't have business credit", rest: " — and what it's costing them every closing cycle." },
-  { icon: ClipboardCheck, bold: "7-step checklist to build business credit", rest: " — simplified for busy real estate professionals." },
-  { icon: Layers, bold: "Business Structure + Financial Foundation + Credit Capacity roadmap", rest: " — the three pillars of a fundable real estate business." },
-  { icon: FileText, bold: "SSN vs. EIN explained", rest: " — structure your business properly based on your state and license type." },
-  { icon: Clock, bold: "Timeline & expectations", rest: " — realistic timeframes (you can go faster or slower)." },
-  { icon: BookOpen, bold: "Founder story from Jessie Hunter", rest: " — California/Georgia broker who wishes someone had told him this 10+ years ago." },
-  { icon: CheckCircle2, bold: "Action plan worksheet", rest: " — tasks you can complete this week." },
-  { icon: Users, bold: "What happens in your free 1:1", rest: " — we complete the Realtor Business Financial Needs Analysis together and generate your custom plan." },
+  { icon: Lightbulb, bold: "Why most Realtors never build a real business foundation", rest: " — and the $8,000 mistake almost everyone repeats." },
+  { icon: Layers, bold: "Business entity options for Realtors", rest: " — Sole Prop / LLC / S-Corp / C-Corp, with state-by-state caveats." },
+  { icon: FileText, bold: "Commission-to-entity compliance", rest: " — how to legally route commission income to your business." },
+  { icon: ClipboardCheck, bold: "The 3-Account Financial Foundation", rest: " — the flagship system that smooths lumpy commission income." },
+  { icon: Clock, bold: "Fundability signals checklist", rest: " — Strong / Watch / Missing across every signal lenders check." },
+  { icon: BookOpen, bold: "The Realtor Credit Ladder (5 stages)", rest: " — from vendor tradelines to LOCs and high-limit business cards." },
+  { icon: CheckCircle2, bold: "30 / 60 / 90-day action plan", rest: " — exactly what to do, in what order, this quarter." },
+  { icon: Users, bold: "Your Custom Plan + Program path", rest: " — what your 1:1 produces and how implementation works after." },
 ];
 
 const GuideContentsBright = ({ guideLink = "/guide" }: Props) => (
@@ -21,13 +21,13 @@ const GuideContentsBright = ({ guideLink = "/guide" }: Props) => (
     <div className="max-w-5xl mx-auto">
       <div className="text-center mb-10">
         <span className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-semibold">
-          📖 Free Guide
+          📖 Free 13-chapter guide
         </span>
         <h2 className="mt-3 text-3xl md:text-4xl font-bold text-secondary">
-          What's inside your free guide + action plan
+          What's inside the free guide
         </h2>
         <p className="mt-3 text-muted-foreground text-lg">
-          A click-and-read walkthrough — no signup required.
+          Click-and-read or download the PDF — no signup required.
         </p>
       </div>
 

@@ -67,11 +67,11 @@ const CashFlowCalculator = ({ guideLink = "/guide" }: Props) => {
             <span className="text-xs font-medium text-primary">Cash-Flow Gap Calculator</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-3">
-            How much of your business is your personal credit carrying?
+            How much "money when you need it" are you losing to personal credit?
           </h2>
           <p className="text-muted-foreground">
-            A 30-second estimate. No signup, no email — just clarity on what the gap between
-            closings is actually costing you.
+            A 30-second estimate. No signup, no email — just clarity on the gap between
+            closings and what it's quietly costing you.
           </p>
         </div>
 
@@ -160,6 +160,28 @@ const CashFlowCalculator = ({ guideLink = "/guide" }: Props) => {
                 which can affect mortgage, auto, and personal loan terms.
               </p>
             )}
+
+            {/* Bar comparison: personal-card cost vs business-credit alternative */}
+            <div className="mt-8 bg-hero-grad border border-border rounded-xl p-5">
+              <p className="text-sm font-semibold text-secondary text-center mb-4">
+                What the same overhead costs on personal vs. business credit
+              </p>
+              <svg viewBox="0 0 400 130" className="w-full h-auto" role="img" aria-label="Cost comparison bar chart">
+                {/* Personal credit bar */}
+                <text x="10" y="22" fontSize="11" fill="hsl(var(--muted-foreground))">Personal credit</text>
+                <rect x="10" y="30" width="380" height="22" rx="4" fill="hsl(var(--muted))" />
+                <rect x="10" y="30" width="320" height="22" rx="4" fill="hsl(var(--destructive))" opacity="0.85" />
+                <text x="335" y="46" fontSize="11" fill="white" fontWeight="bold">High cost + FICO hit</text>
+                {/* Business credit bar */}
+                <text x="10" y="78" fontSize="11" fill="hsl(var(--muted-foreground))">Business credit</text>
+                <rect x="10" y="86" width="380" height="22" rx="4" fill="hsl(var(--muted))" />
+                <rect x="10" y="86" width="120" height="22" rx="4" fill="hsl(var(--primary))" opacity="0.9" />
+                <text x="135" y="102" fontSize="11" fill="hsl(var(--secondary))" fontWeight="bold">Lower cost · separate score</text>
+              </svg>
+              <p className="mt-3 text-xs text-muted-foreground text-center italic">
+                Illustrative. Actual savings depend on rates, limits, and how quickly you season your business profile.
+              </p>
+            </div>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Button asChild size="lg" onClick={handleEngage}>
