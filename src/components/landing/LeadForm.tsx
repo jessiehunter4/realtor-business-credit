@@ -129,7 +129,7 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
             <div className="flex items-start space-x-3">
               <Checkbox id="fundabilityScan" checked={formData.fundabilityScan} onCheckedChange={(checked) => setFormData({ ...formData, fundabilityScan: checked as boolean })} />
               <label htmlFor="fundabilityScan" className="text-sm leading-relaxed cursor-pointer">
-                I also want a free fundability scan to see where my business stands right now.
+                I'd also like to book a free 1:1 to complete the Realtor Business Financial Needs Analysis and get my custom plan.
               </label>
             </div>
           </div>

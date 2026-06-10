@@ -243,7 +243,7 @@ const OneOnOnePage = () => {
             {[
               {
                 icon: Target,
-                text: "We interpret your Fundability Scan in the context of your state and brokerage structure.",
+                text: "We interpret your situation in the context of your state and brokerage structure.",
               },
               {
                 icon: Sparkles,
@@ -292,8 +292,8 @@ const OneOnOnePage = () => {
                 },
                 {
                   step: 2,
-                  title: "Walk Through Your Fundability Scan",
-                  desc: "We'll review your Fundability Scan results together and explain what each score means for your ability to secure business credit.",
+                  title: "Map Your Foundation & Credit Capacity",
+                  desc: "We'll review your current business structure and financial foundation together so you know exactly what's working and what's missing.",
                 },
                 {
                   step: 3,
