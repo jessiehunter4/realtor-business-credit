@@ -84,23 +84,12 @@ const BookingConfirmedPage = () => {
                   </h3>
                   <p className="text-muted-foreground mb-2">{step.description}</p>
                   {step.link && (
-                    step.link.external ? (
-                      <a
-                        href={step.link.to}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
-                      >
+                    <Link
+                      to={step.link.to}
+                      className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
+                    >
                         {step.link.label} <ArrowRight className="w-4 h-4" />
-                      </a>
-                    ) : (
-                      <Link
-                        to={step.link.to}
-                        className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
-                      >
-                        {step.link.label} <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    )
+                    </Link>
                   )}
                 </div>
               </div>
