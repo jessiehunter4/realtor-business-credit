@@ -1,5 +1,6 @@
 import { Building2, Briefcase, ShieldCheck, Landmark } from "lucide-react";
-import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway, BrokerCPADisclaimer } from "../GuideComponents";
+import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway } from "../GuideComponents";
+import { BrokerCPADisclaimer } from "../GuideMedia";
 
 const options = [
   {

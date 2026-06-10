@@ -1,4 +1,5 @@
-import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway, Callout, BrokerCPADisclaimer } from "../GuideComponents";
+import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway, Callout } from "../GuideComponents";
+import { BrokerCPADisclaimer } from "../GuideMedia";
 
 const Ch04 = () => (
   <section id="chapter-4" className="scroll-mt-20 bg-muted/30 py-16">
