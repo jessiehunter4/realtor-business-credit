@@ -1,37 +1,26 @@
+## Hero Section Edits (`src/components/landing/HeroSectionBright.tsx`)
 
-Screenshots confirm the issue: at narrow widths the video sits above the headline and visually dominates; at mid widths the video column grows taller than the text. Plan unchanged.
+**Copy changes:**
+- Remove the "Realtor Business Credit · My Plan. My Progress." badge pill (and the Sparkles icon import if unused).
+- Headline becomes: **"Money when you need it"** (keep the closing-context personalized variant similarly shortened: `Congrats[, FirstName] — money when you need it.`).
+- New first subhead (sized between headline and body, e.g. `text-2xl md:text-3xl font-semibold text-secondary/90`): **"— between closings, before your next client, and when opportunity knocks."**
+- Existing paragraph ("Build the business structure, financial foundation…") stays as the smaller supporting body copy below the video.
 
-## 1. Brand assets (CDN)
+**Layout changes (applies at all breakpoints, desktop included):**
+Switch from the current two-column grid to a single centered column with this vertical order:
 
-Upload the 4 uploaded logos via `lovable-assets`, writing pointer JSONs to:
-- `src/assets/brand/rbc-logo-color.png.asset.json` (transparent bg — primary)
-- `src/assets/brand/rbc-logo-white-bg.png.asset.json`
-- `src/assets/brand/rbc-logo-mono.png.asset.json`
-- `src/assets/brand/rbc-favicon.png.asset.json`
+```text
+1. Headline:  "Money when you need it"
+2. Subhead:   "— between closings, before your next client, and when opportunity knocks."
+3. Video:     aspect-video, max-w ~640px, centered
+4. Body:      "Build the business structure, financial foundation..."
+5. CTAs:      Book Free 1:1 Session  /  Read the Free Guide
+6. Trust bullets grid (4 items)
+7. Trust line: "14+ years brokering · Licensed CA & GA · Certified Credit Suite Partner"
+```
 
-ImageMagick-trim whitespace on the wide logos before upload so the mark/wordmark fills the asset. Add `<link rel="icon" href="{favicon.url}">` in `index.html`.
+- Replace `grid lg:grid-cols-[1.15fr_1fr]` with a single `max-w-3xl mx-auto text-center` container.
+- Video wrapper keeps `aspect-video w-full rounded-3xl` styling with its glow blur; widen `max-w-[520px]` → `max-w-[640px]` so it reads well on desktop while still being subordinate to the headline.
+- CTAs and trust bullets center-aligned (drop the `lg:text-left` / `lg:justify-start` variants).
 
-## 2. Hero proportion fix (responsive)
-
-In `HeroSectionBright.tsx`:
-- Wrap video block in `aspect-video w-full max-w-[520px] mx-auto lg:mx-0 lg:self-center` so height is constrained and never exceeds text column.
-- Grid: `lg:grid-cols-[1.15fr_1fr] items-center`.
-- Mobile order: keep `order-first lg:order-last` but cap video width to `max-w-md` and put it BELOW the headline on mobile (`order-last`) so the headline lands first — fixes "video on top of headline" issue.
-
-In `HeroVideo.tsx`:
-- Video & fallback img both render with `w-full h-full object-cover` inside the parent aspect wrapper, so layout is identical pre/post load and never balloons.
-
-## 3. Site header (new)
-
-New `src/components/shared/SiteHeader.tsx`:
-- Sticky `top-0 z-40 bg-white/85 backdrop-blur border-b`.
-- Left: `<Link to="/">` cropped color logo (h-9 desktop / h-7 mobile).
-- Desktop nav (md+): Guide, Sample Plan, 1:1 Session, Cards.
-- Right: outline `Log in` → `/auth`, primary `Start Here` → `/one-on-one`.
-- Mobile: lucide `Menu` opening shadcn `Sheet` with same links + CTAs.
-
-Mount `<SiteHeader />` at top of: `LandingPage`, `OneOnOnePage`, `GuidePage`, `SamplePlanPage`, `CheckoutPage`, `BusinessCreditCardsForRealtorsPage`, `PrivacyPage`, `TermsPage`, `BookingConfirmedPage`, `IntakeSurveyPage`. Reduce `HeroSectionBright` top padding (`py-16 md:py-24` → `py-10 md:py-16`) so the header doesn't double-space.
-
-## Files touched
-- New: `src/components/shared/SiteHeader.tsx`, 4 `.asset.json` pointers under `src/assets/brand/`
-- Edited: `index.html`, `src/components/landing/HeroSectionBright.tsx`, `src/components/shared/HeroVideo.tsx`, the 10 page files above.
+**No other files changed.** Header, downstream sections, and `HeroVideo` component remain as-is.
