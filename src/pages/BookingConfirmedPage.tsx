@@ -41,15 +41,9 @@ const BookingConfirmedPage = () => {
       link: { to: intakeLink, label: "Start the Intake Survey" },
     },
     {
-      icon: Search,
-      title: "Take the Fundability Scan (Optional)",
-      description: "Get a diagnostic snapshot of how fundable your business is today.",
-      link: { to: "https://mybetterbusinesscredit.fundabilityscan.com/", label: "Take Fundability Scan", external: true },
-    },
-    {
       icon: UserCheck,
       title: "Show Up to Your Session",
-      description: "Jessie will review your intake responses and scan results to map out your next steps.",
+      description: "Jessie will review your intake responses and map out your next steps together on the call.",
     },
   ];
 
@@ -90,23 +84,12 @@ const BookingConfirmedPage = () => {
                   </h3>
                   <p className="text-muted-foreground mb-2">{step.description}</p>
                   {step.link && (
-                    step.link.external ? (
-                      <a
-                        href={step.link.to}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
-                      >
+                    <Link
+                      to={step.link.to}
+                      className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
+                    >
                         {step.link.label} <ArrowRight className="w-4 h-4" />
-                      </a>
-                    ) : (
-                      <Link
-                        to={step.link.to}
-                        className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm"
-                      >
-                        {step.link.label} <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    )
+                    </Link>
                   )}
                 </div>
               </div>

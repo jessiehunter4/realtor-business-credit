@@ -55,7 +55,7 @@ const GuideIntroduction = () => (
         <Paragraph>Look, I'm a realtor too. I know some of us are "bottom-line" people. If you already know you need business credit and just want to talk through YOUR specific situation—skip the guide.</Paragraph>
         <Paragraph><strong>For a limited time, I'm offering one-on-one sessions.</strong> Just you and me, realtor to realtor. In our session together, we'll:</Paragraph>
         <ul className="list-disc pl-6 space-y-1 text-base text-foreground/90 mt-2">
-          <li>How "Fundable" are you? We will run your "Fundability Scan" live together (takes about 5 minutes)</li>
+          <li>How "Fundable" are you? We will run your "Needs Analysis" live together (takes about 5 minutes)</li>
           <li>Discuss YOUR current situation and what prompted you to reach out</li>
           <li>Outline customized next steps specifically for YOUR business</li>
         </ul>

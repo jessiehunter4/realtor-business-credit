@@ -47,8 +47,8 @@ const GuideConclusion = () => (
         <Paragraph><strong>For a limited time,</strong> I'm personally offering one-on-one sessions with realtors who are serious about establishing business credit.</Paragraph>
         <Paragraph>This isn't a sales call. This isn't a pitch. This is a realtor-to-realtor business conversation.</Paragraph>
 
-        <p className="font-bold mt-4 text-foreground">First 5 Minutes: Your Fundability Scan</p>
-        <Paragraph>We'll run your Fundability Scan together. This shows you exactly where YOUR business stands right now for credit purposes.</Paragraph>
+        <p className="font-bold mt-4 text-foreground">First 5 Minutes: Your Needs Analysis</p>
+        <Paragraph>We'll run your Needs Analysis together. This shows you exactly where YOUR business stands right now for credit purposes.</Paragraph>
 
         <p className="font-bold mt-4 text-foreground">Next 10-15 Minutes: Your Situation</p>
         <ul className="list-disc pl-6 space-y-1 text-base text-foreground/90 mt-2">
@@ -78,7 +78,7 @@ const GuideConclusion = () => (
         <p className="mt-2"><Link to="/one-on-one" className="font-bold text-primary hover:underline">Book your session →</Link></p>
       </ActionStep>
       <ActionStep>
-        <h4 className="font-bold text-foreground mt-0 mb-2">Step 2: Complete Your Free Fundability Scan</h4>
+        <h4 className="font-bold text-foreground mt-0 mb-2">Step 2: Complete Your Free Needs Analysis</h4>
         <Paragraph>Done during the session, it takes about 5 minutes. It's a simple assessment that shows where your business stands for credit purposes.</Paragraph>
       </ActionStep>
       <ActionStep>

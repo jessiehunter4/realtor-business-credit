@@ -31,9 +31,6 @@ const SiteFooter = () => {
           <Link to="/business-credit-cards-for-realtors" className="hover:text-primary" onClick={handleComparisonClick}>
             Business Credit Cards for Realtors
           </Link>
-          <a href="https://mybetterbusinesscredit.fundabilityscan.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
-            Fundability Scan
-          </a>
           <Link to="/privacy" className="hover:text-primary">Privacy</Link>
           <Link to="/terms" className="hover:text-primary">Terms</Link>
         </div>

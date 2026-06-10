@@ -14,7 +14,7 @@ const GuideResources = () => (
             <Paragraph><strong>Main Website:</strong> mybetterbusinesscredit.com</Paragraph>
             <Paragraph><strong>Realtor-Specific Resources:</strong> realtorbusinesscredit.com</Paragraph>
             <Paragraph>
-              <strong>Free Fundability Scan & Session Booking:</strong>{" "}
+              <strong>Free Needs Analysis & Session Booking:</strong>{" "}
               <Link to="/one-on-one" className="text-primary hover:underline font-bold">
                 Book Here →
               </Link>

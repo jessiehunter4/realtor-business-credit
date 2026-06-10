@@ -3,17 +3,16 @@ import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
-import HeroSection from "@/components/landing/HeroSection";
-import TrustStrip from "@/components/landing/TrustStrip";
-import AudienceSegmenter from "@/components/landing/AudienceSegmenter";
-import TimingSection from "@/components/landing/TimingSection";
-import TruthSection from "@/components/landing/TruthSection";
-import ComparisonSection from "@/components/landing/ComparisonSection";
-import ProblemsSection from "@/components/landing/ProblemsSection";
+import HeroSectionBright from "@/components/landing/HeroSectionBright";
+import IsThisForMe from "@/components/landing/IsThisForMe";
+import WhyAfterClosingStrip from "@/components/landing/WhyAfterClosingStrip";
+import ComparisonBright from "@/components/landing/ComparisonBright";
 import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
-import GuideContentsSection from "@/components/landing/GuideContentsSection";
-import CTASection from "@/components/landing/CTASection";
-import FounderQuoteSection from "@/components/landing/FounderQuoteSection";
+import GuideContentsBright from "@/components/landing/GuideContentsBright";
+import OneOnOneStepsBlock from "@/components/landing/OneOnOneStepsBlock";
+import TestimonialsBright from "@/components/landing/TestimonialsBright";
+import FinalCTABright from "@/components/landing/FinalCTABright";
+import StickyMobileCTABar from "@/components/shared/StickyMobileCTABar";
 import SiteFooter from "@/components/shared/SiteFooter";
 import Seo from "@/components/shared/Seo";
 
@@ -45,10 +44,10 @@ const LandingPage = () => {
   }, [contactId]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Seo
-        title="Realtor Business Credit: Stop Floating Your Business on Personal Credit"
-        description="Free guide and one-on-one help for real estate agents and brokers building separate business credit, fundability, and funding capacity for their real estate business."
+        title="Realtor Business Credit: Turn Your Closings Into Business Credit Capacity"
+        description="Free guide and free one-on-one for real estate agents and brokers. Build a fundable business structure, financial foundation, and separate business credit — without relying on personal credit."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
@@ -59,18 +58,17 @@ const LandingPage = () => {
           founder: { "@type": "Person", name: "Jessie Hunter" },
         }}
       />
-      <HeroSection firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
-      <TrustStrip />
-      <AudienceSegmenter />
-      <TimingSection />
-      <TruthSection />
-      <ComparisonSection />
-      <ProblemsSection />
+      <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
+      <IsThisForMe />
+      <WhyAfterClosingStrip />
+      <ComparisonBright />
       <CashFlowCalculator guideLink={guideLink} />
-      <GuideContentsSection />
-      <CTASection guideLink={guideLink} />
-      <FounderQuoteSection />
+      <GuideContentsBright guideLink={guideLink} />
+      <OneOnOneStepsBlock />
+      <TestimonialsBright />
+      <FinalCTABright guideLink={guideLink} />
       <SiteFooter />
+      <StickyMobileCTABar guideLink={guideLink} />
     </div>
   );
 };

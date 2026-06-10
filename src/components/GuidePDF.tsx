@@ -175,7 +175,7 @@ const BookCTA = () => (
   <View style={s.bigCtaBox} wrap={false}>
     <Text style={s.bigCtaTitle}>Book Your One-on-One Session</Text>
     <Text style={[s.calloutText, { textAlign: 'center', marginBottom: 6 }]}>
-      5 minutes for the Fundability Scan. 30 minutes for our conversation.{'\n'}Complete clarity on YOUR path forward.
+      5 minutes for the Needs Analysis. 30 minutes for our conversation.{'\n'}Complete clarity on YOUR path forward.
     </Text>
     <Link src={CTA_URL} style={[s.link, { textAlign: 'center', fontSize: 12, marginTop: 6 }]}>
       RealtorBusinessCredit.com/one-on-one →
@@ -328,7 +328,7 @@ export const GuidePDF = () => (
         <Text style={[s.calloutText, { marginTop: 6 }]}>
           <Text style={{ fontFamily: 'Helvetica-Bold' }}>For a limited time, I'm offering one-on-one sessions.</Text> Just you and me, realtor to realtor. In our session together, we'll:
         </Text>
-        <Text style={[s.calloutText, { marginLeft: 12, marginTop: 4 }]}>• How "Fundable" are you? We will run your "Fundability Scan" live together (takes about 5 minutes)</Text>
+        <Text style={[s.calloutText, { marginLeft: 12, marginTop: 4 }]}>• How "Fundable" are you? We will run your "Needs Analysis" live together (takes about 5 minutes)</Text>
         <Text style={[s.calloutText, { marginLeft: 12 }]}>• Discuss YOUR current situation and what prompted you to reach out</Text>
         <Text style={[s.calloutText, { marginLeft: 12 }]}>• Outline customized next steps specifically for YOUR business</Text>
         <Text style={[s.calloutText, { marginTop: 8 }]}>
@@ -1282,8 +1282,8 @@ export const GuidePDF = () => (
         <Text style={s.calloutText}><Text style={s.bold}>For a limited time,</Text> I'm personally offering one-on-one sessions with realtors who are serious about establishing business credit.</Text>
         <Text style={[s.calloutText, { marginTop: 4 }]}>This isn't a sales call. This isn't a pitch. This is a realtor-to-realtor business conversation.</Text>
         <Text style={[s.calloutText, { marginTop: 8, fontFamily: 'Helvetica-Bold' }]}>Here's exactly what happens in our session:</Text>
-        <Text style={[s.calloutText, { marginTop: 8, fontFamily: 'Helvetica-Bold' }]}>First 5 Minutes: Your Fundability Scan</Text>
-        <Text style={s.calloutText}>We'll run your Fundability Scan together. This shows you exactly where YOUR business stands right now for credit purposes.</Text>
+        <Text style={[s.calloutText, { marginTop: 8, fontFamily: 'Helvetica-Bold' }]}>First 5 Minutes: Your Needs Analysis</Text>
+        <Text style={s.calloutText}>We'll run your Needs Analysis together. This shows you exactly where YOUR business stands right now for credit purposes.</Text>
         <Text style={[s.calloutText, { marginTop: 8, fontFamily: 'Helvetica-Bold' }]}>Next 10-15 Minutes: Your Situation</Text>
         <Text style={s.calloutText}>We'll discuss:</Text>
         <Text style={[s.calloutText, { marginLeft: 12 }]}>• Why you booked this session—what's your current situation?</Text>
@@ -1331,7 +1331,7 @@ export const GuidePDF = () => (
       </View>
 
       <View style={s.actionBox} wrap={false}>
-        <Text style={s.actionTitle}>Step 2: Complete Your Free Fundability Scan</Text>
+        <Text style={s.actionTitle}>Step 2: Complete Your Free Needs Analysis</Text>
         <Text style={s.calloutText}>Done during the session, it takes about 5 minutes. It's a simple assessment that shows where your business stands for credit purposes. Once you complete your scan, we'll review YOUR results together and discuss YOUR specific situation.</Text>
       </View>
 
@@ -1405,7 +1405,7 @@ export const GuidePDF = () => (
         <Text style={s.calloutTitle}>Realtor Business Credit</Text>
         <Text style={s.calloutText}><Text style={s.bold}>Main Website:</Text> <Link src={MAIN_URL} style={s.link}>mybetterbusinesscredit.com</Link></Text>
         <Text style={s.calloutText}><Text style={s.bold}>Realtor-Specific Resources:</Text> <Link src={REALTOR_URL} style={s.link}>realtorbusinesscredit.com</Link></Text>
-        <Text style={s.calloutText}><Text style={s.bold}>Free Fundability Scan & Session Booking:</Text> <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link></Text>
+        <Text style={s.calloutText}><Text style={s.bold}>Free Needs Analysis & Session Booking:</Text> <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link></Text>
       </View>
 
       <Text style={s.h2}>About the Author</Text>
