@@ -18,6 +18,7 @@ import PortalPlanView from "./pages/PortalPlanView";
 import BookingConfirmedPage from "./pages/BookingConfirmedPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import SamplePlanPage from "./pages/SamplePlanPage";
+import AdminVideoUpload from "./pages/AdminVideoUpload";
 import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
@@ -54,6 +55,14 @@ const App = () => (
                 <MLSImport />
               </ProtectedRoute>
             } 
+          />
+          <Route
+            path="/admin/video-upload"
+            element={
+              <ProtectedRoute>
+                <AdminVideoUpload />
+              </ProtectedRoute>
+            }
           />
           <Route 
             path="/admin/intake" 
