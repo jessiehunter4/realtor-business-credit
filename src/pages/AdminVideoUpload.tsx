@@ -7,7 +7,17 @@ import { toast } from "sonner";
 import { Upload, ArrowLeft, Trash2, Video } from "lucide-react";
 
 const STORAGE_PATH = "hero-jessie.mp4";
+const CAPTIONS_PATH = "hero-jessie.vtt";
 const BUCKET = "site-videos";
+
+// Convert SRT subtitle text to WebVTT format
+const srtToVtt = (srt: string): string => {
+  const body = srt
+    .replace(/\r+/g, "")
+    .replace(/^\uFEFF/, "")
+    .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2");
+  return `WEBVTT\n\n${body.trim()}\n`;
+};
 
 const AdminVideoUpload = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -15,6 +25,11 @@ const AdminVideoUpload = () => {
   const [progress, setProgress] = useState(0);
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
   const [exists, setExists] = useState(false);
+
+  const [captionsFile, setCaptionsFile] = useState<File | null>(null);
+  const [captionsUploading, setCaptionsUploading] = useState(false);
+  const [captionsExists, setCaptionsExists] = useState(false);
+  const [captionsUrl, setCaptionsUrl] = useState<string | null>(null);
 
   const refresh = async () => {
     const { data: files } = await supabase.storage
@@ -29,6 +44,20 @@ const AdminVideoUpload = () => {
       setCurrentUrl(data?.signedUrl ?? null);
     } else {
       setCurrentUrl(null);
+    }
+
+    const { data: capFiles } = await supabase.storage
+      .from(BUCKET)
+      .list("", { search: CAPTIONS_PATH });
+    const capFound = capFiles?.some((f) => f.name === CAPTIONS_PATH) ?? false;
+    setCaptionsExists(capFound);
+    if (capFound) {
+      const { data } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrl(CAPTIONS_PATH, 60 * 60);
+      setCaptionsUrl(data?.signedUrl ?? null);
+    } else {
+      setCaptionsUrl(null);
     }
   };
 
@@ -71,6 +100,48 @@ const AdminVideoUpload = () => {
       return;
     }
     toast.success("Video removed.");
+    await refresh();
+  };
+
+  const handleCaptionsUpload = async () => {
+    if (!captionsFile) return;
+    const name = captionsFile.name.toLowerCase();
+    if (!name.endsWith(".vtt") && !name.endsWith(".srt")) {
+      toast.error("Captions must be a .vtt or .srt file.");
+      return;
+    }
+    setCaptionsUploading(true);
+    try {
+      const raw = await captionsFile.text();
+      const vtt = name.endsWith(".srt") ? srtToVtt(raw) : raw;
+      const blob = new Blob([vtt], { type: "text/vtt" });
+      const { error } = await supabase.storage
+        .from(BUCKET)
+        .upload(CAPTIONS_PATH, blob, {
+          upsert: true,
+          contentType: "text/vtt",
+          cacheControl: "3600",
+        });
+      if (error) {
+        toast.error(`Captions upload failed: ${error.message}`);
+        return;
+      }
+      toast.success("Captions uploaded. They'll show in the hero video player.");
+      setCaptionsFile(null);
+      await refresh();
+    } finally {
+      setCaptionsUploading(false);
+    }
+  };
+
+  const handleCaptionsDelete = async () => {
+    if (!confirm("Remove captions? The video will play without subtitles.")) return;
+    const { error } = await supabase.storage.from(BUCKET).remove([CAPTIONS_PATH]);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Captions removed.");
     await refresh();
   };
 
@@ -140,6 +211,69 @@ const AdminVideoUpload = () => {
               >
                 <Upload className="h-4 w-4" />
                 {uploading ? "Uploading…" : exists ? "Replace video" : "Upload video"}
+              </Button>
+            </div>
+
+            <div className="border-t border-border pt-6">
+              <p className="text-sm font-semibold mb-2">Captions / Subtitles</p>
+              <p className="text-xs text-muted-foreground mb-3">
+                Upload the caption file Heygen exports alongside the video. Both <code>.vtt</code> and{" "}
+                <code>.srt</code> are accepted — SRT is auto-converted to WebVTT so it shows inside
+                the video's CC button.
+              </p>
+
+              {captionsExists && captionsUrl ? (
+                <div className="space-y-2 mb-4">
+                  <p className="text-xs text-success">
+                    ✓ Captions uploaded — viewers can toggle them on in the player.
+                  </p>
+                  <div className="flex gap-2">
+                    <a
+                      href={captionsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs underline text-primary"
+                    >
+                      Preview .vtt
+                    </a>
+                    <button
+                      onClick={handleCaptionsDelete}
+                      className="text-xs text-destructive underline"
+                    >
+                      Remove captions
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic mb-3">
+                  No captions uploaded yet.
+                </p>
+              )}
+
+              <input
+                type="file"
+                accept=".vtt,.srt,text/vtt,application/x-subrip"
+                onChange={(e) => setCaptionsFile(e.target.files?.[0] ?? null)}
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky file:text-sky-foreground hover:file:bg-sky/90"
+                disabled={captionsUploading}
+              />
+              {captionsFile && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Selected: {captionsFile.name} ({(captionsFile.size / 1024).toFixed(1)} KB)
+                </p>
+              )}
+              <Button
+                className="mt-4"
+                variant="outline"
+                onClick={handleCaptionsUpload}
+                disabled={!captionsFile || captionsUploading}
+              >
+                <Upload className="h-4 w-4" />
+                {captionsUploading
+                  ? "Uploading…"
+                  : captionsExists
+                  ? "Replace captions"
+                  : "Upload captions"}
               </Button>
             </div>
           </CardContent>
