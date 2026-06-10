@@ -1,5 +1,4 @@
 import { Wallet, Hourglass, Rocket } from "lucide-react";
-import heroImage from "@/assets/landing/hero-money-flow.jpg";
 
 const items = [
   {
@@ -22,8 +21,7 @@ const items = [
 const MoneyWhenYouNeedItStrip = () => (
   <section className="container mx-auto px-4 py-12">
     <div className="bg-accent-grad border border-accent/30 rounded-3xl p-6 md:p-10 shadow-card">
-      <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
-        <div>
+      <div className="max-w-3xl mx-auto text-center mb-8">
           <span className="inline-flex items-center gap-2 bg-white/70 backdrop-blur rounded-full px-3 py-1 text-xs font-semibold text-secondary border border-accent/30">
             💵 The #1 thing Realtors actually ask for
           </span>
@@ -34,17 +32,6 @@ const MoneyWhenYouNeedItStrip = () => (
             That's the real ask. Not theory, not buzzwords — capital that's available
             the moment your business needs it, separate from your personal credit.
           </p>
-        </div>
-        <div className="rounded-2xl overflow-hidden border border-border shadow-card">
-          <img
-            src={heroImage}
-            alt="Realtor reviewing cash-flow chart at her desk"
-            loading="lazy"
-            width={1408}
-            height={896}
-            className="w-full h-auto block"
-          />
-        </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
