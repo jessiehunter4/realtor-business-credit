@@ -32,9 +32,9 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
         <div className="absolute top-1/3 right-1/4 w-56 h-56 rounded-full bg-accent/15 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
-          <div className="text-center lg:text-left">
+      <div className="container mx-auto px-4 py-10 md:py-16 lg:py-20 relative z-10">
+        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-10 items-center max-w-6xl mx-auto">
+          <div className="text-center lg:text-left order-1">
             <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-border rounded-full px-4 py-1.5 text-xs font-semibold text-secondary shadow-card">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               Realtor Business Credit · My Plan. My Progress.
@@ -84,13 +84,15 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             </p>
           </div>
 
-          <div className="relative order-first lg:order-last">
+          <div className="relative order-2 w-full max-w-[520px] mx-auto lg:mx-0 lg:self-center">
             <div className="absolute -inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
-            <HeroVideo
-              poster={heroImage}
-              alt="Jessie Hunter explains why Realtors need separate business credit"
-              className="relative w-full h-auto rounded-3xl shadow-card-hover border border-border bg-secondary"
-            />
+            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
+              <HeroVideo
+                poster={heroImage}
+                alt="Jessie Hunter explains why Realtors need separate business credit"
+                className="rounded-3xl"
+              />
+            </div>
           </div>
         </div>
       </div>
