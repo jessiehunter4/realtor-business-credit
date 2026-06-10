@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/brand/rbc-logo-color.png.asset.json";
+import logoAsset from "@/assets/brand/rbc-logo-narrow.png.asset.json";
 
 const navLinks = [
   { to: "/guide", label: "Guide" },
@@ -22,7 +22,7 @@ const SiteHeader = () => {
           <img
             src={logoAsset.url}
             alt="Realtor Business Credit"
-            className="h-8 md:h-10 w-auto"
+            className="h-10 md:h-12 w-auto"
           />
         </Link>
 
@@ -70,7 +70,7 @@ const SiteHeader = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[18rem] flex flex-col gap-6">
             <Link to="/" onClick={() => setOpen(false)} className="flex items-center pt-2">
-              <img src={logoAsset.url} alt="Realtor Business Credit" className="h-8 w-auto" />
+              <img src={logoAsset.url} alt="Realtor Business Credit" className="h-10 w-auto" />
             </Link>
             <nav className="flex flex-col gap-1">
               {navLinks.map((l) => (
