@@ -1,26 +1,31 @@
-## Hero Section Edits (`src/components/landing/HeroSectionBright.tsx`)
+## Goal
+Make `/business-credit-cards-for-realtors` visually consistent with the landing page (`HeroSectionBright`, `IsThisForMe`, `FinalCTABright`) — same bright, navy/teal/sky/amber palette, gradient hero, rounded cards, and CTA styling. No copy/content changes, no structural reorganization beyond what's needed to apply the look.
 
-**Copy changes:**
-- Remove the "Realtor Business Credit · My Plan. My Progress." badge pill (and the Sparkles icon import if unused).
-- Headline becomes: **"Money when you need it"** (keep the closing-context personalized variant similarly shortened: `Congrats[, FirstName] — money when you need it.`).
-- New first subhead (sized between headline and body, e.g. `text-2xl md:text-3xl font-semibold text-secondary/90`): **"— between closings, before your next client, and when opportunity knocks."**
-- Existing paragraph ("Build the business structure, financial foundation…") stays as the smaller supporting body copy below the video.
+## Changes (file: `src/pages/BusinessCreditCardsForRealtorsPage.tsx`)
 
-**Layout changes (applies at all breakpoints, desktop included):**
-Switch from the current two-column grid to a single centered column with this vertical order:
+**Hero section**
+- Replace dark `bg-secondary` hero with a bright gradient hero matching `HeroSectionBright`: `relative overflow-hidden bg-hero-grad` with three blurred color blobs (primary, sky, accent).
+- Headline: `text-secondary` with `text-[clamp(...)]` fluid scale + `text-balance`; keep the eyebrow line ("Educational round-up · Updated 2026") in primary.
+- Subhead in `text-muted-foreground`.
+- CTA buttons → pill-shaped (`rounded-full`) primary (teal) and sky-colored secondary, matching hero CTAs (`bg-primary`/`bg-sky`, `shadow-card`, hover states). Drop the outline variant.
 
-```text
-1. Headline:  "Money when you need it"
-2. Subhead:   "— between closings, before your next client, and when opportunity knocks."
-3. Video:     aspect-video, max-w ~640px, centered
-4. Body:      "Build the business structure, financial foundation..."
-5. CTAs:      Book Free 1:1 Session  /  Read the Free Guide
-6. Trust bullets grid (4 items)
-7. Trust line: "14+ years brokering · Licensed CA & GA · Certified Credit Suite Partner"
-```
+**TL;DR card**
+- Keep structure, but switch to the bright card pattern: `bg-card border border-border rounded-2xl shadow-card` with a subtle `bg-hero-grad` or primary-tinted accent. Checkmark icons stay `text-primary`.
 
-- Replace `grid lg:grid-cols-[1.15fr_1fr]` with a single `max-w-3xl mx-auto text-center` container.
-- Video wrapper keeps `aspect-video w-full rounded-3xl` styling with its glow blur; widen `max-w-[520px]` → `max-w-[640px]` so it reads well on desktop while still being subordinate to the headline.
-- CTAs and trust bullets center-aligned (drop the `lg:text-left` / `lg:justify-start` variants).
+**Categories grid**
+- Cards use `bg-card border border-border rounded-2xl shadow-card hover:shadow-card-hover transition-shadow` (matching `IsThisForMe`).
+- Icon chip: `rounded-2xl bg-primary/10 text-primary` (12x12) — rotate accent tones (`bg-sky/15 text-sky`, `bg-accent/20 text-accent-foreground`, `bg-primary/10 text-primary`) across the 5 cards for visual rhythm.
+- "Best for" label uses `text-primary`; "Watch-outs" label uses `text-accent-foreground` with amber accent.
 
-**No other files changed.** Header, downstream sections, and `HeroVideo` component remain as-is.
+**"Why the order matters" section**
+- Replace `bg-muted/30` with `bg-hero-grad` band (matching the gradient feel) wrapped in a rounded container, or keep section background but add a bright wrapper card. Buttons → same pill style (primary + sky).
+
+**FAQs**
+- Keep left-border treatment but switch border to `border-primary` and tighten typography to match landing rhythm.
+
+**Final CTA**
+- Add a `FinalCTABright`-style block at the bottom (reuse the existing component or inline equivalent) so the page closes with the same CTA card the home page uses. Pass `guideLink="/guide"`.
+
+## Out of scope
+- No copy rewrites, no new content sections, no SEO/metadata changes, no header/footer changes (already `SiteHeader`/`SiteFooter`).
+- No changes to `index.css` tokens — only Tailwind utility classes already in the design system.
