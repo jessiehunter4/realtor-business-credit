@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   CheckCircle2,
   AlertTriangle,
@@ -9,18 +8,21 @@ import {
   Plane,
   Wrench,
   Wallet,
-  ArrowRight,
   ShieldCheck,
+  BookOpen,
+  Calendar,
 } from "lucide-react";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
+import FinalCTABright from "@/components/landing/FinalCTABright";
 
 const cardCategories = [
   {
     icon: Wallet,
+    tone: "bg-primary/10 text-primary",
     name: "Cash-back business cards",
     bestFor:
       "Realtors with steady marketing spend (Zillow, FB ads, photography) who want a flat 1.5–2% return on every dollar.",
@@ -29,6 +31,7 @@ const cardCategories = [
   },
   {
     icon: Plane,
+    tone: "bg-sky/15 text-sky",
     name: "Travel & points business cards",
     bestFor:
       "Agents who travel for showings, conferences (NAR, Inman, broker conventions), or relocation business. Sign-up bonuses can offset a year of conference travel.",
@@ -37,6 +40,7 @@ const cardCategories = [
   },
   {
     icon: Building2,
+    tone: "bg-accent/20 text-accent-foreground",
     name: "Office supply / category bonus cards",
     bestFor:
       "Brokers and team leads with recurring spend on signs, lockboxes, printers, software subscriptions, and office supplies.",
@@ -45,6 +49,7 @@ const cardCategories = [
   },
   {
     icon: Wrench,
+    tone: "bg-primary/10 text-primary",
     name: "EIN-only / no personal guarantee cards",
     bestFor:
       "Established businesses with strong fundability (D-U-N-S, business bank account, 6+ months of business credit history, vendor tradelines reporting).",
@@ -53,6 +58,7 @@ const cardCategories = [
   },
   {
     icon: ShieldCheck,
+    tone: "bg-sky/15 text-sky",
     name: "Charge cards (pay in full each month)",
     bestFor:
       "Agents who want higher purchasing power without a fixed credit limit, and who close consistently enough to pay balances in full.",
