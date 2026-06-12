@@ -121,37 +121,48 @@ const BusinessCreditCardsForRealtorsPage = () => {
       />
 
       {/* Hero */}
-      <section className="bg-secondary text-secondary-foreground py-16 md:py-24">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <section className="relative overflow-hidden bg-hero-grad">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
+          <div className="absolute top-1/3 right-1/4 w-56 h-56 rounded-full bg-accent/15 blur-3xl" />
+        </div>
+        <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl relative z-10">
           <p className="text-primary text-sm md:text-base font-semibold uppercase tracking-wider mb-3">
             Educational round-up · Updated 2026
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-5">
+          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
             Business Credit Cards for Realtors:
             <span className="block text-primary mt-2">A Plain-English Buyer&apos;s Guide</span>
           </h1>
-          <p className="text-lg md:text-xl text-secondary-foreground/85 leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty max-w-3xl">
             Most articles on this topic are written for "small businesses" in general.
             This one is written for residential and commercial real estate agents
             and brokers — the categories of cards that actually fit, and the
             order to set them up so you qualify for higher limits later.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link to="/guide">
-                Read the free 7-step guide <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10">
-              <Link to="/one-on-one">Book a free One-on-One</Link>
-            </Button>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/one-on-one"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
+            >
+              <Calendar className="h-5 w-5" />
+              Book Free 1:1 Session
+            </Link>
+            <Link
+              to="/guide"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+            >
+              <BookOpen className="h-5 w-5" />
+              Read the Free Guide
+            </Link>
           </div>
         </div>
       </section>
 
       {/* TL;DR */}
       <section className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-        <Card className="border-primary/20 bg-primary/5">
+        <Card className="border-border rounded-2xl shadow-card bg-card">
           <CardContent className="pt-6 space-y-3">
             <h2 className="text-xl md:text-2xl font-bold text-secondary">
               The 60-second version
@@ -180,12 +191,12 @@ const BusinessCreditCardsForRealtorsPage = () => {
           5 categories of business cards Realtors actually use
         </h2>
         <div className="grid md:grid-cols-2 gap-5">
-          {cardCategories.map(({ icon: Icon, name, bestFor, watchOuts }) => (
-            <Card key={name} className="border-border">
+          {cardCategories.map(({ icon: Icon, tone, name, bestFor, watchOuts }) => (
+            <Card key={name} className="border-border rounded-2xl shadow-card hover:shadow-card-hover transition-shadow bg-card">
               <CardContent className="pt-6 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${tone}`}>
+                    <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold text-secondary">{name}</h3>
                 </div>
@@ -194,7 +205,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
                   <p className="text-sm text-foreground/85 leading-relaxed">{bestFor}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-1 flex items-center gap-1">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-accent-foreground mb-1 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" /> Watch-outs
                   </p>
                   <p className="text-sm text-foreground/75 leading-relaxed">{watchOuts}</p>
@@ -211,30 +222,42 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* The order matters */}
-      <section className="bg-muted/30 py-14 md:py-20">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-4">
+      <section className="container mx-auto px-4 py-14 md:py-20 max-w-5xl">
+        <div className="relative overflow-hidden bg-hero-grad border border-border rounded-3xl shadow-card px-6 py-12 md:py-16">
+          <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-sky/15 blur-3xl pointer-events-none" />
+          <div className="relative max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-4 tracking-tight">
             Why the order you do this in matters more than the card
           </h2>
-          <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-4">
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-4">
             The single biggest mistake we see Realtors make is applying for a
             business card the same week they form an LLC. The result is almost
             always: approved on personal credit, full personal guarantee, no
             business credit benefit, and a hard inquiry on the personal report.
           </p>
-          <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-6">
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6">
             The free guide walks through a 7-step setup — entity, EIN, business
             address, business phone, business bank account, D-U-N-S, vendor
             tradelines — that takes 60–120 days but unlocks dramatically better
             cards afterward.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild>
-              <Link to="/guide">Get the 7-step guide (free)</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/one-on-one">Book a One-on-One review</Link>
-            </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/one-on-one"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
+            >
+              <Calendar className="h-5 w-5" />
+              Book a One-on-One review
+            </Link>
+            <Link
+              to="/guide"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+            >
+              <BookOpen className="h-5 w-5" />
+              Get the 7-step guide (free)
+            </Link>
+          </div>
           </div>
         </div>
       </section>
@@ -248,12 +271,13 @@ const BusinessCreditCardsForRealtorsPage = () => {
           {faqs.map((f) => (
             <div key={f.q} className="border-l-2 border-primary pl-4">
               <h3 className="text-lg font-semibold text-secondary mb-1">{f.q}</h3>
-              <p className="text-base text-foreground/80 leading-relaxed">{f.a}</p>
+              <p className="text-base text-muted-foreground leading-relaxed">{f.a}</p>
             </div>
           ))}
         </div>
       </section>
 
+      <FinalCTABright guideLink="/guide" />
       <SiteFooter />
     </div>
   );
