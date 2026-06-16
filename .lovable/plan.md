@@ -1,31 +1,20 @@
-## Goal
-Make `/business-credit-cards-for-realtors` visually consistent with the landing page (`HeroSectionBright`, `IsThisForMe`, `FinalCTABright`) — same bright, navy/teal/sky/amber palette, gradient hero, rounded cards, and CTA styling. No copy/content changes, no structural reorganization beyond what's needed to apply the look.
+## Problem
 
-## Changes (file: `src/pages/BusinessCreditCardsForRealtorsPage.tsx`)
+The hero video player still displays the old "lady realtor" still image (`hero-money-flow.jpg`) as its poster/fallback. That image was added as a placeholder before the video was uploaded and was never removed. You want the image removed from the video player position, but the file kept in the assets folder for other uses.
 
-**Hero section**
-- Replace dark `bg-secondary` hero with a bright gradient hero matching `HeroSectionBright`: `relative overflow-hidden bg-hero-grad` with three blurred color blobs (primary, sky, accent).
-- Headline: `text-secondary` with `text-[clamp(...)]` fluid scale + `text-balance`; keep the eyebrow line ("Educational round-up · Updated 2026") in primary.
-- Subhead in `text-muted-foreground`.
-- CTA buttons → pill-shaped (`rounded-full`) primary (teal) and sky-colored secondary, matching hero CTAs (`bg-primary`/`bg-sky`, `shadow-card`, hover states). Drop the outline variant.
+## Fix
 
-**TL;DR card**
-- Keep structure, but switch to the bright card pattern: `bg-card border border-border rounded-2xl shadow-card` with a subtle `bg-hero-grad` or primary-tinted accent. Checkmark icons stay `text-primary`.
+**Edit `src/components/landing/HeroSectionBright.tsx`:**
+- Remove the `import heroImage from "@/assets/landing/hero-money-flow.jpg"` line.
+- Remove the `poster={heroImage}` prop from the `<HeroVideo>` call.
 
-**Categories grid**
-- Cards use `bg-card border border-border rounded-2xl shadow-card hover:shadow-card-hover transition-shadow` (matching `IsThisForMe`).
-- Icon chip: `rounded-2xl bg-primary/10 text-primary` (12x12) — rotate accent tones (`bg-sky/15 text-sky`, `bg-accent/20 text-accent-foreground`, `bg-primary/10 text-primary`) across the 5 cards for visual rhythm.
-- "Best for" label uses `text-primary`; "Watch-outs" label uses `text-accent-foreground` with amber accent.
-
-**"Why the order matters" section**
-- Replace `bg-muted/30` with `bg-hero-grad` band (matching the gradient feel) wrapped in a rounded container, or keep section background but add a bright wrapper card. Buttons → same pill style (primary + sky).
-
-**FAQs**
-- Keep left-border treatment but switch border to `border-primary` and tighten typography to match landing rhythm.
-
-**Final CTA**
-- Add a `FinalCTABright`-style block at the bottom (reuse the existing component or inline equivalent) so the page closes with the same CTA card the home page uses. Pass `guideLink="/guide"`.
+**Edit `src/components/shared/HeroVideo.tsx`:**
+- Make the `poster` prop optional.
+- When no video URL is available (storage check pending or no file uploaded), render a neutral dark surface (e.g. `bg-secondary` matching the surrounding card) instead of the `<img>` fallback. Keep the same `aspect-video`/sizing wrapper so layout doesn't shift.
+- On the `<video>` element, do not set a `poster` attribute — the browser will show the video's first frame, which is the Heygen intro of Jessie.
 
 ## Out of scope
-- No copy rewrites, no new content sections, no SEO/metadata changes, no header/footer changes (already `SiteHeader`/`SiteFooter`).
-- No changes to `index.css` tokens — only Tailwind utility classes already in the design system.
+
+- The image file `src/assets/landing/hero-money-flow.jpg` is **not** deleted — it remains available for other components.
+- No changes to the uploaded video, captions, styling, copy, or other landing-page sections.
+- No changes to the admin upload flow.

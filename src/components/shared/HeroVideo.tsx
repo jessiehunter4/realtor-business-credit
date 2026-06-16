@@ -6,8 +6,8 @@ interface Props {
   storagePath?: string;
   /** Storage path for captions (WebVTT) inside the site-videos bucket */
   captionsPath?: string;
-  /** Poster image shown before play / when no video uploaded yet */
-  poster: string;
+  /** Optional poster image shown before play / when no video uploaded yet */
+  poster?: string;
   /** Accessible label */
   alt: string;
   className?: string;
@@ -69,27 +69,23 @@ const HeroVideo = ({
     };
   }, [storagePath, captionsPath]);
 
-  if (!checked) {
-    // Show poster while we check; avoids flicker
+  if (!checked || !videoUrl) {
+    if (poster) {
+      return (
+        <img
+          src={poster}
+          alt={alt}
+          className={`${className} w-full h-full object-cover`}
+          width={1408}
+          height={896}
+        />
+      );
+    }
     return (
-      <img
-        src={poster}
-        alt={alt}
-        className={`${className} w-full h-full object-cover`}
-        width={1408}
-        height={896}
-      />
-    );
-  }
-
-  if (!videoUrl) {
-    return (
-      <img
-        src={poster}
-        alt={alt}
-        className={`${className} w-full h-full object-cover`}
-        width={1408}
-        height={896}
+      <div
+        role="img"
+        aria-label={alt}
+        className={`${className} w-full h-full bg-secondary`}
       />
     );
   }
