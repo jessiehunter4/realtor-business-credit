@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { BookOpen, Calendar, ShieldCheck, FileText, GraduationCap } from "lucide-react";
-import heroImage from "@/assets/landing/hero-money-flow.jpg";
 import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
@@ -47,7 +46,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             <div className="absolute -inset-4 sm:-inset-6 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
             <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
-                poster={heroImage}
                 alt="Jessie Hunter explains why Realtors need separate business credit"
                 className="rounded-2xl sm:rounded-3xl"
               />
