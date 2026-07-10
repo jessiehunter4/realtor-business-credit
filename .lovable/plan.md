@@ -1,20 +1,40 @@
-## Problem
+## Modernize homepage as a coaching program
 
-The hero video player still displays the old "lady realtor" still image (`hero-money-flow.jpg`) as its poster/fallback. That image was added as a placeholder before the video was uploaded and was never removed. You want the image removed from the video player position, but the file kept in the assets folder for other uses.
+Keep the existing hero video and both headlines exactly as they are. Add coaching-program framing and a new curriculum section based on the "Curriculum experience" direction you picked.
 
-## Fix
+### 1. Hero: add coaching-program eyebrow badge only
+In `HeroSectionBright.tsx`, add a small pulsing badge above the headline: **"Coaching Program for Realtors"** (teal dot + teal text on teal-tinted pill). Headline, tagline, video, subhead, CTAs, and trust bullets stay untouched.
 
-**Edit `src/components/landing/HeroSectionBright.tsx`:**
-- Remove the `import heroImage from "@/assets/landing/hero-money-flow.jpg"` line.
-- Remove the `poster={heroImage}` prop from the `<HeroVideo>` call.
+### 2. New `ProgramCurriculum.tsx` section (placed right after the hero)
+Curriculum-style block matching the picked direction:
 
-**Edit `src/components/shared/HeroVideo.tsx`:**
-- Make the `poster` prop optional.
-- When no video URL is available (storage check pending or no file uploaded), render a neutral dark surface (e.g. `bg-secondary` matching the surrounding card) instead of the `<img>` fallback. Keep the same `aspect-video`/sizing wrapper so layout doesn't shift.
-- On the `<video>` element, do not set a `poster` attribute — the browser will show the video's first frame, which is the Heygen intro of Jessie.
+- Centered header:
+  - H2: **"Program Curriculum"**
+  - Sub: "The structured coaching path from credit-uncertainty to funded real estate business."
+- 5 module cards in a responsive grid (md:grid-cols-5, stacks on mobile):
 
-## Out of scope
+  ```text
+  01 Watch Intro       — video icon (teal)   — "Meet Jessie and see why Realtors need separate business credit."
+  02 Book Free 1:1     — calendar (sky)      — "Grab a no-pressure strategy session with your coach."
+  03 Needs Analysis    — chart (amber)       — "Complete the Realtor Business Financial Needs Analysis together."
+  04 Custom Plan       — check-circle (teal) — "Get a personalized Structure, Finance & Credit Plan."
+  05 Implementation    — users (teal on navy)— "Execute with 1:1 coaching or the Realtor Credit Cohort."
+  ```
 
-- The image file `src/assets/landing/hero-money-flow.jpg` is **not** deleted — it remains available for other components.
-- No changes to the uploaded video, captions, styling, copy, or other landing-page sections.
-- No changes to the admin upload flow.
+- Each card: white `bg-card`, `rounded-3xl`, subtle border, hover lift + accent border tint. Card 5 uses navy `bg-secondary` with white text as the "outcome" emphasis.
+- Small chip on each card ("Video · 3 min", "Live · 30 min", "Assignment", "Deliverable", "Cohort or 1:1") for coaching-program feel.
+- Below cards, two CTAs: primary "Book Free 1:1" → `/one-on-one`, secondary "Read the Free Guide" → guide link.
+- All colors come from existing tokens (`primary`, `sky`, `accent`, `secondary`, `card`, `border`) — no hardcoded hex.
+
+### 3. Wire into `LandingPage.tsx`
+Insert `<ProgramCurriculum />` immediately after `<HeroSectionBright />` and before `<IsThisForMe />`. Remove the now-redundant `<OneOnOneStepsBlock />` further down (it duplicates steps 2–4 of the new curriculum) — or keep it? **Recommendation: remove it** to avoid repetition. Confirm if you'd rather keep both.
+
+### Out of scope
+- No video, hero copy, guide, or plan-generation changes.
+- No new fonts, no palette changes.
+- No CTA URL changes.
+
+### Files touched
+- `src/components/landing/HeroSectionBright.tsx` (add eyebrow badge)
+- `src/components/landing/ProgramCurriculum.tsx` (new)
+- `src/pages/LandingPage.tsx` (insert new section; optionally remove `OneOnOneStepsBlock`)

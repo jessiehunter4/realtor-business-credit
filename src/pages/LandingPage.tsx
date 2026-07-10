@@ -11,7 +11,7 @@ import ComparisonBright from "@/components/landing/ComparisonBright";
 import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
 import GuideContentsBright from "@/components/landing/GuideContentsBright";
 import SamplePlanPreview from "@/components/landing/SamplePlanPreview";
-import OneOnOneStepsBlock from "@/components/landing/OneOnOneStepsBlock";
+import ProgramCurriculum from "@/components/landing/ProgramCurriculum";
 import TestimonialsBright from "@/components/landing/TestimonialsBright";
 import FinalCTABright from "@/components/landing/FinalCTABright";
 import StickyMobileCTABar from "@/components/shared/StickyMobileCTABar";
@@ -63,6 +63,7 @@ const LandingPage = () => {
       />
       <SiteHeader />
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
+      <ProgramCurriculum guideLink={guideLink} />
       <IsThisForMe />
       <MoneyWhenYouNeedItStrip />
       <ThreePillarsDiagram />
@@ -70,7 +71,6 @@ const LandingPage = () => {
       <CashFlowCalculator guideLink={guideLink} />
       <GuideContentsBright guideLink={guideLink} />
       <SamplePlanPreview />
-      <OneOnOneStepsBlock />
       <TestimonialsBright />
       <FinalCTABright guideLink={guideLink} />
       <SiteFooter />
