@@ -2,6 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 import { defineTool, type ToolContext } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 
+// The MCP entry is bundled into a Deno edge function at build time; `process.env`
+// is provided by Deno's Node-compat shim there. Declare it locally so the
+// browser tsconfig doesn't need @types/node.
+declare const process: { env: Record<string, string | undefined> };
+
 function supabaseForUser(ctx: ToolContext) {
   return createClient(
     process.env.SUPABASE_URL!,
