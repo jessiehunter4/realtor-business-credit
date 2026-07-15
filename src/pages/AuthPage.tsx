@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,10 @@ const authSchema = z.object({
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const rawNext = searchParams.get("next");
+  const next =
+    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : null;
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,19 +28,27 @@ export default function AuthPage() {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/admin");
+        if (next) {
+          window.location.replace(next);
+        } else {
+          navigate("/admin");
+        }
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        navigate("/admin");
+        if (next) {
+          window.location.replace(next);
+        } else {
+          navigate("/admin");
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, next]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +94,7 @@ export default function AuthPage() {
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/admin`
+          emailRedirectTo: `${window.location.origin}${next ?? "/admin"}`
         }
       });
 
