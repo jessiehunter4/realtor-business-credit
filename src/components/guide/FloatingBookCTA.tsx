@@ -13,15 +13,14 @@ const FloatingBookCTA = () => {
   const href = `/one-on-one${params ? `?${params}` : ""}`;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 px-4 w-auto">
+    <div className="fixed bottom-6 left-6 z-40">
       <Button
         asChild
-        size="lg"
-        className="shadow-2xl shadow-primary/30 text-base rounded-full"
+        className="h-14 gap-2 rounded-full bg-secondary px-6 text-secondary-foreground shadow-xl hover:bg-secondary/90"
       >
         <Link to={href}>
-          <Calendar className="mr-2 h-5 w-5" />
-          Book a One-on-One Session
+          <Calendar className="h-5 w-5" />
+          <span className="text-sm font-semibold">Book a Session</span>
         </Link>
       </Button>
     </div>
