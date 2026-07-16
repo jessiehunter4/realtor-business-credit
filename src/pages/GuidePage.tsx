@@ -165,6 +165,45 @@ const GuidePage = () => {
     }
   }, [contactId, logEvent]);
 
+  // Restore reading position when returning to /guide after visiting the booking page.
+  useEffect(() => {
+    if (!accessGranted) return;
+    const target = readGuideScroll();
+    if (target == null) return;
+
+    // Prevent browser's own scroll restoration from fighting ours.
+    const prev = window.history.scrollRestoration;
+    try {
+      window.history.scrollRestoration = "manual";
+    } catch {
+      // ignore
+    }
+
+    let cancelled = false;
+    let attempts = 0;
+    const tryScroll = () => {
+      if (cancelled) return;
+      const maxY = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxY >= target - 2 || attempts > 40) {
+        window.scrollTo({ top: target, behavior: "auto" });
+        clearGuideScroll();
+        return;
+      }
+      attempts += 1;
+      requestAnimationFrame(tryScroll);
+    };
+    requestAnimationFrame(tryScroll);
+
+    return () => {
+      cancelled = true;
+      try {
+        window.history.scrollRestoration = prev;
+      } catch {
+        // ignore
+      }
+    };
+  }, [accessGranted]);
+
   const handleAccessGranted = () => {
     setAccessGranted(true);
   };
