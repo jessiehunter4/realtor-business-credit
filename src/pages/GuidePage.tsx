@@ -35,7 +35,6 @@ import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
-import { saveGuideScroll, consumeGuideScroll } from "@/lib/guideScrollMemory";
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
   25: { add: "g-guide-25pct" },
@@ -169,25 +168,6 @@ const GuidePage = () => {
     setAccessGranted(true);
   };
 
-  // Restore reading position when returning from the booking flow.
-  useEffect(() => {
-    if (!accessGranted) return;
-    const y = consumeGuideScroll();
-    if (y == null) return;
-    // Wait for chapters to render/layout before scrolling.
-    let attempts = 0;
-    const tryScroll = () => {
-      const maxY = document.documentElement.scrollHeight - window.innerHeight;
-      if (maxY >= y || attempts > 40) {
-        window.scrollTo({ top: y, behavior: "auto" });
-      } else {
-        attempts += 1;
-        requestAnimationFrame(tryScroll);
-      }
-    };
-    requestAnimationFrame(tryScroll);
-  }, [accessGranted]);
-
   const handleDownload = useCallback(async () => {
     setGenerating(true);
     try {
@@ -248,10 +228,7 @@ const GuidePage = () => {
               <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
             </Button>
             <Button asChild size="sm" className="text-sm">
-              <Link
-                to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
-                onClick={saveGuideScroll}
-              >
+              <Link to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}>
                 <Calendar className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Book a One-on-One Session</span>
                 <span className="sm:hidden">Book Session</span>
