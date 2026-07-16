@@ -58,6 +58,11 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
       }
 
       onAccessGranted(returnedContactId);
+      try {
+        localStorage.setItem("rbc_guide_optin_completed", "true");
+      } catch {
+        // ignore storage errors
+      }
     } catch (err) {
       console.error("Opt-in submission failed:", err);
       toast.error("Something went wrong. Please try again.");

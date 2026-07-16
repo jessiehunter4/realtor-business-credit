@@ -54,7 +54,45 @@ const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
 
 const GuidePage = () => {
   const { contactId, buildForwardParams } = useContactIdentity();
-  const [accessGranted, setAccessGranted] = useState(!!contactId);
+  const [accessGranted, setAccessGranted] = useState(() => {
+    if (contactId) return true;
+    try {
+      if (localStorage.getItem("rbc_guide_optin_completed") === "true") return true;
+    } catch {
+      // ignore
+    }
+    return false;
+  });
+
+  // Grant access to authenticated users automatically (they've already identified themselves).
+  useEffect(() => {
+    if (accessGranted) return;
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled && session) {
+        setAccessGranted(true);
+        try {
+          localStorage.setItem("rbc_guide_optin_completed", "true");
+        } catch {
+          // ignore
+        }
+      }
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session) {
+        setAccessGranted(true);
+        try {
+          localStorage.setItem("rbc_guide_optin_completed", "true");
+        } catch {
+          // ignore
+        }
+      }
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [accessGranted]);
   const [generating, setGenerating] = useState(false);
   const taggedMount = useRef(false);
 
