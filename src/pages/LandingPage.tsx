@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import HeroSectionBright from "@/components/landing/HeroSectionBright";
+import CustomPlanPreview from "@/components/landing/CustomPlanPreview";
 import IsThisForMe from "@/components/landing/IsThisForMe";
 import MoneyWhenYouNeedItStrip from "@/components/landing/MoneyWhenYouNeedItStrip";
 import ThreePillarsDiagram from "@/components/landing/ThreePillarsDiagram";
