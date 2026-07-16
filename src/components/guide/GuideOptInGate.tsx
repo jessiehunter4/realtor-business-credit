@@ -7,15 +7,6 @@ import { BookOpen, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const formatUSPhone = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 10);
-  const len = digits.length;
-  if (len === 0) return "";
-  if (len < 4) return `(${digits}`;
-  if (len < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-};
-
 interface GuideOptInGateProps {
   onAccessGranted: (contactId: string) => void;
 }
@@ -128,12 +119,9 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
               <Input
                 id="phone"
                 type="tel"
-                value={formatUSPhone(phone)}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 555-5555"
-                inputMode="tel"
-                autoComplete="tel"
-                maxLength={14}
                 required
               />
             </div>
