@@ -50,7 +50,7 @@ const ThreePillarsDiagram = () => (
         ))}
       </div>
 
-      <div className="mt-8 max-w-2xl mx-auto bg-card border border-border rounded-2xl px-6 py-4 text-center shadow-card">
+      <div className="mt-8 max-w-2xl mx-auto bg-hero-grad border border-border rounded-2xl px-6 py-4 text-center shadow-card">
         <p className="text-base md:text-lg font-bold text-secondary">
           = Money when you need it.
         </p>

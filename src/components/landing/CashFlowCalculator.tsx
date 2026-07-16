@@ -162,7 +162,7 @@ const CashFlowCalculator = ({ guideLink = "/guide" }: Props) => {
             )}
 
             {/* Bar comparison: personal-card cost vs business-credit alternative */}
-            <div className="mt-8 bg-card border border-border rounded-xl p-5">
+            <div className="mt-8 bg-hero-grad border border-border rounded-xl p-5">
               <p className="text-sm font-semibold text-secondary text-center mb-4">
                 What the same overhead costs on personal vs. business credit
               </p>
