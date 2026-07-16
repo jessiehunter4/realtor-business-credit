@@ -8,7 +8,7 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
  * Styled as a cohesive pair with the Table of Contents button on the right.
  */
 const FloatingBookCTA = () => {
-  const { buildForward pattern } = useContactIdentity();
+  const { buildForwardParams } = useContactIdentity();
   const params = buildForwardParams();
   const href = `/one-on-one${params ? `?${params}` : ""}`;
 
