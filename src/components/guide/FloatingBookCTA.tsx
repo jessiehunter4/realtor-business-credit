@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
-import { saveGuideScroll } from "@/lib/guideScrollMemory";
 
 /**
  * Floating "Book a One-on-One Session" button fixed to the bottom of the viewport.
@@ -19,7 +18,6 @@ const FloatingBookCTA = () => {
         asChild
         size="lg"
         className="shadow-2xl shadow-primary/30 text-base rounded-full"
-        onClick={saveGuideScroll}
       >
         <Link to={href}>
           <Calendar className="mr-2 h-5 w-5" />

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import SiteHeader from "@/components/shared/SiteHeader";
-import { readGuideScroll } from "@/lib/guideScrollMemory";
 
 const BookingConfirmedPage = () => {
   const [searchParams] = useSearchParams();
@@ -13,7 +12,6 @@ const BookingConfirmedPage = () => {
   const token = searchParams.get("token") || "";
   const appointmentId = searchParams.get("appointment") || searchParams.get("appointmentId") || "";
   const { contactId } = useContactIdentity();
-  const hasGuideProgress = readGuideScroll() != null;
 
   useEffect(() => {
     void postFunnelEvent({
@@ -121,14 +119,6 @@ const BookingConfirmedPage = () => {
       {/* Footer CTAs */}
       <section className="py-12 bg-secondary text-secondary-foreground">
         <div className="container max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          {hasGuideProgress && (
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/guide">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Return to Where You Left Off
-              </Link>
-            </Button>
-          )}
           <Button variant="outline" asChild className="border-primary text-primary hover:bg-primary/10">
             <Link to="/guide">
               <BookOpen className="w-4 h-4 mr-2" />
