@@ -206,9 +206,12 @@ const GuidePage = () => {
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <span className="text-secondary-foreground font-semibold text-sm md:text-base">
+          <Link
+            to="/"
+            className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors"
+          >
             Realtor Business Credit
-          </span>
+          </Link>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
