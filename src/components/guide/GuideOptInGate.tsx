@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PhoneInput from "@/components/shared/PhoneInput";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,12 +117,10 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Mobile Phone</Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="(555) 555-5555"
+                onChange={(digits) => setPhone(digits)}
                 required
               />
             </div>
