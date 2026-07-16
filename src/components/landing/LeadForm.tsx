@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import PhoneInput from "@/components/shared/PhoneInput";
 
 interface LeadFormProps {
   defaultValues: {
@@ -94,7 +95,7 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number *</Label>
-            <Input id="phone" type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+            <PhoneInput id="phone" required value={formData.phone} onChange={(digits) => setFormData({ ...formData, phone: digits })} />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
