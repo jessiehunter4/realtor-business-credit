@@ -25,6 +25,7 @@ import TermsPage from "./pages/TermsPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import ScrollMemory from "./components/ScrollMemory";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollMemory />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/guide" element={<GuidePage />} />
