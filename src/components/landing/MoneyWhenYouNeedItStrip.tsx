@@ -20,7 +20,7 @@ const items = [
 
 const MoneyWhenYouNeedItStrip = () => (
   <section className="container mx-auto px-4 py-12">
-    <div className="bg-accent-grad border border-accent/30 rounded-3xl p-6 md:p-10 shadow-card">
+    <div className="bg-card border border-border rounded-3xl p-6 md:p-10 shadow-card">
       <div className="max-w-3xl mx-auto text-center mb-8">
           <span className="inline-flex items-center gap-2 bg-white/70 backdrop-blur rounded-full px-3 py-1 text-xs font-semibold text-secondary border border-accent/30">
             💵 The #1 thing Realtors actually ask for
