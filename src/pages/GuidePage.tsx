@@ -30,6 +30,8 @@ import GuideResources from "@/components/guide/GuideResources";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
+import ChapterBookCTA from "@/components/guide/ChapterBookCTA";
+import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
@@ -200,18 +202,31 @@ const GuidePage = () => {
       <GuideTOC />
       <GuideIntroduction />
       <Ch01 />
+      <ChapterBookCTA />
       <Ch02 />
+      <ChapterBookCTA />
       <Ch03 />
+      <ChapterBookCTA />
       <Ch04 />
+      <ChapterBookCTA />
       <Ch05 />
+      <ChapterBookCTA />
       <Ch06 />
+      <ChapterBookCTA />
       <Ch07 />
+      <ChapterBookCTA />
       <Ch08 />
+      <ChapterBookCTA />
       <Ch09 />
+      <ChapterBookCTA />
       <Ch10 />
+      <ChapterBookCTA />
       <Ch11 />
+      <ChapterBookCTA />
       <Ch12 />
+      <ChapterBookCTA />
       <Ch13 />
+      <ChapterBookCTA />
       <section className="container mx-auto max-w-3xl px-4 py-12">
         <StateEntityWidget />
       </section>
@@ -220,6 +235,7 @@ const GuidePage = () => {
 
       <GuideProgressBar />
       <GuideFloatingTOC />
+      <FloatingBookCTA />
       <SiteFooter />
     </div>
   );
