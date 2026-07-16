@@ -96,55 +96,6 @@ const GuidePage = () => {
   const [generating, setGenerating] = useState(false);
   const taggedMount = useRef(false);
 
-  // Persist scroll position so returning to /guide (back button or after booking)
-  // restores the user's exact reading spot instead of jumping to the top.
-  const SCROLL_KEY = "rbc_guide_scroll_y";
-  useEffect(() => {
-    if (!accessGranted) return;
-
-    // Restore
-    try {
-      const saved = sessionStorage.getItem(SCROLL_KEY);
-      if (saved) {
-        const y = parseInt(saved, 10);
-        if (!Number.isNaN(y) && y > 0) {
-          // Wait for layout/content to render before scrolling.
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => window.scrollTo(0, y));
-          });
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    let ticking = false;
-    const save = () => {
-      try {
-        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-      } catch {
-        // ignore
-      }
-      ticking = false;
-    };
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(save);
-    };
-    const onHide = () => save();
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pagehide", onHide);
-    window.addEventListener("beforeunload", onHide);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pagehide", onHide);
-      window.removeEventListener("beforeunload", onHide);
-      save();
-    };
-  }, [accessGranted]);
-
   const handleThreshold = useCallback(
     async (pct: number) => {
       console.log(`[Guide] Scroll threshold reached: ${pct}%`);
