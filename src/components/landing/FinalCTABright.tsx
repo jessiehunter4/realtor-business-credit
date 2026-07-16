@@ -7,9 +7,7 @@ interface Props {
 
 const FinalCTABright = ({ guideLink = "/guide" }: Props) => (
   <section className="container mx-auto px-4 py-16 md:py-24">
-    <div className="relative overflow-hidden bg-hero-grad border border-border rounded-3xl shadow-card text-center px-6 py-14 md:py-20">
-      <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-sky/15 blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden bg-card border border-border rounded-3xl shadow-card text-center px-6 py-14 md:py-20">
       <div className="relative">
         <h2 className="text-3xl md:text-5xl font-bold text-secondary tracking-tight">
           Money when you need it isn't luck — it's a plan.
