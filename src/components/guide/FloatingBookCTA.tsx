@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 /**
- * Floating "Book a One-on-One Session" button fixed to the bottom of the viewport.
- * Persistent while scrolling the guide.
+ * Floating "Book a One-on-One Session" button fixed to the bottom-left of the viewport.
+ * Styled as a cohesive pair with the Table of Contents button on the right.
  */
 const FloatingBookCTA = () => {
   const { buildForwardParams } = useContactIdentity();
@@ -13,18 +13,17 @@ const FloatingBookCTA = () => {
   const href = `/one-on-one${params ? `?${params}` : ""}`;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 px-4 w-auto">
-      <Button
-        asChild
-        size="lg"
-        className="shadow-2xl shadow-primary/30 text-base rounded-full"
-      >
-        <Link to={href}>
-          <Calendar className="mr-2 h-5 w-5" />
-          Book a One-on-One Session
-        </Link>
-      </Button>
-    </div>
+    <Button
+      asChild
+      size="icon"
+      aria-label="Book a One-on-One Session"
+      title="Book a One-on-One Session"
+      className="fixed bottom-6 left-6 z-40 h-14 w-14 rounded-full shadow-xl bg-secondary text-secondary-foreground hover:bg-secondary/90"
+    >
+      <Link to={href}>
+        <Calendar className="h-6 w-6" />
+      </Link>
+    </Button>
   );
 };
 
