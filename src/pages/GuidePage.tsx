@@ -35,6 +35,7 @@ import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
+import { saveGuideScroll, readGuideScroll, clearGuideScroll } from "@/lib/guideScrollMemory";
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
   25: { add: "g-guide-25pct" },
@@ -228,7 +229,10 @@ const GuidePage = () => {
               <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
             </Button>
             <Button asChild size="sm" className="text-sm">
-              <Link to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}>
+              <Link
+                to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
+                onClick={saveGuideScroll}
+              >
                 <Calendar className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Book a One-on-One Session</span>
                 <span className="sm:hidden">Book Session</span>
