@@ -1,13 +1,11 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   CheckCircle,
   Shield,
   CreditCard,
   ArrowRight,
-  BookOpen,
 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
