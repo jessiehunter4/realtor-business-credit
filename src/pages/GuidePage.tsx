@@ -35,6 +35,14 @@ import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
+import { cn } from "@/lib/utils";
+
+const guideNavLinks = [
+  { to: "/guide", label: "Guide" },
+  { to: "/sample-plan", label: "Sample Plan" },
+  { to: "/one-on-one", label: "1:1 Session" },
+  { to: "/business-credit-cards-for-realtors", label: "Cards" },
+];
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
   25: { add: "g-guide-25pct" },
