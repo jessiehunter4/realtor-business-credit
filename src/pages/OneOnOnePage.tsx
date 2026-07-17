@@ -100,31 +100,34 @@ const OneOnOnePage = () => {
         path="/one-on-one"
       />
       {/* Hero */}
-      <section className="bg-secondary text-secondary-foreground py-16 md:py-28">
-        <div className="container mx-auto px-4 text-center max-w-4xl">
-          <p className="text-primary font-semibold text-sm md:text-base tracking-widest uppercase mb-4">
-            Free Strategy Session
-          </p>
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+      <section className="relative overflow-hidden bg-hero-grad py-16 md:py-24">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
+        </div>
+        <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-primary/10 border border-primary/20">
+            <span className="text-primary text-xs font-semibold tracking-wide uppercase">
+              Free Strategy Session
+            </span>
+          </div>
+          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
             Why a One-on-One Business Credit Session{" "}
             <span className="text-primary">Changes Everything</span>
           </h1>
-          <p className="text-lg md:text-xl text-secondary-foreground/80 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
             In 30 minutes we map exactly where your <em>money when you need it</em>
-            is leaking — and what to fix first.
+            {" "}is leaking — and what to fix first.
           </p>
-          <Button
-            asChild
-            size="lg"
-            className="text-lg px-8 py-6"
+          <a
+            href="#book"
             data-analytics-id="cta-one-on-one-hero"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
           >
-            <a href="#book">
-              <Calendar className="mr-2 h-5 w-5" />
-              Book My Free One-on-One Session
-            </a>
-          </Button>
-          <p className="mt-6 text-sm text-secondary-foreground/70">
+            <Calendar className="h-5 w-5" />
+            Book My Free One-on-One Session
+          </a>
+          <p className="mt-6 text-sm text-muted-foreground">
             Want to see what you'll receive first?{" "}
             <Link to="/sample-plan" className="font-semibold text-primary hover:underline">
               Preview a sample custom plan →
@@ -497,43 +500,40 @@ const OneOnOnePage = () => {
       </section>
 
       {/* Bottom CTA */}
-      <section className="bg-secondary py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center text-secondary-foreground">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="relative overflow-hidden bg-hero-grad py-16 md:py-24">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 right-1/4 w-56 h-56 rounded-full bg-accent/15 blur-3xl" />
+          <div className="absolute -bottom-24 -left-16 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-4 tracking-tight">
               Ready to Get <span className="text-primary">Your Plan</span>?
             </h2>
-            <p className="text-lg text-secondary-foreground/80 mb-10 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
               30 minutes. No cost. No pressure. Just a straightforward business
               conversation between two real estate professionals.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button
-                asChild
-                size="lg"
-                className="text-lg px-8 py-6"
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+              <a
+                href="#book"
                 data-analytics-id="cta-one-on-one-bottom"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
               >
-                <a href="#book">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Schedule My Free One-On-One Session
-                </a>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="text-lg px-8 py-6 border-primary/40 text-primary hover:bg-primary/10"
+                <Calendar className="h-5 w-5" />
+                Schedule My Free One-On-One Session
+              </a>
+              <Link
+                to={`/guide${forwardParams ? `?${forwardParams}` : ""}`}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
               >
-                <Link to={`/guide${forwardParams ? `?${forwardParams}` : ""}`}>
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  Read the Guide First
-                </Link>
-              </Button>
+                <BookOpen className="h-5 w-5" />
+                Read the Guide First
+              </Link>
             </div>
 
-            <p className="text-sm text-secondary-foreground/60 italic">
+            <p className="text-sm text-muted-foreground italic">
               Limited availability. Sessions fill up quickly.
             </p>
           </div>
