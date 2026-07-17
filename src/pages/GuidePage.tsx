@@ -33,6 +33,7 @@ import GuideOptInGate from "@/components/guide/GuideOptInGate";
 import ChapterBookCTA from "@/components/guide/ChapterBookCTA";
 import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
+import SiteHeader from "@/components/shared/SiteHeader";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
 
@@ -203,8 +204,9 @@ const GuidePage = () => {
         description="A bright, comprehensive guide for Realtors and brokers: business entity structure, the 3-account financial foundation, fundability signals, and the credit ladder — with a free 1:1 and custom plan."
         path="/guide"
       />
+      <SiteHeader />
       {/* Sticky CTA Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
+      <div className="sticky top-16 z-40 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link
             to="/"
