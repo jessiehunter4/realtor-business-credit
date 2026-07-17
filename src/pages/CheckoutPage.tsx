@@ -14,6 +14,7 @@ import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/shared/Seo";
 import SiteHeader from "@/components/shared/SiteHeader";
+import SiteFooter from "@/components/shared/SiteFooter";
 
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
 
@@ -54,7 +55,7 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary text-secondary-foreground">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
       <Seo
         title="Enroll · Realtor Business Credit Program"
@@ -62,47 +63,35 @@ const CheckoutPage = () => {
         path="/checkout"
         noindex
       />
-      {/* Header */}
-      <header className="border-b border-border/20 bg-secondary/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <div>
-              <p className="text-sm font-bold text-primary-foreground leading-tight">
-                Realtor Business Credit
-              </p>
-              <p className="text-[10px] text-muted-foreground leading-tight">
-                by My Better Business Credit
-              </p>
-            </div>
-          </Link>
-        </div>
-      </header>
 
       {/* Hero */}
-      <section className="py-16 md:py-24">
-        <div className="max-w-3xl mx-auto px-4 text-center">
+      <section className="relative overflow-hidden bg-hero-grad py-16 md:py-24">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
+        </div>
+        <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
             <Shield className="h-4 w-4 text-primary" />
-            <span className="text-xs font-medium text-primary">
+            <span className="text-xs font-semibold uppercase tracking-wide text-primary">
               Secure Checkout
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 leading-tight">
+          <h1 className="text-[clamp(2rem,6vw,3.25rem)] font-bold text-secondary mb-4 tracking-tight leading-[1.1] text-balance">
             Start Building Your
             <span className="text-primary"> Business Credit</span> Today
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10">
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed">
             Enroll in the Realtor Business Credit program and get your
             personalized plan, coaching, and step-by-step guidance.
           </p>
 
           {/* What's Included Card */}
-          <Card className="bg-card/5 border-border/20 text-left mb-10 max-w-lg mx-auto">
+          <Card className="bg-card border-border rounded-2xl shadow-card text-left mb-10 max-w-lg mx-auto">
             <CardContent className="p-6 md:p-8">
-              <h2 className="text-lg font-semibold text-primary-foreground mb-5">
+              <h2 className="text-lg font-semibold text-secondary mb-5">
                 What's Included
               </h2>
               <ul className="space-y-4">
@@ -116,7 +105,7 @@ const CheckoutPage = () => {
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-foreground/90">
                       {item}
                     </span>
                   </li>
@@ -131,15 +120,11 @@ const CheckoutPage = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={handlePaymentClick}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
           >
-            <Button
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-6 rounded-lg font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30"
-            >
-              <CreditCard className="h-5 w-5 mr-2" />
-              Proceed to Payment
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
+            <CreditCard className="h-5 w-5" />
+            Proceed to Payment
+            <ArrowRight className="h-5 w-5" />
           </a>
 
           <p className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1.5">
@@ -152,16 +137,16 @@ const CheckoutPage = () => {
       {/* Trust / FAQ area */}
       <section className="pb-16 md:pb-24">
         <div className="max-w-2xl mx-auto px-4">
-          <Card className="bg-card/5 border-border/20">
+          <Card className="bg-card border-border rounded-2xl shadow-card">
             <CardContent className="p-6 md:p-8">
-              <h3 className="text-base font-semibold text-primary-foreground mb-4">
+              <h3 className="text-base font-semibold text-secondary mb-4">
                 Questions?
               </h3>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-sm text-muted-foreground mb-2 leading-relaxed">
                 If you have any questions about the program or need help with
                 enrollment, reach out directly to your coach or email us.
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Remember — this is about building a smarter financial
                 foundation for your real estate business. You don't have to do
                 this alone.
@@ -171,19 +156,7 @@ const CheckoutPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/20 py-8">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} My Better Business Credit. All rights
-            reserved.
-          </p>
-          <p className="text-[10px] text-muted-foreground mt-1">
-            This program provides education and coaching only — not legal, tax,
-            or financial advice.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };
