@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
