@@ -52,16 +52,20 @@ const BookingConfirmedPage = () => {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       {/* Hero */}
-      <section className="bg-secondary text-secondary-foreground py-16 md:py-24">
-        <div className="container max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+      <section className="relative overflow-hidden bg-hero-grad py-16 md:py-24">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute -bottom-24 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
+        </div>
+        <div className="container max-w-4xl mx-auto px-4 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase mb-5">
             <CheckCircle className="w-4 h-4" />
             Session Confirmed
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+          <h1 className="text-[clamp(2rem,6vw,3.25rem)] font-bold text-secondary tracking-tight leading-[1.1] text-balance mb-4">
             Your Session Is Booked — Here's What to Do Next
           </h1>
-          <p className="text-lg md:text-xl text-secondary-foreground/80 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Complete the steps below before your call so Jessie can prepare a personalized action plan just for you.
           </p>
         </div>
@@ -117,19 +121,21 @@ const BookingConfirmedPage = () => {
       </section>
 
       {/* Footer CTAs */}
-      <section className="py-12 bg-secondary text-secondary-foreground">
-        <div className="container max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button variant="outline" asChild className="border-primary text-primary hover:bg-primary/10">
-            <Link to="/guide">
-              <BookOpen className="w-4 h-4 mr-2" />
-              Read the Free Guide
-            </Link>
-          </Button>
-          <Button variant="outline" asChild className="border-primary text-primary hover:bg-primary/10">
-            <Link to="/one-on-one">
-              Learn More About the 1:1 Session
-            </Link>
-          </Button>
+      <section className="py-12 bg-hero-grad">
+        <div className="container max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            to="/guide"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+          >
+            <BookOpen className="w-4 h-4" />
+            Read the Free Guide
+          </Link>
+          <Link
+            to="/one-on-one"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
+          >
+            Learn More About the 1:1 Session
+          </Link>
         </div>
       </section>
     </div>
