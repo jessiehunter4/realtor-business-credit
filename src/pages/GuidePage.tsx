@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
@@ -35,6 +35,14 @@ import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
+import { cn } from "@/lib/utils";
+
+const guideNavLinks = [
+  { to: "/guide", label: "Guide" },
+  { to: "/sample-plan", label: "Sample Plan" },
+  { to: "/one-on-one", label: "1:1 Session" },
+  { to: "/business-credit-cards-for-realtors", label: "Cards" },
+];
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
   25: { add: "g-guide-25pct" },
@@ -206,12 +214,30 @@ const GuidePage = () => {
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link
-            to="/"
-            className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors"
-          >
-            Realtor Business Credit
-          </Link>
+          <div className="flex items-center gap-4 lg:gap-6">
+            <Link
+              to="/"
+              className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors"
+            >
+              Realtor Business Credit
+            </Link>
+            <nav className="hidden md:flex items-center gap-1">
+              {guideNavLinks.map((l) => (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  className={({ isActive }) =>
+                    cn(
+                      "px-2 lg:px-3 py-1.5 rounded-full text-xs lg:text-sm font-medium text-secondary-foreground/80 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                      isActive && "text-secondary-foreground bg-white/10"
+                    )
+                  }
+                >
+                  {l.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
