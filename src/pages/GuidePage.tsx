@@ -214,12 +214,30 @@ const GuidePage = () => {
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link
-            to="/"
-            className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors"
-          >
-            Realtor Business Credit
-          </Link>
+          <div className="flex items-center gap-4 lg:gap-6">
+            <Link
+              to="/"
+              className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors"
+            >
+              Realtor Business Credit
+            </Link>
+            <nav className="hidden md:flex items-center gap-1">
+              {guideNavLinks.map((l) => (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  className={({ isActive }) =>
+                    cn(
+                      "px-2 lg:px-3 py-1.5 rounded-full text-xs lg:text-sm font-medium text-secondary-foreground/80 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                      isActive && "text-secondary-foreground bg-white/10"
+                    )
+                  }
+                >
+                  {l.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
