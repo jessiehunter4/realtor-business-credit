@@ -302,6 +302,8 @@ const GuidePage = () => {
       </section>
       <GuideConclusion />
       <GuideResources />
+      {/* Spacer so floating buttons don't cover final content on small screens */}
+      <div className="h-20 sm:h-24" aria-hidden="true" />
 
       <GuideProgressBar />
       <GuideFloatingTOC />
