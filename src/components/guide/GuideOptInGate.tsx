@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ interface GuideOptInGateProps {
 }
 
 const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,12 +59,21 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
         }
       }
 
-      onAccessGranted(returnedContactId);
       try {
         localStorage.setItem("rbc_guide_optin_completed", "true");
       } catch {
         // ignore storage errors
       }
+
+      // UI-only prototype: after opt-in, route through a mock login before
+      // unlocking the guide/dashboard. Real auth will replace this later.
+      navigate("/mock-login", {
+        state: {
+          firstName: firstName.trim(),
+          email: email.trim(),
+          contactId: returnedContactId,
+        },
+      });
     } catch (err) {
       console.error("Opt-in submission failed:", err);
       toast.error("Something went wrong. Please try again.");
