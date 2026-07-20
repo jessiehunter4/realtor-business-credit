@@ -23,6 +23,8 @@ import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRe
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
+import MockLoginPage from "./pages/MockLoginPage";
+import MockDashboardPage from "./pages/MockDashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import ScrollMemory from "./components/ScrollMemory";
@@ -102,6 +104,8 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
+          <Route path="/mock-login" element={<MockLoginPage />} />
+          <Route path="/mock-dashboard" element={<MockDashboardPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
