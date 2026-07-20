@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, Download, Loader2 } from "lucide-react";
+import { Calendar, Download, Loader2, Menu, X } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { GuidePDF } from "@/components/GuidePDF";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,6 +62,7 @@ const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
 
 const GuidePage = () => {
   const { contactId, buildForwardParams } = useContactIdentity();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accessGranted, setAccessGranted] = useState(() => {
     if (contactId) return true;
     try {
