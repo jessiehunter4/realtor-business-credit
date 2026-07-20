@@ -13,9 +13,9 @@ const ChapterBookCTA = () => {
   const href = `/one-on-one${params ? `?${params}` : ""}`;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 pb-10">
+    <div className="container mx-auto max-w-3xl px-4 pb-8 md:pb-10">
       <div className="flex justify-center">
-        <Button asChild size="lg" className="text-base">
+        <Button asChild size="lg" className="w-full sm:w-auto text-sm sm:text-base rounded-full">
           <Link to={href}>
             <Calendar className="mr-2 h-5 w-5" />
             Book a One-on-One Session

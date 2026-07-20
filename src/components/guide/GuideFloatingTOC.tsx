@@ -60,9 +60,10 @@ const GuideFloatingTOC = () => {
       <SheetTrigger asChild>
         <Button
           size="icon"
-          className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-xl bg-secondary text-secondary-foreground hover:bg-secondary/90"
+          className="fixed right-4 sm:right-6 z-40 h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-xl bg-secondary text-secondary-foreground hover:bg-secondary/90"
+          style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
         >
-          <BookOpen className="h-6 w-6" />
+          <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[320px] sm:w-[380px] overflow-y-auto">

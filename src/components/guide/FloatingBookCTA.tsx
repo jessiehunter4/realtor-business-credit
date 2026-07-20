@@ -13,10 +13,13 @@ const FloatingBookCTA = () => {
   const href = `/one-on-one${params ? `?${params}` : ""}`;
 
   return (
-    <div className="fixed bottom-6 left-6 z-40">
+    <div
+      className="hidden sm:block fixed bottom-6 left-6 z-40"
+      style={{ bottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+    >
       <Button
         asChild
-        className="h-14 gap-2 rounded-full bg-secondary px-6 text-secondary-foreground shadow-xl hover:bg-secondary/90"
+        className="h-12 md:h-14 gap-2 rounded-full bg-secondary px-5 md:px-6 text-secondary-foreground shadow-xl hover:bg-secondary/90"
       >
         <Link to={href}>
           <Calendar className="h-5 w-5" />

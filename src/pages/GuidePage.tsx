@@ -213,13 +213,14 @@ const GuidePage = () => {
       />
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
-        <div className="container mx-auto px-4 py-3 grid grid-cols-3 items-center">
-          <div className="flex items-center justify-start">
+        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex md:grid md:grid-cols-3 items-center gap-2">
+          <div className="flex items-center justify-start min-w-0 flex-shrink">
             <Link
               to="/"
-              className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors"
+              className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors truncate"
             >
-              Realtor Business Credit
+              <span className="hidden sm:inline">Realtor Business Credit</span>
+              <span className="sm:hidden">RBC Guide</span>
             </Link>
           </div>
           <nav className="hidden md:flex items-center justify-center gap-1">
@@ -238,28 +239,28 @@ const GuidePage = () => {
               </NavLink>
             ))}
           </nav>
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2 ml-auto flex-shrink-0">
             <Button
               variant="outline"
               size="sm"
-              className="text-sm border-primary/40 text-primary hover:bg-primary/10"
+              className="text-xs sm:text-sm border-primary/40 text-primary hover:bg-primary/10 px-2 sm:px-3"
               onClick={handleDownload}
               disabled={generating}
             >
               {generating ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="sm:mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <Download className="mr-2 h-4 w-4" />
+                <Download className="sm:mr-2 h-4 w-4" />
               )}
               <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
             </Button>
-            <Button asChild size="sm" className="text-sm">
+            <Button asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
               <Link
                 to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
               >
-                <Calendar className="mr-2 h-4 w-4" />
+                <Calendar className="sm:mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Book a One-on-One Session</span>
-                <span className="sm:hidden">Book Session</span>
+                <span className="sm:hidden">Book 1:1</span>
               </Link>
             </Button>
           </div>
@@ -301,6 +302,8 @@ const GuidePage = () => {
       </section>
       <GuideConclusion />
       <GuideResources />
+      {/* Spacer so floating buttons don't cover final content on small screens */}
+      <div className="h-20 sm:h-24" aria-hidden="true" />
 
       <GuideProgressBar />
       <GuideFloatingTOC />
