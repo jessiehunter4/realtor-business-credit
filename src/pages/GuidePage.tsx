@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, Download, Loader2 } from "lucide-react";
+import { Calendar, Download, Loader2, Menu, X } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { GuidePDF } from "@/components/GuidePDF";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,6 +62,7 @@ const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
 
 const GuidePage = () => {
   const { contactId, buildForwardParams } = useContactIdentity();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accessGranted, setAccessGranted] = useState(() => {
     if (contactId) return true;
     try {
@@ -103,6 +104,21 @@ const GuidePage = () => {
   }, [accessGranted]);
   const [generating, setGenerating] = useState(false);
   const taggedMount = useRef(false);
+
+  // Close mobile menu on Escape + lock body scroll while open
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [mobileMenuOpen]);
 
   const handleThreshold = useCallback(
     async (pct: number) => {
@@ -240,10 +256,11 @@ const GuidePage = () => {
             ))}
           </nav>
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 ml-auto flex-shrink-0">
+            {/* Desktop: Download + Book */}
             <Button
               variant="outline"
               size="sm"
-              className="text-xs sm:text-sm border-primary/40 text-primary hover:bg-primary/10 px-2 sm:px-3"
+              className="hidden md:inline-flex text-xs sm:text-sm border-primary/40 text-primary hover:bg-primary/10 px-2 sm:px-3"
               onClick={handleDownload}
               disabled={generating}
             >
@@ -254,13 +271,79 @@ const GuidePage = () => {
               )}
               <span className="hidden sm:inline">{generating ? "Generating..." : "Download PDF"}</span>
             </Button>
-            <Button asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
+            {/* Primary CTA stays visible on all breakpoints */}
+            <Button asChild size="sm" className="text-xs sm:text-sm px-2.5 sm:px-3">
               <Link
                 to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
               >
                 <Calendar className="sm:mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Book a One-on-One Session</span>
                 <span className="sm:hidden">Book 1:1</span>
+              </Link>
+            </Button>
+            {/* Mobile hamburger */}
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="guide-mobile-menu"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-full text-secondary-foreground hover:bg-white/10 transition-colors"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile dropdown menu */}
+        <div
+          id="guide-mobile-menu"
+          className={cn(
+            "md:hidden overflow-hidden border-t border-white/10 transition-[max-height,opacity] duration-300 ease-out",
+            mobileMenuOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"
+          )}
+        >
+          <div className="container mx-auto px-3 sm:px-4 py-3 flex flex-col gap-1 bg-secondary/95">
+            {guideNavLinks.map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    isActive && "text-secondary-foreground bg-white/10"
+                  )
+                }
+              >
+                {l.label}
+              </NavLink>
+            ))}
+            <div className="h-px bg-white/10 my-2" />
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-center border-primary/40 text-primary hover:bg-primary/10"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleDownload();
+              }}
+              disabled={generating}
+            >
+              {generating ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {generating ? "Generating..." : "Download PDF"}
+            </Button>
+            <Button asChild size="sm" className="w-full justify-center">
+              <Link
+                to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Book a One-on-One Session
               </Link>
             </Button>
           </div>
