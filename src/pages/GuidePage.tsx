@@ -105,6 +105,21 @@ const GuidePage = () => {
   const [generating, setGenerating] = useState(false);
   const taggedMount = useRef(false);
 
+  // Close mobile menu on Escape + lock body scroll while open
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [mobileMenuOpen]);
+
   const handleThreshold = useCallback(
     async (pct: number) => {
       console.log(`[Guide] Scroll threshold reached: ${pct}%`);
