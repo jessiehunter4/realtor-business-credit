@@ -98,7 +98,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
           <p className="mt-5 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-            14+ years brokering · Licensed CA &amp; GA · Certified Credit Suite Partner
+            16+ years brokering · Licensed CA &amp; GA · Certified Credit Suite Partner
           </p>
         </div>
       </div>
