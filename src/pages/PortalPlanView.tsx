@@ -12,6 +12,8 @@ import PlanTaskChecklist from "@/components/plan/PlanTaskChecklist";
 export default function PortalPlanView() {
   const { id } = useParams<{ id: string }>();
   const [planData, setPlanData] = useState<PlanData | null>(null);
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -21,7 +23,7 @@ export default function PortalPlanView() {
       if (!id) return;
       const { data, error: fetchError } = await supabase
         .from("custom_plans")
-        .select("plan_data, status")
+        .select("plan_data, status, created_at, updated_at")
         .eq("id", id)
         .single();
 
@@ -38,6 +40,8 @@ export default function PortalPlanView() {
       }
 
       setPlanData(data.plan_data as unknown as PlanData);
+      setCreatedAt(data.created_at ?? null);
+      setUpdatedAt(data.updated_at ?? null);
       setLoading(false);
     }
     fetchPlan();
@@ -47,7 +51,9 @@ export default function PortalPlanView() {
     if (!planData) return;
     setGenerating(true);
     try {
-      const blob = await pdf(<PlanPDF planData={planData} />).toBlob();
+      const blob = await pdf(
+        <PlanPDF planData={planData} createdAt={createdAt} updatedAt={updatedAt} />
+      ).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -59,7 +65,7 @@ export default function PortalPlanView() {
     } finally {
       setGenerating(false);
     }
-  }, [planData]);
+  }, [planData, createdAt, updatedAt]);
 
   if (loading) {
     return (
@@ -105,7 +111,7 @@ export default function PortalPlanView() {
             </Button>
           </div>
           <TabsContent value="plan">
-            <PlanDocument planData={planData} />
+            <PlanDocument planData={planData} createdAt={createdAt} updatedAt={updatedAt} />
           </TabsContent>
           <TabsContent value="checklist">
             {id && <PlanTaskChecklist planId={id} planData={planData} />}

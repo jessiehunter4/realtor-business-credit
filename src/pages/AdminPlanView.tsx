@@ -155,7 +155,13 @@ export default function AdminPlanView() {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <PlanDocument planData={planData} editMode={editMode} onEditSection={handleEditSection} />
+        <PlanDocument
+          planData={planData}
+          editMode={editMode}
+          onEditSection={handleEditSection}
+          createdAt={plan.created_at}
+          updatedAt={plan.updated_at}
+        />
       </main>
     </div>
   );
