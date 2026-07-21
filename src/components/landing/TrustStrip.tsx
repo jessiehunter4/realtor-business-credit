@@ -1,7 +1,7 @@
 import { Award, MapPin, ShieldCheck, GraduationCap } from "lucide-react";
 
 const items = [
-  { icon: Award, label: "16+ years brokering" },
+  { icon: Award, label: "16 years brokering" },
   { icon: MapPin, label: "Licensed CA & GA" },
   { icon: ShieldCheck, label: "Certified Credit Suite Partner" },
   { icon: GraduationCap, label: "Educational — not legal/tax advice" },
