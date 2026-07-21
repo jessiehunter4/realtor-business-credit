@@ -42,6 +42,7 @@ const guideNavLinks = [
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/one-on-one", label: "1:1 Session" },
   { to: "/business-credit-cards-for-realtors", label: "Cards" },
+  { to: "/about", label: "About" },
 ];
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
