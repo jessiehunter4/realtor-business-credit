@@ -27,6 +27,7 @@ const SiteFooter = () => {
           <span>© {new Date().getFullYear()} RealtorBusinessCredit.com</span>
           <Link to="/" className="hover:text-primary">Home</Link>
           <Link to="/guide" className="hover:text-primary">Free Guide</Link>
+          <Link to="/pricing" className="hover:text-primary">Pricing</Link>
           <Link to="/one-on-one" className="hover:text-primary">Book a Session</Link>
           <Link to="/about" className="hover:text-primary">About</Link>
           <Link to="/business-credit-cards-for-realtors" className="hover:text-primary" onClick={handleComparisonClick}>

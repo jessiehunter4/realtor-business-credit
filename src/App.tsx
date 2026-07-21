@@ -21,6 +21,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import SamplePlanPage from "./pages/SamplePlanPage";
 import AdminVideoUpload from "./pages/AdminVideoUpload";
 import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
+import PricingPage from "./pages/PricingPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/" element={<LandingPage />} />
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/one-on-one" element={<OneOnOnePage />} />
           <Route path="/intake" element={<IntakeSurveyPage />} />
           <Route path="/auth" element={<AuthPage />} />

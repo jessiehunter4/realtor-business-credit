@@ -8,6 +8,7 @@ import logoAsset from "@/assets/brand/rbc-logo-narrow.png.asset.json";
 const navLinks = [
   { to: "/guide", label: "Guide" },
   { to: "/sample-plan", label: "Sample Plan" },
+  { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
   { to: "/one-on-one", label: "1:1 Session" },
   { to: "/business-credit-cards-for-realtors", label: "Cards" },

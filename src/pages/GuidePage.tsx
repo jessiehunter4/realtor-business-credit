@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 const guideNavLinks = [
   { to: "/guide", label: "Guide" },
   { to: "/sample-plan", label: "Sample Plan" },
+  { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
   { to: "/one-on-one", label: "1:1 Session" },
   { to: "/business-credit-cards-for-realtors", label: "Cards" },
