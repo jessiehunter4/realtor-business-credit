@@ -103,7 +103,7 @@ const helpSteps = [
 ];
 
 const stats = [
-  { value: "14+", label: "Years brokering" },
+  { value: "16+", label: "Years brokering" },
   { value: "100s", label: "Transactions closed" },
   { value: "CA & GA", label: "Licensed states" },
   { value: "Certified", label: "Credit Suite Partner" },
@@ -208,7 +208,7 @@ const AboutPage = () => {
             <div className="md:col-span-3 space-y-4">
               <p className="text-primary font-semibold uppercase tracking-wide text-sm">Our Story</p>
               <h2 className="text-3xl md:text-4xl font-bold text-secondary">
-                14+ years in real estate. Zero trainings on business credit.
+                16+ years in real estate. Zero trainings on business credit.
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 Jessie Hunter has been a real estate broker since 2010, licensed in
@@ -375,7 +375,7 @@ const AboutPage = () => {
               ))}
             </div>
             <ul className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-secondary-foreground/80">
-              <li className="flex items-center gap-2"><Award className="h-4 w-4 text-primary" aria-hidden /> 14+ years brokering</li>
+              <li className="flex items-center gap-2"><Award className="h-4 w-4 text-primary" aria-hidden /> 16+ years brokering</li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" aria-hidden /> Licensed CA &amp; GA</li>
               <li className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> Certified Credit Suite Partner</li>
               <li className="flex items-center gap-2"><GraduationCap className="h-4 w-4 text-primary" aria-hidden /> Educational — not legal/tax advice</li>
