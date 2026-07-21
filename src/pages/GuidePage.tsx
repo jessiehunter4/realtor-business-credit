@@ -350,6 +350,7 @@ const GuidePage = () => {
             </Button>
           </div>
         </div>
+        <GuideProgressBar />
       </div>
 
       <GuideCover />
@@ -390,7 +391,6 @@ const GuidePage = () => {
       {/* Spacer so floating buttons don't cover final content on small screens */}
       <div className="h-20 sm:h-24" aria-hidden="true" />
 
-      <GuideProgressBar />
       <GuideFloatingTOC />
       <FloatingBookCTA />
       <SiteFooter />
