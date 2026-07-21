@@ -810,82 +810,247 @@ export default function AdminDashboard() {
               </select>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Funnel Progression</CardTitle>
-                <CardDescription>Event counts across funnel stages</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {funnelData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={funnelData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                      <XAxis
-                        dataKey="event_type"
-                        tickFormatter={(v) => FUNNEL_LABELS[v] || v}
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                        className="text-xs fill-muted-foreground"
-                      />
-                      <YAxis className="text-xs fill-muted-foreground" />
-                      <Tooltip
-                        labelFormatter={(v) => FUNNEL_LABELS[v as string] || v}
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                        }}
-                      />
-                      <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        {funnelData.map((_, i) => (
-                          <Cell key={i} fill={BAR_COLORS[i] || "hsl(var(--primary))"} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-muted-foreground text-center py-12">
-                    No funnel events recorded yet. Events will appear as visitors interact with your site.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            {(() => {
+              const countFor = (et: string) =>
+                funnelData.find((f) => f.event_type === et)?.count || 0;
+              const visitors = countFor("site_visit");
+              const leadsCaptured = countFor("guide_view");
+              const bookings = countFor("booking_confirmed");
+              const sales = countFor(SALES_EVENT_TYPE);
+              const overallRate =
+                visitors > 0 ? Math.round((sales / visitors) * 1000) / 10 : 0;
+              const kpis = [
+                { label: "Visitors", value: visitors, hint: "Top of funnel" },
+                { label: "Leads Captured", value: leadsCaptured, hint: "Guide viewers" },
+                { label: "Bookings Confirmed", value: bookings, hint: "Attended-ready" },
+                {
+                  label: "Sales",
+                  value: sales,
+                  hint: `${overallRate}% of visitors`,
+                  accent: true,
+                },
+              ];
+              const stageRows = FUNNEL_ORDER.map((et, idx) => {
+                const count = countFor(et);
+                const prev = idx === 0 ? 0 : countFor(FUNNEL_ORDER[idx - 1]);
+                const convRate =
+                  idx === 0 ? null : prev > 0 ? (count / prev) * 100 : 0;
+                const dropOff = convRate === null ? null : Math.max(0, 100 - convRate);
+                const shareOfVisitors =
+                  visitors > 0 ? (count / visitors) * 100 : 0;
+                return {
+                  event_type: et,
+                  label: FUNNEL_LABELS[et] || et,
+                  count,
+                  convRate,
+                  dropOff,
+                  shareOfVisitors,
+                  isSales: et === SALES_EVENT_TYPE,
+                };
+              });
+              return (
+                <>
+                  {/* KPI headline strip */}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {kpis.map((k) => (
+                      <Card
+                        key={k.label}
+                        className={k.accent ? "border-primary/40 bg-primary/5" : ""}
+                      >
+                        <CardHeader className="pb-1">
+                          <CardDescription className="text-xs">{k.label}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p
+                            className={`text-3xl font-bold ${
+                              k.accent ? "text-primary" : ""
+                            }`}
+                          >
+                            {k.value.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">{k.hint}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
 
-            {/* Conversion rates */}
-            {funnelData.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Conversion Rates</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {[
-                      { label: "Visit → Guide View", from: "site_visit", to: "guide_view" },
-                      { label: "Guide View → 50%+", from: "guide_view", to: "guide_read_50" },
-                      { label: "Guide View → Complete", from: "guide_view", to: "guide_read_100" },
-                      { label: "Guide Complete → 1:1", from: "guide_read_100", to: "one_on_one_visited" },
-                      { label: "Visit → Checkout", from: "site_visit", to: "checkout_visited" },
-                      { label: "Checkout → Click", from: "checkout_visited", to: "checkout_clicked" },
-                      { label: "Intake Start → Submit", from: "intake_started", to: "intake_submitted" },
-                    ].map(({ label, from, to }) => {
-                      const fromCount = funnelData.find((f) => f.event_type === from)?.count || 0;
-                      const toCount = funnelData.find((f) => f.event_type === to)?.count || 0;
-                      const rate = fromCount > 0 ? Math.round((toCount / fromCount) * 100) : 0;
-                      return (
-                        <div key={label} className="p-3 bg-muted rounded-lg">
-                          <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                          <p className="text-2xl font-bold">{rate}%</p>
-                          <p className="text-xs text-muted-foreground">
-                            {toCount} / {fromCount}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Funnel Progression</CardTitle>
+                      <CardDescription>
+                        Customer lifecycle from first visit through completed sale.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {funnelData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={360}>
+                          <BarChart
+                            data={stageRows}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 70 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                            <XAxis
+                              dataKey="label"
+                              angle={-30}
+                              textAnchor="end"
+                              height={90}
+                              interval={0}
+                              className="text-xs fill-muted-foreground"
+                            />
+                            <YAxis
+                              allowDecimals={false}
+                              className="text-xs fill-muted-foreground"
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: "hsl(var(--card))",
+                                border: "1px solid hsl(var(--border))",
+                                borderRadius: "8px",
+                              }}
+                            />
+                            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                              {stageRows.map((row) => (
+                                <Cell
+                                  key={row.event_type}
+                                  fill={
+                                    FUNNEL_STAGE_COLORS[row.event_type] ||
+                                    "hsl(var(--primary))"
+                                  }
+                                />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <p className="text-muted-foreground text-center py-12">
+                          No funnel events recorded yet. Events will appear as visitors
+                          interact with your site.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Stage-by-stage conversion + drop-off table */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Stage-by-Stage Conversion</CardTitle>
+                      <CardDescription>
+                        Conversion, drop-off, and share of top-of-funnel for each stage.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left py-2 pr-4 font-medium text-muted-foreground">
+                                Stage
+                              </th>
+                              <th className="text-right py-2 pr-4 font-medium text-muted-foreground">
+                                Count
+                              </th>
+                              <th className="text-right py-2 pr-4 font-medium text-muted-foreground">
+                                Conv. from prev
+                              </th>
+                              <th className="text-right py-2 pr-4 font-medium text-muted-foreground">
+                                Drop-off
+                              </th>
+                              <th className="text-right py-2 font-medium text-muted-foreground">
+                                % of Visitors
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {stageRows.map((row, idx) => (
+                              <tr
+                                key={row.event_type}
+                                className={`border-b border-border/50 ${
+                                  row.isSales ? "bg-primary/5" : ""
+                                }`}
+                              >
+                                <td className="py-2 pr-4">
+                                  <span className="inline-flex items-center gap-2">
+                                    <span
+                                      className="inline-block h-2.5 w-2.5 rounded-full"
+                                      style={{
+                                        backgroundColor:
+                                          FUNNEL_STAGE_COLORS[row.event_type] ||
+                                          "hsl(var(--primary))",
+                                      }}
+                                    />
+                                    <span
+                                      className={
+                                        row.isSales ? "font-semibold text-primary" : ""
+                                      }
+                                    >
+                                      {idx + 1}. {row.label}
+                                    </span>
+                                  </span>
+                                </td>
+                                <td className="py-2 pr-4 text-right font-medium tabular-nums">
+                                  {row.count.toLocaleString()}
+                                </td>
+                                <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">
+                                  {row.convRate === null
+                                    ? "—"
+                                    : `${Math.round(row.convRate * 10) / 10}%`}
+                                </td>
+                                <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">
+                                  {row.dropOff === null
+                                    ? "—"
+                                    : `${Math.round(row.dropOff * 10) / 10}%`}
+                                </td>
+                                <td className="py-2 text-right tabular-nums text-muted-foreground">
+                                  {`${Math.round(row.shareOfVisitors * 10) / 10}%`}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Sales summary */}
+                  <Card className="border-primary/40">
+                    <CardHeader>
+                      <CardTitle>Sales Summary</CardTitle>
+                      <CardDescription>
+                        Final conversion metric across the selected date range.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4 sm:grid-cols-3">
+                        <div className="p-3 bg-primary/5 rounded-lg">
+                          <p className="text-xs text-muted-foreground mb-1">Total sales</p>
+                          <p className="text-3xl font-bold text-primary">
+                            {sales.toLocaleString()}
                           </p>
                         </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                        <div className="p-3 bg-muted rounded-lg">
+                          <p className="text-xs text-muted-foreground mb-1">
+                            Visitor → Sale rate
+                          </p>
+                          <p className="text-3xl font-bold">{overallRate}%</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {sales.toLocaleString()} / {visitors.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="p-3 bg-muted rounded-lg">
+                          <p className="text-xs text-muted-foreground mb-1">Revenue</p>
+                          <p className="text-lg font-semibold text-muted-foreground">
+                            Not tracked yet
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Enable Stripe purchase events to populate.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })()}
 
             {/* Recent events */}
             <Card>
