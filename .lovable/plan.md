@@ -1,82 +1,108 @@
-## Pricing Page Plan
+# Realtor Client Dashboard Redesign (/mock-dashboard)
 
-### New route
-- Add `src/pages/PricingPage.tsx` at route `/pricing` in `src/App.tsx`.
-- Reuse `SiteHeader`, `SiteFooter`, `FloatingBookCTA`, `ScrollMemory`, `ChapterBookCTA` styling patterns.
-- Match homepage bright design system: soft gradient background, pill buttons, shadow cards, brand navy/green/amber palette.
+UI-only refactor of `src/pages/MockDashboardPage.tsx`. Keeps mock data (no auth/backend changes), reuses the bright design system (shadow-card, pill buttons, primary/secondary tokens, `bg-hero-grad`), and stays fully responsive.
 
-### Sections (top → bottom)
+## Information Architecture
 
-1. **Hero**
-   - Eyebrow badge: "Coaching + Implementation"
-   - H1: "Simple pricing. Real support. Money when you need it."
-   - Sub: One-line explainer that every path starts with a free 1:1 session.
-   - Two CTAs: "Book Free 1:1 Session" (primary → `/one-on-one`), "Read the Guide" (secondary → `/guide`).
+Replace the current single-scroll layout with a **sticky sub-nav (tabs)** below the welcome header. Six tabs, each rendering a section on the same page (no route changes):
 
-2. **How pricing works** (overview strip)
-   - 3 short bullets: (1) Free 1:1 to build your custom plan, (2) Pick the support level that fits, (3) Cancel or upgrade anytime.
+```text
+[ Overview | Guides | My Plan | 90-Day Plan | Goals | Purchases ]
+```
 
-3. **Three pricing cards** (recommended = middle "Cohort")
-   - **Self-Paced Blueprint** — $497 one-time
-     - Custom Business, Finance & Credit Plan (PDF + portal)
-     - Guide + 7-step action checklist
-     - Fundability Scan
-     - Credit Suite vendor & tradeline directory access
-     - Email support
-   - **Realtor Credit Cohort** — $1,997 (90 days) *[Most Popular badge]*
-     - Everything in Self-Paced
-     - 90-day small-group cohort (5–10 Realtors)
-     - Weekly live coaching calls
-     - Private cohort community
-     - Credit Suite client portal + coach
-   - **1:1 Private Coaching** — $4,997 / quarter
-     - Everything in Cohort
-     - Private 1:1 coaching with Jessie
-     - Dedicated Credit Suite specialist
-     - Priority response + funding strategy sessions
-     - Quarterly plan reviews
-   - Each card: title, price, "who it's for" line, feature list with green check icons, CTA button "Book Free 1:1 Session" → `/one-on-one` (all cards route to the free session first, matching the funnel model in project knowledge).
+Mobile: horizontal scroll tab bar (`overflow-x-auto`, snap). Desktop: centered tab row.
 
-4. **Feature comparison table**
-   - Rows: Custom Plan, Fundability Scan, Vendor Directory, Live Coaching, Cohort Community, 1:1 with Jessie, Credit Suite Coach, Priority Support, Plan Reviews.
-   - Columns: Self-Paced / Cohort / 1:1 with check/dash marks.
-   - Fully responsive: table on md+, stacked cards on mobile.
+## Section Breakdown
 
-5. **Trust strip** — reuse "16 years, hundreds of transactions, Credit Suite Certified Partner, CA + GA licensed" indicators (same style as homepage `TrustStrip`).
+### 1. Header (persistent)
+- Welcome, {firstName} + eyebrow "Your success dashboard"
+- Right side: Log out (existing), avatar circle with initials
+- Below header: **4 KPI stat cards** (replaces current 3)
+  - Fundability Score (62/100, +8)
+  - Business Credit Score (mock: "Building" state with dashed ring until data)
+  - 90-Day Plan Progress (x/y)
+  - Next Session (Thu 2 PM PT)
 
-6. **FAQ** (accordion via shadcn `Accordion`)
-   - Do I have to pay upfront? Is there a payment plan?
-   - What's actually included in the free 1:1 session?
-   - How is this different from generic business credit programs?
-   - Do you guarantee approval amounts or credit limits? (compliance-safe answer)
-   - Can I switch between plans?
-   - What if I'm brand new / haven't closed many deals yet?
-   - Do you provide legal or tax advice? (No — educational + coaching)
+### 2. Overview tab (default)
+- **Next Recommended Action** hero card — big, primary-tinted, single CTA ("Register your D-U-N-S number →")
+- **Current Roadmap Stage** — horizontal stepper (Foundations → Fundability → Tradelines → Cards → Funding), current step highlighted
+- **Upcoming Tasks** — top 3 open tasks from 90-day plan with quick-complete
+- **Recent Activity** — existing list, condensed
 
-7. **Final CTA band**
-   - Headline: "Not sure which plan fits? Start with the free 1:1."
-   - Buttons: "Book Free 1:1 Session" + "Read the Free Guide".
+### 3. Guides Library tab
+- Grid of guide cards (3-col desktop, 1-col mobile):
+  - Business Credit Guide → `/guide` (with "Continue reading" if `guideScrollMemory` has a saved position; else "Start")
+  - Business Credit Cards for Realtors → `/business-credit-cards-for-realtors`
+  - Sample Plan → `/sample-plan`
+- Each card: thumbnail (gradient block + icon), title, 1-line description, progress bar (mock %), badges (New / In Progress / Complete), Download PDF button where applicable.
 
-### Navigation updates
-- `src/components/shared/SiteHeader.tsx`: add "Pricing" to desktop nav (between Guide and About) and to mobile hamburger menu; active state via `NavLink` styling already in place.
-- `src/pages/GuidePage.tsx`: add "Pricing" to the centered sticky-bar nav and mobile menu, matching the existing About pattern.
-- `src/components/shared/SiteFooter.tsx`: add Pricing link in footer nav.
+### 4. My Plan tab
+- Summary card: goals snapshot from mock intake
+- **Recommendations** list (3-5 items with priority badges)
+- **Financing Roadmap** — vertical timeline: 0-90d, 3-6mo, 6-12mo milestones
+- Link to full plan (`/sample-plan`), Download PDF button (reuse existing pattern)
 
-### SEO & accessibility
-- `<Helmet>` with title "Pricing — Realtor Business Credit" (<60 chars) and meta description (<160 chars) focused on "coaching + business credit pricing for Realtors".
-- Canonical + og:title/og:url/og:type/twitter:card self-referencing `/pricing`.
-- JSON-LD `Product`/`Offer` array for the three tiers (Organization already sitewide).
-- Single H1, semantic `<section>` with `aria-labelledby`, accessible accordion (shadcn already a11y-compliant), keyboard-focusable pricing cards.
+### 5. 90-Day Action Plan tab
+- Interactive checklist grouped by cadence:
+  - **This Week** (daily/weekly tasks)
+  - **This Month** (weekly)
+  - **Milestones** (monthly)
+- Overall progress bar + segmented progress by group
+- Reuse existing `toggleTask` logic; extend `INITIAL_TASKS` with `cadence` + `dueLabel` fields
+- Empty/complete state: celebratory card ("You've cleared this week — book your next 1:1")
 
-### Technical notes
-- No backend/schema changes — pricing values live in a typed array in `PricingPage.tsx`.
-- Reuse shadcn `Card`, `Button`, `Badge`, `Accordion`, `Table` — no new deps.
-- All CTAs link to existing `/one-on-one` and `/guide` routes; no new checkout wiring (`/checkout` already exists but pricing funnel starts with the free session per project knowledge).
-- Fully responsive: 1-col mobile, 2-col md, 3-col lg for pricing cards; overflow-x scroll fallback on comparison table.
+### 6. Goals tab
+- Card grid of goal tiles (5 goals from spec):
+  - Build Business Credit
+  - Obtain First Business Credit Card
+  - Reach Funding Eligibility
+  - Improve Fundability
+  - Separate Personal & Business Credit
+- Each tile: icon, status pill (Not started / In progress / On track / Complete), circular progress, "Next step" line, small CTA
 
-### QA checklist after build
-- Route renders at `/pricing`, header/footer/floating CTA present.
-- Nav link appears and highlights on active route across `SiteHeader`, `GuidePage` bar, and footer.
-- Mobile hamburger includes Pricing.
-- Cards, table, and FAQ scale cleanly at 375 / 768 / 1280.
-- Lighthouse: meta tags present, single H1, no console errors.
+### 7. Purchases & Payments tab
+- **Active Services** card (mock: "One-on-One Coaching — Active", renewal date)
+- **Purchase History** table (Date, Product, Amount, Status, Invoice link) — 2-3 mock rows
+- **Subscription** panel with remaining access period bar
+- CTA to `/pricing` for upgrades
+
+### 8. Progress Analytics (embedded on Overview + dedicated card in Goals)
+- Use `recharts` (already available via shadcn chart) for:
+  - Line: Tasks completed over time (weekly)
+  - Radial: Funding readiness score
+  - Bar: Credit-building progress by category
+- Compact, 2-column on desktop, stacked on mobile
+
+## Component Plan
+
+New files under `src/components/dashboard/`:
+- `DashboardTabs.tsx` — sticky tab bar
+- `StatCard.tsx` — extracted from existing inline `StatCard`
+- `NextActionCard.tsx`
+- `RoadmapStepper.tsx`
+- `GuideCard.tsx`
+- `GoalTile.tsx`
+- `ChecklistGroup.tsx`
+- `PurchaseHistoryTable.tsx`
+- `ProgressCharts.tsx` (recharts wrappers)
+
+Mock data lives in `src/data/mockDashboard.ts` (new): tasks, guides, goals, purchases, activity, chart series. Keeps `MockDashboardPage.tsx` a thin composition file.
+
+## Design Tokens & Behavior
+- Colors: existing `primary`, `secondary`, `accent`, `muted-foreground`, `bg-hero-grad`, `shadow-card`. No hardcoded hex.
+- Radius: `rounded-3xl` cards, `rounded-full` buttons and pills.
+- Motion: subtle fade/slide on tab change (framer-motion already in stack) or CSS `transition`.
+- Responsive: single-column stack < md; 2-col md; 3-col lg where relevant.
+- Accessibility: tabs use shadcn `Tabs` (roving focus, aria), all interactive tiles are buttons/links.
+
+## Out of Scope
+- Real auth, real data, Supabase reads/writes (still mock per existing TODO comment).
+- Route or navigation changes outside this page.
+- New backend tables or edge functions.
+
+## QA Checklist
+- Renders cleanly at 360, 768, 1024, 1440 widths.
+- All CTAs link to existing routes (`/guide`, `/sample-plan`, `/one-on-one`, `/pricing`, `/business-credit-cards-for-realtors`).
+- Tab state preserved on scroll; sticky sub-nav doesn't overlap KPI cards.
+- Task toggles persist within session (component state, as today).
+- No console errors; typecheck clean.
