@@ -1,108 +1,57 @@
-# Realtor Client Dashboard Redesign (/mock-dashboard)
+# Pricing Page Redesign
 
-UI-only refactor of `src/pages/MockDashboardPage.tsx`. Keeps mock data (no auth/backend changes), reuses the bright design system (shadow-card, pill buttons, primary/secondary tokens, `bg-hero-grad`), and stays fully responsive.
+Refactor `src/pages/PricingPage.tsx` in place — same route, same three tiers, upgraded UX and conversion elements. Reuse the existing bright design system (SiteHeader/Footer, shadcn Accordion/Badge, `bg-hero-grad`, `shadow-card`, primary/secondary tokens) so it feels native to the site.
 
-## Information Architecture
+## Sections (top → bottom)
 
-Replace the current single-scroll layout with a **sticky sub-nav (tabs)** below the welcome header. Six tabs, each rendering a section on the same page (no route changes):
+1. **Hero** — Badge "Pricing", H1 "Choose your path to money when you need it", supporting line, two secondary links (Read the Guide, See a Sample Plan).
+2. **Pricing cards (3-up)** — redesigned card:
+   - Plan name + one-line value prop
+   - Price + cadence (with small "billed once" / "over 90 days" / "per quarter" clarifier)
+   - "Best for…" line
+   - **Includes** feature list (Check icons)
+   - **Not included** line for the two lower tiers (Minus icon, muted) — makes limitations explicit
+   - Primary CTA button → tier-specific Stripe Payment Link (new tab, `rel="noopener"`)
+   - Secondary text link "Prefer to talk first? Book a free 1:1" → `/one-on-one`
+   - Highlighted middle tier (Cohort) with "Most Popular" ribbon and subtle ring — already the pattern, kept
+3. **Reassurance strip** — 4 icon items: Secure Stripe checkout · 30-day satisfaction guarantee · Free 1:1 first · Cancel anytime (where applicable)
+4. **Comparison table** — keep existing rows, tighten styling; sticky header on scroll for mobile-friendly horizontal scroll; each column header links to its tier's Stripe link.
+5. **Testimonials** — new 3-card grid with placeholder quotes clearly marked `[Sample testimonial — replace with real client quote]`. Avatar initials, name/role, star row. Uses `shadow-card` cards.
+6. **Guarantee callout** — full-width panel: "30-Day Satisfaction Guarantee. If within 30 days of enrolling you feel this isn't the right fit, email us and we'll refund your enrollment — no hard feelings." (Exact wording confirmed with user before ship; placeholder for now.)
+7. **FAQ** — keep existing 7 items, add two: "Is my payment secure?" and "What does the 30-day guarantee cover?"
+8. **Final CTA** — keep existing gradient panel; add small "Questions before you buy? Book a free 1:1" secondary link.
 
-```text
-[ Overview | Guides | My Plan | 90-Day Plan | Goals | Purchases ]
+## Stripe integration
+
+User will provide three Stripe Payment Link URLs. Until provided, use placeholder constants at the top of the file:
+
+```
+const STRIPE_LINKS = {
+  selfPaced: "https://buy.stripe.com/REPLACE_SELF_PACED",
+  cohort:    "https://buy.stripe.com/REPLACE_COHORT",
+  oneOnOne:  "https://buy.stripe.com/REPLACE_ONE_ON_ONE",
+};
 ```
 
-Mobile: horizontal scroll tab bar (`overflow-x-auto`, snap). Desktop: centered tab row.
+Each tier CTA:
+- `<a href={STRIPE_LINKS.x} target="_blank" rel="noopener noreferrer">`
+- Label: "Get Started" (self-paced), "Enroll in Cohort" (cohort, primary style), "Start 1:1 Coaching" (1:1)
+- Secondary "Book Free 1:1" link stays under every card for hesitant buyers
 
-## Section Breakdown
+Existing `/checkout` page and its Stripe link stay untouched (used from Portal/other flows).
 
-### 1. Header (persistent)
-- Welcome, {firstName} + eyebrow "Your success dashboard"
-- Right side: Log out (existing), avatar circle with initials
-- Below header: **4 KPI stat cards** (replaces current 3)
-  - Fundability Score (62/100, +8)
-  - Business Credit Score (mock: "Building" state with dashed ring until data)
-  - 90-Day Plan Progress (x/y)
-  - Next Session (Thu 2 PM PT)
+## SEO / accessibility
 
-### 2. Overview tab (default)
-- **Next Recommended Action** hero card — big, primary-tinted, single CTA ("Register your D-U-N-S number →")
-- **Current Roadmap Stage** — horizontal stepper (Foundations → Fundability → Tradelines → Cards → Funding), current step highlighted
-- **Upcoming Tasks** — top 3 open tasks from 90-day plan with quick-complete
-- **Recent Activity** — existing list, condensed
+- Keep `<Seo>` with title/description; extend JSON-LD `Product`/`Offer` `url` to point at each Stripe Payment Link once provided
+- Proper `<section aria-labelledby>` on every block, single H1, `<th scope>` on comparison, `alt`/`aria-label` on decorative icons
+- Focus rings preserved via existing button styles
 
-### 3. Guides Library tab
-- Grid of guide cards (3-col desktop, 1-col mobile):
-  - Business Credit Guide → `/guide` (with "Continue reading" if `guideScrollMemory` has a saved position; else "Start")
-  - Business Credit Cards for Realtors → `/business-credit-cards-for-realtors`
-  - Sample Plan → `/sample-plan`
-- Each card: thumbnail (gradient block + icon), title, 1-line description, progress bar (mock %), badges (New / In Progress / Complete), Download PDF button where applicable.
+## Files touched
 
-### 4. My Plan tab
-- Summary card: goals snapshot from mock intake
-- **Recommendations** list (3-5 items with priority badges)
-- **Financing Roadmap** — vertical timeline: 0-90d, 3-6mo, 6-12mo milestones
-- Link to full plan (`/sample-plan`), Download PDF button (reuse existing pattern)
+- `src/pages/PricingPage.tsx` — full refactor in place
+- No new routes, no header/footer/nav changes, no backend changes
 
-### 5. 90-Day Action Plan tab
-- Interactive checklist grouped by cadence:
-  - **This Week** (daily/weekly tasks)
-  - **This Month** (weekly)
-  - **Milestones** (monthly)
-- Overall progress bar + segmented progress by group
-- Reuse existing `toggleTask` logic; extend `INITIAL_TASKS` with `cadence` + `dueLabel` fields
-- Empty/complete state: celebratory card ("You've cleared this week — book your next 1:1")
+## Follow-up needed from you
 
-### 6. Goals tab
-- Card grid of goal tiles (5 goals from spec):
-  - Build Business Credit
-  - Obtain First Business Credit Card
-  - Reach Funding Eligibility
-  - Improve Fundability
-  - Separate Personal & Business Credit
-- Each tile: icon, status pill (Not started / In progress / On track / Complete), circular progress, "Next step" line, small CTA
-
-### 7. Purchases & Payments tab
-- **Active Services** card (mock: "One-on-One Coaching — Active", renewal date)
-- **Purchase History** table (Date, Product, Amount, Status, Invoice link) — 2-3 mock rows
-- **Subscription** panel with remaining access period bar
-- CTA to `/pricing` for upgrades
-
-### 8. Progress Analytics (embedded on Overview + dedicated card in Goals)
-- Use `recharts` (already available via shadcn chart) for:
-  - Line: Tasks completed over time (weekly)
-  - Radial: Funding readiness score
-  - Bar: Credit-building progress by category
-- Compact, 2-column on desktop, stacked on mobile
-
-## Component Plan
-
-New files under `src/components/dashboard/`:
-- `DashboardTabs.tsx` — sticky tab bar
-- `StatCard.tsx` — extracted from existing inline `StatCard`
-- `NextActionCard.tsx`
-- `RoadmapStepper.tsx`
-- `GuideCard.tsx`
-- `GoalTile.tsx`
-- `ChecklistGroup.tsx`
-- `PurchaseHistoryTable.tsx`
-- `ProgressCharts.tsx` (recharts wrappers)
-
-Mock data lives in `src/data/mockDashboard.ts` (new): tasks, guides, goals, purchases, activity, chart series. Keeps `MockDashboardPage.tsx` a thin composition file.
-
-## Design Tokens & Behavior
-- Colors: existing `primary`, `secondary`, `accent`, `muted-foreground`, `bg-hero-grad`, `shadow-card`. No hardcoded hex.
-- Radius: `rounded-3xl` cards, `rounded-full` buttons and pills.
-- Motion: subtle fade/slide on tab change (framer-motion already in stack) or CSS `transition`.
-- Responsive: single-column stack < md; 2-col md; 3-col lg where relevant.
-- Accessibility: tabs use shadcn `Tabs` (roving focus, aria), all interactive tiles are buttons/links.
-
-## Out of Scope
-- Real auth, real data, Supabase reads/writes (still mock per existing TODO comment).
-- Route or navigation changes outside this page.
-- New backend tables or edge functions.
-
-## QA Checklist
-- Renders cleanly at 360, 768, 1024, 1440 widths.
-- All CTAs link to existing routes (`/guide`, `/sample-plan`, `/one-on-one`, `/pricing`, `/business-credit-cards-for-realtors`).
-- Tab state preserved on scroll; sticky sub-nav doesn't overlap KPI cards.
-- Task toggles persist within session (component state, as today).
-- No console errors; typecheck clean.
+- Three Stripe Payment Link URLs (one per tier) to replace placeholders
+- Final wording for the 30-day guarantee (I'll ship a reasonable default; you can tweak)
