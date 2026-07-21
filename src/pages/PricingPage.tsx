@@ -1,5 +1,17 @@
 import { Link } from "react-router-dom";
-import { Check, Minus, Sparkles, ShieldCheck, HeartHandshake, Users } from "lucide-react";
+import {
+  Check,
+  Minus,
+  Sparkles,
+  ShieldCheck,
+  HeartHandshake,
+  Users,
+  Lock,
+  BadgeCheck,
+  Star,
+  CalendarClock,
+  ArrowRight,
+} from "lucide-react";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import Seo from "@/components/shared/Seo";
@@ -11,15 +23,25 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// TODO: replace placeholders with real Stripe Payment Links (one per tier).
+const STRIPE_LINKS = {
+  selfPaced: "https://buy.stripe.com/REPLACE_SELF_PACED",
+  cohort: "https://buy.stripe.com/REPLACE_COHORT",
+  oneOnOne: "https://buy.stripe.com/REPLACE_ONE_ON_ONE",
+} as const;
+
 type Tier = {
   id: string;
   name: string;
   price: string;
   cadence: string;
+  cadenceNote?: string;
   who: string;
   features: string[];
+  notIncluded?: string[];
   highlighted?: boolean;
   ctaLabel: string;
+  ctaHref: string;
 };
 
 const tiers: Tier[] = [
@@ -28,6 +50,7 @@ const tiers: Tier[] = [
     name: "Self-Paced Blueprint",
     price: "$497",
     cadence: "one-time",
+    cadenceNote: "Billed once — lifetime access to your plan & portal",
     who: "For Realtors who want the plan and want to run with it on their own.",
     features: [
       "Custom Business, Finance & Credit Plan (PDF + portal)",
@@ -36,13 +59,16 @@ const tiers: Tier[] = [
       "Credit Suite vendor & tradeline directory access",
       "Email support",
     ],
-    ctaLabel: "Book Free 1:1 Session",
+    notIncluded: ["Live coaching calls", "Cohort community"],
+    ctaLabel: "Get Started",
+    ctaHref: STRIPE_LINKS.selfPaced,
   },
   {
     id: "cohort",
     name: "Realtor Credit Cohort",
     price: "$1,997",
     cadence: "90 days",
+    cadenceNote: "One-time enrollment for the 90-day program",
     who: "For Realtors who want structure, accountability, and a small group.",
     features: [
       "Everything in Self-Paced",
@@ -51,14 +77,17 @@ const tiers: Tier[] = [
       "Private cohort community",
       "Credit Suite client portal + coach",
     ],
+    notIncluded: ["Private 1:1 coaching with Jessie"],
     highlighted: true,
-    ctaLabel: "Book Free 1:1 Session",
+    ctaLabel: "Enroll in Cohort",
+    ctaHref: STRIPE_LINKS.cohort,
   },
   {
     id: "one-on-one",
     name: "1:1 Private Coaching",
     price: "$4,997",
     cadence: "per quarter",
+    cadenceNote: "Quarterly engagement, renewable",
     who: "For Realtors and brokers who want private, high-touch guidance.",
     features: [
       "Everything in Cohort",
@@ -67,7 +96,8 @@ const tiers: Tier[] = [
       "Priority response + funding strategy sessions",
       "Quarterly plan reviews",
     ],
-    ctaLabel: "Book Free 1:1 Session",
+    ctaLabel: "Start 1:1 Coaching",
+    ctaHref: STRIPE_LINKS.oneOnOne,
   },
 ];
 
@@ -92,7 +122,7 @@ const comparison: ComparisonRow[] = [
 const faqs = [
   {
     q: "Do I have to pay upfront? Is there a payment plan?",
-    a: "Every path starts with a free 1:1 session where we build your custom plan. If a paid option makes sense, we'll walk through pricing and payment plan availability together — no pressure, no surprise charges.",
+    a: "You can enroll directly, or start with a free 1:1 session first. If a payment plan makes sense for the Cohort or 1:1 tier, we can walk through options together — no pressure, no surprise charges.",
   },
   {
     q: "What's included in the free 1:1 session?",
@@ -118,6 +148,14 @@ const faqs = [
     q: "Do you provide legal or tax advice?",
     a: "No. Everything we do is educational and coaching. We strongly encourage you to consult your broker, attorney, and CPA about your specific situation.",
   },
+  {
+    q: "Is my payment secure?",
+    a: "Yes. All payments are processed by Stripe over an encrypted connection. We never see or store your card details, and your receipt is delivered instantly by email.",
+  },
+  {
+    q: "What does the 30-day guarantee cover?",
+    a: "If within 30 days of enrolling you feel the program isn't the right fit, email us and we'll refund your enrollment — no hard feelings. Applies to Cohort and 1:1 Coaching enrollments.",
+  },
 ];
 
 const trustItems = [
@@ -125,6 +163,37 @@ const trustItems = [
   { icon: Users, label: "Hundreds of transactions closed" },
   { icon: ShieldCheck, label: "Credit Suite Certified Partner" },
   { icon: HeartHandshake, label: "Licensed in California & Georgia" },
+];
+
+const reassurance = [
+  { icon: Lock, label: "Secure Stripe checkout" },
+  { icon: BadgeCheck, label: "30-day satisfaction guarantee" },
+  { icon: CalendarClock, label: "Free 1:1 available first" },
+  { icon: ShieldCheck, label: "No hidden fees" },
+];
+
+const testimonials = [
+  {
+    quote:
+      "Within 90 days I had a real entity, a business bank account, and my first two tradelines reporting. I stopped putting marketing on my personal card.",
+    name: "Placeholder Name",
+    role: "Residential Agent · CA",
+    initials: "PA",
+  },
+  {
+    quote:
+      "The cohort format was the accountability I needed. Seeing other Realtors go through the same steps kept me moving every single week.",
+    name: "Placeholder Name",
+    role: "Broker · GA",
+    initials: "PB",
+  },
+  {
+    quote:
+      "I finally have money when I need it — a business line I can tap between closings without touching my personal credit.",
+    name: "Placeholder Name",
+    role: "Commercial Agent · TX",
+    initials: "PC",
+  },
 ];
 
 const jsonLd = {
@@ -144,7 +213,7 @@ const jsonLd = {
         price: t.price.replace(/[^0-9.]/g, ""),
         priceCurrency: "USD",
         availability: "https://schema.org/InStock",
-        url: "https://realtorbusinesscredit.com/pricing",
+        url: t.ctaHref,
       },
     },
   })),
@@ -165,7 +234,7 @@ const PricingPage = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
         title="Pricing — Realtor Business Credit Coaching"
-        description="Transparent pricing for Realtor business credit coaching. Self-paced blueprint, 90-day cohort, and 1:1 private coaching. Every path starts with a free 1:1 session."
+        description="Transparent pricing for Realtor business credit coaching. Self-paced blueprint, 90-day cohort, and 1:1 private coaching — enroll directly or book a free 1:1 first."
         path="/pricing"
         jsonLd={jsonLd}
       />
@@ -175,55 +244,36 @@ const PricingPage = () => {
         {/* Hero */}
         <section className="container mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-14 max-w-5xl text-center">
           <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-            Coaching + Implementation
+            Pricing
           </Badge>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary tracking-tight">
-            Simple pricing. Real support.
+            Choose your path to
             <br />
             <span className="text-primary">Money when you need it.</span>
           </h1>
           <p className="mt-5 text-lg md:text-xl text-secondary/70 max-w-2xl mx-auto leading-relaxed">
-            Every path starts with a free 1:1 session. We build your custom
-            plan first — then you choose the support level that fits.
+            Three ways to build separate business credit for your real estate
+            business. Enroll directly below, or start with a free 1:1 session
+            first — your call.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              to="/one-on-one"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
-            >
-              Book Free 1:1 Session
-            </Link>
             <Link
               to="/guide"
               className="inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm md:text-base font-semibold text-secondary hover:bg-secondary/5 transition-colors"
             >
               Read the Free Guide
             </Link>
-          </div>
-        </section>
-
-        {/* Overview */}
-        <section className="container mx-auto px-4 pb-14 max-w-5xl" aria-labelledby="how-pricing-works">
-          <h2 id="how-pricing-works" className="sr-only">How pricing works</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              { n: "1", t: "Book a free 1:1", d: "We build your custom Business, Finance & Credit Plan together." },
-              { n: "2", t: "Pick your path", d: "Self-paced, cohort, or private coaching — whichever fits your goals." },
-              { n: "3", t: "Get to work", d: "Implement with real support until you have money when you need it." },
-            ].map((s) => (
-              <div key={s.n} className="rounded-2xl bg-white border border-border p-6 shadow-card">
-                <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
-                  {s.n}
-                </div>
-                <h3 className="mt-3 font-semibold text-secondary">{s.t}</h3>
-                <p className="mt-1 text-sm text-secondary/70 leading-relaxed">{s.d}</p>
-              </div>
-            ))}
+            <Link
+              to="/sample-plan"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm md:text-base font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+            >
+              See a Sample Plan
+            </Link>
           </div>
         </section>
 
         {/* Pricing cards */}
-        <section className="container mx-auto px-4 pb-16 max-w-6xl" aria-labelledby="pricing-tiers">
+        <section className="container mx-auto px-4 pb-10 max-w-6xl" aria-labelledby="pricing-tiers">
           <h2 id="pricing-tiers" className="sr-only">Pricing tiers</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch">
             {tiers.map((tier) => (
@@ -247,6 +297,9 @@ const PricingPage = () => {
                   <span className="text-4xl font-bold text-secondary">{tier.price}</span>
                   <span className="text-sm text-secondary/60">{tier.cadence}</span>
                 </div>
+                {tier.cadenceNote && (
+                  <p className="mt-1 text-xs text-secondary/55">{tier.cadenceNote}</p>
+                )}
                 <ul className="mt-6 space-y-3 flex-1">
                   {tier.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-secondary/80">
@@ -254,24 +307,56 @@ const PricingPage = () => {
                       <span>{f}</span>
                     </li>
                   ))}
+                  {tier.notIncluded?.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-secondary/45">
+                      <Minus className="mt-0.5 h-4 w-4 shrink-0" aria-label="Not included" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
                 </ul>
-                <Link
-                  to="/one-on-one"
+                <a
+                  href={tier.ctaHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={
-                    "mt-7 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
+                    "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
                     (tier.highlighted
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
                       : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5")
                   }
                 >
                   {tier.ctaLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <Link
+                  to="/one-on-one"
+                  className="mt-3 text-center text-xs font-medium text-primary hover:underline"
+                >
+                  Prefer to talk first? Book a free 1:1
                 </Link>
               </div>
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-secondary/60">
-            Pricing shown in USD. Payment plans may be available — we'll cover options on your free 1:1.
+            Pricing shown in USD. Payment plans may be available — ask on your free 1:1.
           </p>
+        </section>
+
+        {/* Reassurance strip */}
+        <section className="container mx-auto px-4 pb-16 max-w-5xl" aria-labelledby="reassurance">
+          <h2 id="reassurance" className="sr-only">Buying with confidence</h2>
+          <div className="rounded-2xl bg-white border border-border shadow-card p-5 md:p-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {reassurance.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-secondary/85 leading-tight">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Comparison */}
@@ -279,6 +364,9 @@ const PricingPage = () => {
           <h2 id="compare-plans" className="text-2xl md:text-3xl font-bold text-secondary text-center">
             Compare what's included
           </h2>
+          <p className="mt-3 text-center text-sm text-secondary/65 max-w-xl mx-auto">
+            Every plan builds on the one before it. Pick the level of support that fits how you like to work.
+          </p>
           <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-white shadow-card">
             <table className="w-full text-left min-w-[640px]">
               <thead>
@@ -291,7 +379,7 @@ const PricingPage = () => {
               </thead>
               <tbody>
                 {comparison.map((row, idx) => (
-                  <tr key={row.feature} className={idx % 2 ? "bg-secondary/5/30" : ""}>
+                  <tr key={row.feature} className={idx % 2 ? "bg-secondary/[0.03]" : ""}>
                     <th scope="row" className="p-4 text-sm font-medium text-secondary/90 border-t border-border">
                       {row.feature}
                     </th>
@@ -302,8 +390,78 @@ const PricingPage = () => {
                     ))}
                   </tr>
                 ))}
+                <tr>
+                  <th scope="row" className="p-4 text-sm font-medium text-secondary/90 border-t border-border">
+                    &nbsp;
+                  </th>
+                  <td className="p-4 text-center border-t border-border">
+                    <a href={STRIPE_LINKS.selfPaced} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-primary hover:underline">Get Started →</a>
+                  </td>
+                  <td className="p-4 text-center border-t border-border">
+                    <a href={STRIPE_LINKS.cohort} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-primary hover:underline">Enroll →</a>
+                  </td>
+                  <td className="p-4 text-center border-t border-border">
+                    <a href={STRIPE_LINKS.oneOnOne} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-primary hover:underline">Start 1:1 →</a>
+                  </td>
+                </tr>
               </tbody>
             </table>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="container mx-auto px-4 pb-16 max-w-6xl" aria-labelledby="testimonials">
+          <h2 id="testimonials" className="text-2xl md:text-3xl font-bold text-secondary text-center">
+            What Realtors are saying
+          </h2>
+          <p className="mt-3 text-center text-sm text-secondary/65">
+            Sample quotes shown while we collect launch cohort testimonials.
+          </p>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {testimonials.map((t, i) => (
+              <figure key={i} className="rounded-2xl bg-white border border-border p-6 shadow-card flex flex-col">
+                <div className="flex items-center gap-1 text-primary" aria-label="5 star rating">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+                <blockquote className="mt-4 text-sm text-secondary/85 leading-relaxed flex-1">
+                  "{t.quote}"
+                </blockquote>
+                <figcaption className="mt-5 flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-secondary">{t.name}</div>
+                    <div className="text-xs text-secondary/60">{t.role}</div>
+                  </div>
+                </figcaption>
+                <p className="mt-3 text-[10px] uppercase tracking-wide text-secondary/40">
+                  Sample testimonial — replace with real client quote
+                </p>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        {/* Guarantee */}
+        <section className="container mx-auto px-4 pb-16 max-w-5xl" aria-labelledby="guarantee">
+          <div className="rounded-3xl border-2 border-primary/25 bg-primary/5 p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="h-16 w-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-card">
+              <BadgeCheck className="h-8 w-8" />
+            </div>
+            <div>
+              <h2 id="guarantee" className="text-2xl md:text-3xl font-bold text-secondary">
+                30-Day Satisfaction Guarantee
+              </h2>
+              <p className="mt-2 text-secondary/75 leading-relaxed">
+                If within 30 days of enrolling you feel the program isn't the
+                right fit for your real estate business, email us and we'll
+                refund your enrollment — no hard feelings. Applies to Cohort
+                and 1:1 Coaching enrollments.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -344,10 +502,10 @@ const PricingPage = () => {
         <section className="container mx-auto px-4 pb-20 max-w-4xl">
           <div className="rounded-3xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-8 md:p-12 text-center shadow-card">
             <h2 className="text-3xl md:text-4xl font-bold">
-              Not sure which plan fits?
+              Still have questions before you buy?
             </h2>
             <p className="mt-3 text-lg text-primary-foreground/90 max-w-2xl mx-auto">
-              Start with the free 1:1. We'll build your custom plan together, then you choose the support level that makes sense.
+              Book a free 1:1 session. We'll build your custom plan together, then you can decide which enrollment path fits — with zero pressure.
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
