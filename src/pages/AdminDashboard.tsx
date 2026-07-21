@@ -44,46 +44,44 @@ interface RecentEvent {
 const FUNNEL_ORDER = [
   "site_visit",
   "guide_view",
-  "guide_read_25",
   "guide_read_50",
-  "guide_read_75",
   "guide_read_100",
   "one_on_one_visited",
   "booking_confirmed",
+  "intake_submitted",
   "checkout_visited",
   "checkout_clicked",
-  "intake_started",
-  "intake_submitted",
 ];
 
 const FUNNEL_LABELS: Record<string, string> = {
-  site_visit: "Site Visit",
-  guide_view: "Guide View",
+  site_visit: "Visitors",
+  guide_view: "Leads Captured",
+  guide_read_50: "Qualified Leads",
+  guide_read_100: "Guide Completed",
+  one_on_one_visited: "Consultation Visit",
+  booking_confirmed: "Bookings Confirmed",
+  intake_submitted: "Intake Submitted",
+  checkout_visited: "Checkout Reached",
+  checkout_clicked: "Sales",
+  // Legacy labels retained for Recent Events rendering
   guide_read_25: "Guide 25%",
-  guide_read_50: "Guide 50%",
   guide_read_75: "Guide 75%",
-  guide_read_100: "Guide 100%",
-  one_on_one_visited: "1:1 Page Visit",
-  booking_confirmed: "Booking Confirmed",
-  checkout_visited: "Checkout Visit",
-  checkout_clicked: "Checkout Click",
   intake_started: "Intake Start",
-  intake_submitted: "Intake Submit",
 };
 
-const BAR_COLORS = [
-  "hsl(var(--primary))",
-  "hsl(var(--primary))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-  "hsl(var(--chart-5))",
-];
+// Bars fade from muted upstream stages into a bold Sales accent at the end.
+const FUNNEL_STAGE_COLORS: Record<string, string> = {
+  site_visit: "hsl(var(--chart-2))",
+  guide_view: "hsl(var(--chart-2))",
+  guide_read_50: "hsl(var(--chart-3))",
+  guide_read_100: "hsl(var(--chart-3))",
+  one_on_one_visited: "hsl(var(--chart-4))",
+  booking_confirmed: "hsl(var(--chart-4))",
+  intake_submitted: "hsl(var(--chart-5))",
+  checkout_visited: "hsl(var(--chart-5))",
+  checkout_clicked: "hsl(var(--primary))",
+};
+const SALES_EVENT_TYPE = "checkout_clicked";
 
 const AUTO_REFRESH_MS = 15000;
 
