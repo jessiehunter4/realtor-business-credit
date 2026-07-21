@@ -231,7 +231,7 @@ const GuidePage = () => {
       />
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
-        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex md:grid md:grid-cols-3 items-center gap-2">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-3.5 flex md:grid md:grid-cols-3 items-center gap-2">
           <div className="flex items-center justify-start min-w-0 flex-shrink">
             <Link
               to="/"
