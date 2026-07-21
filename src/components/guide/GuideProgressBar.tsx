@@ -15,7 +15,7 @@ const GuideProgressBar = () => {
   }, []);
 
   return (
-    <div className="fixed top-[52px] left-0 right-0 z-50 h-1 bg-muted/30">
+    <div className="fixed top-[60px] sm:top-[64px] left-0 right-0 z-50 h-1 bg-muted/30">
       <div
         className="h-full bg-primary transition-[width] duration-150 ease-out"
         style={{ width: `${progress}%` }}
