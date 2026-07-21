@@ -241,14 +241,14 @@ const GuidePage = () => {
               <span className="sm:hidden">RBC Guide</span>
             </Link>
           </div>
-          <nav className="hidden md:flex items-center justify-center gap-1">
+          <nav className="hidden md:flex items-center justify-center gap-0.5 lg:gap-1 flex-nowrap whitespace-nowrap">
             {guideNavLinks.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 className={({ isActive }) =>
                   cn(
-                    "px-2 lg:px-3 py-1.5 rounded-full text-xs lg:text-sm font-medium text-secondary-foreground/80 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    "px-1.5 lg:px-2.5 py-1.5 rounded-full text-xs lg:text-sm font-medium whitespace-nowrap text-secondary-foreground/80 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
                     isActive && "text-secondary-foreground bg-white/10"
                   )
                 }
