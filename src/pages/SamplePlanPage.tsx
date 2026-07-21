@@ -10,7 +10,18 @@ import Seo from "@/components/shared/Seo";
 import { SAMPLE_PLAN } from "@/data/samplePlan";
 
 const SamplePlanPage = () => {
-  const pdfDoc = useMemo(() => <PlanPDF planData={SAMPLE_PLAN} />, []);
+  const sampleCreatedAt = useMemo(
+    () => new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    []
+  );
+  const sampleUpdatedAt = useMemo(
+    () => new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    []
+  );
+  const pdfDoc = useMemo(
+    () => <PlanPDF planData={SAMPLE_PLAN} createdAt={sampleCreatedAt} updatedAt={sampleUpdatedAt} />,
+    [sampleCreatedAt, sampleUpdatedAt]
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,7 +78,11 @@ const SamplePlanPage = () => {
             </PDFDownloadLink>
           </div>
 
-          <PlanDocument planData={SAMPLE_PLAN} />
+          <PlanDocument
+            planData={SAMPLE_PLAN}
+            createdAt={sampleCreatedAt}
+            updatedAt={sampleUpdatedAt}
+          />
         </div>
       </section>
 

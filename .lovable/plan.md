@@ -1,57 +1,46 @@
-# Pricing Page Redesign
+## Add Original Draft Date & Last Modified Date to the Customized Plan
 
-Refactor `src/pages/PricingPage.tsx` in place — same route, same three tiers, upgraded UX and conversion elements. Reuse the existing bright design system (SiteHeader/Footer, shadcn Accordion/Badge, `bg-hero-grad`, `shadow-card`, primary/secondary tokens) so it feels native to the site.
+### Data source
+Use existing `custom_plans` columns — no schema changes needed:
+- **Original Draft Date** → `created_at` (set once at row creation, never changes)
+- **Last Modified Date** → `updated_at` (already auto-bumped on every save/publish via existing triggers/update calls)
 
-## Sections (top → bottom)
+Both fields are already returned by the current `select("*")` in `AdminPlanView` and will be added to the `select` in `PortalPlanView`.
 
-1. **Hero** — Badge "Pricing", H1 "Choose your path to money when you need it", supporting line, two secondary links (Read the Guide, See a Sample Plan).
-2. **Pricing cards (3-up)** — redesigned card:
-   - Plan name + one-line value prop
-   - Price + cadence (with small "billed once" / "over 90 days" / "per quarter" clarifier)
-   - "Best for…" line
-   - **Includes** feature list (Check icons)
-   - **Not included** line for the two lower tiers (Minus icon, muted) — makes limitations explicit
-   - Primary CTA button → tier-specific Stripe Payment Link (new tab, `rel="noopener"`)
-   - Secondary text link "Prefer to talk first? Book a free 1:1" → `/one-on-one`
-   - Highlighted middle tier (Cohort) with "Most Popular" ribbon and subtle ring — already the pattern, kept
-3. **Reassurance strip** — 4 icon items: Secure Stripe checkout · 30-day satisfaction guarantee · Free 1:1 first · Cancel anytime (where applicable)
-4. **Comparison table** — keep existing rows, tighten styling; sticky header on scroll for mobile-friendly horizontal scroll; each column header links to its tier's Stripe link.
-5. **Testimonials** — new 3-card grid with placeholder quotes clearly marked `[Sample testimonial — replace with real client quote]`. Avatar initials, name/role, star row. Uses `shadow-card` cards.
-6. **Guarantee callout** — full-width panel: "30-Day Satisfaction Guarantee. If within 30 days of enrolling you feel this isn't the right fit, email us and we'll refund your enrollment — no hard feelings." (Exact wording confirmed with user before ship; placeholder for now.)
-7. **FAQ** — keep existing 7 items, add two: "Is my payment secure?" and "What does the 30-day guarantee cover?"
-8. **Final CTA** — keep existing gradient panel; add small "Questions before you buy? Book a free 1:1" secondary link.
+### UI changes
 
-## Stripe integration
+**1. `src/components/plan/PlanDocument.tsx`**
+- Extend props to accept optional `createdAt?: string` and `updatedAt?: string`.
+- In the header's right-side "Prepared for" block, add two small metadata lines under the location/license line:
+  - `Drafted: Mon DD, YYYY`
+  - `Last updated: Mon DD, YYYY` (only rendered when it differs from the draft date by more than a minute, to avoid redundant "same day" noise on brand-new plans)
+- Use existing header typography (`text-white/50 text-[10px] font-sans`) so it blends with the current design.
+- Guard against missing values — render nothing if a date is absent or invalid.
 
-User will provide three Stripe Payment Link URLs. Until provided, use placeholder constants at the top of the file:
+**2. `src/components/plan/PlanPDF.tsx`**
+- Mirror the same two lines in the PDF cover header block using the existing small-caption style so the printed/downloaded PDF stays in parity with the web view.
 
-```
-const STRIPE_LINKS = {
-  selfPaced: "https://buy.stripe.com/REPLACE_SELF_PACED",
-  cohort:    "https://buy.stripe.com/REPLACE_COHORT",
-  oneOnOne:  "https://buy.stripe.com/REPLACE_ONE_ON_ONE",
-};
-```
+**3. `src/pages/AdminPlanView.tsx`**
+- Pass `plan.created_at` and `plan.updated_at` into `<PlanDocument />`.
+- No other changes — the existing `.update({ plan_data })` call already bumps `updated_at`.
 
-Each tier CTA:
-- `<a href={STRIPE_LINKS.x} target="_blank" rel="noopener noreferrer">`
-- Label: "Get Started" (self-paced), "Enroll in Cohort" (cohort, primary style), "Start 1:1 Coaching" (1:1)
-- Secondary "Book Free 1:1" link stays under every card for hesitant buyers
+**4. `src/pages/PortalPlanView.tsx`**
+- Expand the select to `select("plan_data, status, created_at, updated_at")`.
+- Store the two timestamps in state and pass them into both `<PlanDocument />` and `<PlanPDF />` (so the client's downloaded PDF also shows them).
 
-Existing `/checkout` page and its Stripe link stay untouched (used from Portal/other flows).
+**5. `src/pages/SamplePlanPage.tsx`** (small consistency touch)
+- Pass hardcoded illustrative dates (e.g. drafted a week ago, updated yesterday) so the sample preview visually matches the real plan layout.
 
-## SEO / accessibility
+### Formatting
+Single shared helper (inline or in `src/lib/utils.ts`) that returns `"Mon DD, YYYY"` via `Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" })`. Used by both the web component and the PDF for consistency.
 
-- Keep `<Seo>` with title/description; extend JSON-LD `Product`/`Offer` `url` to point at each Stripe Payment Link once provided
-- Proper `<section aria-labelledby>` on every block, single H1, `<th scope>` on comparison, `alt`/`aria-label` on decorative icons
-- Focus rings preserved via existing button styles
+### Out of scope
+- No migration, no new columns, no trigger changes — `updated_at` bumping already works via existing update paths.
+- No changes to intake, generation edge function, or checklist.
 
-## Files touched
-
-- `src/pages/PricingPage.tsx` — full refactor in place
-- No new routes, no header/footer/nav changes, no backend changes
-
-## Follow-up needed from you
-
-- Three Stripe Payment Link URLs (one per tier) to replace placeholders
-- Final wording for the 30-day guarantee (I'll ship a reasonable default; you can tweak)
+### QA checklist
+- Draft a new plan → header shows "Drafted: <today>", no "Last updated" line (same-day new draft).
+- Edit + save in `AdminPlanView` → "Last updated" appears with new timestamp; "Drafted" unchanged.
+- Publish → dates carry into the portal view and the downloaded PDF.
+- Sample plan page renders the two lines with illustrative dates.
+- Mobile: header remains readable; long dates don't wrap awkwardly.
