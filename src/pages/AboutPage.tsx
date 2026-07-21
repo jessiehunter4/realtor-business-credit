@@ -6,7 +6,6 @@ import {
   Calendar,
   Compass,
   GraduationCap,
-  HandshakeIcon,
   Handshake,
   HeartHandshake,
   MapPin,
