@@ -1,4 +1,5 @@
 import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { formatPlanDate, isMeaningfullyUpdated } from "@/lib/utils";
 
 interface FundabilityItem {
   label: string;
@@ -47,10 +48,14 @@ interface PlanDocumentProps {
   planData: PlanData;
   editMode?: boolean;
   onEditSection?: (section: string, value: string) => void;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
-export default function PlanDocument({ planData, editMode, onEditSection }: PlanDocumentProps) {
+export default function PlanDocument({ planData, editMode, onEditSection, createdAt, updatedAt }: PlanDocumentProps) {
   const { sections } = planData;
+  const draftedLabel = formatPlanDate(createdAt);
+  const updatedLabel = isMeaningfullyUpdated(createdAt, updatedAt) ? formatPlanDate(updatedAt) : null;
 
   const EditableText = ({ section, value, rows = 4 }: { section: string; value: string; rows?: number }) => {
     if (!editMode) return <p className="leading-relaxed text-gray-600 whitespace-pre-wrap">{value}</p>;
@@ -83,6 +88,12 @@ export default function PlanDocument({ planData, editMode, onEditSection }: Plan
             {[planData.city, planData.state].filter(Boolean).join(", ")}
             {planData.license_type ? ` · ${planData.license_type}` : ""}
           </p>
+          {draftedLabel && (
+            <p className="text-white/50 text-[10px] font-sans mt-1">Drafted: {draftedLabel}</p>
+          )}
+          {updatedLabel && (
+            <p className="text-white/50 text-[10px] font-sans">Last updated: {updatedLabel}</p>
+          )}
         </div>
       </div>
 
