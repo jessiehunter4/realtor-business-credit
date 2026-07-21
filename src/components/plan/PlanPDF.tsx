@@ -6,6 +6,7 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 import type { PlanData } from "./PlanDocument";
+import { formatPlanDate, isMeaningfullyUpdated } from "@/lib/utils";
 
 const s = StyleSheet.create({
   page: {
@@ -134,9 +135,19 @@ const statusLabel = (status: string) =>
 const statusSymbol = (status: string) =>
   status === "strong" ? "✓" : status === "warning" ? "⚠" : "✕";
 
-export default function PlanPDF({ planData }: { planData: PlanData }) {
+export default function PlanPDF({
+  planData,
+  createdAt,
+  updatedAt,
+}: {
+  planData: PlanData;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}) {
   const { sections } = planData;
-  const preparedDate = new Date().toLocaleDateString("en-US", {
+  const draftedLabel = formatPlanDate(createdAt);
+  const updatedLabel = isMeaningfullyUpdated(createdAt, updatedAt) ? formatPlanDate(updatedAt) : null;
+  const preparedFallback = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -162,7 +173,16 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
             {locationLine}
             {planData.license_type ? ` · ${planData.license_type}` : ""}
           </Text>
-          <Text style={[s.coverPreparedMeta, { marginTop: 2 }]}>Prepared {preparedDate}</Text>
+          {draftedLabel ? (
+            <>
+              <Text style={[s.coverPreparedMeta, { marginTop: 2 }]}>Drafted: {draftedLabel}</Text>
+              {updatedLabel && (
+                <Text style={s.coverPreparedMeta}>Last updated: {updatedLabel}</Text>
+              )}
+            </>
+          ) : (
+            <Text style={[s.coverPreparedMeta, { marginTop: 2 }]}>Prepared {preparedFallback}</Text>
+          )}
         </View>
         <Text style={s.coverFooter}>
           My Better Business Credit · RealtorBusinessCredit.com{"\n"}
@@ -199,6 +219,12 @@ export default function PlanPDF({ planData }: { planData: PlanData }) {
               {locationLine}
               {planData.license_type ? ` · ${planData.license_type}` : ""}
             </Text>
+            {draftedLabel && (
+              <Text style={s.headerMeta}>Drafted: {draftedLabel}</Text>
+            )}
+            {updatedLabel && (
+              <Text style={s.headerMeta}>Last updated: {updatedLabel}</Text>
+            )}
           </View>
         </View>
 
