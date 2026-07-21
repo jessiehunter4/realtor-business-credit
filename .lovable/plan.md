@@ -1,60 +1,43 @@
-# Visitor Flow Prototype (UI-only)
+# About Us Page
 
-Goal: after the Guide opt-in form is submitted, send the visitor through a mock login screen and into a mock visitor dashboard. No auth, no backend, no DB changes.
+## New route
+- Add `/about` route in `src/App.tsx` → `src/pages/AboutPage.tsx`.
+- Add "About" link to `SiteHeader` (desktop nav array + mobile Sheet) between "Sample Plan" and "1:1 Session".
+- Add "About" link to `SiteFooter` link row.
 
-## Flow
+## Page structure (`src/pages/AboutPage.tsx`)
+Reuses `SiteHeader`, `SiteFooter`, `StickyMobileCTABar`, `Seo`, and existing tokens (`bg-hero-grad`, `shadow-card`, `rounded-3xl`, pill buttons, fluid `clamp()` type). Sections built as small components under `src/components/about/`:
 
-```text
-/guide (opt-in form)
-   └─ submit ──▶ /mock-login (email + password UI)
-                    └─ "Log in" ──▶ /mock-dashboard (placeholder data)
-```
+1. **AboutHero** — eyebrow "About Realtor Business Credit", H1 "Built by a Realtor, for Realtors", subhead tying to "Money when you need it", primary CTA "Book a 1:1 Session", secondary "Read the Free Guide". `bg-hero-grad`.
+2. **OurStory** — Jessie's 14+ years / hundreds of transactions / no one taught business credit story from the knowledge file. Two-column on desktop with a supporting image/quote card.
+3. **MissionVision** — two cards side-by-side: Mission (help Realtors build separate business credit + funding capacity) and Vision (a real estate business with its own financial footprint).
+4. **CoreValues** — 4–6 icon cards (Education over hype, Realtor-specific, Protection first, Transparent guidance, Long-term partnership, Compliance-aware). Lucide icons in tinted chips matching landing style.
+5. **WhatMakesUsDifferent** — comparison-style bullets: Realtor-specific vs generic credit programs, dual-coach model (RBC coach + Credit Suite), custom 90-day plan, cohort option.
+6. **HowWeHelp** — 4-step process: Free guide → 1:1 session → Fundability Scan + Intake → Custom plan & program. Uses card grid consistent with `ProgramCurriculum`.
+7. **TrustCredibility** — stat tiles ("14+ years", "Hundreds of transactions", "Licensed CA & GA", "Certified Credit Suite Partner") + existing `TestimonialsBright` reused (or inline variant) for social proof.
+8. **MeetTheTeam** — Jessie Hunter card (Founder & Broker) with placeholder cards for "Realtor Business Credit Coach" and "Credit Suite Coach" (per dual-coach model). Uses initials avatars where no photo exists.
+9. **FinalCTA** — reuse pattern from `FinalCTABright`: "Ready to turn your closings into capacity?" with "Book a 1:1 Session" primary + "Read the Free Guide" secondary.
 
-## Changes
+## Copy guardrails (from project knowledge)
+- Educational only; no legal/tax/investment advice.
+- No guaranteed approvals/limits/timeframes.
+- Credit Suite referenced generically as "certified partner", no proprietary language.
+- Use approved phrasing: "You don't have to do this alone", "My Plan. My Progress. My Better Business Credit."
 
-### 1. `GuideOptInGate` submission handoff
-- Keep existing form + validation as-is.
-- On successful submit, instead of unlocking the guide inline, navigate to `/mock-login` and pass the entered `firstName` + `email` via `navigate(..., { state })` so the mock pages can personalize.
-- Keep the existing `localStorage` completion flag so returning users still bypass the gate on `/guide`.
+## SEO
+- `Seo` component: title "About Realtor Business Credit — Our Story & Mission", meta description, canonical `/about`.
+- JSON-LD `AboutPage` + `Person` (Jessie Hunter, founder) + link to parent Organization.
+- Semantic `<main>`, single `<h1>`, `<section>` per block, alt text on all imagery.
 
-### 2. New page: `src/pages/MockLoginPage.tsx` (route `/mock-login`)
-- `SiteHeader` + bright brand shell (bg-hero-grad, shadow-card, rounded-3xl card, pill buttons — matches homepage).
-- Centered auth card:
-  - Eyebrow: "Welcome back"
-  - H1: "Log in to your Realtor Business Credit portal"
-  - Email input (prefilled from nav state if present)
-  - Password input with show/hide toggle
-  - "Remember me" checkbox + "Forgot password?" link (visual only, `#`)
-  - Primary pill button: "Log in" → `navigate('/mock-dashboard', { state })`
-  - Divider + secondary "Create an account" link (visual only)
-- Trust strip below card: "Secure · Private · Realtor-only"
-- No validation beyond `required`; no API calls. Comment block at top marks it as UI mock and lists the integration points for later (Supabase auth swap-in).
+## Responsive & a11y
+- Fluid type via `clamp()`; grids collapse to single column < md.
+- Subtle `animate-in fade-in / slide-in-from-bottom` on section reveal (Tailwind utilities already in use).
+- Focus-visible rings on all CTAs; sufficient contrast against `bg-hero-grad`; icons `aria-hidden`.
 
-### 3. New page: `src/pages/MockDashboardPage.tsx` (route `/mock-dashboard`)
-- `SiteHeader` + bright shell, matching homepage tokens.
-- Greeting: "Welcome back, {firstName || 'Realtor'}"
-- Top row of 3 stat cards (mock numbers):
-  - Fundability Score — 62 / 100 (progress ring)
-  - 90-Day Plan Progress — 4 of 12 steps
-  - Next Session — "Thu 2:00 PM PT"
-- Main grid:
-  - Left (2/3): "Your Custom Plan" preview card (reuse look of `CustomPlanPreview` at smaller scale) with a mock 5-item task checklist (checkboxes, non-persistent local state).
-  - Right (1/3): Stack of small cards — "Book a 1:1", "Continue the Guide", "Sample Plan", each a pill CTA to existing routes.
-- Bottom row: "Recent Activity" list (3 static rows) and "Resources" links.
-- Log-out button in top right → `navigate('/')` and clears any local state used by this mock.
+## Files touched
+- Add: `src/pages/AboutPage.tsx`, `src/components/about/{AboutHero,OurStory,MissionVision,CoreValues,WhatMakesUsDifferent,HowWeHelp,TrustCredibility,MeetTheTeam,AboutFinalCTA}.tsx`.
+- Edit: `src/App.tsx` (route), `src/components/shared/SiteHeader.tsx` (nav arrays), `src/components/shared/SiteFooter.tsx` (link row).
 
-### 4. Router
-- Register `/mock-login` and `/mock-dashboard` in `src/App.tsx` alongside existing routes. Public routes, no guards.
-- Add `ScrollMemory` behavior automatically via existing global component (no change).
-
-## Non-goals / explicitly out of scope
-- No Supabase auth wiring, no profiles table, no RLS.
-- No changes to `AuthPage`, admin routes, or MLS/GHL logic.
-- No changes to lead submission POST or CRM sync — the opt-in still records the lead exactly as today; only the post-submit UI destination changes.
-
-## Design tokens
-Bright shell (`bg-hero-grad`), `shadow-card`, `rounded-3xl` cards, pill buttons (Teal primary / Sky secondary), fluid `clamp()` type sizes — consistent with homepage and modernized interior pages.
-
-## Extensibility hooks (comments only, no code yet)
-- `MockLoginPage`: TODO markers for `supabase.auth.signInWithPassword` and redirect target.
-- `MockDashboardPage`: TODO markers for fetching profile, plan, tasks, and next appointment.
+## Out of scope
+- No new imagery generation unless needed; will use existing brand assets + Lucide icons. Can add AI-generated portrait placeholders in a follow-up if desired.
+- No backend/DB changes.
