@@ -109,7 +109,16 @@ export default function AdminPlanView() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold">Plan: {planData.contact_name || "Agent"}</h1>
-                <Badge variant="outline" className={plan.status === "published" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
+                <Badge
+                  variant="outline"
+                  className={
+                    plan.status === "published"
+                      ? "bg-primary/10 text-primary"
+                      : plan.status === "archived"
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-muted text-muted-foreground"
+                  }
+                >
                   {plan.status}
                 </Badge>
               </div>
