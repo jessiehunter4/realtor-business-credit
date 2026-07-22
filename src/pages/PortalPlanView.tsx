@@ -25,16 +25,30 @@ export default function PortalPlanView() {
         .from("custom_plans")
         .select("plan_data, status, created_at, updated_at")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
-      if (fetchError || !data) {
-        setError("Plan not found.");
+      if (fetchError) {
+        setError("We couldn't load this plan. Please try again in a moment.");
         setLoading(false);
         return;
       }
-
+      if (!data) {
+        setError("This plan link isn't valid. Please contact your coach for an updated link.");
+        setLoading(false);
+        return;
+      }
+      if (data.status === "draft") {
+        setError("Your plan is still being finalized by your coach. You'll be notified as soon as it's ready to view.");
+        setLoading(false);
+        return;
+      }
+      if (data.status === "archived") {
+        setError("This version of your plan has been replaced by a newer one. Please contact your coach for the current plan link.");
+        setLoading(false);
+        return;
+      }
       if (data.status !== "published") {
-        setError("This plan is not yet available. Please check back later.");
+        setError("This plan is not currently available. Please contact your coach.");
         setLoading(false);
         return;
       }

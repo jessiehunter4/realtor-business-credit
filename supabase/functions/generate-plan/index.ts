@@ -295,21 +295,31 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       const errText = await aiResponse.text();
       console.error("AI gateway error:", aiResponse.status, errText);
       if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "AI rate limit reached. Wait a moment and try again." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "AI credits exhausted. Add credits to your Lovable workspace to continue." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      throw new Error(`AI gateway error: ${aiResponse.status}`);
+      if (aiResponse.status === 403) {
+        return new Response(JSON.stringify({ error: "AI credit limit reached for this workspace. Ask the workspace owner to raise the limit." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      return new Response(JSON.stringify({ error: `AI gateway error (${aiResponse.status}). Please retry.` }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const aiData = await aiResponse.json();
     const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) {
-      throw new Error("AI did not return a tool call");
+      console.error("AI response missing tool_call:", JSON.stringify(aiData).slice(0, 500));
+      return new Response(JSON.stringify({ error: "AI returned no plan structure. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const aiPlan = JSON.parse(toolCall.function.arguments);
+    let aiPlan: any;
+    try {
+      aiPlan = JSON.parse(toolCall.function.arguments);
+    } catch (parseErr) {
+      console.error("Failed to parse AI arguments:", parseErr, toolCall.function.arguments?.slice(0, 500));
+      return new Response(JSON.stringify({ error: "AI returned malformed plan data. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // Build plan_data
     const planData = {
@@ -328,28 +338,77 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       },
     };
 
-    // Save to custom_plans
-    const { data: plan, error: insertError } = await adminClient
+    // Supersede logic: if an existing draft exists for this intake, update it in place.
+    // Otherwise, archive any prior published/draft rows and insert a fresh draft.
+    const { data: existingDraft, error: draftLookupErr } = await adminClient
       .from("custom_plans")
-      .insert({
-        intake_survey_id,
-        agent_id: survey.agent_id,
-        lead_id: survey.lead_id,
-        contact_name: survey.contact_name,
-        contact_email: survey.contact_email,
-        plan_data: planData,
-        status: "draft",
-        created_by: userId,
-      })
       .select("id")
-      .single();
+      .eq("intake_survey_id", intake_survey_id)
+      .eq("status", "draft")
+      .maybeSingle();
 
-    if (insertError) {
-      console.error("Insert error:", insertError);
-      throw new Error("Failed to save plan");
+    if (draftLookupErr) {
+      console.error("Draft lookup error:", draftLookupErr);
+      return new Response(JSON.stringify({ error: "Failed to look up existing plan." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    return new Response(JSON.stringify({ plan_id: plan.id }), {
+    let planId: string;
+
+    if (existingDraft) {
+      const { data: updated, error: updateErr } = await adminClient
+        .from("custom_plans")
+        .update({
+          plan_data: planData,
+          contact_name: survey.contact_name,
+          contact_email: survey.contact_email,
+          agent_id: survey.agent_id,
+          lead_id: survey.lead_id,
+          created_by: userId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingDraft.id)
+        .select("id")
+        .single();
+      if (updateErr || !updated) {
+        console.error("Update draft error:", updateErr);
+        return new Response(JSON.stringify({ error: "Failed to update existing draft plan." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      planId = updated.id;
+    } else {
+      // Archive any prior published rows so there is a single source of truth.
+      const { error: archiveErr } = await adminClient
+        .from("custom_plans")
+        .update({ status: "archived" })
+        .eq("intake_survey_id", intake_survey_id)
+        .eq("status", "published");
+      if (archiveErr) {
+        console.error("Archive prior plans error:", archiveErr);
+        return new Response(JSON.stringify({ error: "Failed to archive prior plans." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const { data: inserted, error: insertError } = await adminClient
+        .from("custom_plans")
+        .insert({
+          intake_survey_id,
+          agent_id: survey.agent_id,
+          lead_id: survey.lead_id,
+          contact_name: survey.contact_name,
+          contact_email: survey.contact_email,
+          plan_data: planData,
+          status: "draft",
+          created_by: userId,
+        })
+        .select("id")
+        .single();
+
+      if (insertError || !inserted) {
+        console.error("Insert error:", insertError);
+        return new Response(JSON.stringify({ error: "Failed to save plan." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      planId = inserted.id;
+    }
+
+    return new Response(JSON.stringify({ plan_id: planId, superseded: !!existingDraft }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
