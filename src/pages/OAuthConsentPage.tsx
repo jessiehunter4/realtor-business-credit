@@ -118,7 +118,7 @@ export default function OAuthConsentPage() {
               <div>
                 <p className="text-sm">
                   <span className="font-semibold">{details.client?.name ?? "An external app"}</span>{" "}
-                  is requesting access to Realtor Business Credit on your behalf.
+                  is requesting access to RE Pro Business Credit on your behalf.
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   This lets it call this app's enabled tools while you are signed in. It does not

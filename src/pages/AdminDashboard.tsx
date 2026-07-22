@@ -591,7 +591,7 @@ export default function AdminDashboard() {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold">Realtor Business Credit Admin</h1>
+            <h1 className="text-2xl font-bold">RE Pro Business Credit Admin</h1>
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
               View Site
             </Button>

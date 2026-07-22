@@ -10,10 +10,10 @@ const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unse
 
 export default defineMcp({
   name: "realtor-business-credit-mcp",
-  title: "Realtor Business Credit",
+  title: "RE Pro Business Credit",
   version: "0.1.0",
   instructions:
-    "Tools for the Realtor Business Credit coaching app. `whoami` reports the signed-in user. `list_agents` reads agents from the app database, respecting the caller's row-level security.",
+    "Tools for the RE Pro Business Credit coaching app. `whoami` reports the signed-in user. `list_agents` reads agents from the app database, respecting the caller's row-level security.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",

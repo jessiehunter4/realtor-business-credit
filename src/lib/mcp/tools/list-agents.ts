@@ -22,7 +22,7 @@ export default defineTool({
   name: "list_agents",
   title: "List agents",
   description:
-    "List real estate agents in the Realtor Business Credit database. Respects the caller's row-level security permissions.",
+    "List real estate agents in the RE Pro Business Credit database. Respects the caller's row-level security permissions.",
   inputSchema: {
     limit: z.number().int().min(1).max(100).optional().describe("Max rows to return (default 25)."),
     search: z

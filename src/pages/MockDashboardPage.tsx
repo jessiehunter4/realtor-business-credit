@@ -96,8 +96,8 @@ const MockDashboardPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-hero-grad">
       <Seo
-        title="Your Portal — Realtor Business Credit"
-        description="Your custom Realtor Business Credit plan, progress, and next steps."
+        title="Your Portal — RE Pro Business Credit"
+        description="Your custom RE Pro Business Credit plan, progress, and next steps."
         noindex
       />
       <SiteHeader />
@@ -253,7 +253,7 @@ const MockDashboardPage = () => {
           <TabsContent value="guides" className="mt-0">
             <SectionCard
               title="Guides library"
-              subtitle="Everything you need to build your Realtor business credit foundation"
+              subtitle="Everything you need to build your RE Pro Business Credit foundation"
             >
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {DASHBOARD_GUIDES.map((g) => <GuideCard key={g.id} guide={g} />)}

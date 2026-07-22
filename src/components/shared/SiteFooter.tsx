@@ -18,10 +18,14 @@ const SiteFooter = () => {
       <div className="container mx-auto px-4 max-w-5xl space-y-3 text-center md:text-left">
         <p className="text-xs md:text-sm leading-relaxed">
           <strong className="text-secondary-foreground">Educational content only.</strong>{" "}
-          Realtor Business Credit and My Better Business Credit do not provide legal,
+          RE Pro Business Credit and My Better Business Credit do not provide legal,
           tax, or investment advice. Always consult your broker, attorney, and tax
           professional about your specific situation. Outcomes vary and depend on
           each Realtor&apos;s actions and circumstances.
+        </p>
+        <p className="text-xs text-secondary-foreground/70 italic">
+          RE Pro Business Credit — Business Credit &amp; Finance for Real Estate
+          Professionals. A specialized program of My Better Business Credit.
         </p>
         <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 text-xs text-secondary-foreground/60">
           <span>© {new Date().getFullYear()} RealtorBusinessCredit.com</span>

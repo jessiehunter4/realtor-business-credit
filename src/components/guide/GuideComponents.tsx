@@ -67,7 +67,7 @@ export const QuoteBlock = ({ attribution, children }: QuoteBlockProps) => (
 export const BookSessionCTA = () => (
   <div className="mt-8 p-5 md:p-6 bg-primary/8 border-l-4 border-primary rounded-r-2xl">
     <p className="m-0 italic text-foreground">
-      Ready to put this into action? Book a free one-on-one. We'll walk through your Realtor Business Financial Needs Analysis together and you'll leave with a custom plan.
+      Ready to put this into action? Book a free one-on-one. We'll walk through your RE Pro Business Financial Needs Analysis together and you'll leave with a custom plan.
     </p>
     <p className="mt-3 mb-0">
       <Link to="/one-on-one" data-analytics-id="cta-book-guide-inline" className="font-bold text-primary hover:underline">

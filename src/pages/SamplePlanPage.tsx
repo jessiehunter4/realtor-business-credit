@@ -27,8 +27,8 @@ const SamplePlanPage = () => {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <Seo
-        title="Sample Realtor Business Credit Plan — See What You'll Receive"
-        description="A full sample of the personalized Realtor Business Structure, Finance & Credit Plan you receive after your free 1:1 session. Built for a fictional Sacramento broker so you know exactly what to expect."
+        title="Sample RE Pro Business Credit Plan — See What You'll Receive"
+        description="A full sample of the personalized RE Pro Business Structure, Finance & Credit Plan you receive after your free 1:1 session. Built for a fictional Sacramento broker so you know exactly what to expect."
         path="/sample-plan"
       />
 
@@ -93,7 +93,7 @@ const SamplePlanPage = () => {
           </h2>
           <p className="mt-3 text-muted-foreground text-lg">
             Book your free 1:1 and walk away with one just like this — built from your
-            Realtor Business Financial Needs Analysis.
+            RE Pro Business Financial Needs Analysis.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link

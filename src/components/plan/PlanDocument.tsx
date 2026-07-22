@@ -75,7 +75,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
       <div className="bg-[#0d1b2a] px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">
         <div>
           <p className="text-[#3eaf7c] text-[10px] sm:text-xs tracking-[0.2em] uppercase font-sans font-semibold mb-1">
-            Realtor Business Credit
+            RE Pro Business Credit
           </p>
           <p className="text-white text-lg sm:text-xl font-bold leading-snug font-serif">
             Your Custom Business Credit Plan
