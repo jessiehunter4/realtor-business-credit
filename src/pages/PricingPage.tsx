@@ -234,7 +234,7 @@ const PricingPage = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
         title="Pricing — RE Pro Business Credit Coaching"
-        description="Transparent pricing for Realtor business credit coaching. Self-paced blueprint, 90-day cohort, and 1:1 private coaching — enroll directly or book a free 1:1 first."
+        description="Transparent pricing for RE Pro Business Credit coaching. Self-paced blueprint, 90-day cohort, and 1:1 private coaching — enroll directly or book a free 1:1 first."
         path="/pricing"
         jsonLd={jsonLd}
       />

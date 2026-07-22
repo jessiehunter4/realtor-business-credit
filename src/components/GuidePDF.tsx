@@ -173,7 +173,7 @@ export const GuidePDF = () => (
     {/* COVER */}
     <Page size="LETTER" style={s.coverPage}>
       <View style={{ alignItems: 'center' }}>
-        <Text style={s.coverEyebrow}>REALTOR BUSINESS CREDIT</Text>
+        <Text style={s.coverEyebrow}>RE PRO BUSINESS CREDIT</Text>
         <Text style={s.coverTitle}>
           The Realtor Business{'\n'}
           <Text style={s.coverHighlight}>Structure, Finance &amp; Credit</Text>{'\n'}Guide

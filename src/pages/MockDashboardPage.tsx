@@ -253,7 +253,7 @@ const MockDashboardPage = () => {
           <TabsContent value="guides" className="mt-0">
             <SectionCard
               title="Guides library"
-              subtitle="Everything you need to build your Realtor business credit foundation"
+              subtitle="Everything you need to build your RE Pro Business Credit foundation"
             >
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {DASHBOARD_GUIDES.map((g) => <GuideCard key={g.id} guide={g} />)}
