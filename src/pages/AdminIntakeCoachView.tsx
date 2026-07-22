@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
   ArrowLeft, Loader2, Save, StickyNote, CheckCircle, AlertCircle,
-  User, Target, Building, CreditCard, Handshake, Sparkles, FileText,
+  User, Target, Building, CreditCard, Handshake, Sparkles, FileText, Send,
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -58,13 +58,21 @@ export default function AdminIntakeCoachView() {
   const [savingNote, setSavingNote] = useState<string | null>(null);
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [existingPlanId, setExistingPlanId] = useState<string | null>(null);
+  const [existingPlanStatus, setExistingPlanStatus] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
     const [surveyRes, notesRes, planRes] = await Promise.all([
       supabase.from("intake_surveys").select("*").eq("id", id).single(),
       supabase.from("intake_coach_notes").select("*").eq("intake_survey_id", id).order("created_at", { ascending: false }),
-      supabase.from("custom_plans").select("id").eq("intake_survey_id", id).order("created_at", { ascending: false }).limit(1),
+      supabase
+        .from("custom_plans")
+        .select("id, status")
+        .eq("intake_survey_id", id)
+        .in("status", ["draft", "published"])
+        .order("created_at", { ascending: false })
+        .limit(1),
     ]);
 
     if (surveyRes.error) {
@@ -77,6 +85,7 @@ export default function AdminIntakeCoachView() {
     setForm(surveyRes.data);
     setNotes(notesRes.data || []);
     setExistingPlanId(planRes.data?.[0]?.id || null);
+    setExistingPlanStatus(planRes.data?.[0]?.status || null);
     setLoading(false);
   }, [id, navigate]);
 
@@ -176,12 +185,28 @@ export default function AdminIntakeCoachView() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      toast.success("Plan generated!");
+      toast.success(data?.superseded ? "Plan updated (existing draft refreshed)" : "Plan generated!");
       navigate(`/admin/plan/${data.plan_id}`);
     } catch (e: any) {
       toast.error(e.message || "Failed to generate plan");
     }
     setGeneratingPlan(false);
+  };
+
+  const handleQuickPublish = async () => {
+    if (!existingPlanId) return;
+    setPublishing(true);
+    const { error } = await supabase
+      .from("custom_plans")
+      .update({ status: "published", published_at: new Date().toISOString() })
+      .eq("id", existingPlanId);
+    if (error) {
+      toast.error(`Failed to publish: ${error.message}`);
+    } else {
+      toast.success("Plan published — the agent can now view it.");
+      fetchData();
+    }
+    setPublishing(false);
   };
 
   if (loading) {
