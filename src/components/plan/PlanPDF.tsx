@@ -144,7 +144,15 @@ export default function PlanPDF({
   createdAt?: string | null;
   updatedAt?: string | null;
 }) {
-  const { sections } = planData;
+  const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
+  const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
+  const fundabilityItems = sections.fundability?.items ?? [];
+  const fundabilityNarrative = sections.fundability?.narrative ?? "";
+  const actionItems = sections.action_plan_90day?.items ?? [];
+  const milestones = sections.roadmap?.milestones ?? [];
+  const fundingItems = sections.funding_opportunities?.items ?? [];
+  const nextStepsNarrative = sections.next_steps?.narrative ?? "";
+  const programOptions = sections.next_steps?.program_options ?? [];
   const draftedLabel = formatPlanDate(createdAt);
   const updatedLabel = isMeaningfullyUpdated(createdAt, updatedAt) ? formatPlanDate(updatedAt) : null;
   const preparedFallback = new Date().toLocaleDateString("en-US", {
@@ -231,12 +239,12 @@ export default function PlanPDF({
         {/* Section 1 */}
         <Text style={s.sectionEyebrow}>Section 01</Text>
         <Text style={s.sectionTitle}>Your Goals & Snapshot</Text>
-        <Text style={s.narrative}>{sections.goals_snapshot.narrative}</Text>
+        <Text style={s.narrative}>{goalsNarrative}</Text>
 
         {/* Section 2 */}
         <Text style={s.sectionEyebrow}>Section 02</Text>
         <Text style={s.sectionTitle}>Business Structure & Fundability</Text>
-        {sections.fundability.items.map((item, i) => (
+        {fundabilityItems.map((item, i) => (
           <View key={i} style={s.fundRow}>
             <View style={[s.fundIcon, { backgroundColor: statusColor(item.status) + "22" }]}>
               <Text style={{ fontSize: 8, color: statusColor(item.status) }}>{statusSymbol(item.status)}</Text>
@@ -245,7 +253,7 @@ export default function PlanPDF({
             <Text style={[s.fundStatus, { color: statusColor(item.status) }]}>{statusLabel(item.status)}</Text>
           </View>
         ))}
-        <Text style={[s.narrative, { marginTop: 8 }]}>{sections.fundability.narrative}</Text>
+        <Text style={[s.narrative, { marginTop: 8 }]}>{fundabilityNarrative}</Text>
 
         {/* Section 3 */}
         <Text style={s.sectionEyebrow}>Section 03</Text>
@@ -253,7 +261,7 @@ export default function PlanPDF({
         <Text style={[s.narrative, { fontSize: 9, color: "#666666", marginBottom: 10 }]}>
           Check each box as you complete it. Your portal also tracks progress automatically.
         </Text>
-        {sections.action_plan_90day.items.map((item, i) => (
+        {actionItems.map((item, i) => (
           <View key={i} style={s.actionRow} wrap={false}>
             <View style={s.actionCheckbox} />
             <View style={s.actionBadge}>
@@ -269,7 +277,7 @@ export default function PlanPDF({
         {/* Section 4 */}
         <Text style={s.sectionEyebrow}>Section 04</Text>
         <Text style={s.sectionTitle}>6–12 Month Roadmap</Text>
-        {sections.roadmap.milestones.map((m, i) => (
+        {milestones.map((m, i) => (
           <View key={i} style={s.milestoneRow} wrap={false}>
             <View style={s.milestoneBadge}>
               <Text style={s.milestoneMonth}>{m.month}</Text>
@@ -281,7 +289,7 @@ export default function PlanPDF({
         {/* Section 5 */}
         <Text style={s.sectionEyebrow}>Section 05</Text>
         <Text style={s.sectionTitle}>Credit & Funding Opportunities</Text>
-        {sections.funding_opportunities.items.map((f, i) => (
+        {fundingItems.map((f, i) => (
           <View key={i} style={s.fundingItem} wrap={false}>
             <Text style={s.fundingType}>{f.type}</Text>
             <Text style={s.fundingDesc}>{f.description}</Text>
@@ -294,9 +302,9 @@ export default function PlanPDF({
         {/* Section 6 */}
         <Text style={s.sectionEyebrow}>Section 06</Text>
         <Text style={s.sectionTitle}>Program Options & Next Steps</Text>
-        <Text style={s.narrative}>{sections.next_steps.narrative}</Text>
+        <Text style={s.narrative}>{nextStepsNarrative}</Text>
         <View style={s.programGrid}>
-          {sections.next_steps.program_options.map((opt, i) => (
+          {programOptions.map((opt, i) => (
             <View key={i} style={s.programCard} wrap={false}>
               <Text style={s.programName}>{opt.name}</Text>
               <Text style={s.programDesc}>{opt.description}</Text>
