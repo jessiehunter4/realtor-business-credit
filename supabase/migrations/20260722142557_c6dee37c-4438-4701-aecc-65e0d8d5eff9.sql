@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS custom_plans_one_draft_per_intake ON public.custom_plans (intake_survey_id) WHERE status = 'draft';
