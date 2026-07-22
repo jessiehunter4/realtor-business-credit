@@ -9,8 +9,8 @@ const TermsPage = () => (
   <div className="min-h-screen bg-background">
     <SiteHeader />
     <Seo
-      title="Terms of Service · Realtor Business Credit"
-      description="Terms of service for the Realtor Business Credit program by My Better Business Credit, including educational scope, payments, and limitations of liability."
+      title="Terms of Service · RE Pro Business Credit"
+      description="Terms of service for the RE Pro Business Credit program by My Better Business Credit, including educational scope, payments, and limitations of liability."
       path="/terms"
     />
     <main className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
@@ -21,7 +21,7 @@ const TermsPage = () => (
         <section>
           <p>
             These Terms of Service ("Terms") govern your access to and use of
-            realtorbusinesscredit.com, the Realtor Business Credit program, the free guide,
+            realtorbusinesscredit.com, the RE Pro Business Credit program, the free guide,
             one-on-one sessions, intake survey, custom plan, portal, cohort, and any related
             services (collectively, the "Services") provided by{" "}
             <strong>My Better Business Credit</strong> ("we," "us," "our").

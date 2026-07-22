@@ -25,7 +25,7 @@ const modules = [
   {
     n: "03",
     title: "Needs Analysis",
-    desc: "Complete the Realtor Business Financial Needs Analysis together.",
+    desc: "Complete the RE Pro Business Financial Needs Analysis together.",
     chip: "Assignment",
     icon: ClipboardList,
     accent: "accent" as const,

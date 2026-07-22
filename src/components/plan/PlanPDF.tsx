@@ -159,7 +159,7 @@ export default function PlanPDF({
       {/* Cover Page */}
       <Page size="LETTER" style={s.coverPage}>
         <View>
-          <Text style={s.coverBrand}>Realtor Business Credit</Text>
+          <Text style={s.coverBrand}>RE Pro Business Credit</Text>
           <View style={s.coverDivider} />
           <Text style={s.coverTitle}>Your Custom{"\n"}Business Credit Plan</Text>
           <Text style={s.coverSubtitle}>
@@ -193,7 +193,7 @@ export default function PlanPDF({
       <Page size="LETTER" style={s.page}>
         {/* Running header */}
         <View style={s.runningHeader} fixed>
-          <Text style={s.runningHeaderBrand}>Realtor Business Credit Plan</Text>
+          <Text style={s.runningHeaderBrand}>RE Pro Business Credit Plan</Text>
           <Text>{planData.contact_name || "Agent"}</Text>
         </View>
 
@@ -209,7 +209,7 @@ export default function PlanPDF({
         {/* Header band */}
         <View style={s.header}>
           <View>
-            <Text style={s.headerBrand}>Realtor Business Credit</Text>
+            <Text style={s.headerBrand}>RE Pro Business Credit</Text>
             <Text style={s.headerTitle}>Your Custom Business Credit Plan</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>

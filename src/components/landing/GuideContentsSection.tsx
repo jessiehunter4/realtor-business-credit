@@ -5,7 +5,7 @@ const guideItems = [
   { bold: "Timeline & Expectations", rest: " – realistic timeframes (you can go faster or slower)" },
   { bold: "Personal Founder Story", rest: " – from California/Georgia broker Jessie Hunter who wish someone had told him this 10+ years ago" },
   { bold: "Action Plan Worksheet", rest: " – step-by-step tasks you can complete this week" },
-  { bold: "Access to Dual Coaching", rest: " – Realtor Business Credit Coach + Credit Suite Coach" },
+  { bold: "Access to Dual Coaching", rest: " – RE Pro Business Credit Coach + Credit Suite Coach" },
   { bold: "Free Fundability Scan", rest: " – see exactly where your business stands right now" },
 ];
 

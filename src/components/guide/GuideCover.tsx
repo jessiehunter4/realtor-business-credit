@@ -6,7 +6,7 @@ const GuideCover = () => (
       <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center max-w-6xl mx-auto">
         <div className="order-2 md:order-1">
           <p className="text-xs md:text-sm uppercase tracking-widest text-primary font-bold mb-3">
-            Realtor Business Credit · Free Guide
+            RE Pro Business Credit · Free Guide
           </p>
           <h1 className="text-[clamp(1.75rem,6vw,3.5rem)] lg:text-6xl font-bold text-secondary leading-tight mb-4 md:mb-5">
             Realtor Business <span className="text-primary">Structure,</span> Finance &amp; Credit Guide

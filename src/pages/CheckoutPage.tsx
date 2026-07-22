@@ -55,8 +55,8 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <Seo
-        title="Enroll · Realtor Business Credit Program"
-        description="Secure enrollment for the Realtor Business Credit program — coaching, cohort, and the implementation portal."
+        title="Enroll · RE Pro Business Credit Program"
+        description="Secure enrollment for the RE Pro Business Credit program — coaching, cohort, and the implementation portal."
         path="/checkout"
         noindex
       />
@@ -81,7 +81,7 @@ const CheckoutPage = () => {
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed">
-            Enroll in the Realtor Business Credit program and get your
+            Enroll in the RE Pro Business Credit program and get your
             personalized plan, coaching, and step-by-step guidance.
           </p>
 
@@ -93,7 +93,7 @@ const CheckoutPage = () => {
               </h2>
               <ul className="space-y-4">
                 {[
-                  "Personalized Realtor Business Credit Plan",
+                  "Personalized RE Pro Business Credit Plan",
                   "1-on-1 coaching with a Realtor credit specialist",
                   "90-day action plan with milestones",
                   "Credit Suite portal & business funding directory",

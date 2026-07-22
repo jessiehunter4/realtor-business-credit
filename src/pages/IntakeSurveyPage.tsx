@@ -287,7 +287,7 @@ export default function IntakeSurveyPage() {
             <CheckCircle className="h-16 w-16 text-primary mx-auto" />
             <h2 className="text-2xl font-semibold text-foreground">Thank You!</h2>
             <p className="text-muted-foreground">
-              Your Realtor Business Financial Needs Analysis has been submitted. 
+              Your RE Pro Business Financial Needs Analysis has been submitted. 
               We'll review your answers before our session together.
             </p>
           </CardContent>
@@ -308,7 +308,7 @@ export default function IntakeSurveyPage() {
     <div className="min-h-screen bg-muted/30 py-8 px-4">
       <SiteHeader />
       <Seo
-        title="Realtor Business Financial Needs Analysis"
+        title="RE Pro Business Financial Needs Analysis"
         description="A short intake to prepare for your one-on-one business credit session."
         path="/intake"
         noindex
@@ -317,7 +317,7 @@ export default function IntakeSurveyPage() {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold text-secondary">
-            Realtor Business Financial Needs Analysis
+            RE Pro Business Financial Needs Analysis
           </h1>
           <p className="text-muted-foreground">
             {form.contact_name ? `Welcome, ${form.contact_name}!` : "Welcome!"} Please complete the sections below to help us prepare for your session.

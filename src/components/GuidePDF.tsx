@@ -144,7 +144,7 @@ const BookCTA = () => (
     <Text style={s.bigCtaTitle}>Book your free 1:1</Text>
     <Text style={s.bigCtaText}>
       5 minutes for the Needs Analysis. 30 minutes together.{'\n'}
-      You leave with your Custom Realtor Business Structure, Finance &amp; Credit Plan.
+      You leave with your Custom RE Pro Business Structure, Finance &amp; Credit Plan.
     </Text>
     <Link src={CTA_URL} style={s.bigCtaLink}>RealtorBusinessCredit.com/one-on-one →</Link>
     <Text style={[s.bigCtaText, { marginTop: 8, fontSize: 9, color: '#8AA0BE' }]}>
@@ -166,7 +166,7 @@ const StatusItem = ({ status, label }: { status: 'Strong' | 'Watch' | 'Missing';
 // ============= DOCUMENT =============
 export const GuidePDF = () => (
   <Document
-    title="Realtor Business Structure, Finance & Credit Guide"
+    title="RE Pro Business Structure, Finance & Credit Guide"
     author="Jessie Hunter"
     subject="Business Structure, Finance & Credit for Real Estate Professionals"
   >
@@ -185,7 +185,7 @@ export const GuidePDF = () => (
         <Text style={{ fontSize: 10, color: '#CFE3FF', textAlign: 'center', marginTop: 4 }}>
           Real Estate Broker · California &amp; Georgia
         </Text>
-        <Text style={s.coverBrand}>Realtor Business Credit</Text>
+        <Text style={s.coverBrand}>RE Pro Business Credit</Text>
         <Text style={s.coverCopyright}>
           © 2026 RealtorBusinessCredit.com — All Rights Reserved.{'\n'}Educational purposes only.
         </Text>
@@ -571,9 +571,9 @@ export const GuidePDF = () => (
       <ChapterStart label="CHAPTER 13" title="The next step: Custom Plan + Program" />
       <P>This guide gives you the map. The free 1:1 gives you the route. The optional program executes it with you.</P>
       <Text style={s.h2}>What happens in your free 1:1</Text>
-      <OL num={1}>We complete the <B>Realtor Business Financial Needs Analysis</B> together — about 5 minutes.</OL>
+      <OL num={1}>We complete the <B>RE Pro Business Financial Needs Analysis</B> together — about 5 minutes.</OL>
       <OL num={2}>We identify the top 3–5 structural gaps blocking your fundability today.</OL>
-      <OL num={3}>You receive your <B>Custom Realtor Business Structure, Finance &amp; Credit Plan</B> — a click-and-read page plus downloadable PDF with prioritized 90-day action steps.</OL>
+      <OL num={3}>You receive your <B>Custom RE Pro Business Structure, Finance &amp; Credit Plan</B> — a click-and-read page plus downloadable PDF with prioritized 90-day action steps.</OL>
       <View style={s.calloutInfo} wrap={false}>
         <Text style={s.calloutTitle}>No cost. No obligation.</Text>
         <Text style={s.calloutText}>The guide is free. The 1:1 is free. The plan generated from your Needs Analysis is yours to keep, whether you join the program or not.</Text>

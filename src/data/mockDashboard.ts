@@ -37,7 +37,7 @@ export interface GuideEntry {
 export const DASHBOARD_GUIDES: GuideEntry[] = [
   {
     id: "g1",
-    title: "Realtor Business Credit Guide",
+    title: "RE Pro Business Credit Guide",
     description: "The full 13-chapter blueprint on structure, finance, and credit.",
     to: "/guide",
     progress: 42,
@@ -144,7 +144,7 @@ export interface ActivityItem {
 }
 
 export const RECENT_ACTIVITY: ActivityItem[] = [
-  { icon: "file", text: "You downloaded the Realtor Business Credit Guide", when: "2 days ago" },
+  { icon: "file", text: "You downloaded the RE Pro Business Credit Guide", when: "2 days ago" },
   { icon: "calendar", text: "One-on-One session booked for Thursday 2:00 PM PT", when: "3 days ago" },
   { icon: "sparkles", text: "Custom plan generated from your intake survey", when: "3 days ago" },
   { icon: "check", text: "Completed: Open dedicated business bank account", when: "5 days ago" },

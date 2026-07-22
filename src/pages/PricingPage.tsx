@@ -199,7 +199,7 @@ const testimonials = [
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Realtor Business Credit Coaching Programs",
+  name: "RE Pro Business Credit Coaching Programs",
   itemListElement: tiers.map((t, i) => ({
     "@type": "ListItem",
     position: i + 1,
@@ -207,7 +207,7 @@ const jsonLd = {
       "@type": "Product",
       name: t.name,
       description: t.who,
-      brand: { "@type": "Brand", name: "Realtor Business Credit" },
+      brand: { "@type": "Brand", name: "RE Pro Business Credit" },
       offers: {
         "@type": "Offer",
         price: t.price.replace(/[^0-9.]/g, ""),
@@ -233,7 +233,7 @@ const PricingPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
-        title="Pricing — Realtor Business Credit Coaching"
+        title="Pricing — RE Pro Business Credit Coaching"
         description="Transparent pricing for Realtor business credit coaching. Self-paced blueprint, 90-day cohort, and 1:1 private coaching — enroll directly or book a free 1:1 first."
         path="/pricing"
         jsonLd={jsonLd}

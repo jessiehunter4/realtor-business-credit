@@ -12,13 +12,13 @@ const steps = [
     icon: ClipboardList,
     n: "2",
     title: "Complete the Needs Analysis",
-    desc: "On the call we complete the Realtor Business Financial Needs Analysis together.",
+    desc: "On the call we complete the RE Pro Business Financial Needs Analysis together.",
   },
   {
     icon: FileBadge,
     n: "3",
     title: "Get your custom plan",
-    desc: "Walk away with a personalized Realtor Business Structure, Finance & Credit Plan — read online or download the PDF.",
+    desc: "Walk away with a personalized RE Pro Business Structure, Finance & Credit Plan — read online or download the PDF.",
   },
 ];
 
@@ -30,7 +30,7 @@ const OneOnOneStepsBlock = () => (
           Free · No card · No pressure
         </span>
         <h2 className="mt-3 text-3xl md:text-4xl font-bold text-secondary">
-          Get your custom Realtor Business Credit plan — free
+          Get your custom RE Pro Business Credit plan — free
         </h2>
         <p className="mt-3 text-muted-foreground text-lg">
           Three simple steps. We do the heavy lifting on the call.

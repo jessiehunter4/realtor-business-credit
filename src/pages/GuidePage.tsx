@@ -225,7 +225,7 @@ const GuidePage = () => {
   return (
     <div className="min-h-screen bg-background scroll-smooth">
       <Seo
-        title="Realtor Business Structure, Finance & Credit Guide (Free)"
+        title="RE Pro Business Structure, Finance & Credit Guide (Free)"
         description="A bright, comprehensive guide for Realtors and brokers: business entity structure, the 3-account financial foundation, fundability signals, and the credit ladder — with a free 1:1 and custom plan."
         path="/guide"
       />
@@ -237,8 +237,8 @@ const GuidePage = () => {
               to="/"
               className="text-secondary-foreground font-semibold text-sm md:text-base hover:text-primary transition-colors truncate"
             >
-              <span className="hidden sm:inline">Realtor Business Credit</span>
-              <span className="sm:hidden">RBC Guide</span>
+              <span className="hidden sm:inline">RE Pro Business Credit</span>
+              <span className="sm:hidden">RE Pro Guide</span>
             </Link>
           </div>
           <nav className="hidden md:flex items-center justify-center gap-0.5 lg:gap-1 flex-nowrap whitespace-nowrap">

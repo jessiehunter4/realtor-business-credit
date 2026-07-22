@@ -13,7 +13,7 @@ const SamplePlanPreview = () => (
           See what your custom plan looks like — before you book.
         </h2>
         <p className="mt-3 text-muted-foreground text-lg">
-          Every free 1:1 ends with a personalized Realtor Business Structure, Finance
+          Every free 1:1 ends with a personalized RE Pro Business Structure, Finance
           &amp; Credit Plan. Here's a full sample for a fictional Sacramento broker so you
           know exactly what you're getting.
         </p>

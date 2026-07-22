@@ -9,8 +9,8 @@ const PrivacyPage = () => (
   <div className="min-h-screen bg-background">
     <SiteHeader />
     <Seo
-      title="Privacy Policy · Realtor Business Credit"
-      description="How Realtor Business Credit and My Better Business Credit collect, use, store, and protect your information, including SMS and email communications."
+      title="Privacy Policy · RE Pro Business Credit"
+      description="How RE Pro Business Credit and My Better Business Credit collect, use, store, and protect your information, including SMS and email communications."
       path="/privacy"
     />
     <main className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
@@ -21,7 +21,7 @@ const PrivacyPage = () => (
         <section>
           <p>
             This Privacy Policy explains how <strong>My Better Business Credit</strong> and its
-            program brand <strong>Realtor Business Credit</strong> ("we," "us," "our") collect,
+            program brand <strong>RE Pro Business Credit</strong> ("we," "us," "our") collect,
             use, share, and protect information about you when you visit{" "}
             <Link to="/" className="text-primary underline">realtorbusinesscredit.com</Link>,
             request our guide, book a session, complete our intake survey, or receive emails or
@@ -33,7 +33,7 @@ const PrivacyPage = () => (
           <h2 className="text-xl font-semibold text-secondary">1. Information we collect</h2>
           <ul className="list-disc pl-6 space-y-1">
             <li><strong>Contact details</strong> you provide: name, email, phone, brokerage, city, state, license type.</li>
-            <li><strong>Survey responses</strong> from the Realtor Business Financial Needs Analysis.</li>
+            <li><strong>Survey responses</strong> from the RE Pro Business Financial Needs Analysis.</li>
             <li><strong>Public real estate data</strong>: closed-transaction information from MLS exports our broker is authorized to access.</li>
             <li><strong>Usage data</strong>: pages visited, time on page, scroll depth, referrer, device, and approximate location, used to improve the site and measure marketing performance.</li>
             <li><strong>Communication consent</strong>: timestamp and source of your opt-in to receive email and SMS.</li>
@@ -56,7 +56,7 @@ const PrivacyPage = () => (
           <p>
             By providing your mobile number on a form, by checking a consent box, or by replying
             to a message, you agree to receive recurring marketing and service text messages from
-            Realtor Business Credit at the number you provided. Message frequency varies. Message
+            RE Pro Business Credit at the number you provided. Message frequency varies. Message
             and data rates may apply. Consent is not a condition of any purchase.
           </p>
           <p>

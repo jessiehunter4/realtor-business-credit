@@ -38,7 +38,7 @@ const BookingConfirmedPage = () => {
     {
       icon: ClipboardList,
       title: "Complete the Intake Survey",
-      description: "Fill out the Realtor Business Financial Needs Analysis so Jessie can prepare a personalized plan.",
+      description: "Fill out the RE Pro Business Financial Needs Analysis so Jessie can prepare a personalized plan.",
       link: { to: intakeLink, label: "Start the Intake Survey" },
     },
     {
@@ -109,7 +109,7 @@ const BookingConfirmedPage = () => {
         <div className="container max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Why Complete the Intake First?</h2>
           <p className="text-muted-foreground text-lg mb-6">
-            When you fill out the Realtor Business Financial Needs Analysis before your call, Jessie can review your goals, business structure, and credit situation ahead of time — so your session is focused, productive, and personalized to you.
+            When you fill out the RE Pro Business Financial Needs Analysis before your call, Jessie can review your goals, business structure, and credit situation ahead of time — so your session is focused, productive, and personalized to you.
           </p>
           <Button asChild size="lg">
             <Link to={intakeLink}>

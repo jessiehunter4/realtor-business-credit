@@ -39,7 +39,7 @@ const MockLoginPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-hero-grad">
-      <Seo title="Log in — Realtor Business Credit" description="Access your Realtor Business Credit portal." />
+      <Seo title="Log in — RE Pro Business Credit" description="Access your RE Pro Business Credit portal." />
       <SiteHeader />
 
       <main className="flex-1 flex items-center justify-center px-4 py-16">
@@ -53,7 +53,7 @@ const MockLoginPage = () => {
               className="mt-4 font-semibold text-secondary"
               style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", lineHeight: 1.15 }}
             >
-              Log in to your Realtor Business Credit portal
+              Log in to your RE Pro Business Credit portal
             </h1>
             <p className="mt-3 text-muted-foreground text-sm">
               {state.firstName

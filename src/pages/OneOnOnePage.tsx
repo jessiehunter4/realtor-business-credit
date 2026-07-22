@@ -81,7 +81,7 @@ const OneOnOnePage = () => {
     {
       icon: ClipboardList,
       title: "Complete the Intake Survey",
-      description: "Fill out the Realtor Business Financial Needs Analysis so Jessie can prepare a personalized plan.",
+      description: "Fill out the RE Pro Business Financial Needs Analysis so Jessie can prepare a personalized plan.",
       link: { to: intakeLink, label: "Start the Intake Survey" },
     },
     {
@@ -209,7 +209,7 @@ const OneOnOnePage = () => {
         <div className="container max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Why Complete the Intake First?</h2>
           <p className="text-muted-foreground text-lg mb-6">
-            When you fill out the Realtor Business Financial Needs Analysis before your call, Jessie can review your goals, business structure, and credit situation ahead of time — so your session is focused, productive, and personalized to you.
+            When you fill out the RE Pro Business Financial Needs Analysis before your call, Jessie can review your goals, business structure, and credit situation ahead of time — so your session is focused, productive, and personalized to you.
           </p>
           <Button asChild size="lg">
             <Link to={intakeLink}>
@@ -281,7 +281,7 @@ const OneOnOnePage = () => {
                 {
                   step: 1,
                   title: "Review Your Needs Analysis",
-                  desc: "We'll go through your Realtor Business Financial Needs Analysis responses so I understand your goals, production level, and current business structure.",
+                  desc: "We'll go through your RE Pro Business Financial Needs Analysis responses so I understand your goals, production level, and current business structure.",
                 },
                 {
                   step: 2,
@@ -338,7 +338,7 @@ const OneOnOnePage = () => {
               {[
                 {
                   icon: FileText,
-                  text: "A custom Realtor Business Credit Plan (click & read + downloadable PDF).",
+                  text: "A custom RE Pro Business Credit Plan (click & read + downloadable PDF).",
                 },
                 {
                   icon: CheckCircle,
@@ -466,7 +466,7 @@ const OneOnOnePage = () => {
                 Do I need to prepare anything before the call?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground text-base leading-relaxed">
-                Just complete the Realtor Business Financial Needs Analysis
+                Just complete the RE Pro Business Financial Needs Analysis
                 intake form (we'll send it after you book). It takes about 5–10
                 minutes and helps us make the most of our time together.
               </AccordionContent>

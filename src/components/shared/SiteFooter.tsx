@@ -18,7 +18,7 @@ const SiteFooter = () => {
       <div className="container mx-auto px-4 max-w-5xl space-y-3 text-center md:text-left">
         <p className="text-xs md:text-sm leading-relaxed">
           <strong className="text-secondary-foreground">Educational content only.</strong>{" "}
-          Realtor Business Credit and My Better Business Credit do not provide legal,
+          RE Pro Business Credit and My Better Business Credit do not provide legal,
           tax, or investment advice. Always consult your broker, attorney, and tax
           professional about your specific situation. Outcomes vary and depend on
           each Realtor&apos;s actions and circumstances.

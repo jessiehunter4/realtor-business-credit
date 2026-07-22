@@ -67,7 +67,7 @@ const differentiators = [
   },
   {
     title: "Dual-coach model",
-    body: "You get a Realtor Business Credit coach who understands your world plus a Credit Suite specialist for fundability, tradelines, and business credit cards.",
+    body: "You get a RE Pro Business Credit coach who understands your world plus a Credit Suite specialist for fundability, tradelines, and business credit cards.",
   },
   {
     title: "Custom 90-day plan",
@@ -114,12 +114,12 @@ const team = [
     initials: "JH",
     name: "Jessie Hunter",
     role: "Founder & Broker",
-    body: "Real estate broker licensed in California and Georgia, in the business since 2010, and a certified Credit Suite partner. Jessie built Realtor Business Credit to teach agents what he wishes he'd known on day one.",
+    body: "Real estate broker licensed in California and Georgia, in the business since 2010, and a certified Credit Suite partner. Jessie built RE Pro Business Credit to teach agents what he wishes he'd known on day one.",
     tone: "bg-primary/10 text-primary",
   },
   {
     initials: "RC",
-    name: "Realtor Business Credit Coach",
+    name: "RE Pro Business Credit Coach",
     role: "1:1 & Cohort Coaching",
     body: "Works with you on the Realtor-specific pieces: entity structure conversations with your CPA/attorney, financial foundation, and your custom 90-day plan.",
     tone: "bg-sky/15 text-sky",
@@ -137,17 +137,17 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Seo
-        title="About Realtor Business Credit — Our Story & Mission"
-        description="Realtor Business Credit is built by a broker, for brokers and agents. Learn about our mission, dual-coach model, and how we help Realtors build separate business credit and funding capacity."
+        title="About RE Pro Business Credit — Our Story & Mission"
+        description="RE Pro Business Credit is built by a broker, for brokers and agents. Learn about our mission, dual-coach model, and how we help Realtors build separate business credit and funding capacity."
         path="/about"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "AboutPage",
-          name: "About Realtor Business Credit",
+          name: "About RE Pro Business Credit",
           url: "https://realtorbusinesscredit.com/about",
           about: {
             "@type": "Organization",
-            name: "Realtor Business Credit",
+            name: "RE Pro Business Credit",
             url: "https://realtorbusinesscredit.com",
             parentOrganization: {
               "@type": "Organization",
@@ -169,7 +169,7 @@ const AboutPage = () => {
           <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-4 py-1.5 text-xs md:text-sm font-semibold">
               <Sparkles className="h-4 w-4" aria-hidden />
-              About Realtor Business Credit
+              About RE Pro Business Credit
             </span>
             <h1
               className="mt-5 font-bold text-secondary leading-tight"
@@ -225,7 +225,7 @@ const AboutPage = () => {
               <p className="text-muted-foreground leading-relaxed">
                 After finally researching business credit and becoming a{" "}
                 <strong className="text-secondary">certified Credit Suite partner</strong>, Jessie built
-                Realtor Business Credit — a Realtor-specific system so other agents
+                RE Pro Business Credit — a Realtor-specific system so other agents
                 and brokers don't have to wait a decade to figure this out.
               </p>
             </div>

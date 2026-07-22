@@ -22,7 +22,7 @@ const GuideIntroduction = () => (
       <Paragraph>This guide is <strong>education and coaching guidance</strong>. It is not legal, tax, or investment advice. Entity selection, commission handling, and asset-protection strategy should always be confirmed with your broker, CPA, and attorney for your state and your facts.</Paragraph>
 
       <Callout variant="info">
-        <Paragraph className="m-0">There's no cost for the guide or the 1:1. We discuss and complete the <strong>Realtor Business Financial Needs Analysis</strong> together during your free 1:1 — and from it we generate your custom Realtor Business Structure, Finance &amp; Credit Plan.</Paragraph>
+        <Paragraph className="m-0">There's no cost for the guide or the 1:1. We discuss and complete the <strong>RE Pro Business Financial Needs Analysis</strong> together during your free 1:1 — and from it we generate your custom RE Pro Business Structure, Finance &amp; Credit Plan.</Paragraph>
       </Callout>
 
       <SectionHeading>How to read this</SectionHeading>

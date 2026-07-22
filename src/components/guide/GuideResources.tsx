@@ -10,7 +10,7 @@ const GuideResources = () => (
 
           <SectionHeading>Take Your Next Step</SectionHeading>
           <Callout>
-            <h3 className="font-bold text-lg text-primary mt-0 mb-3">Realtor Business Credit</h3>
+            <h3 className="font-bold text-lg text-primary mt-0 mb-3">RE Pro Business Credit</h3>
             <Paragraph><strong>Main Website:</strong> mybetterbusinesscredit.com</Paragraph>
             <Paragraph><strong>Realtor-Specific Resources:</strong> realtorbusinesscredit.com</Paragraph>
             <Paragraph>
@@ -26,7 +26,7 @@ const GuideResources = () => (
             <h3 className="font-bold text-lg text-primary mt-0 mb-3">Jessie Hunter</h3>
             <Paragraph>Jessie Hunter is a licensed real estate broker in California and Georgia with over 15 years of experience in residential and commercial real estate.</Paragraph>
             <Paragraph>After discovering business credit late in his career—and calculating what it cost him not to know earlier—Jessie became a certified partner with Credit Suite to help fellow real estate professionals avoid the same mistakes.</Paragraph>
-            <Paragraph>He founded Realtor Business Credit specifically to address the gap in real estate education around business finance fundamentals.</Paragraph>
+            <Paragraph>He founded RE Pro Business Credit specifically to address the gap in real estate education around business finance fundamentals.</Paragraph>
             <Paragraph>Jessie's mission is simple: Ensure that no realtor waits 10+ years to discover business credit like he did.</Paragraph>
           </StoryBox>
 
@@ -57,7 +57,7 @@ const GuideResources = () => (
         </div>
 
         <div className="mt-10 text-secondary-foreground/70 text-sm">
-          <p><strong className="text-secondary-foreground">Realtor Business Credit</strong></p>
+          <p><strong className="text-secondary-foreground">RE Pro Business Credit</strong></p>
           <p>Helping Real Estate Professionals Build Better Business Credit</p>
           <p className="mt-4 text-secondary-foreground/40">© 2026 RealtorBusinessCredit.com | All Rights Reserved</p>
         </div>

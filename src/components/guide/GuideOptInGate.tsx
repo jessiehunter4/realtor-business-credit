@@ -93,7 +93,7 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
             Read the Free Guide
           </CardTitle>
           <p className="text-muted-foreground text-sm mt-2">
-            Enter your info below to get instant access to the complete Realtor Business Credit Guide &amp; Action Plan.
+            Enter your info below to get instant access to the complete RE Pro Business Credit Guide &amp; Action Plan.
           </p>
         </CardHeader>
         <CardContent>

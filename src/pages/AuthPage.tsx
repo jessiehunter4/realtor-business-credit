@@ -125,7 +125,7 @@ export default function AuthPage() {
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl font-bold text-center">Admin Access</CardTitle>
           <CardDescription className="text-center">
-            Sign in to access the Realtor Business Credit admin dashboard
+            Sign in to access the RE Pro Business Credit admin dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>

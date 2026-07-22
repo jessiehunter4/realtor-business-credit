@@ -12,13 +12,13 @@ const Ch13 = () => (
 
       <Paragraph>This guide gives you the map. The free 1:1 gives you the route. The optional program executes it with you.</Paragraph>
 
-      <GuideImage src={coachImg} alt="Realtor and coach reviewing the Realtor Business Financial Needs Analysis together at a bright table" caption="The free 1:1 — your Needs Analysis becomes your custom plan in one sitting." />
+      <GuideImage src={coachImg} alt="Realtor and coach reviewing the RE Pro Business Financial Needs Analysis together at a bright table" caption="The free 1:1 — your Needs Analysis becomes your custom plan in one sitting." />
 
       <SectionHeading>What happens in your free 1:1</SectionHeading>
       <ol className="list-decimal pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
-        <li>We complete the <strong>Realtor Business Financial Needs Analysis</strong> together — about 5 minutes.</li>
+        <li>We complete the <strong>RE Pro Business Financial Needs Analysis</strong> together — about 5 minutes.</li>
         <li>We identify the top 3–5 structural gaps blocking your fundability today.</li>
-        <li>You receive your <strong>Custom Realtor Business Structure, Finance &amp; Credit Plan</strong> — click-and-read page plus downloadable PDF, with prioritized 90-day action steps.</li>
+        <li>You receive your <strong>Custom RE Pro Business Structure, Finance &amp; Credit Plan</strong> — click-and-read page plus downloadable PDF, with prioritized 90-day action steps.</li>
       </ol>
 
       <Callout variant="info">

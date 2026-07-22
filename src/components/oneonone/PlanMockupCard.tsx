@@ -7,7 +7,7 @@ const PlanMockupCard = () => {
       <div className="bg-[#0d1b2a] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
         <div>
           <p className="text-[#3eaf7c] text-[8px] sm:text-[10px] tracking-[0.2em] uppercase font-sans font-semibold mb-0.5">
-            Realtor Business Credit
+            RE Pro Business Credit
           </p>
           <p className="text-white text-sm sm:text-base font-bold leading-snug font-serif">
             Your Custom Business Credit Plan

@@ -42,7 +42,7 @@ function supabaseForUser(ctx) {
 var list_agents_default = defineTool2({
   name: "list_agents",
   title: "List agents",
-  description: "List real estate agents in the Realtor Business Credit database. Respects the caller's row-level security permissions.",
+  description: "List real estate agents in the RE Pro Business Credit database. Respects the caller's row-level security permissions.",
   inputSchema: {
     limit: z.number().int().min(1).max(100).optional().describe("Max rows to return (default 25)."),
     search: z.string().trim().min(1).optional().describe("Optional case-insensitive match against name, email, or phone.")
@@ -75,9 +75,9 @@ var list_agents_default = defineTool2({
 var projectRef = "pquuigfgbplwbksijlxl";
 var mcp_default = defineMcp({
   name: "realtor-business-credit-mcp",
-  title: "Realtor Business Credit",
+  title: "RE Pro Business Credit",
   version: "0.1.0",
-  instructions: "Tools for the Realtor Business Credit coaching app. `whoami` reports the signed-in user. `list_agents` reads agents from the app database, respecting the caller's row-level security.",
+  instructions: "Tools for the RE Pro Business Credit coaching app. `whoami` reports the signed-in user. `list_agents` reads agents from the app database, respecting the caller's row-level security.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated"

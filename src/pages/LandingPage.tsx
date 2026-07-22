@@ -50,13 +50,13 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Seo
-        title="Realtor Business Credit: Turn Your Closings Into Business Credit Capacity"
+        title="RE Pro Business Credit: Turn Your Closings Into Business Credit Capacity"
         description="Free guide and free one-on-one for real estate agents and brokers. Build a fundable business structure, financial foundation, and separate business credit — without relying on personal credit."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Realtor Business Credit",
+          name: "RE Pro Business Credit",
           url: "https://realtorbusinesscredit.com",
           parentOrganization: { "@type": "Organization", name: "My Better Business Credit" },
           founder: { "@type": "Person", name: "Jessie Hunter" },
