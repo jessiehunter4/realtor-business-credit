@@ -252,9 +252,27 @@ export default function AdminIntakeCoachView() {
           </div>
           <div className="flex gap-2">
             {existingPlanId && (
-              <Button variant="outline" onClick={() => navigate(`/admin/plan/${existingPlanId}`)}>
-                <FileText className="h-4 w-4 mr-1" /> View Plan
-              </Button>
+              <>
+                <Badge
+                  variant="outline"
+                  className={
+                    existingPlanStatus === "published"
+                      ? "bg-primary/10 text-primary self-center"
+                      : "bg-amber-100 text-amber-800 self-center"
+                  }
+                >
+                  Plan: {existingPlanStatus}
+                </Badge>
+                <Button variant="outline" onClick={() => navigate(`/admin/plan/${existingPlanId}`)}>
+                  <FileText className="h-4 w-4 mr-1" /> View Plan
+                </Button>
+                {existingPlanStatus === "draft" && (
+                  <Button onClick={handleQuickPublish} disabled={publishing}>
+                    {publishing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}
+                    Publish
+                  </Button>
+                )}
+              </>
             )}
             <Button
               variant="secondary"
