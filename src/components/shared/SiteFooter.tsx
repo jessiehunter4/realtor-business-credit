@@ -23,6 +23,10 @@ const SiteFooter = () => {
           professional about your specific situation. Outcomes vary and depend on
           each Realtor&apos;s actions and circumstances.
         </p>
+        <p className="text-xs text-secondary-foreground/70 italic">
+          RE Pro Business Credit — Business Credit &amp; Finance for Real Estate
+          Professionals. A specialized program of My Better Business Credit.
+        </p>
         <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 text-xs text-secondary-foreground/60">
           <span>© {new Date().getFullYear()} RealtorBusinessCredit.com</span>
           <Link to="/" className="hover:text-primary">Home</Link>
