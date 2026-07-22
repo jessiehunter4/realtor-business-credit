@@ -53,7 +53,15 @@ interface PlanDocumentProps {
 }
 
 export default function PlanDocument({ planData, editMode, onEditSection, createdAt, updatedAt }: PlanDocumentProps) {
-  const { sections } = planData;
+  const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
+  const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
+  const fundabilityItems = sections.fundability?.items ?? [];
+  const fundabilityNarrative = sections.fundability?.narrative ?? "";
+  const actionItems = sections.action_plan_90day?.items ?? [];
+  const milestones = sections.roadmap?.milestones ?? [];
+  const fundingItems = sections.funding_opportunities?.items ?? [];
+  const nextStepsNarrative = sections.next_steps?.narrative ?? "";
+  const programOptions = sections.next_steps?.program_options ?? [];
   const draftedLabel = formatPlanDate(createdAt);
   const updatedLabel = isMeaningfullyUpdated(createdAt, updatedAt) ? formatPlanDate(updatedAt) : null;
 
@@ -102,7 +110,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
         <h3 className="text-[#1e3a5f] text-base font-bold border-b-2 border-[#3eaf7c] pb-1 mb-3 font-sans">
           1. Your Goals &amp; Snapshot
         </h3>
-        <EditableText section="goals_snapshot" value={sections.goals_snapshot.narrative} />
+        <EditableText section="goals_snapshot" value={goalsNarrative} />
       </div>
 
       {/* Section 2 - Fundability */}
@@ -111,7 +119,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
           2. Business Structure &amp; Fundability
         </h3>
         <div className="space-y-1.5 mb-4">
-          {sections.fundability.items.map((item, i) => (
+          {fundabilityItems.map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               {item.status === "strong" && <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />}
               {item.status === "warning" && <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />}
@@ -127,7 +135,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
             </div>
           ))}
         </div>
-        <EditableText section="fundability" value={sections.fundability.narrative} rows={3} />
+        <EditableText section="fundability" value={fundabilityNarrative} rows={3} />
       </div>
 
       {/* Section 3 - 90-Day Action Plan */}
@@ -136,7 +144,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
           3. 90-Day Action Plan
         </h3>
         <div className="space-y-2.5">
-          {sections.action_plan_90day.items.map((item, i) => (
+          {actionItems.map((item, i) => (
             <div key={i} className="flex gap-3 items-start">
               <div className="w-6 h-6 rounded-full bg-[#3eaf7c] text-white flex items-center justify-center text-xs font-bold flex-shrink-0 font-sans mt-0.5">
                 {item.step}
@@ -156,7 +164,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
           4. 6–12 Month Roadmap
         </h3>
         <div className="space-y-3">
-          {sections.roadmap.milestones.map((m, i) => (
+          {milestones.map((m, i) => (
             <div key={i} className="flex gap-3 items-start">
               <div className="bg-[#1e3a5f] text-white text-xs font-bold px-2 py-1 rounded font-sans flex-shrink-0 min-w-[80px] text-center">
                 {m.month}
@@ -173,7 +181,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
           5. Credit &amp; Funding Opportunities
         </h3>
         <div className="space-y-2">
-          {sections.funding_opportunities.items.map((f, i) => (
+          {fundingItems.map((f, i) => (
             <div key={i} className="border-l-2 border-[#3eaf7c] pl-3">
               <p className="font-semibold text-[#1e3a5f] text-sm">{f.type}</p>
               <p className="text-gray-600 text-sm">{f.description}</p>
@@ -190,9 +198,9 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
         <h3 className="text-[#1e3a5f] text-base font-bold border-b-2 border-[#3eaf7c] pb-1 mb-3 font-sans">
           6. Program Options &amp; Next Steps
         </h3>
-        <EditableText section="next_steps" value={sections.next_steps.narrative} rows={3} />
+        <EditableText section="next_steps" value={nextStepsNarrative} rows={3} />
         <div className="grid sm:grid-cols-2 gap-3 mt-4">
-          {sections.next_steps.program_options.map((opt, i) => (
+          {programOptions.map((opt, i) => (
             <div key={i} className="border border-gray-200 rounded-lg p-3">
               <p className="font-semibold text-[#1e3a5f] text-sm">{opt.name}</p>
               <p className="text-gray-600 text-xs mt-1">{opt.description}</p>
