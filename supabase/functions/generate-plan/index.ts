@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { recommendProgram, type Program } from "../_shared/recommend-program.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -151,6 +152,15 @@ serve(async (req) => {
 
     // Compute fundability items
     const fundabilityItems = computeFundabilityItems(survey);
+
+    // Load active programs and compute recommendation
+    const { data: programsData } = await adminClient
+      .from("programs")
+      .select("slug, name, tagline, price_display, cadence, cta_label, cta_href, pricing_anchor, fit_rules, sort_order")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+    const programs: Program[] = (programsData as any[]) || [];
+    const recommendation = programs.length > 0 ? recommendProgram(survey, programs) : null;
 
     // Build prompt
     const notesText = coachNotes.length > 0
@@ -375,6 +385,14 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
     let planId: string;
 
     if (existingDraft) {
+      // Preserve admin override if one exists on the draft.
+      const { data: overrideCheck } = await adminClient
+        .from("custom_plans")
+        .select("recommendation_overridden_at, recommended_program_slug, recommendation_reasoning, recommendation_score")
+        .eq("id", existingDraft.id)
+        .single();
+      const preserveOverride = !!overrideCheck?.recommendation_overridden_at;
+
       const { data: updated, error: updateErr } = await adminClient
         .from("custom_plans")
         .update({
@@ -385,6 +403,20 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
           lead_id: survey.lead_id,
           created_by: userId,
           updated_at: new Date().toISOString(),
+          ...(recommendation && !preserveOverride
+            ? {
+                recommended_program_slug: recommendation.slug,
+                recommendation_reasoning: {
+                  bullets: recommendation.reasoning,
+                  needs_more_info: recommendation.needs_more_info,
+                },
+                recommendation_score: {
+                  scores: recommendation.scores,
+                  rule_hits: recommendation.rule_hits,
+                  winner_score: recommendation.score,
+                },
+              }
+            : {}),
         })
         .eq("id", existingDraft.id)
         .select("id")
@@ -417,6 +449,20 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
           plan_data: planData,
           status: "draft",
           created_by: userId,
+          ...(recommendation
+            ? {
+                recommended_program_slug: recommendation.slug,
+                recommendation_reasoning: {
+                  bullets: recommendation.reasoning,
+                  needs_more_info: recommendation.needs_more_info,
+                },
+                recommendation_score: {
+                  scores: recommendation.scores,
+                  rule_hits: recommendation.rule_hits,
+                  winner_score: recommendation.score,
+                },
+              }
+            : {}),
         })
         .select("id")
         .single();
