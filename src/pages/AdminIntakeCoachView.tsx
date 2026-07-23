@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 import { COHORT_TIME_SLOTS } from "./IntakeSurveyPage";
+import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
@@ -842,6 +843,7 @@ export default function AdminIntakeCoachView() {
                         ))}
                       </RadioGroup>
                     </div>
+                    <IntakePricingAndReadiness readiness={form.investment_readiness} />
                     <div className="space-y-2">
                       <Label>Anything else you want us to know?</Label>
                       <Textarea value={form.additional_notes || ""} onChange={(e) => updateField("additional_notes", e.target.value)} rows={4} />
