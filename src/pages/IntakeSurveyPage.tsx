@@ -96,6 +96,9 @@ interface SurveyData {
   brokerage_name?: string;
   city?: string;
   state?: string;
+  business_street?: string;
+  business_zip?: string;
+  business_phone?: string;
   license_type?: string;
   years_in_real_estate?: string;
   gci_last_12_months?: string;
