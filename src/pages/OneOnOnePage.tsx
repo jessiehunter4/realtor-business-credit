@@ -106,9 +106,6 @@ const OneOnOnePage = () => {
           <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
-          <span className="inline-flex items-center gap-2 bg-card border border-border rounded-full px-3 py-1 text-xs font-semibold text-primary shadow-card mb-4">
-            Free · 5 Simple Steps · 5–10 Minutes
-          </span>
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
             Your Custom Business & Finance Plan{" "}
             <span className="text-primary">in 5 Simple Steps</span>
