@@ -23,6 +23,14 @@ interface FundingItem {
   description: string;
 }
 
+interface GoalItem {
+  label: string;
+  priority: "primary" | "secondary" | string;
+  horizon?: string;
+  target_amount?: string;
+  why_it_matters?: string;
+}
+
 interface ProgramOption {
   name: string;
   description: string;
@@ -35,7 +43,7 @@ export interface PlanData {
   state: string;
   license_type: string;
   sections: {
-    goals_snapshot: { narrative: string };
+    goals_snapshot: { narrative: string; goals?: GoalItem[] };
     fundability: { items: FundabilityItem[]; narrative: string };
     action_plan_90day: { items: ActionItem[] };
     roadmap: { milestones: Milestone[] };
@@ -55,6 +63,7 @@ interface PlanDocumentProps {
 export default function PlanDocument({ planData, editMode, onEditSection, createdAt, updatedAt }: PlanDocumentProps) {
   const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
   const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
+  const goalsList = sections.goals_snapshot?.goals ?? [];
   const fundabilityItems = sections.fundability?.items ?? [];
   const fundabilityNarrative = sections.fundability?.narrative ?? "";
   const actionItems = sections.action_plan_90day?.items ?? [];
@@ -110,6 +119,43 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
         <h3 className="text-[#1e3a5f] text-base font-bold border-b-2 border-[#3eaf7c] pb-1 mb-3 font-sans">
           1. Your Goals &amp; Snapshot
         </h3>
+        {goalsList.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {goalsList.map((g, i) => (
+              <div
+                key={i}
+                className={`rounded-lg border p-3 ${
+                  g.priority === "primary"
+                    ? "border-[#3eaf7c] bg-[#3eaf7c]/5"
+                    : "border-gray-200 bg-gray-50"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
+                      g.priority === "primary"
+                        ? "bg-[#3eaf7c] text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {g.priority === "primary" ? "Primary Goal" : `Goal ${i + 1}`}
+                  </span>
+                  <span className="font-semibold text-[#1e3a5f] text-sm">{g.label}</span>
+                </div>
+                {(g.horizon || g.target_amount) && (
+                  <p className="text-xs text-gray-500 mb-1">
+                    {g.horizon && <span>Horizon: {g.horizon}</span>}
+                    {g.horizon && g.target_amount && <span> · </span>}
+                    {g.target_amount && <span>Target: {g.target_amount}</span>}
+                  </p>
+                )}
+                {g.why_it_matters && (
+                  <p className="text-sm text-gray-700 leading-snug">{g.why_it_matters}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
         <EditableText section="goals_snapshot" value={goalsNarrative} />
       </div>
 
