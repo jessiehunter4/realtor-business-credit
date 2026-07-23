@@ -472,18 +472,41 @@ export default function IntakeSurveyPage() {
                   <Input value={form.brokerage_name || ""} onChange={e => updateField("brokerage_name", e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>City</Label>
-                  <Input value={form.city || ""} onChange={e => updateField("city", e.target.value)} />
+                  <Label>Business Phone</Label>
+                  <Input
+                    type="tel"
+                    value={form.business_phone || ""}
+                    onChange={e => updateField("business_phone", e.target.value)}
+                    placeholder="(555) 555-5555"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>State</Label>
-                <Select value={form.state || ""} onValueChange={v => updateField("state", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
-                  <SelectContent>
-                    {US_STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <Label className="text-base font-semibold">Business Address</Label>
+                <Input
+                  value={form.business_street || ""}
+                  onChange={e => updateField("business_street", e.target.value)}
+                  placeholder="Street address"
+                />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Input
+                    value={form.city || ""}
+                    onChange={e => updateField("city", e.target.value)}
+                    placeholder="City"
+                  />
+                  <Select value={form.state || ""} onValueChange={v => updateField("state", v)}>
+                    <SelectTrigger><SelectValue placeholder="State" /></SelectTrigger>
+                    <SelectContent>
+                      {US_STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    value={form.business_zip || ""}
+                    onChange={e => updateField("business_zip", e.target.value)}
+                    placeholder="ZIP code"
+                    inputMode="numeric"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>License Type</Label>
