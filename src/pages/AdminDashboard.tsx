@@ -589,15 +589,15 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold">RE Pro Business Credit Admin</h1>
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <h1 className="text-lg sm:text-2xl font-bold">RE Pro Business Credit Admin</h1>
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
               View Site
             </Button>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <span className="text-xs sm:text-sm text-muted-foreground truncate max-w-[60vw]">{user?.email}</span>
             <Button onClick={handleSignOut} variant="outline" size="sm">
               Sign Out
             </Button>
@@ -605,45 +605,48 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Quick actions */}
-        <div className="mb-6 flex gap-3">
-          <Button onClick={() => navigate("/admin/mls-import")}>Import MLS Data</Button>
-          <Button variant="outline" onClick={() => navigate("/admin/intake")}>
+        <div className="mb-6 flex flex-wrap gap-2 sm:gap-3 items-center">
+          <Button size="sm" onClick={() => navigate("/admin/mls-import")}>Import MLS Data</Button>
+          <Button size="sm" variant="outline" onClick={() => navigate("/admin/intake")}>
             Intake Surveys
           </Button>
           <Button
+            size="sm"
             variant="outline"
             onClick={() => void refreshDashboardData(dateRange, hostFilter, true)}
             disabled={refreshingDashboard}
             className="gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${refreshingDashboard ? "animate-spin" : ""}`} />
-            {refreshingDashboard ? "Refreshing..." : "Refresh Dashboard"}
+            {refreshingDashboard ? "Refreshing..." : "Refresh"}
           </Button>
-          <p className="text-xs text-muted-foreground self-center">
-            Auto-refresh: {Math.floor(AUTO_REFRESH_MS / 1000)}s · Last refresh: {lastRefreshLabel}
+          <p className="text-xs text-muted-foreground w-full sm:w-auto sm:self-center">
+            Auto-refresh: {Math.floor(AUTO_REFRESH_MS / 1000)}s · Last: {lastRefreshLabel}
           </p>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview" className="gap-1.5">
-              <Users className="h-4 w-4" /> Overview
-            </TabsTrigger>
-            <TabsTrigger value="funnel" className="gap-1.5">
-              <TrendingUp className="h-4 w-4" /> Funnel Analytics
-            </TabsTrigger>
-            <TabsTrigger value="engagement" className="gap-1.5">
-              <Activity className="h-4 w-4" /> Engagement
-            </TabsTrigger>
-            <TabsTrigger value="seo" className="gap-1.5">
-              <TrendingUp className="h-4 w-4" /> SEO Funnel
-            </TabsTrigger>
-            <TabsTrigger value="bookings" className="gap-1.5">
-              <CalendarClock className="h-4 w-4" /> Bookings
-            </TabsTrigger>
-          </TabsList>
+          <div className="-mx-3 sm:mx-0 overflow-x-auto">
+            <TabsList className="w-max sm:w-auto flex sm:inline-flex mx-3 sm:mx-0">
+              <TabsTrigger value="overview" className="gap-1.5 whitespace-nowrap">
+                <Users className="h-4 w-4" /> Overview
+              </TabsTrigger>
+              <TabsTrigger value="funnel" className="gap-1.5 whitespace-nowrap">
+                <TrendingUp className="h-4 w-4" /> <span className="hidden xs:inline">Funnel Analytics</span><span className="xs:hidden">Funnel</span>
+              </TabsTrigger>
+              <TabsTrigger value="engagement" className="gap-1.5 whitespace-nowrap">
+                <Activity className="h-4 w-4" /> Engagement
+              </TabsTrigger>
+              <TabsTrigger value="seo" className="gap-1.5 whitespace-nowrap">
+                <TrendingUp className="h-4 w-4" /> SEO
+              </TabsTrigger>
+              <TabsTrigger value="bookings" className="gap-1.5 whitespace-nowrap">
+                <CalendarClock className="h-4 w-4" /> Bookings
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* ======== OVERVIEW TAB ======== */}
           <TabsContent value="overview" className="space-y-6">
@@ -696,7 +699,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   <Button onClick={handleManualSync} disabled={syncing || syncStats.pending === 0}>
                     {syncing ? (
                       <>
@@ -780,7 +783,7 @@ export default function AdminDashboard() {
 
           {/* ======== FUNNEL ANALYTICS TAB ======== */}
           <TabsContent value="funnel" className="space-y-6">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {(["7d", "30d", "90d", "all"] as const).map((r) => (
                 <Button
                   key={r}
