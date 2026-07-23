@@ -48,6 +48,8 @@ const EDITABLE_SURVEY_FIELDS = [
   "preferred_support_format",
   "interest_in_cohort",
   "preferred_cohort_days",
+  "preferred_cohort_time_1",
+  "preferred_cohort_time_2",
   "investment_readiness",
   "additional_notes",
 ] as const;
