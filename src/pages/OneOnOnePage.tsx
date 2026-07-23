@@ -106,13 +106,18 @@ const OneOnOnePage = () => {
           <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
+          <span className="inline-flex items-center gap-2 bg-card border border-border rounded-full px-3 py-1 text-xs font-semibold text-primary shadow-card mb-4">
+            Free · 5 Simple Steps · 5–10 Minutes
+          </span>
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
-            Why a One-on-One Business Credit Session{" "}
-            <span className="text-primary">Changes Everything</span>
+            Your Custom Business & Finance Plan{" "}
+            <span className="text-primary">in 5 Simple Steps</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            In 30 minutes we map exactly where your <em>money when you need it</em>
-            {" "}is leaking — and what to fix first.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
+            Answer a few friendly questions about your real estate business, goals, and structure. 
+            In just 5–10 minutes, we'll build a personalized{" "}
+            <em>RE Pro Business Structure, Finance & Credit Plan</em> tailored to your situation — 
+            then review it together on a free one-on-one call.
           </p>
           <a
             href="#book"
@@ -122,7 +127,7 @@ const OneOnOnePage = () => {
             <Calendar className="h-5 w-5" />
             Book My Free One-on-One Session
           </a>
-          <p className="mt-6 text-sm text-muted-foreground">
+          <p className="mt-5 text-sm text-muted-foreground">
             Want to see what you'll receive first?{" "}
             <Link to="/sample-plan" className="font-semibold text-primary hover:underline">
               Preview a sample custom plan →
