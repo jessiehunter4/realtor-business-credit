@@ -346,22 +346,26 @@ export default function AdminIntakeCoachView() {
                        <div className="space-y-2">
                          <Label>First Name</Label>
                          <Input
-                           value={(form.contact_name || "").split(" ")[0] || ""}
+                           value={form.first_name || ""}
                            onChange={(e) => {
                              const first = e.target.value;
-                             const rest = (form.contact_name || "").split(" ").slice(1).join(" ");
-                             updateField("contact_name", [first, rest].filter(Boolean).join(" "));
+                             updateField("first_name", first);
+                             const full = [first, form.last_name].filter(Boolean).join(" ");
+                             updateField("full_name", full);
+                             updateField("contact_name", full);
                            }}
                          />
                        </div>
                        <div className="space-y-2">
                          <Label>Last Name</Label>
                          <Input
-                           value={(form.contact_name || "").split(" ").slice(1).join(" ")}
+                           value={form.last_name || ""}
                            onChange={(e) => {
                              const last = e.target.value;
-                             const first = (form.contact_name || "").split(" ")[0] || "";
-                             updateField("contact_name", [first, last].filter(Boolean).join(" "));
+                             updateField("last_name", last);
+                             const full = [form.first_name, last].filter(Boolean).join(" ");
+                             updateField("full_name", full);
+                             updateField("contact_name", full);
                            }}
                          />
                        </div>
