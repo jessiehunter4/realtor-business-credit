@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 import { COHORT_TIME_SLOTS } from "./IntakeSurveyPage";
+import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
