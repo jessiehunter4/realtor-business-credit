@@ -402,6 +402,9 @@ export type Database = {
           agent_id: string | null
           brokerage_name: string | null
           business_credit_cards: string | null
+          business_phone: string | null
+          business_street: string | null
+          business_zip: string | null
           city: string | null
           contact_email: string | null
           contact_name: string | null
@@ -458,6 +461,9 @@ export type Database = {
           agent_id?: string | null
           brokerage_name?: string | null
           business_credit_cards?: string | null
+          business_phone?: string | null
+          business_street?: string | null
+          business_zip?: string | null
           city?: string | null
           contact_email?: string | null
           contact_name?: string | null
@@ -514,6 +520,9 @@ export type Database = {
           agent_id?: string | null
           brokerage_name?: string | null
           business_credit_cards?: string | null
+          business_phone?: string | null
+          business_street?: string | null
+          business_zip?: string | null
           city?: string | null
           contact_email?: string | null
           contact_name?: string | null
