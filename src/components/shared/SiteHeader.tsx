@@ -24,7 +24,7 @@ const SiteHeader = () => {
           <img
             src={logoAsset.url}
             alt="RE Pro Business Credit"
-            className="h-10 md:h-12 w-auto"
+            className="h-10 md:h-12 w-36 md:w-44"
           />
         </Link>
 
