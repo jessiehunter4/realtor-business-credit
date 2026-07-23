@@ -18,6 +18,7 @@ import {
   User, Target, Building, CreditCard, Handshake, Sparkles, FileText, Send,
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import { COHORT_TIME_SLOTS } from "./IntakeSurveyPage";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
@@ -144,7 +145,9 @@ export default function AdminIntakeCoachView() {
       "business_credit_cards", "vendor_tradelines", "credit_reporting_bureaus",
       "funding_gap_methods", "desired_funding_types", "personal_guarantee_comfort",
       "personal_credit_score_range", "preferred_support_format",
-      "interest_in_cohort", "preferred_cohort_days", "investment_readiness",
+      "interest_in_cohort", "preferred_cohort_days",
+      "preferred_cohort_time_1", "preferred_cohort_time_2",
+      "investment_readiness",
       "additional_notes",
     ];
     const updateFields: Record<string, any> = {};
@@ -782,8 +785,46 @@ export default function AdminIntakeCoachView() {
                       </RadioGroup>
                     </div>
                     <div className="space-y-2">
-                      <Label>Preferred days/times for cohort</Label>
-                      <Input value={form.preferred_cohort_days || ""} onChange={(e) => updateField("preferred_cohort_days", e.target.value)} />
+                      <Label>Preferred cohort session time</Label>
+                      <p className="text-xs text-muted-foreground">Cohorts meet Mon/Wed/Fri at 7:00 AM or 5:00 PM PT.</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-normal">1st choice</Label>
+                          <Select
+                            value={(form as any).preferred_cohort_time_1 || ""}
+                            onValueChange={(v) => {
+                              const second = (form as any).preferred_cohort_time_2 || "";
+                              updateField("preferred_cohort_time_1" as any, v);
+                              updateField("preferred_cohort_days", [v, second].filter(Boolean).join("; "));
+                            }}
+                          >
+                            <SelectTrigger><SelectValue placeholder="Select a time" /></SelectTrigger>
+                            <SelectContent>
+                              {COHORT_TIME_SLOTS.map((slot) => (
+                                <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-sm font-normal">2nd choice</Label>
+                          <Select
+                            value={(form as any).preferred_cohort_time_2 || ""}
+                            onValueChange={(v) => {
+                              const first = (form as any).preferred_cohort_time_1 || "";
+                              updateField("preferred_cohort_time_2" as any, v);
+                              updateField("preferred_cohort_days", [first, v].filter(Boolean).join("; "));
+                            }}
+                          >
+                            <SelectTrigger><SelectValue placeholder="Select a time" /></SelectTrigger>
+                            <SelectContent>
+                              {COHORT_TIME_SLOTS.map((slot) => (
+                                <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label>Investment readiness</Label>
