@@ -827,8 +827,50 @@ export default function IntakeSurveyPage() {
                 </RadioGroup>
               </div>
               <div className="space-y-2">
-                <Label>Preferred days/times for cohort sessions</Label>
-                <Input value={form.preferred_cohort_days || ""} onChange={e => updateField("preferred_cohort_days", e.target.value)} placeholder="e.g. Tuesdays at 12pm PT" />
+                <Label>Preferred cohort session time</Label>
+                <p className="text-xs text-muted-foreground">Cohorts meet Mon/Wed/Fri at 7:00 AM or 5:00 PM PT. Pick your 1st and 2nd choice.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-sm font-normal">1st choice</Label>
+                    <Select
+                      value={form.preferred_cohort_time_1 || ""}
+                      onValueChange={(v) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          preferred_cohort_time_1: v,
+                          preferred_cohort_days: [v, prev.preferred_cohort_time_2].filter(Boolean).join("; "),
+                        }));
+                      }}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select a time" /></SelectTrigger>
+                      <SelectContent>
+                        {COHORT_TIME_SLOTS.map((slot) => (
+                          <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-sm font-normal">2nd choice</Label>
+                    <Select
+                      value={form.preferred_cohort_time_2 || ""}
+                      onValueChange={(v) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          preferred_cohort_time_2: v,
+                          preferred_cohort_days: [prev.preferred_cohort_time_1, v].filter(Boolean).join("; "),
+                        }));
+                      }}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select a time" /></SelectTrigger>
+                      <SelectContent>
+                        {COHORT_TIME_SLOTS.map((slot) => (
+                          <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Investment readiness</Label>
