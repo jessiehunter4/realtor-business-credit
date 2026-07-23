@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
+import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -897,6 +898,7 @@ export default function IntakeSurveyPage() {
                   ))}
                 </RadioGroup>
               </div>
+              <IntakePricingAndReadiness readiness={form.investment_readiness} />
               <div className="space-y-2">
                 <Label>Anything else you want us to know before our session?</Label>
                 <Textarea value={form.additional_notes || ""} onChange={e => updateField("additional_notes", e.target.value)} rows={4} />

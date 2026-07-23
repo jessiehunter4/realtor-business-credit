@@ -1,101 +1,38 @@
+## Goal
 
-# Program Readiness & Next Steps — Redesign Plan
+On the Intake Survey (Step E — Program Fit & Support), directly under the "Preferred cohort times" (1st/2nd choice) block, add:
 
-## Goals
-- Replace the vague "Investment readiness" prompt with a clear, action-oriented question.
-- Give agents an inline, expandable path to pricing + next action right where they review their plan, so they don't have to navigate away.
-- Route each readiness choice to the right destination (Stripe, prep guidance, 1:1 booking, or continued browsing).
-- Keep the design extensible for future tiers and readiness options.
+1. An expanding **"Take a look at our pricing"** FAQ-style accordion — same tiers as the Pricing page, no navigation required.
+2. A **readiness response block** that reacts to the existing "Where are you right now with starting the program?" radio group. Each choice reveals a dropdown-style panel with a tailored message + CTA.
 
-## Recommended Placement
-Primary surface: **`PortalPlanView` (agent-facing plan)**, appended as a new Section 7 "Your Next Step" below `PlanDocument`. This is the highest-intent moment — they've just read their custom plan.
+The existing radio question stays as-is (used for saving `readiness` to the DB). The new block reads its value and renders response content.
 
-Secondary surfaces (reuse same component):
-- Bottom of `SamplePlanPage` (drives sample viewers to book or explore pricing).
-- Optional post-submit confirmation on `IntakeSurveyPage` (before their plan is ready, shows readiness capture only, not CTAs).
+## Copy per choice
 
-The intake survey itself keeps a simplified version of the question for coach context, but the *decision experience* moves to the plan view where a real plan justifies the ask.
+- **Ready now** → "Great — let's get started." Primary CTA: **Enroll now** (Stripe checkout link from `pricingTiers.ts`, defaults to Cohort tier).
+- **Within 30 days** → "No problem, no pressure. We'll help you prep so day one moves fast." No hard CTA; small secondary link to pricing accordion above.
+- **Need more clarity** → "Okay — schedule a free 1:1 with a coach and we'll walk it through together." Primary CTA: **Book a free 1-on-1** → `/one-on-one`.
+- **Just exploring** → "No problem — we'll keep you updated." Secondary link: **Read the free guide** → `/guide`.
 
-## New Question & Options
-Prompt: **"Where are you right now with starting the program?"** (subtitle: "Pick the option that fits — we'll show you exactly what to do next.")
+Each response uses the same accent-card styling already used in `NextStepPanel` (green/amber/sky/neutral).
 
-Options (radio, each expands accordion-style on select):
+## Placement
 
-1. **I'm ready to start now** → confirmation panel + primary CTA "Enroll & begin" → routes to `/checkout` (existing Stripe payment link). Secondary link "See what's included" opens the inline Pricing accordion.
-2. **I want to start within 30 days** → "No problem — and no pressure." panel with a short prep checklist (gather EIN docs, review the guide, list current business accounts) + "Save my spot — email me reminders" (tags contact in GHL) + "See pricing while I prepare".
-3. **I need more clarity first** → "Let's talk it through." panel + primary CTA "Book a free 1-on-1" → `/one-on-one` booking, plus a "Reply with a question" mailto/link.
-4. **I'm just exploring** → "Take your time." panel with links to Guide, Sample Plan, and Pricing. No hard CTA, one soft "Send me the highlights" opt-in.
+`src/pages/IntakeSurveyPage.tsx`, Step E, immediately after the two preferred-time Select dropdowns and before the "Anything else" textarea. Both new blocks render inside the existing card, so the survey flow is uninterrupted.
 
-Everything except option 1 also surfaces the inline Pricing accordion so the price is never a hidden variable.
+## Technical details
 
-## Inline Pricing Accordion
-New component `InlinePricingAccordion` built on shadcn `Accordion` (type=single, collapsible). One panel per tier, using the same tier data source that powers `PricingPage`:
-- Self-Paced
-- Cohort (highlighted "Most popular")
-- 1:1 Coaching
+- **New component:** `src/components/intake/IntakePricingAndReadiness.tsx`
+  - Props: `readiness: string` (current radio value).
+  - Renders `<InlinePricingAccordion />` (reuse existing component from `src/components/plan/InlinePricingAccordion.tsx`) with a friendly headline: "Take a look at our pricing".
+  - Renders a conditional response card below, keyed on `readiness`. Uses a local map of `{ headline, body, cta }` mirroring `NextStepPanel`'s options but scoped to survey context (no funnel event / no GHL tagging — those already fire when the plan is generated).
+- **Edit:** `src/pages/IntakeSurveyPage.tsx`
+  - Import and mount the new component in Step E, passing the current `readiness` state value.
+  - No schema changes, no edge function changes.
+- **Reuse:** `PRICING_TIERS` and `InlinePricingAccordion` (already shared between Pricing page and Plan portal), so pricing stays in sync everywhere.
 
-Each panel shows: price, billing cadence, 4–6 bullet inclusions, primary CTA (Stripe link for that tier), "Compare all plans" link to `/pricing` for the full table. Extract tier definitions from `PricingPage` into `src/data/pricingTiers.ts` so both surfaces stay in sync — this is how future tiers plug in with zero redesign.
+## Out of scope
 
-## Interaction Flow
-```text
-Plan renders
-   │
-   ▼
-"Your Next Step" card (always visible under plan)
-   │
-   ├─ radio: Ready now         → green confirmation + Enroll CTA (Stripe)
-   ├─ radio: Within 30 days    → prep checklist + reminder opt-in + pricing
-   ├─ radio: Need more clarity → 1:1 booking CTA + pricing
-   └─ radio: Just exploring    → resource links + pricing (soft)
-
-Below radios: <InlinePricingAccordion />  (collapsed by default; auto-opens
-first tier when the selected option's panel includes "See pricing")
-```
-
-Selection is persisted to `custom_plans.readiness_selection` (new column) and mirrored to `intake_surveys.investment_readiness` for backward compatibility so the coach view still shows it. Selection also fires a funnel event (`plan_readiness_selected`) and applies a GHL tag (`f-readiness-ready-now`, `f-readiness-30-days`, `f-readiness-clarity`, `f-readiness-exploring`).
-
-## Copy Revisions
-- Intake survey Step E question changes to "Where are you right now with starting the program?" with the four new option labels above (replacing "Ready now / Within 30 days / Need more clarity / Just exploring" wording — the values stored keep the same enum for DB compatibility).
-- Admin coach view (`AdminIntakeCoachView.tsx` line 830) label updates to "Program readiness" and reuses the new option labels.
-- `generate-plan` prompt (line 204): rename field label to "Program readiness" to keep coach/AI language aligned.
-- Remove any lingering "investment" phrasing from Portal/Sample plan surfaces.
-
-## Technical Changes
-
-### New files
-- `src/components/plan/NextStepPanel.tsx` — radio group + four expandable option panels + selection persistence.
-- `src/components/plan/InlinePricingAccordion.tsx` — shadcn Accordion consuming shared tier data.
-- `src/data/pricingTiers.ts` — canonical tier list (name, price, cadence, bullets, stripeUrl, highlighted flag).
-
-### Modified files
-- `src/pages/PortalPlanView.tsx` — render `<NextStepPanel planId={id} contactId={...} />` below `<PlanDocument />` inside the "Plan" tab.
-- `src/pages/SamplePlanPage.tsx` — render the same panel in demo mode (no persistence, CTAs still live).
-- `src/pages/PricingPage.tsx` — refactor to consume `pricingTiers.ts` (visual output unchanged).
-- `src/pages/IntakeSurveyPage.tsx` — update Step E label + option copy; keep stored values compatible.
-- `src/pages/AdminIntakeCoachView.tsx` — update label + options.
-- `supabase/functions/generate-plan/index.ts` — relabel field in prompt.
-
-### Database migration
-- `ALTER TABLE public.custom_plans ADD COLUMN readiness_selection TEXT` (nullable, one of the four enum values).
-- No changes to `intake_surveys` schema — existing `investment_readiness` column is reused for backward compatibility.
-
-### Business logic
-- `NextStepPanel` fetches `readiness_selection` on mount if present; on change it:
-  1. Upserts to `custom_plans.readiness_selection`.
-  2. Calls `tag-ghl-contact` edge function with the mapped tag.
-  3. Logs a funnel event via existing `logFunnelEvent` helper.
-- Stripe checkout CTAs continue to open the existing payment link in a new tab; the "Enroll" primary CTA carries `contactId` as a query param the same way `CheckoutPage` already does.
-
-### Edge cases
-- Anonymous viewer (no contactId): selection still works locally but skips GHL tagging and DB write (or writes with `null` contact).
-- Sample plan mode: panel renders but persistence + tagging are no-ops (`demo` prop).
-- Changing selection: overwrites previous value, replaces GHL tag (`tag-ghl-contact` handles idempotency).
-- Draft/archived plans: panel hidden (only shown when `status === "published"`).
-- Future tiers: add an entry to `pricingTiers.ts` — accordion and PricingPage pick it up automatically.
-- Future readiness options: add to a single `READINESS_OPTIONS` array in `NextStepPanel` with `{ id, label, panel: ReactNode, primaryCta }`.
-
-## Phased Rollout
-1. **Phase 1 — Foundation:** extract `pricingTiers.ts`, refactor `PricingPage` to use it (no visual change). Ship migration for `custom_plans.readiness_selection`.
-2. **Phase 2 — Panel:** build `InlinePricingAccordion` + `NextStepPanel`, mount on `PortalPlanView` + `SamplePlanPage`. Wire GHL tagging and funnel events.
-3. **Phase 3 — Copy alignment:** update intake survey, admin coach view, and generate-plan prompt to the new "Program readiness" language.
-4. **Phase 4 — Measure & iterate:** review funnel events by readiness bucket in the admin dashboard; adjust panel copy/CTAs based on conversion.
+- No changes to `NextStepPanel` on the plan portal.
+- No new DB columns; `readiness` already persists via existing intake save logic.
+- No Stripe changes — reuses existing tier links.
