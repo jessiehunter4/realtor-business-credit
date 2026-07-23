@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import {
   Check,
   Minus,
@@ -230,6 +231,18 @@ const Cell = ({ value }: { value: boolean | string }) => {
 };
 
 const PricingPage = () => {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight");
+  const highlightRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!highlight) return;
+    const t = setTimeout(() => {
+      highlightRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [highlight]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
