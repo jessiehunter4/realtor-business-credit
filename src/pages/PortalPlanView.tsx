@@ -8,12 +8,21 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PlanDocument, { type PlanData } from "@/components/plan/PlanDocument";
 import PlanPDF from "@/components/plan/PlanPDF";
 import PlanTaskChecklist from "@/components/plan/PlanTaskChecklist";
+import type { RecommendedProgram, RecommendationReasoningBullet } from "@/components/plan/RecommendedProgramCard";
+
+type RecommendationBundle = {
+  program: RecommendedProgram;
+  bullets: RecommendationReasoningBullet[];
+  overridden?: boolean;
+  needsMoreInfo?: boolean;
+};
 
 export default function PortalPlanView() {
   const { id } = useParams<{ id: string }>();
   const [planData, setPlanData] = useState<PlanData | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [recommendation, setRecommendation] = useState<RecommendationBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -23,7 +32,7 @@ export default function PortalPlanView() {
       if (!id) return;
       const { data, error: fetchError } = await supabase
         .from("custom_plans")
-        .select("plan_data, status, created_at, updated_at")
+        .select("plan_data, status, created_at, updated_at, recommended_program_slug, recommendation_reasoning, recommendation_overridden_at")
         .eq("id", id)
         .maybeSingle();
 
@@ -56,6 +65,24 @@ export default function PortalPlanView() {
       setPlanData(data.plan_data as unknown as PlanData);
       setCreatedAt(data.created_at ?? null);
       setUpdatedAt(data.updated_at ?? null);
+
+      if (data.recommended_program_slug) {
+        const { data: prog } = await supabase
+          .from("programs")
+          .select("slug, name, tagline, price_display, cadence, cta_label, cta_href")
+          .eq("slug", data.recommended_program_slug)
+          .maybeSingle();
+        if (prog) {
+          const reasoning = (data.recommendation_reasoning as any) || {};
+          setRecommendation({
+            program: prog as RecommendedProgram,
+            bullets: Array.isArray(reasoning.bullets) ? reasoning.bullets : [],
+            overridden: !!data.recommendation_overridden_at,
+            needsMoreInfo: !!reasoning.needs_more_info,
+          });
+        }
+      }
+
       setLoading(false);
     }
     fetchPlan();
@@ -66,7 +93,7 @@ export default function PortalPlanView() {
     setGenerating(true);
     try {
       const blob = await pdf(
-        <PlanPDF planData={planData} createdAt={createdAt} updatedAt={updatedAt} />
+        <PlanPDF planData={planData} createdAt={createdAt} updatedAt={updatedAt} recommendation={recommendation} />
       ).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -79,7 +106,7 @@ export default function PortalPlanView() {
     } finally {
       setGenerating(false);
     }
-  }, [planData, createdAt, updatedAt]);
+  }, [planData, createdAt, updatedAt, recommendation]);
 
   if (loading) {
     return (
@@ -125,7 +152,7 @@ export default function PortalPlanView() {
             </Button>
           </div>
           <TabsContent value="plan">
-            <PlanDocument planData={planData} createdAt={createdAt} updatedAt={updatedAt} />
+            <PlanDocument planData={planData} createdAt={createdAt} updatedAt={updatedAt} recommendation={recommendation} />
           </TabsContent>
           <TabsContent value="checklist">
             {id && <PlanTaskChecklist planId={id} planData={planData} />}
