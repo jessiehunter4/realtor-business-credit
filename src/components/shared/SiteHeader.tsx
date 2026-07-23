@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/brand/rbc-logo-narrow.png.asset.json";
+import logoAsset from "@/assets/brand/brand_logo.jpeg.asset.json";
 
 const navLinks = [
   { to: "/guide", label: "Guide" },
