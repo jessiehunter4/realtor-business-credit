@@ -18,6 +18,7 @@ import {
   User, Target, Building, CreditCard, Handshake, Sparkles, FileText, Send,
 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import { COHORT_TIME_SLOTS } from "./IntakeSurveyPage";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
