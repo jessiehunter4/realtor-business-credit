@@ -388,40 +388,53 @@ export default function AdminIntakeCoachView() {
                       </div>
                       <div className="space-y-2">
                         <Label>Business Phone</Label>
-                        <Input
-                          type="tel"
+                        <PhoneInput
                           value={form.business_phone || ""}
-                          onChange={(e) => updateField("business_phone", e.target.value)}
-                          placeholder="(555) 555-5555"
+                          onChange={(raw) => updateField("business_phone", raw)}
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-base font-semibold">Business Address</Label>
-                      <Input
-                        value={form.business_street || ""}
-                        onChange={(e) => updateField("business_street", e.target.value)}
-                        placeholder="Street address"
-                      />
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Input
-                          value={form.city || ""}
-                          onChange={(e) => updateField("city", e.target.value)}
-                          placeholder="City"
-                        />
-                        <Select value={form.state || ""} onValueChange={(v) => updateField("state", v)}>
-                          <SelectTrigger><SelectValue placeholder="State" /></SelectTrigger>
-                          <SelectContent>
-                            {US_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                        <Input
-                          value={form.business_zip || ""}
-                          onChange={(e) => updateField("business_zip", e.target.value)}
-                          placeholder="ZIP code"
-                          inputMode="numeric"
-                        />
-                      </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="cv-street" className="text-sm font-normal text-muted-foreground">Street</Label>
+                         <Input
+                           id="cv-street"
+                           value={form.business_street || ""}
+                           onChange={(e) => updateField("business_street", e.target.value)}
+                           placeholder="123 Main St"
+                         />
+                       </div>
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                         <div className="space-y-2">
+                           <Label htmlFor="cv-city" className="text-sm font-normal text-muted-foreground">City</Label>
+                           <Input
+                             id="cv-city"
+                             value={form.city || ""}
+                             onChange={(e) => updateField("city", e.target.value)}
+                             placeholder="City"
+                           />
+                         </div>
+                         <div className="space-y-2">
+                           <Label className="text-sm font-normal text-muted-foreground">State</Label>
+                           <Select value={form.state || ""} onValueChange={(v) => updateField("state", v)}>
+                             <SelectTrigger><SelectValue placeholder="State" /></SelectTrigger>
+                             <SelectContent>
+                               {US_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                             </SelectContent>
+                           </Select>
+                         </div>
+                         <div className="space-y-2">
+                           <Label htmlFor="cv-zip" className="text-sm font-normal text-muted-foreground">ZIP Code</Label>
+                           <Input
+                             id="cv-zip"
+                             value={form.business_zip || ""}
+                             onChange={(e) => updateField("business_zip", e.target.value)}
+                             placeholder="12345"
+                             inputMode="numeric"
+                           />
+                         </div>
+                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label>License Type</Label>
