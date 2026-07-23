@@ -15,7 +15,7 @@ import {
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import Seo from "@/components/shared/Seo";
-import { Badge } from "@/components/ui/badge";
+
 import {
   Accordion,
   AccordionContent,
