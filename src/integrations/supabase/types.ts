@@ -393,6 +393,8 @@ export type Database = {
           desired_monthly_credit_capacity: string | null
           entity_type: string | null
           filled_by: string
+          first_name: string | null
+          full_name: string | null
           funding_gap_methods: string[] | null
           gci_last_12_months: string | null
           goal_time_horizon: string | null
@@ -406,6 +408,7 @@ export type Database = {
           id: string
           interest_in_cohort: string | null
           investment_readiness: string | null
+          last_name: string | null
           lead_id: string | null
           license_type: string | null
           personal_credit_score_range: string | null
@@ -444,6 +447,8 @@ export type Database = {
           desired_monthly_credit_capacity?: string | null
           entity_type?: string | null
           filled_by?: string
+          first_name?: string | null
+          full_name?: string | null
           funding_gap_methods?: string[] | null
           gci_last_12_months?: string | null
           goal_time_horizon?: string | null
@@ -457,6 +462,7 @@ export type Database = {
           id?: string
           interest_in_cohort?: string | null
           investment_readiness?: string | null
+          last_name?: string | null
           lead_id?: string | null
           license_type?: string | null
           personal_credit_score_range?: string | null
@@ -495,6 +501,8 @@ export type Database = {
           desired_monthly_credit_capacity?: string | null
           entity_type?: string | null
           filled_by?: string
+          first_name?: string | null
+          full_name?: string | null
           funding_gap_methods?: string[] | null
           gci_last_12_months?: string | null
           goal_time_horizon?: string | null
@@ -508,6 +516,7 @@ export type Database = {
           id?: string
           interest_in_cohort?: string | null
           investment_readiness?: string | null
+          last_name?: string | null
           lead_id?: string | null
           license_type?: string | null
           personal_credit_score_range?: string | null
