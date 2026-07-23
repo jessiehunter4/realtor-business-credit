@@ -342,16 +342,34 @@ export default function AdminIntakeCoachView() {
                     <CardDescription>You can edit (proxy-fill) any field on behalf of the agent.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Contact Name</Label>
-                        <Input value={form.contact_name || ""} onChange={(e) => updateField("contact_name", e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Contact Email</Label>
-                        <Input value={form.contact_email || ""} onChange={(e) => updateField("contact_email", e.target.value)} />
-                      </div>
-                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                       <div className="space-y-2">
+                         <Label>First Name</Label>
+                         <Input
+                           value={(form.contact_name || "").split(" ")[0] || ""}
+                           onChange={(e) => {
+                             const first = e.target.value;
+                             const rest = (form.contact_name || "").split(" ").slice(1).join(" ");
+                             updateField("contact_name", [first, rest].filter(Boolean).join(" "));
+                           }}
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label>Last Name</Label>
+                         <Input
+                           value={(form.contact_name || "").split(" ").slice(1).join(" ")}
+                           onChange={(e) => {
+                             const last = e.target.value;
+                             const first = (form.contact_name || "").split(" ")[0] || "";
+                             updateField("contact_name", [first, last].filter(Boolean).join(" "));
+                           }}
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label>Contact Email</Label>
+                         <Input value={form.contact_email || ""} onChange={(e) => updateField("contact_email", e.target.value)} />
+                       </div>
+                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Brokerage / Team</Label>
