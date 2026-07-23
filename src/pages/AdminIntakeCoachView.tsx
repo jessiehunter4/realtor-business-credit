@@ -40,6 +40,30 @@ const SECTIONS = [
   { key: "program", label: "Program Fit", icon: Handshake },
 ] as const;
 
+const GOAL_OPTIONS = [
+  "Cover overhead between closings",
+  "Grow marketing spend",
+  "Hire admin, ISA, or team members",
+  "Build reserves / emergency fund",
+  "Buy an investment property",
+  "Fund brokerage transition or expansion",
+  "Reduce reliance on personal credit",
+  "Prepare for a slow season",
+  "Other",
+];
+const PAIN_OPTIONS = [
+  "Cash flow gap between commissions",
+  "High personal credit card balances",
+  "No access to business credit",
+  "Inconsistent income planning",
+  "Debt payoff",
+  "Tax bill / quarterly estimates",
+  "Other",
+];
+const HORIZON_OPTIONS = ["0–3 months", "3–6 months", "6–12 months", "12–24 months"];
+const FUNDING_AMOUNT_OPTIONS = ["Under $10K","$10K–$25K","$25K–$50K","$50K–$100K","$100K–$250K","$250K+","Not sure"];
+const CREDIT_CAPACITY_OPTIONS = ["Under $5K","$5K–$10K","$10K–$25K","$25K–$50K","$50K–$100K","$100K+","Not sure"];
+
 type SectionKey = typeof SECTIONS[number]["key"];
 
 export default function AdminIntakeCoachView() {
@@ -112,6 +136,8 @@ export default function AdminIntakeCoachView() {
       "license_type", "years_in_real_estate", "gci_last_12_months",
       "top_financial_goal", "top_financial_need",
       "desired_monthly_credit_capacity", "has_business_entity", "entity_type",
+      "primary_goal", "additional_goals", "top_financial_pain",
+      "goal_time_horizon", "target_funding_amount", "goals_notes",
       "has_business_address", "address_type", "has_business_phone",
       "has_business_email", "has_business_website", "has_business_bank_account",
       "uses_accounting_software", "accounting_software_name",
@@ -402,19 +428,105 @@ export default function AdminIntakeCoachView() {
                   <CardHeader>
                     <CardTitle>Goals</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
                     <div className="space-y-2">
-                      <Label>Top financial goal (12–24 months)</Label>
-                      <Textarea value={form.top_financial_goal || ""} onChange={(e) => updateField("top_financial_goal", e.target.value)} rows={3} />
+                      <Label>Primary financial goal</Label>
+                      <RadioGroup value={form.primary_goal || ""} onValueChange={(v) => {
+                        updateField("primary_goal", v);
+                        updateField("top_financial_goal", v);
+                        const extras = ((form.additional_goals as string[] | null) || []).filter((g) => g !== v);
+                        updateField("additional_goals", extras);
+                      }}>
+                        {GOAL_OPTIONS.map((opt) => (
+                          <div key={opt} className="flex items-center space-x-2">
+                            <RadioGroupItem value={opt} id={`cv-pg-${opt}`} />
+                            <Label htmlFor={`cv-pg-${opt}`} className="font-normal">{opt}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
                     </div>
+
                     <div className="space-y-2">
-                      <Label>Most important financial need right now</Label>
-                      <Textarea value={form.top_financial_need || ""} onChange={(e) => updateField("top_financial_need", e.target.value)} rows={3} />
+                      <Label>Additional goals</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {GOAL_OPTIONS.filter((o) => o !== form.primary_goal).map((opt) => {
+                          const arr = (form.additional_goals as string[] | null) || [];
+                          const checked = arr.includes(opt);
+                          return (
+                            <div key={opt} className="flex items-start space-x-2">
+                              <Checkbox
+                                id={`cv-ag-${opt}`}
+                                checked={checked}
+                                onCheckedChange={() => {
+                                  const next = checked ? arr.filter((v) => v !== opt) : [...arr, opt];
+                                  updateField("additional_goals", next);
+                                }}
+                              />
+                              <Label htmlFor={`cv-ag-${opt}`} className="font-normal">{opt}</Label>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
+
                     <div className="space-y-2">
-                      <Label>Desired monthly business credit capacity</Label>
-                      <Input value={form.desired_monthly_credit_capacity || ""} onChange={(e) => updateField("desired_monthly_credit_capacity", e.target.value)} />
+                      <Label>Top financial pain right now</Label>
+                      <RadioGroup value={form.top_financial_pain || ""} onValueChange={(v) => {
+                        updateField("top_financial_pain", v);
+                        updateField("top_financial_need", v);
+                      }}>
+                        {PAIN_OPTIONS.map((opt) => (
+                          <div key={opt} className="flex items-center space-x-2">
+                            <RadioGroupItem value={opt} id={`cv-pain-${opt}`} />
+                            <Label htmlFor={`cv-pain-${opt}`} className="font-normal">{opt}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Time horizon</Label>
+                        <Select value={form.goal_time_horizon || ""} onValueChange={(v) => updateField("goal_time_horizon", v)}>
+                          <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                          <SelectContent>
+                            {HORIZON_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Target funding amount</Label>
+                        <Select value={form.target_funding_amount || ""} onValueChange={(v) => updateField("target_funding_amount", v)}>
+                          <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                          <SelectContent>
+                            {FUNDING_AMOUNT_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Desired monthly credit capacity</Label>
+                      <Select value={form.desired_monthly_credit_capacity || ""} onValueChange={(v) => updateField("desired_monthly_credit_capacity", v)}>
+                        <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                        <SelectContent>
+                          {CREDIT_CAPACITY_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Goals notes</Label>
+                      <Textarea value={form.goals_notes || ""} onChange={(e) => updateField("goals_notes", e.target.value)} rows={3} />
+                    </div>
+
+                    {(form.top_financial_goal || form.top_financial_need) && !form.primary_goal && !form.top_financial_pain ? (
+                      <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
+                        <div className="font-medium">Legacy free-text goal responses:</div>
+                        {form.top_financial_goal ? <div><span className="font-semibold">Goal:</span> {form.top_financial_goal}</div> : null}
+                        {form.top_financial_need ? <div><span className="font-semibold">Need:</span> {form.top_financial_need}</div> : null}
+                      </div>
+                    ) : null}
                   </CardContent>
                 </Card>
               </div>
