@@ -897,6 +897,7 @@ export default function IntakeSurveyPage() {
                   ))}
                 </RadioGroup>
               </div>
+              <IntakePricingAndReadiness readiness={form.investment_readiness} />
               <div className="space-y-2">
                 <Label>Anything else you want us to know before our session?</Label>
                 <Textarea value={form.additional_notes || ""} onChange={e => updateField("additional_notes", e.target.value)} rows={4} />
