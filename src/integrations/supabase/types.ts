@@ -429,6 +429,8 @@ export type Database = {
           personal_credit_score_range: string | null
           personal_guarantee_comfort: string | null
           preferred_cohort_days: string | null
+          preferred_cohort_time_1: string | null
+          preferred_cohort_time_2: string | null
           preferred_support_format: string | null
           primary_goal: string | null
           sides_closed_last_12_months: string | null
@@ -483,6 +485,8 @@ export type Database = {
           personal_credit_score_range?: string | null
           personal_guarantee_comfort?: string | null
           preferred_cohort_days?: string | null
+          preferred_cohort_time_1?: string | null
+          preferred_cohort_time_2?: string | null
           preferred_support_format?: string | null
           primary_goal?: string | null
           sides_closed_last_12_months?: string | null
@@ -537,6 +541,8 @@ export type Database = {
           personal_credit_score_range?: string | null
           personal_guarantee_comfort?: string | null
           preferred_cohort_days?: string | null
+          preferred_cohort_time_1?: string | null
+          preferred_cohort_time_2?: string | null
           preferred_support_format?: string | null
           primary_goal?: string | null
           sides_closed_last_12_months?: string | null
