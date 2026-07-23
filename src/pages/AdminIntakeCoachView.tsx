@@ -770,7 +770,7 @@ export default function AdminIntakeCoachView() {
                       </RadioGroup>
                     </div>
                     <div className="space-y-2">
-                      <Label>Personal credit score range (right now or currently)</Label>
+                      <Label>Personal credit score range (right now)</Label>
                       <Select value={form.personal_credit_score_range || ""} onValueChange={(v) => updateField("personal_credit_score_range", v)}>
                         <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
                         <SelectContent>
