@@ -1,0 +1,84 @@
+import type { LucideIcon } from "lucide-react";
+import { Sparkles, Users, HeartHandshake } from "lucide-react";
+
+export type PricingTier = {
+  id: "self-paced" | "cohort" | "one-on-one";
+  name: string;
+  price: string;
+  cadence: string;
+  cadenceNote?: string;
+  who: string;
+  features: string[];
+  notIncluded?: string[];
+  highlighted?: boolean;
+  ctaLabel: string;
+  ctaHref: string;
+  icon: LucideIcon;
+};
+
+// TODO: replace placeholders with real Stripe Payment Links (one per tier).
+export const STRIPE_LINKS = {
+  selfPaced: "https://buy.stripe.com/REPLACE_SELF_PACED",
+  cohort: "https://buy.stripe.com/REPLACE_COHORT",
+  oneOnOne: "https://buy.stripe.com/REPLACE_ONE_ON_ONE",
+} as const;
+
+export const PRICING_TIERS: PricingTier[] = [
+  {
+    id: "self-paced",
+    name: "Self-Paced Blueprint",
+    price: "$497",
+    cadence: "one-time",
+    cadenceNote: "Billed once — lifetime access to your plan & portal",
+    who: "For Realtors who want the plan and want to run with it on their own.",
+    features: [
+      "Custom Business, Finance & Credit Plan (PDF + portal)",
+      "Guide + 7-step action checklist",
+      "Free Fundability Scan",
+      "Credit Suite vendor & tradeline directory access",
+      "Email support",
+    ],
+    notIncluded: ["Live coaching calls", "Cohort community"],
+    ctaLabel: "Get Started",
+    ctaHref: STRIPE_LINKS.selfPaced,
+    icon: Sparkles,
+  },
+  {
+    id: "cohort",
+    name: "Realtor Credit Cohort",
+    price: "$1,997",
+    cadence: "90 days",
+    cadenceNote: "One-time enrollment for the 90-day program",
+    who: "For Realtors who want structure, accountability, and a small group.",
+    features: [
+      "Everything in Self-Paced",
+      "90-day cohort with 5–10 Realtors",
+      "Weekly live coaching calls",
+      "Private cohort community",
+      "Credit Suite client portal + coach",
+    ],
+    notIncluded: ["Private 1:1 coaching with Jessie"],
+    highlighted: true,
+    ctaLabel: "Enroll in Cohort",
+    ctaHref: STRIPE_LINKS.cohort,
+    icon: Users,
+  },
+  {
+    id: "one-on-one",
+    name: "1:1 Private Coaching",
+    price: "$4,997",
+    cadence: "per quarter",
+    cadenceNote: "Quarterly engagement, renewable",
+    who: "For Realtors and brokers who want private, high-touch guidance.",
+    features: [
+      "Everything in Cohort",
+      "Private 1:1 coaching with Jessie",
+      "Dedicated Credit Suite specialist",
+      "Priority response + funding strategy sessions",
+      "Quarterly plan reviews",
+    ],
+    ctaLabel: "Start 1:1 Coaching",
+    ctaHref: STRIPE_LINKS.oneOnOne,
+    icon: HeartHandshake,
+  },
+];

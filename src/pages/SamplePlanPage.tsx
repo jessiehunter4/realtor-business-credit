@@ -4,6 +4,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Calendar, Download, ArrowLeft, FileText } from "lucide-react";
 import PlanDocument from "@/components/plan/PlanDocument";
 import PlanPDF from "@/components/plan/PlanPDF";
+import NextStepPanel from "@/components/plan/NextStepPanel";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
 import Seo from "@/components/shared/Seo";
@@ -83,6 +84,8 @@ const SamplePlanPage = () => {
             createdAt={sampleCreatedAt}
             updatedAt={sampleUpdatedAt}
           />
+
+          <NextStepPanel demo />
         </div>
       </section>
 

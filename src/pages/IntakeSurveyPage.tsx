@@ -882,9 +882,14 @@ export default function IntakeSurveyPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Investment readiness</Label>
+                <Label>Where are you right now with starting the program?</Label>
                 <RadioGroup value={form.investment_readiness || ""} onValueChange={v => updateField("investment_readiness", v)}>
-                  {["Ready now", "Within 30 days", "Need more clarity first", "Just exploring"].map(opt => (
+                  {[
+                    "I'm ready to start now",
+                    "I want to start within 30 days",
+                    "I need more clarity first",
+                    "I'm just exploring",
+                  ].map(opt => (
                     <div key={opt} className="flex items-center space-x-2">
                       <RadioGroupItem value={opt} id={`ir-${opt}`} />
                       <Label htmlFor={`ir-${opt}`} className="font-normal">{opt}</Label>

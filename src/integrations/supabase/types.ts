@@ -204,6 +204,7 @@ export type Database = {
           plan_data: Json | null
           plan_html: string | null
           published_at: string | null
+          readiness_selection: string | null
           recommendation_overridden_at: string | null
           recommendation_overridden_by: string | null
           recommendation_reasoning: Json | null
@@ -224,6 +225,7 @@ export type Database = {
           plan_data?: Json | null
           plan_html?: string | null
           published_at?: string | null
+          readiness_selection?: string | null
           recommendation_overridden_at?: string | null
           recommendation_overridden_by?: string | null
           recommendation_reasoning?: Json | null
@@ -244,6 +246,7 @@ export type Database = {
           plan_data?: Json | null
           plan_html?: string | null
           published_at?: string | null
+          readiness_selection?: string | null
           recommendation_overridden_at?: string | null
           recommendation_overridden_by?: string | null
           recommendation_reasoning?: Json | null

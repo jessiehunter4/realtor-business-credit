@@ -1,0 +1,1 @@
+ALTER TABLE public.custom_plans ADD COLUMN IF NOT EXISTS readiness_selection TEXT;

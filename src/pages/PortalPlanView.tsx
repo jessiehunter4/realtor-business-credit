@@ -8,12 +8,16 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PlanDocument, { type PlanData } from "@/components/plan/PlanDocument";
 import PlanPDF from "@/components/plan/PlanPDF";
 import PlanTaskChecklist from "@/components/plan/PlanTaskChecklist";
+import NextStepPanel, { type ReadinessId } from "@/components/plan/NextStepPanel";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 export default function PortalPlanView() {
   const { id } = useParams<{ id: string }>();
+  const { contactId } = useContactIdentity();
   const [planData, setPlanData] = useState<PlanData | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [readiness, setReadiness] = useState<ReadinessId | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -23,7 +27,7 @@ export default function PortalPlanView() {
       if (!id) return;
       const { data, error: fetchError } = await supabase
         .from("custom_plans")
-        .select("plan_data, status, created_at, updated_at")
+        .select("plan_data, status, created_at, updated_at, readiness_selection")
         .eq("id", id)
         .maybeSingle();
 
@@ -56,6 +60,7 @@ export default function PortalPlanView() {
       setPlanData(data.plan_data as unknown as PlanData);
       setCreatedAt(data.created_at ?? null);
       setUpdatedAt(data.updated_at ?? null);
+      setReadiness((data.readiness_selection as ReadinessId | null) ?? null);
       setLoading(false);
     }
     fetchPlan();
@@ -126,6 +131,11 @@ export default function PortalPlanView() {
           </div>
           <TabsContent value="plan">
             <PlanDocument planData={planData} createdAt={createdAt} updatedAt={updatedAt} />
+            <NextStepPanel
+              planId={id}
+              contactId={contactId || undefined}
+              initialSelection={readiness}
+            />
           </TabsContent>
           <TabsContent value="checklist">
             {id && <PlanTaskChecklist planId={id} planData={planData} />}
