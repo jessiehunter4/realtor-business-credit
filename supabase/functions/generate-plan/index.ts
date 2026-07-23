@@ -201,7 +201,7 @@ Credit & Funding:
 Program Preferences:
 - Support Format: ${survey.preferred_support_format || "N/A"}
 - Cohort Interest: ${survey.interest_in_cohort || "N/A"}
-- Investment Readiness: ${survey.investment_readiness || "N/A"}
+- Program Readiness: ${survey.investment_readiness || "N/A"}
 - Additional Notes: ${survey.additional_notes || "None"}${notesText}
 
 Generate a personalized plan using the generate_plan tool. Be specific, actionable, and tie recommendations back to their stated goals and production level. Avoid generic advice. Do NOT provide legal, tax, or financial advice — this is education and coaching only.`;
