@@ -17,6 +17,7 @@ import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
+import PhoneInput from "@/components/shared/PhoneInput";
 import Seo from "@/components/shared/Seo";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -473,10 +474,9 @@ export default function IntakeSurveyPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Business Phone</Label>
-                  <Input
-                    type="tel"
+                  <PhoneInput
                     value={form.business_phone || ""}
-                    onChange={e => updateField("business_phone", e.target.value)}
+                    onChange={(digits) => updateField("business_phone", digits)}
                     placeholder="(555) 555-5555"
                   />
                 </div>
