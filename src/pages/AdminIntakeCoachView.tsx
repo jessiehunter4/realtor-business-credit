@@ -20,6 +20,7 @@ import {
 import type { Tables } from "@/integrations/supabase/types";
 import { COHORT_TIME_SLOTS } from "./IntakeSurveyPage";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
+import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import PhoneInput from "@/components/shared/PhoneInput";
 
 type IntakeSurvey = Tables<"intake_surveys">;
