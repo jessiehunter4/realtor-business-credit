@@ -267,20 +267,20 @@ export default function AdminIntakeCoachView() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/admin/intake")}>
+        <div className="container mx-auto px-4 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/admin/intake")} className="shrink-0">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold">{survey.contact_name || "Unnamed"}</h1>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-bold break-words">{survey.contact_name || "Unnamed"}</h1>
                 {statusBadge}
               </div>
-              <p className="text-sm text-muted-foreground">{survey.contact_email}</p>
+              <p className="text-sm text-muted-foreground break-all">{survey.contact_email}</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {existingPlanId && (
               <>
                 <Badge
@@ -293,11 +293,11 @@ export default function AdminIntakeCoachView() {
                 >
                   Plan: {existingPlanStatus}
                 </Badge>
-                <Button variant="outline" onClick={() => navigate(`/admin/plan/${existingPlanId}`)}>
+                <Button variant="outline" size="sm" onClick={() => navigate(`/admin/plan/${existingPlanId}`)}>
                   <FileText className="h-4 w-4 mr-1" /> View Plan
                 </Button>
                 {existingPlanStatus === "draft" && (
-                  <Button onClick={handleQuickPublish} disabled={publishing}>
+                  <Button size="sm" onClick={handleQuickPublish} disabled={publishing}>
                     {publishing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}
                     Publish
                   </Button>
@@ -306,6 +306,7 @@ export default function AdminIntakeCoachView() {
             )}
             <Button
               variant="secondary"
+              size="sm"
               onClick={handleGeneratePlan}
               disabled={generatingPlan}
             >
@@ -313,11 +314,11 @@ export default function AdminIntakeCoachView() {
               {existingPlanId ? "Regenerate Plan" : "Generate Plan"}
             </Button>
             {survey.status === "submitted" && (
-              <Button variant="outline" onClick={handleMarkReviewed}>
+              <Button variant="outline" size="sm" onClick={handleMarkReviewed}>
                 <CheckCircle className="h-4 w-4 mr-1" /> Mark Reviewed
               </Button>
             )}
-            <Button onClick={handleSaveProxy} disabled={saving}>
+            <Button size="sm" onClick={handleSaveProxy} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Save className="h-4 w-4 mr-1" />}
               Save Changes
             </Button>
@@ -327,14 +328,16 @@ export default function AdminIntakeCoachView() {
 
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6 flex-wrap h-auto gap-1">
-            {SECTIONS.map((s) => (
-              <TabsTrigger key={s.key} value={s.key} className="gap-1.5">
-                <s.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{s.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="mb-6 -mx-4 px-4 overflow-x-auto">
+            <TabsList className="inline-flex w-max h-auto gap-1">
+              {SECTIONS.map((s) => (
+                <TabsTrigger key={s.key} value={s.key} className="gap-1.5 whitespace-nowrap">
+                  <s.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{s.label}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
           {/* Profile & Production */}
           <TabsContent value="profile">
