@@ -411,13 +411,33 @@ export default function IntakeSurveyPage() {
             <CardContent className="space-y-4">
               {/* Name & Email fields (always shown in direct mode, read-only in token mode if pre-filled) */}
               {isDirectMode && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>Full Name <span className="text-destructive">*</span></Label>
+                    <Label>First Name <span className="text-destructive">*</span></Label>
                     <Input
-                      value={form.contact_name || ""}
-                      onChange={e => updateField("contact_name", e.target.value)}
-                      placeholder="Your full name"
+                      value={form.first_name || ""}
+                      onChange={e => {
+                        const first = e.target.value;
+                        updateField("first_name", first);
+                        const full = [first, form.last_name].filter(Boolean).join(" ");
+                        updateField("full_name", full);
+                        updateField("contact_name", full);
+                      }}
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Last Name <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={form.last_name || ""}
+                      onChange={e => {
+                        const last = e.target.value;
+                        updateField("last_name", last);
+                        const full = [form.first_name, last].filter(Boolean).join(" ");
+                        updateField("full_name", full);
+                        updateField("contact_name", full);
+                      }}
+                      placeholder="Last name"
                     />
                   </div>
                   <div className="space-y-2">
