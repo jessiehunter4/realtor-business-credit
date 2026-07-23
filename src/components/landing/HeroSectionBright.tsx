@@ -35,15 +35,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
       <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16 lg:py-20 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-primary/10 border border-primary/20">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
-            </span>
-            <span className="text-primary text-xs font-semibold tracking-wide uppercase">
-              Coaching Program for Realtors
-            </span>
-          </div>
           <h1 className="text-[clamp(2rem,7vw,3.75rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance">
             {headline}
           </h1>
