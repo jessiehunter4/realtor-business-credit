@@ -1,5 +1,9 @@
 import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import { formatPlanDate, isMeaningfullyUpdated } from "@/lib/utils";
+import RecommendedProgramCard, {
+  type RecommendedProgram,
+  type RecommendationReasoningBullet,
+} from "./RecommendedProgramCard";
 
 interface FundabilityItem {
   label: string;
@@ -58,9 +62,15 @@ interface PlanDocumentProps {
   onEditSection?: (section: string, value: string) => void;
   createdAt?: string | null;
   updatedAt?: string | null;
+  recommendation?: {
+    program: RecommendedProgram;
+    bullets: RecommendationReasoningBullet[];
+    overridden?: boolean;
+    needsMoreInfo?: boolean;
+  } | null;
 }
 
-export default function PlanDocument({ planData, editMode, onEditSection, createdAt, updatedAt }: PlanDocumentProps) {
+export default function PlanDocument({ planData, editMode, onEditSection, createdAt, updatedAt, recommendation }: PlanDocumentProps) {
   const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
   const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
   const goalsList = sections.goals_snapshot?.goals ?? [];
@@ -113,6 +123,18 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
           )}
         </div>
       </div>
+
+      {/* Recommended program */}
+      {recommendation && (
+        <div className="px-6 sm:px-8 pt-6">
+          <RecommendedProgramCard
+            program={recommendation.program}
+            bullets={recommendation.bullets}
+            overridden={recommendation.overridden}
+            needsMoreInfo={recommendation.needsMoreInfo}
+          />
+        </div>
+      )}
 
       {/* Section 1 - Goals & Snapshot */}
       <div className="px-6 sm:px-8 pt-6 pb-4">

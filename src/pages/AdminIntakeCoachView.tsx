@@ -84,6 +84,15 @@ export default function AdminIntakeCoachView() {
   const [existingPlanId, setExistingPlanId] = useState<string | null>(null);
   const [existingPlanStatus, setExistingPlanStatus] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [programs, setPrograms] = useState<Array<{ slug: string; name: string; tagline?: string | null }>>([]);
+  const [planRec, setPlanRec] = useState<{
+    slug: string | null;
+    reasoning: any;
+    score: any;
+    overriddenAt: string | null;
+  }>({ slug: null, reasoning: null, score: null, overriddenAt: null });
+  const [overrideSlug, setOverrideSlug] = useState<string>("");
+  const [savingOverride, setSavingOverride] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -92,7 +101,7 @@ export default function AdminIntakeCoachView() {
       supabase.from("intake_coach_notes").select("*").eq("intake_survey_id", id).order("created_at", { ascending: false }),
       supabase
         .from("custom_plans")
-        .select("id, status")
+        .select("id, status, recommended_program_slug, recommendation_reasoning, recommendation_score, recommendation_overridden_at")
         .eq("intake_survey_id", id)
         .in("status", ["draft", "published"])
         .order("created_at", { ascending: false })
@@ -108,14 +117,67 @@ export default function AdminIntakeCoachView() {
     setSurvey(surveyRes.data);
     setForm(surveyRes.data);
     setNotes(notesRes.data || []);
-    setExistingPlanId(planRes.data?.[0]?.id || null);
-    setExistingPlanStatus(planRes.data?.[0]?.status || null);
+    const plan = planRes.data?.[0];
+    setExistingPlanId(plan?.id || null);
+    setExistingPlanStatus(plan?.status || null);
+    setPlanRec({
+      slug: plan?.recommended_program_slug || null,
+      reasoning: plan?.recommendation_reasoning || null,
+      score: plan?.recommendation_score || null,
+      overriddenAt: plan?.recommendation_overridden_at || null,
+    });
+    setOverrideSlug(plan?.recommended_program_slug || "");
     setLoading(false);
   }, [id, navigate]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("programs")
+        .select("slug, name, tagline")
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      setPrograms((data as any[]) || []);
+    })();
+  }, []);
+
+  const handleSaveOverride = async () => {
+    if (!existingPlanId || !overrideSlug) return;
+    setSavingOverride(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("override-recommendation", {
+        body: { plan_id: existingPlanId, program_slug: overrideSlug },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Recommendation overridden");
+      fetchData();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to override");
+    }
+    setSavingOverride(false);
+  };
+
+  const handleClearOverride = async () => {
+    if (!existingPlanId) return;
+    setSavingOverride(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("override-recommendation", {
+        body: { plan_id: existingPlanId, clear: true },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Override cleared — regenerate plan to refresh AI recommendation");
+      fetchData();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to clear override");
+    }
+    setSavingOverride(false);
+  };
 
   const updateField = (key: keyof IntakeSurvey, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -752,6 +814,98 @@ export default function AdminIntakeCoachView() {
 
           {/* Program Fit */}
           <TabsContent value="program">
+            {existingPlanId && (
+              <Card className="mb-6 border-primary/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    Program Recommendation
+                    {planRec.overriddenAt && (
+                      <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800">
+                        Coach override
+                      </Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {planRec.slug ? (
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Current: </span>
+                      <span className="font-semibold">
+                        {programs.find((p) => p.slug === planRec.slug)?.name || planRec.slug}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No recommendation yet. Regenerate the plan to compute one.
+                    </p>
+                  )}
+
+                  {Array.isArray(planRec.reasoning?.bullets) && planRec.reasoning.bullets.length > 0 && (
+                    <div>
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                        Why this fits
+                      </Label>
+                      <ul className="mt-1.5 space-y-1 text-sm">
+                        {planRec.reasoning.bullets.map((b: any, i: number) => (
+                          <li key={i} className="flex gap-2">
+                            <span className="text-primary">•</span>
+                            <span>{b.bullet}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {planRec.score?.scores && (
+                    <details className="text-xs">
+                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                        Score breakdown
+                      </summary>
+                      <div className="mt-2 space-y-1 font-mono">
+                        {Object.entries(planRec.score.scores).map(([slug, s]: any) => (
+                          <div key={slug} className="flex justify-between border-b border-dashed py-0.5">
+                            <span>{slug}</span>
+                            <span className="font-bold">{String(s)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+
+                  <div className="pt-3 border-t space-y-2">
+                    <Label>Override recommendation</Label>
+                    <div className="flex gap-2">
+                      <select
+                        value={overrideSlug}
+                        onChange={(e) => setOverrideSlug(e.target.value)}
+                        className="flex-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="">Select a program…</option>
+                        {programs.map((p) => (
+                          <option key={p.slug} value={p.slug}>{p.name}</option>
+                        ))}
+                      </select>
+                      <Button
+                        onClick={handleSaveOverride}
+                        disabled={savingOverride || !overrideSlug || overrideSlug === planRec.slug}
+                      >
+                        {savingOverride ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save override"}
+                      </Button>
+                      {planRec.overriddenAt && (
+                        <Button variant="outline" onClick={handleClearOverride} disabled={savingOverride}>
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Overrides persist through plan regeneration. Clear the override to let the engine recompute on the next regeneration.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <Card>

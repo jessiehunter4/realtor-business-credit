@@ -204,6 +204,11 @@ export type Database = {
           plan_data: Json | null
           plan_html: string | null
           published_at: string | null
+          recommendation_overridden_at: string | null
+          recommendation_overridden_by: string | null
+          recommendation_reasoning: Json | null
+          recommendation_score: Json | null
+          recommended_program_slug: string | null
           status: string
           updated_at: string
         }
@@ -219,6 +224,11 @@ export type Database = {
           plan_data?: Json | null
           plan_html?: string | null
           published_at?: string | null
+          recommendation_overridden_at?: string | null
+          recommendation_overridden_by?: string | null
+          recommendation_reasoning?: Json | null
+          recommendation_score?: Json | null
+          recommended_program_slug?: string | null
           status?: string
           updated_at?: string
         }
@@ -234,6 +244,11 @@ export type Database = {
           plan_data?: Json | null
           plan_html?: string | null
           published_at?: string | null
+          recommendation_overridden_at?: string | null
+          recommendation_overridden_by?: string | null
+          recommendation_reasoning?: Json | null
+          recommendation_score?: Json | null
+          recommended_program_slug?: string | null
           status?: string
           updated_at?: string
         }
@@ -685,6 +700,57 @@ export type Database = {
           plan_id?: string
           task_key?: string
           task_label?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      programs: {
+        Row: {
+          active: boolean
+          cadence: string | null
+          created_at: string
+          cta_href: string | null
+          cta_label: string
+          fit_rules: Json
+          id: string
+          name: string
+          price_display: string | null
+          pricing_anchor: string | null
+          slug: string
+          sort_order: number
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cadence?: string | null
+          created_at?: string
+          cta_href?: string | null
+          cta_label?: string
+          fit_rules?: Json
+          id?: string
+          name: string
+          price_display?: string | null
+          pricing_anchor?: string | null
+          slug: string
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cadence?: string | null
+          created_at?: string
+          cta_href?: string | null
+          cta_label?: string
+          fit_rules?: Json
+          id?: string
+          name?: string
+          price_display?: string | null
+          pricing_anchor?: string | null
+          slug?: string
+          sort_order?: number
+          tagline?: string | null
           updated_at?: string
         }
         Relationships: []

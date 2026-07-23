@@ -7,6 +7,10 @@ import {
 } from "@react-pdf/renderer";
 import type { PlanData } from "./PlanDocument";
 import { formatPlanDate, isMeaningfullyUpdated } from "@/lib/utils";
+import type {
+  RecommendedProgram,
+  RecommendationReasoningBullet,
+} from "./RecommendedProgramCard";
 
 const s = StyleSheet.create({
   page: {
@@ -111,6 +115,27 @@ const s = StyleSheet.create({
   goalLabel: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#1e3a5f" },
   goalMeta: { fontSize: 8, color: "#64748b", marginBottom: 2 },
   goalWhy: { fontSize: 9, color: "#333333" },
+  recBox: {
+    borderWidth: 1.5,
+    borderColor: "#3eaf7c",
+    backgroundColor: "#3eaf7c0d",
+    borderRadius: 4,
+    padding: 10,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  recEyebrow: {
+    fontSize: 7,
+    letterSpacing: 1.5,
+    color: "#3eaf7c",
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    marginBottom: 3,
+  },
+  recName: { fontSize: 13, fontFamily: "Helvetica-Bold", color: "#0d1b2a" },
+  recTagline: { fontSize: 9, color: "#555555", marginTop: 2, marginBottom: 6 },
+  recPrice: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#1e3a5f" },
+  recBullet: { fontSize: 9, color: "#333333", marginBottom: 2 },
   programCard: {
     borderWidth: 1, borderColor: "#dddddd", borderRadius: 4,
     padding: 8, marginBottom: 6, width: "48%",
@@ -147,10 +172,17 @@ export default function PlanPDF({
   planData,
   createdAt,
   updatedAt,
+  recommendation,
 }: {
   planData: PlanData;
   createdAt?: string | null;
   updatedAt?: string | null;
+  recommendation?: {
+    program: RecommendedProgram;
+    bullets: RecommendationReasoningBullet[];
+    overridden?: boolean;
+    needsMoreInfo?: boolean;
+  } | null;
 }) {
   const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
   const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
@@ -248,6 +280,30 @@ export default function PlanPDF({
         {/* Section 1 */}
         <Text style={s.sectionEyebrow}>Section 01</Text>
         <Text style={s.sectionTitle}>Your Goals & Snapshot</Text>
+        {recommendation ? (
+          <View style={s.recBox} wrap={false}>
+            <Text style={s.recEyebrow}>
+              Recommended Next Step{recommendation.overridden ? " · Coach-selected" : ""}
+            </Text>
+            <Text style={s.recName}>{recommendation.program.name}</Text>
+            {recommendation.program.tagline ? (
+              <Text style={s.recTagline}>{recommendation.program.tagline}</Text>
+            ) : null}
+            {recommendation.program.price_display ? (
+              <Text style={s.recPrice}>
+                {recommendation.program.price_display}
+                {recommendation.program.cadence ? ` · ${recommendation.program.cadence}` : ""}
+              </Text>
+            ) : null}
+            {recommendation.bullets.length > 0 ? (
+              <View style={{ marginTop: 6 }}>
+                {recommendation.bullets.map((b, i) => (
+                  <Text key={i} style={s.recBullet}>• {b.bullet}</Text>
+                ))}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
         {goalsList.map((g, i) => {
           const isPrimary = g.priority === "primary";
           return (
