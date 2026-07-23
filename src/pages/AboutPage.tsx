@@ -167,12 +167,8 @@ const AboutPage = () => {
         {/* Hero */}
         <section className="bg-hero-grad">
           <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-4 py-1.5 text-xs md:text-sm font-semibold">
-              <Sparkles className="h-4 w-4" aria-hidden />
-              About RE Pro Business Credit
-            </span>
             <h1
-              className="mt-5 font-bold text-secondary leading-tight"
+              className="font-bold text-secondary leading-tight"
               style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
             >
               Built by a Realtor, for Realtors.
