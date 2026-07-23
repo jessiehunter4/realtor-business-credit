@@ -868,6 +868,12 @@ export default function AdminIntakeCoachView() {
                         </div>
                       </div>
                     </div>
+
+                    <InlinePricingAccordion
+                      headline="Take a look at our pricing"
+                      subhead="Tap any tier to expand — no need to leave this page."
+                    />
+
                     <div className="space-y-2">
                       <Label>Ready to get started?</Label>
                       <RadioGroup value={form.investment_readiness || ""} onValueChange={(v) => updateField("investment_readiness", v)}>
