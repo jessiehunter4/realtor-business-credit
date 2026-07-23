@@ -47,6 +47,12 @@ interface SurveyData {
   top_financial_goal?: string;
   top_financial_need?: string;
   desired_monthly_credit_capacity?: string;
+  primary_goal?: string;
+  additional_goals?: string[];
+  top_financial_pain?: string;
+  goal_time_horizon?: string;
+  target_funding_amount?: string;
+  goals_notes?: string;
   // C
   has_business_entity?: string;
   entity_type?: string;
