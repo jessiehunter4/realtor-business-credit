@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
+import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
