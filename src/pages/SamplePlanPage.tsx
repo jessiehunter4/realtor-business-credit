@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Calendar, Download, ArrowLeft, FileText } from "lucide-react";
+import { Calendar, Download, ArrowLeft } from "lucide-react";
 import PlanDocument from "@/components/plan/PlanDocument";
 import PlanPDF from "@/components/plan/PlanPDF";
 import NextStepPanel from "@/components/plan/NextStepPanel";
@@ -42,11 +42,7 @@ const SamplePlanPage = () => {
             <ArrowLeft className="h-4 w-4" /> Back to home
           </Link>
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-border rounded-full px-3 py-1 text-xs font-semibold text-primary shadow-card">
-              <FileText className="h-3.5 w-3.5" />
-              Sample Plan · Not a real Realtor
-            </span>
-            <h1 className="mt-3 text-3xl md:text-5xl font-bold text-secondary tracking-tight">
+            <h1 className="text-3xl md:text-5xl font-bold text-secondary tracking-tight">
               See exactly what your custom plan will look like.
             </h1>
             <p className="mt-4 text-muted-foreground text-lg">
