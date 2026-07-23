@@ -868,7 +868,7 @@ export default function AdminIntakeCoachView() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Program readiness</Label>
+                      <Label>Ready to get started?</Label>
                       <RadioGroup value={form.investment_readiness || ""} onValueChange={(v) => updateField("investment_readiness", v)}>
                         {[
                           "I'm ready to start now",
