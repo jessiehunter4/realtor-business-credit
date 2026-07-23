@@ -103,6 +103,14 @@ const s = StyleSheet.create({
   fundingItem: { borderLeftWidth: 2, borderLeftColor: "#3eaf7c", paddingLeft: 10, marginBottom: 8 },
   fundingType: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#1e3a5f" },
   fundingDesc: { fontSize: 9, color: "#555555" },
+  goalCard: { borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 4, padding: 8, marginBottom: 6 },
+  goalCardPrimary: { borderColor: "#3eaf7c", backgroundColor: "#3eaf7c14" },
+  goalHeader: { flexDirection: "row", alignItems: "center", marginBottom: 3 },
+  goalBadge: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF", backgroundColor: "#3eaf7c", paddingHorizontal: 5, paddingVertical: 2, borderRadius: 2, marginRight: 6, textTransform: "uppercase", letterSpacing: 0.5 },
+  goalBadgeSecondary: { backgroundColor: "#94a3b8" },
+  goalLabel: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#1e3a5f" },
+  goalMeta: { fontSize: 8, color: "#64748b", marginBottom: 2 },
+  goalWhy: { fontSize: 9, color: "#333333" },
   programCard: {
     borderWidth: 1, borderColor: "#dddddd", borderRadius: 4,
     padding: 8, marginBottom: 6, width: "48%",
@@ -146,6 +154,7 @@ export default function PlanPDF({
 }) {
   const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
   const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
+  const goalsList = sections.goals_snapshot?.goals ?? [];
   const fundabilityItems = sections.fundability?.items ?? [];
   const fundabilityNarrative = sections.fundability?.narrative ?? "";
   const actionItems = sections.action_plan_90day?.items ?? [];
@@ -239,6 +248,27 @@ export default function PlanPDF({
         {/* Section 1 */}
         <Text style={s.sectionEyebrow}>Section 01</Text>
         <Text style={s.sectionTitle}>Your Goals & Snapshot</Text>
+        {goalsList.map((g, i) => {
+          const isPrimary = g.priority === "primary";
+          return (
+            <View key={i} style={[s.goalCard, isPrimary ? s.goalCardPrimary : {}]} wrap={false}>
+              <View style={s.goalHeader}>
+                <Text style={[s.goalBadge, isPrimary ? {} : s.goalBadgeSecondary]}>
+                  {isPrimary ? "Primary Goal" : `Goal ${i + 1}`}
+                </Text>
+                <Text style={s.goalLabel}>{g.label}</Text>
+              </View>
+              {(g.horizon || g.target_amount) ? (
+                <Text style={s.goalMeta}>
+                  {g.horizon ? `Horizon: ${g.horizon}` : ""}
+                  {g.horizon && g.target_amount ? " · " : ""}
+                  {g.target_amount ? `Target: ${g.target_amount}` : ""}
+                </Text>
+              ) : null}
+              {g.why_it_matters ? <Text style={s.goalWhy}>{g.why_it_matters}</Text> : null}
+            </View>
+          );
+        })}
         <Text style={s.narrative}>{goalsNarrative}</Text>
 
         {/* Section 2 */}

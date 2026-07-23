@@ -229,6 +229,22 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
                 type: "object",
                 properties: {
                   goals_snapshot_narrative: { type: "string", description: "2-3 paragraph narrative summarizing the agent's goals, production level, and why business credit matters for their situation." },
+                  goals: {
+                    type: "array",
+                    description: "Each of the agent's goals as a distinct, structured entry. Include the primary goal first (priority='primary') followed by every additional goal (priority='secondary'). Do NOT merge goals together.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        label: { type: "string", description: "Short goal title, e.g. 'Grow marketing spend'." },
+                        priority: { type: "string", enum: ["primary", "secondary"] },
+                        horizon: { type: "string", description: "Time horizon if known, e.g. '0-3 months'. Empty string if unknown." },
+                        target_amount: { type: "string", description: "Target funding amount if applicable, else empty string." },
+                        why_it_matters: { type: "string", description: "1-2 sentence rationale tailored to this Realtor." },
+                      },
+                      required: ["label", "priority", "horizon", "target_amount", "why_it_matters"],
+                      additionalProperties: false,
+                    },
+                  },
                   fundability_narrative: { type: "string", description: "1-2 paragraph assessment of their current business structure and fundability readiness." },
                   action_items: {
                     type: "array",
@@ -285,7 +301,7 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
                     },
                   },
                 },
-                required: ["goals_snapshot_narrative", "fundability_narrative", "action_items", "milestones", "funding_items", "next_steps_narrative", "program_options"],
+                 required: ["goals_snapshot_narrative", "goals", "fundability_narrative", "action_items", "milestones", "funding_items", "next_steps_narrative", "program_options"],
                 additionalProperties: false,
               },
             },
@@ -333,7 +349,7 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       state: survey.state,
       license_type: survey.license_type,
       sections: {
-        goals_snapshot: { narrative: aiPlan.goals_snapshot_narrative },
+        goals_snapshot: { narrative: aiPlan.goals_snapshot_narrative, goals: aiPlan.goals || [] },
         fundability: { items: fundabilityItems, narrative: aiPlan.fundability_narrative },
         action_plan_90day: { items: aiPlan.action_items },
         roadmap: { milestones: aiPlan.milestones },
