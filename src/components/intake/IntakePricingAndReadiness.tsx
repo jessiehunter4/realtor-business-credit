@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, CreditCard, BookOpen, CheckCircle } from "lucide-react";
-import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import { STRIPE_LINKS } from "@/data/pricingTiers";
 
 interface Props {
@@ -48,56 +47,49 @@ const RESPONSES: Record<string, Response> = {
 export default function IntakePricingAndReadiness({ readiness }: Props) {
   const active = readiness ? RESPONSES[readiness] : undefined;
 
-  return (
-    <div className="space-y-4 pt-2">
-      <InlinePricingAccordion
-        headline="Take a look at our pricing"
-        subhead="Tap any tier to expand — no need to leave this page."
-      />
+  if (!active) return null;
 
-      {active && (
-        <div className={`rounded-2xl border p-5 ${active.accent}`}>
-          <div className="flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="text-base font-bold text-secondary">{active.headline}</h4>
-              <p className="text-sm text-secondary/80 mt-1 leading-relaxed">{active.body}</p>
-              {(active.cta || active.secondary) && (
-                <div className="mt-4 flex flex-wrap items-center gap-3">
-                  {active.cta && (
-                    active.cta.external ? (
-                      <a
-                        href={active.cta.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-primary/90 transition-colors"
-                      >
-                        <active.cta.icon className="h-4 w-4" />
-                        {active.cta.label}
-                      </a>
-                    ) : (
-                      <Link
-                        to={active.cta.href}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-primary/90 transition-colors"
-                      >
-                        <active.cta.icon className="h-4 w-4" />
-                        {active.cta.label}
-                      </Link>
-                    )
-                  )}
-                  {active.secondary && (
-                    <Link to={active.secondary.href} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
-                      <BookOpen className="h-4 w-4" />
-                      {active.secondary.label}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  )}
-                </div>
+  return (
+    <div className={`rounded-2xl border p-5 ${active.accent}`}>
+      <div className="flex items-start gap-3">
+        <CheckCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <h4 className="text-base font-bold text-secondary">{active.headline}</h4>
+          <p className="text-sm text-secondary/80 mt-1 leading-relaxed">{active.body}</p>
+          {(active.cta || active.secondary) && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              {active.cta && (
+                active.cta.external ? (
+                  <a
+                    href={active.cta.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-primary/90 transition-colors"
+                  >
+                    <active.cta.icon className="h-4 w-4" />
+                    {active.cta.label}
+                  </a>
+                ) : (
+                  <Link
+                    to={active.cta.href}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-primary/90 transition-colors"
+                  >
+                    <active.cta.icon className="h-4 w-4" />
+                    {active.cta.label}
+                  </Link>
+                )
+              )}
+              {active.secondary && (
+                <Link to={active.secondary.href} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                  <BookOpen className="h-4 w-4" />
+                  {active.secondary.label}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               )}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
