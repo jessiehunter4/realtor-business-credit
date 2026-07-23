@@ -1,5 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   Check,
   Minus,
@@ -231,18 +230,6 @@ const Cell = ({ value }: { value: boolean | string }) => {
 };
 
 const PricingPage = () => {
-  const [searchParams] = useSearchParams();
-  const highlight = searchParams.get("highlight");
-  const highlightRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!highlight) return;
-    const t = setTimeout(() => {
-      highlightRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 250);
-    return () => clearTimeout(t);
-  }, [highlight]);
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
@@ -292,23 +279,13 @@ const PricingPage = () => {
             {tiers.map((tier) => (
               <div
                 key={tier.id}
-                ref={highlight === tier.id ? highlightRef : undefined}
-                id={`tier-${tier.id}`}
                 className={
                   "relative flex flex-col rounded-2xl bg-white border p-6 md:p-8 shadow-card transition-transform " +
                   (tier.highlighted
                     ? "border-primary ring-2 ring-primary/30 lg:-translate-y-2"
-                    : "border-border") +
-                  (highlight === tier.id
-                    ? " ring-4 ring-primary/50 border-primary lg:-translate-y-2 shadow-lg"
-                    : "")
+                    : "border-border")
                 }
               >
-                {highlight === tier.id && (
-                  <span className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-card">
-                    Recommended for you
-                  </span>
-                )}
                 {tier.highlighted && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-card">
                     Most Popular
