@@ -24,7 +24,7 @@ const SiteHeader = () => {
           <img
             src={logoAsset.url}
             alt="RE Pro Business Credit"
-            className="h-10 md:h-12 w-auto"
+            className="h-10 md:h-12 w-36 md:w-44"
           />
         </Link>
 
@@ -72,7 +72,7 @@ const SiteHeader = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[18rem] flex flex-col gap-6">
             <Link to="/" onClick={() => setOpen(false)} className="flex items-center pt-2">
-              <img src={logoAsset.url} alt="RE Pro Business Credit" className="h-10 w-auto" />
+              <img src={logoAsset.url} alt="RE Pro Business Credit" className="h-10 w-36" />
             </Link>
             <nav className="flex flex-col gap-1">
               {navLinks.map((l) => (
