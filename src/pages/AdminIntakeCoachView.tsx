@@ -356,9 +356,9 @@ export default function AdminIntakeCoachView() {
                         ))}
                       </RadioGroup>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label>Years in RE</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                      <div className="space-y-2 flex flex-col h-full">
+                        <Label className="min-h-[2.5rem] leading-tight">Years in RE</Label>
                         <Select value={form.years_in_real_estate || ""} onValueChange={(v) => updateField("years_in_real_estate", v)}>
                           <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>
@@ -368,8 +368,8 @@ export default function AdminIntakeCoachView() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Gross Commission Income (Last 12 Months)</Label>
+                      <div className="space-y-2 flex flex-col h-full">
+                        <Label className="min-h-[2.5rem] leading-tight">Gross Commission Income (Last 12 Months)</Label>
                         <Select value={form.gci_last_12_months || ""} onValueChange={(v) => updateField("gci_last_12_months", v)}>
                           <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>
@@ -379,8 +379,8 @@ export default function AdminIntakeCoachView() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Sides (12 mo)</Label>
+                      <div className="space-y-2 flex flex-col h-full">
+                        <Label className="min-h-[2.5rem] leading-tight">Sides Closed (Last 12 Months)</Label>
                         <Select value={form.sides_closed_last_12_months || ""} onValueChange={(v) => updateField("sides_closed_last_12_months", v)}>
                           <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>
