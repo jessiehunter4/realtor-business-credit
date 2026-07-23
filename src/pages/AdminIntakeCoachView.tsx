@@ -40,6 +40,30 @@ const SECTIONS = [
   { key: "program", label: "Program Fit", icon: Handshake },
 ] as const;
 
+const GOAL_OPTIONS = [
+  "Cover overhead between closings",
+  "Grow marketing spend",
+  "Hire admin, ISA, or team members",
+  "Build reserves / emergency fund",
+  "Buy an investment property",
+  "Fund brokerage transition or expansion",
+  "Reduce reliance on personal credit",
+  "Prepare for a slow season",
+  "Other",
+];
+const PAIN_OPTIONS = [
+  "Cash flow gap between commissions",
+  "High personal credit card balances",
+  "No access to business credit",
+  "Inconsistent income planning",
+  "Debt payoff",
+  "Tax bill / quarterly estimates",
+  "Other",
+];
+const HORIZON_OPTIONS = ["0–3 months", "3–6 months", "6–12 months", "12–24 months"];
+const FUNDING_AMOUNT_OPTIONS = ["Under $10K","$10K–$25K","$25K–$50K","$50K–$100K","$100K–$250K","$250K+","Not sure"];
+const CREDIT_CAPACITY_OPTIONS = ["Under $5K","$5K–$10K","$10K–$25K","$25K–$50K","$50K–$100K","$100K+","Not sure"];
+
 type SectionKey = typeof SECTIONS[number]["key"];
 
 export default function AdminIntakeCoachView() {
