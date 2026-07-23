@@ -292,13 +292,23 @@ const PricingPage = () => {
             {tiers.map((tier) => (
               <div
                 key={tier.id}
+                ref={highlight === tier.id ? highlightRef : undefined}
+                id={`tier-${tier.id}`}
                 className={
                   "relative flex flex-col rounded-2xl bg-white border p-6 md:p-8 shadow-card transition-transform " +
                   (tier.highlighted
                     ? "border-primary ring-2 ring-primary/30 lg:-translate-y-2"
-                    : "border-border")
+                    : "border-border") +
+                  (highlight === tier.id
+                    ? " ring-4 ring-primary/50 border-primary lg:-translate-y-2 shadow-lg"
+                    : "")
                 }
               >
+                {highlight === tier.id && (
+                  <span className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-card">
+                    Recommended for you
+                  </span>
+                )}
                 {tier.highlighted && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-card">
                     Most Popular
