@@ -13,6 +13,7 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
+import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -897,6 +898,12 @@ export default function IntakeSurveyPage() {
                   </div>
                 </div>
               </div>
+
+              <InlinePricingAccordion
+                headline="Take a look at our pricing"
+                subhead="Tap any tier to expand — no need to leave this page."
+              />
+
               <div className="space-y-2">
                 <Label>Where are you right now with starting the program?</Label>
                 <RadioGroup value={form.investment_readiness || ""} onValueChange={v => updateField("investment_readiness", v)}>
