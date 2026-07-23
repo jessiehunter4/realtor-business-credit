@@ -898,6 +898,12 @@ export default function IntakeSurveyPage() {
                   </div>
                 </div>
               </div>
+
+              <InlinePricingAccordion
+                headline="Take a look at our pricing"
+                subhead="Tap any tier to expand — no need to leave this page."
+              />
+
               <div className="space-y-2">
                 <Label>Where are you right now with starting the program?</Label>
                 <RadioGroup value={form.investment_readiness || ""} onValueChange={v => updateField("investment_readiness", v)}>
