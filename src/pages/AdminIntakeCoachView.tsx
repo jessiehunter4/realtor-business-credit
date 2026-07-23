@@ -84,6 +84,15 @@ export default function AdminIntakeCoachView() {
   const [existingPlanId, setExistingPlanId] = useState<string | null>(null);
   const [existingPlanStatus, setExistingPlanStatus] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [programs, setPrograms] = useState<Array<{ slug: string; name: string; tagline?: string | null }>>([]);
+  const [planRec, setPlanRec] = useState<{
+    slug: string | null;
+    reasoning: any;
+    score: any;
+    overriddenAt: string | null;
+  }>({ slug: null, reasoning: null, score: null, overriddenAt: null });
+  const [overrideSlug, setOverrideSlug] = useState<string>("");
+  const [savingOverride, setSavingOverride] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -92,7 +101,7 @@ export default function AdminIntakeCoachView() {
       supabase.from("intake_coach_notes").select("*").eq("intake_survey_id", id).order("created_at", { ascending: false }),
       supabase
         .from("custom_plans")
-        .select("id, status")
+        .select("id, status, recommended_program_slug, recommendation_reasoning, recommendation_score, recommendation_overridden_at")
         .eq("intake_survey_id", id)
         .in("status", ["draft", "published"])
         .order("created_at", { ascending: false })
@@ -108,14 +117,67 @@ export default function AdminIntakeCoachView() {
     setSurvey(surveyRes.data);
     setForm(surveyRes.data);
     setNotes(notesRes.data || []);
-    setExistingPlanId(planRes.data?.[0]?.id || null);
-    setExistingPlanStatus(planRes.data?.[0]?.status || null);
+    const plan = planRes.data?.[0];
+    setExistingPlanId(plan?.id || null);
+    setExistingPlanStatus(plan?.status || null);
+    setPlanRec({
+      slug: plan?.recommended_program_slug || null,
+      reasoning: plan?.recommendation_reasoning || null,
+      score: plan?.recommendation_score || null,
+      overriddenAt: plan?.recommendation_overridden_at || null,
+    });
+    setOverrideSlug(plan?.recommended_program_slug || "");
     setLoading(false);
   }, [id, navigate]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("programs")
+        .select("slug, name, tagline")
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      setPrograms((data as any[]) || []);
+    })();
+  }, []);
+
+  const handleSaveOverride = async () => {
+    if (!existingPlanId || !overrideSlug) return;
+    setSavingOverride(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("override-recommendation", {
+        body: { plan_id: existingPlanId, program_slug: overrideSlug },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Recommendation overridden");
+      fetchData();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to override");
+    }
+    setSavingOverride(false);
+  };
+
+  const handleClearOverride = async () => {
+    if (!existingPlanId) return;
+    setSavingOverride(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("override-recommendation", {
+        body: { plan_id: existingPlanId, clear: true },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Override cleared — regenerate plan to refresh AI recommendation");
+      fetchData();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to clear override");
+    }
+    setSavingOverride(false);
+  };
 
   const updateField = (key: keyof IntakeSurvey, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }));
