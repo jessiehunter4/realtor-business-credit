@@ -168,9 +168,6 @@ const PricingPage = () => {
       <main className="flex-1">
         {/* Hero */}
         <section className="container mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-14 max-w-5xl text-center">
-          <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-            Pricing
-          </Badge>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary tracking-tight">
             Choose your path to
             <br />
