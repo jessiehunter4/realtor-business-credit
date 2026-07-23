@@ -519,35 +519,24 @@ export default function IntakeSurveyPage() {
                   ))}
                 </RadioGroup>
               </div>
-              <div className="space-y-2">
-                <Label>Years in Real Estate</Label>
-                <Select value={form.years_in_real_estate || ""} onValueChange={v => updateField("years_in_real_estate", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                  <SelectContent>
-                    {["Less than 1 year", "1–3 years", "3–5 years", "5–10 years", "10–15 years", "15+ years"].map(r => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Gross Commission (Last 12 Months)</Label>
-                  <Select value={form.gci_last_12_months || ""} onValueChange={v => updateField("gci_last_12_months", v)}>
+                  <Label>Years in Real Estate</Label>
+                  <Select value={form.years_in_real_estate || ""} onValueChange={v => updateField("years_in_real_estate", v)}>
                     <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
                     <SelectContent>
-                      {["Under $50K", "$50K–$100K", "$100K–$250K", "$250K–$500K", "$500K–$1M", "Over $1M"].map(r => (
+                      {["Less than 1 year", "1–3 years", "3–5 years", "5–10 years", "10–15 years", "15+ years"].map(r => (
                         <SelectItem key={r} value={r}>{r}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Sides Closed (Last 12 Months)</Label>
-                  <Select value={form.sides_closed_last_12_months || ""} onValueChange={v => updateField("sides_closed_last_12_months", v)}>
+                  <Label>Gross Commission (Last 12 Months)</Label>
+                  <Select value={form.gci_last_12_months || ""} onValueChange={v => updateField("gci_last_12_months", v)}>
                     <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
                     <SelectContent>
-                      {["0–5", "6–12", "13–24", "25–50", "50+"].map(r => (
+                      {["Under $50K", "$50K–$100K", "$100K–$250K", "$250K–$500K", "$500K–$1M", "Over $1M"].map(r => (
                         <SelectItem key={r} value={r}>{r}</SelectItem>
                       ))}
                     </SelectContent>
