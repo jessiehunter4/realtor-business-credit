@@ -532,7 +532,7 @@ export default function IntakeSurveyPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Gross Commission Income (Last 12 Months)</Label>
+                  <Label>Gross Commission (Last 12 Months)</Label>
                   <Select value={form.gci_last_12_months || ""} onValueChange={v => updateField("gci_last_12_months", v)}>
                     <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
                     <SelectContent>
