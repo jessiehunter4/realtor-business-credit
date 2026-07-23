@@ -106,11 +106,6 @@ const OneOnOnePage = () => {
           <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-sky/15 blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-primary/10 border border-primary/20">
-            <span className="text-primary text-xs font-semibold tracking-wide uppercase">
-              Free Strategy Session
-            </span>
-          </div>
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
             Why a One-on-One Business Credit Session{" "}
             <span className="text-primary">Changes Everything</span>
