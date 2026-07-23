@@ -110,7 +110,7 @@ export default function AdminIntakeCoachView() {
     const editableKeys: (keyof IntakeSurvey)[] = [
       "contact_name", "contact_email", "brokerage_name", "city", "state",
       "license_type", "years_in_real_estate", "gci_last_12_months",
-      "sides_closed_last_12_months", "top_financial_goal", "top_financial_need",
+      "top_financial_goal", "top_financial_need",
       "desired_monthly_credit_capacity", "has_business_entity", "entity_type",
       "has_business_address", "address_type", "has_business_phone",
       "has_business_email", "has_business_website", "has_business_bank_account",
@@ -374,17 +374,6 @@ export default function AdminIntakeCoachView() {
                           <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>
                             {["Under $50K", "$50K–$100K", "$100K–$250K", "$250K–$500K", "$500K–$1M", "Over $1M"].map((r) => (
-                              <SelectItem key={r} value={r}>{r}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2 flex flex-col h-full">
-                        <Label className="min-h-[2.5rem] leading-tight">Sides Closed (Last 12 Months)</Label>
-                        <Select value={form.sides_closed_last_12_months || ""} onValueChange={(v) => updateField("sides_closed_last_12_months", v)}>
-                          <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                          <SelectContent>
-                            {["0–5", "6–12", "13–24", "25–50", "50+"].map((r) => (
                               <SelectItem key={r} value={r}>{r}</SelectItem>
                             ))}
                           </SelectContent>
