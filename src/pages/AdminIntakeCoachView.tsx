@@ -369,7 +369,7 @@ export default function AdminIntakeCoachView() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label>GCI (12 mo)</Label>
+                        <Label>Gross Commission Income (Last 12 Months)</Label>
                         <Select value={form.gci_last_12_months || ""} onValueChange={(v) => updateField("gci_last_12_months", v)}>
                           <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>

@@ -168,7 +168,7 @@ Profile:
 - City/State: ${survey.city || "N/A"}, ${survey.state || "N/A"}
 - License Type: ${survey.license_type || "N/A"}
 - Years in Real Estate: ${survey.years_in_real_estate || "N/A"}
-- GCI Last 12 Months: ${survey.gci_last_12_months || "N/A"}
+- Gross Commission Income (Last 12 Months): ${survey.gci_last_12_months || "N/A"}
 - Sides Closed: ${survey.sides_closed_last_12_months || "N/A"}
 
 Goals:
