@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.log-funnel-event]
 verify_jwt = false
+
+[functions.override-recommendation]
+verify_jwt = true
