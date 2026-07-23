@@ -818,7 +818,7 @@ export default function IntakeSurveyPage() {
                 </RadioGroup>
               </div>
               <div className="space-y-2">
-                <Label>Approximate personal credit score range (right now or currently)</Label>
+                <Label>Approximate personal credit score range (right now)</Label>
                 <Select value={form.personal_credit_score_range || ""} onValueChange={v => updateField("personal_credit_score_range", v)}>
                   <SelectTrigger><SelectValue placeholder="Select range (optional)" /></SelectTrigger>
                   <SelectContent>
