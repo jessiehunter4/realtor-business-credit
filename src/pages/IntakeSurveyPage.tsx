@@ -123,6 +123,8 @@ interface SurveyData {
   preferred_support_format?: string;
   interest_in_cohort?: string;
   preferred_cohort_days?: string;
+  preferred_cohort_time_1?: string;
+  preferred_cohort_time_2?: string;
   investment_readiness?: string;
   additional_notes?: string;
 }
