@@ -35,7 +35,7 @@ const US_STATES = [
 ];
 
 const SECTIONS = [
-  { key: "profile", label: "Profile & Production", icon: User },
+  { key: "profile", label: "Profile", icon: User },
   { key: "goals", label: "Goals", icon: Target },
   { key: "structure", label: "Business Structure", icon: Building },
   { key: "credit", label: "Credit & Funding", icon: CreditCard },
@@ -345,7 +345,7 @@ export default function AdminIntakeCoachView() {
               <div className="lg:col-span-2">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Profile & Production</CardTitle>
+                    <CardTitle>Profile</CardTitle>
                     <CardDescription>You can edit (proxy-fill) any field on behalf of the agent.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
