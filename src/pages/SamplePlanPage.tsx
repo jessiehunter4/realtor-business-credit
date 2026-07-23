@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Calendar, Download, ArrowLeft, FileText } from "lucide-react";
+import { Calendar, Download, ArrowLeft } from "lucide-react";
 import PlanDocument from "@/components/plan/PlanDocument";
 import PlanPDF from "@/components/plan/PlanPDF";
 import NextStepPanel from "@/components/plan/NextStepPanel";
