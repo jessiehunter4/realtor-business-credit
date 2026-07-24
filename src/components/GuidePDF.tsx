@@ -387,7 +387,7 @@ export const GuidePDF = ({
       <P>This is where Realtors get tripped up — and where you protect yourself and your fundability.</P>
       <View style={s.figure} wrap={false}>
         <View style={s.figureFrame}>
-          <Image src={structureDiagramSrc} style={s.figureImg} />
+          <Image src={structureSrc} style={s.figureImg} />
         </View>
         <Text style={s.figureCaption}>RE Pro Business Credit Structure — personal credit as a temporary bridge to business-supported capital.</Text>
       </View>
@@ -417,7 +417,7 @@ export const GuidePDF = ({
       <P>Most Realtors think asset protection equals "I need an LLC." Real asset protection is <B>layered</B>.</P>
       <View style={s.figure} wrap={false}>
         <View style={s.figureFrame}>
-          <Image src={structureHowItWorksSrc} style={s.figureImg} />
+          <Image src={howItWorksSrc} style={s.figureImg} />
         </View>
         <Text style={s.figureCaption}>How the RE Pro Business Credit Structure Works — objectives and five progressive steps.</Text>
       </View>
