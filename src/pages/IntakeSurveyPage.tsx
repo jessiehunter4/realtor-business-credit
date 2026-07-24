@@ -555,14 +555,12 @@ export default function IntakeSurveyPage() {
           )}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-8 lg:items-start">
-          <div className="lg:sticky lg:top-24">
-            <StepVideoPlaceholder
-              stepNumber={step + 1}
-              title={activeVideo.title}
-              description={activeVideo.description}
-            />
-          </div>
+        <div className="space-y-6 max-w-3xl mx-auto">
+          <StepVideoPlaceholder
+            stepNumber={step + 1}
+            title={activeVideo.title}
+            description={activeVideo.description}
+          />
           <div className="space-y-6 min-w-0">
         {/* Step A */}
         {step === 0 && (
