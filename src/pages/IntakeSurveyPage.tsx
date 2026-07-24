@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,10 @@ import { supabase } from "@/integrations/supabase/client";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import GoalStatement from "@/components/intake/GoalStatement";
+import PlanPreviewCard from "@/components/intake/PlanPreviewCard";
+import PlanGenerationLoader from "@/components/intake/PlanGenerationLoader";
+import PlanSuccessCelebration from "@/components/intake/PlanSuccessCelebration";
+import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -125,6 +129,7 @@ interface SurveyData {
 export default function IntakeSurveyPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const navigate = useNavigate();
   const { contactId, email: identityEmail, firstName, lastName } = useContactIdentity();
   const { toast } = useToast();
   const mountLogged = useRef(false);
@@ -135,6 +140,9 @@ export default function IntakeSurveyPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [intakeId, setIntakeId] = useState<string | null>(null);
+  const [intakeToken, setIntakeToken] = useState<string | null>(token);
+  const { state: planState, generate: generatePlan, reset: resetPlan } = usePlanGeneration();
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
@@ -303,6 +311,9 @@ export default function IntakeSurveyPage() {
           errorMessage = data?.error || errorMessage;
           throw new Error(errorMessage);
         }
+        const data = await res.json().catch(() => null);
+        if (data?.id) setIntakeId(data.id);
+        if (data?.access_token) setIntakeToken(data.access_token);
       } else {
         // Token-based submit
         const res = await fetch(
@@ -318,6 +329,8 @@ export default function IntakeSurveyPage() {
           errorMessage = data?.error || errorMessage;
           throw new Error(errorMessage);
         }
+        // Token mode: use the survey id from the loaded form; token comes from URL.
+        if (form.id) setIntakeId(form.id);
       }
 
       setSubmitted(true);
@@ -394,18 +407,58 @@ export default function IntakeSurveyPage() {
   }
 
   if (submitted) {
+    // Post-submit flow: preview → generating → success (with confetti) → portal.
+    const goToPortal = () => {
+      if (planState.status !== "success") return;
+      const url = `/portal/plan/${planState.planId}${intakeToken ? `?token=${encodeURIComponent(intakeToken)}` : ""}`;
+      navigate(url);
+    };
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-6">
-        <Card className="max-w-md w-full">
-          <CardContent className="pt-6 text-center space-y-4">
-            <CheckCircle className="h-16 w-16 text-primary mx-auto" />
-            <h2 className="text-2xl font-semibold text-foreground">Thank You!</h2>
-            <p className="text-muted-foreground">
-              Your RE Pro Business Financial Needs Analysis has been submitted. 
-              We'll review your answers before our session together.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex flex-col">
+        <SiteHeader />
+        <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+          {planState.status === "success" ? (
+            <PlanSuccessCelebration
+              planId={planState.planId}
+              contactEmail={form.contact_email}
+              onPrimary={goToPortal}
+              primaryLabel="View My Plan"
+            />
+          ) : planState.status === "generating" ? (
+            <PlanGenerationLoader />
+          ) : planState.status === "error" ? (
+            <Card className="max-w-md w-full">
+              <CardContent className="pt-6 text-center space-y-4">
+                <h2 className="text-xl font-semibold text-foreground">We hit a snag</h2>
+                <p className="text-muted-foreground text-sm">{planState.message}</p>
+                {planState.retriable && intakeId && (
+                  <Button
+                    onClick={() => {
+                      resetPlan();
+                      generatePlan({ intakeSurveyId: intakeId, intakeToken, source: "user" });
+                    }}
+                  >
+                    Try again
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <PlanPreviewCard
+              disabled={!intakeId}
+              onGenerate={() => {
+                if (!intakeId) return;
+                void postFunnelEvent({
+                  contactId: contactId || undefined,
+                  eventType: "plan_generation_started",
+                }).catch(() => {});
+                generatePlan({ intakeSurveyId: intakeId, intakeToken, source: "user" });
+              }}
+            />
+          )}
+        </div>
+        <SiteFooter />
       </div>
     );
   }
