@@ -494,104 +494,74 @@ export default function AdminIntakeCoachView() {
                     <CardTitle>Goals</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                      <Label>Primary financial goal</Label>
-                      <RadioGroup value={form.primary_goal || ""} onValueChange={(v) => {
-                        updateField("primary_goal", v);
-                        updateField("top_financial_goal", v);
-                        const extras = ((form.additional_goals as string[] | null) || []).filter((g) => g !== v);
-                        updateField("additional_goals", extras);
-                      }}>
-                        {GOAL_OPTIONS.map((opt) => (
-                          <div key={opt} className="flex items-center space-x-2">
-                            <RadioGroupItem value={opt} id={`cv-pg-${opt}`} />
-                            <Label htmlFor={`cv-pg-${opt}`} className="font-normal">{opt}</Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Additional goals</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {GOAL_OPTIONS.filter((o) => o !== form.primary_goal).map((opt) => {
-                          const arr = (form.additional_goals as string[] | null) || [];
-                          const checked = arr.includes(opt);
-                          return (
-                            <div key={opt} className="flex items-start space-x-2">
-                              <Checkbox
-                                id={`cv-ag-${opt}`}
-                                checked={checked}
-                                onCheckedChange={() => {
-                                  const next = checked ? arr.filter((v) => v !== opt) : [...arr, opt];
-                                  updateField("additional_goals", next);
-                                }}
-                              />
-                              <Label htmlFor={`cv-ag-${opt}`} className="font-normal">{opt}</Label>
+                    {(() => {
+                      const goals = (form.primary_goals as string[] | null) || [];
+                      const pains = (form.financial_pains as string[] | null) || [];
+                      const toggle = (key: "primary_goals" | "financial_pains", opt: string, max: number) => {
+                        const arr = (form[key] as string[] | null) || [];
+                        if (arr.includes(opt)) {
+                          updateField(key, arr.filter((v) => v !== opt));
+                        } else if (arr.length < max) {
+                          updateField(key, [...arr, opt]);
+                        } else {
+                          toast.error(`Pick up to ${max}. Uncheck one to change your selection.`);
+                        }
+                      };
+                      return (
+                        <>
+                          <div className="space-y-2">
+                            <Label>Primary Financial Goals (Top 3)</Label>
+                            <p className="text-xs text-muted-foreground">Selected {goals.length} of {MAX_GOALS}.</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {GOAL_OPTIONS.map((opt) => {
+                                const checked = goals.includes(opt);
+                                const disabled = !checked && goals.length >= MAX_GOALS;
+                                return (
+                                  <div key={opt} className="flex items-start space-x-2">
+                                    <Checkbox
+                                      id={`cv-pg-${opt}`}
+                                      checked={checked}
+                                      disabled={disabled}
+                                      onCheckedChange={() => toggle("primary_goals", opt, MAX_GOALS)}
+                                    />
+                                    <Label htmlFor={`cv-pg-${opt}`} className={`font-normal ${disabled ? "opacity-50" : ""}`}>{opt}</Label>
+                                  </div>
+                                );
+                              })}
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Top financial pain right now</Label>
-                      <RadioGroup value={form.top_financial_pain || ""} onValueChange={(v) => {
-                        updateField("top_financial_pain", v);
-                        updateField("top_financial_need", v);
-                      }}>
-                        {PAIN_OPTIONS.map((opt) => (
-                          <div key={opt} className="flex items-center space-x-2">
-                            <RadioGroupItem value={opt} id={`cv-pain-${opt}`} />
-                            <Label htmlFor={`cv-pain-${opt}`} className="font-normal">{opt}</Label>
                           </div>
-                        ))}
-                      </RadioGroup>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Time horizon</Label>
-                        <Select value={form.goal_time_horizon || ""} onValueChange={(v) => updateField("goal_time_horizon", v)}>
-                          <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                          <SelectContent>
-                            {HORIZON_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Target funding amount</Label>
-                        <Select value={form.target_funding_amount || ""} onValueChange={(v) => updateField("target_funding_amount", v)}>
-                          <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                          <SelectContent>
-                            {FUNDING_AMOUNT_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                          <div className="space-y-2">
+                            <Label>Financial Pains (Up to 3)</Label>
+                            <p className="text-xs text-muted-foreground">Selected {pains.length} of {MAX_PAINS}.</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {PAIN_OPTIONS.map((opt) => {
+                                const checked = pains.includes(opt);
+                                const disabled = !checked && pains.length >= MAX_PAINS;
+                                return (
+                                  <div key={opt} className="flex items-start space-x-2">
+                                    <Checkbox
+                                      id={`cv-pain-${opt}`}
+                                      checked={checked}
+                                      disabled={disabled}
+                                      onCheckedChange={() => toggle("financial_pains", opt, MAX_PAINS)}
+                                    />
+                                    <Label htmlFor={`cv-pain-${opt}`} className={`font-normal ${disabled ? "opacity-50" : ""}`}>{opt}</Label>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
 
-                    <div className="space-y-2">
-                      <Label>Desired monthly credit capacity</Label>
-                      <Select value={form.desired_monthly_credit_capacity || ""} onValueChange={(v) => updateField("desired_monthly_credit_capacity", v)}>
-                        <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                        <SelectContent>
-                          {CREDIT_CAPACITY_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                          <GoalStatement goals={goals} pains={pains} name={form.first_name || form.contact_name} />
 
-                    <div className="space-y-2">
-                      <Label>Goals notes</Label>
-                      <Textarea value={form.goals_notes || ""} onChange={(e) => updateField("goals_notes", e.target.value)} rows={3} />
-                    </div>
-
-                    {(form.top_financial_goal || form.top_financial_need) && !form.primary_goal && !form.top_financial_pain ? (
-                      <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
-                        <div className="font-medium">Legacy free-text goal responses:</div>
-                        {form.top_financial_goal ? <div><span className="font-semibold">Goal:</span> {form.top_financial_goal}</div> : null}
-                        {form.top_financial_need ? <div><span className="font-semibold">Need:</span> {form.top_financial_need}</div> : null}
-                      </div>
-                    ) : null}
+                          <div className="space-y-2">
+                            <Label>Goals notes</Label>
+                            <Textarea value={form.goals_notes || ""} onChange={(e) => updateField("goals_notes", e.target.value)} rows={3} />
+                          </div>
+                        </>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               </div>
