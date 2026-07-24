@@ -19,6 +19,7 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,6 +27,10 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
 
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim()) {
       toast.error("Please fill in all fields.");
+      return;
+    }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
       return;
     }
 
@@ -65,15 +70,32 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
         // ignore storage errors
       }
 
-      // UI-only prototype: after opt-in, route through a mock login before
-      // unlocking the guide/dashboard. Real auth will replace this later.
-      navigate("/mock-login", {
-        state: {
-          firstName: firstName.trim(),
-          email: email.trim(),
-          contactId: returnedContactId,
+      // Create the visitor's account so they land in the dashboard signed in.
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            phone: phone.trim(),
+            ghl_contact_id: returnedContactId || undefined,
+          },
         },
       });
+
+      if (signUpError) {
+        if (signUpError.message.includes("already registered")) {
+          toast.info("You already have an account — please log in.");
+          navigate(`/login?next=${encodeURIComponent("/guide")}`);
+          return;
+        }
+        throw signUpError;
+      }
+
+      // Grant guide access immediately; session is created client-side.
+      onAccessGranted(returnedContactId);
     } catch (err) {
       console.error("Opt-in submission failed:", err);
       toast.error("Something went wrong. Please try again.");
@@ -139,6 +161,21 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
                 onChange={(digits) => setPhone(digits)}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Create a password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimum 8 characters"
+                required
+                minLength={8}
+              />
+              <p className="text-xs text-muted-foreground">
+                We'll create your account so you can save your plan and progress.
+              </p>
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={submitting}>
               {submitting ? (

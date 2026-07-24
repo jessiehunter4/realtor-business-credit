@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/brand-logo-v2.jpg.asset.json";
+import { supabase } from "@/integrations/supabase/client";
 
 const navLinks = [
   { to: "/guide", label: "Guide" },
@@ -16,6 +17,15 @@ const navLinks = [
 
 const SiteHeader = () => {
   const [open, setOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => setSignedIn(!!session));
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
@@ -46,12 +56,21 @@ const SiteHeader = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <Link
-            to="/auth"
-            className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
-          >
-            Log in
-          </Link>
+          {signedIn ? (
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+            >
+              Log in
+            </Link>
+          )}
           <Link
             to="/one-on-one"
             data-analytics-id="cta-start-here-header"
@@ -89,10 +108,10 @@ const SiteHeader = () => {
             <div className="mt-auto flex flex-col gap-2">
               <SheetClose asChild>
                 <Link
-                  to="/auth"
+                  to={signedIn ? "/dashboard" : "/login"}
                   className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
                 >
-                  Log in
+                  {signedIn ? "Dashboard" : "Log in"}
                 </Link>
               </SheetClose>
               <SheetClose asChild>
