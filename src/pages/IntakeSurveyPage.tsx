@@ -89,15 +89,9 @@ interface SurveyData {
   years_in_real_estate?: string;
   gci_last_12_months?: string;
   sides_closed_last_12_months?: string;
-  // B
-  top_financial_goal?: string;
-  top_financial_need?: string;
-  desired_monthly_credit_capacity?: string;
-  primary_goal?: string;
-  additional_goals?: string[];
-  top_financial_pain?: string;
-  goal_time_horizon?: string;
-  target_funding_amount?: string;
+  // B — Goals (multi-select, top 3 each)
+  primary_goals?: string[];
+  financial_pains?: string[];
   goals_notes?: string;
   // C
   has_business_entity?: string;
@@ -144,6 +138,9 @@ export default function IntakeSurveyPage() {
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
+  const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hydratedFromDraft = useRef(false);
 
   // Log intake_started on mount
   useEffect(() => {
@@ -182,10 +179,22 @@ export default function IntakeSurveyPage() {
     if (isDirectMode) {
       // Pre-populate from contact identity
       const defaultName = [firstName, lastName].filter(Boolean).join(" ");
+      // Restore any locally saved draft first
+      let localDraft: SurveyData = {};
+      try {
+        const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+        if (raw) localDraft = JSON.parse(raw) as SurveyData;
+      } catch {
+        // ignore
+      }
+      hydratedFromDraft.current = !!Object.keys(localDraft).length;
       setForm(prev => ({
         ...prev,
-        contact_name: prev.contact_name || defaultName || "",
-        contact_email: prev.contact_email || identityEmail || "",
+        ...localDraft,
+        contact_name: localDraft.contact_name || prev.contact_name || defaultName || "",
+        contact_email: localDraft.contact_email || prev.contact_email || identityEmail || "",
+        first_name: localDraft.first_name || prev.first_name || firstName || "",
+        last_name: localDraft.last_name || prev.last_name || lastName || "",
       }));
       setLoading(false);
       return;
@@ -220,6 +229,53 @@ export default function IntakeSurveyPage() {
       return { ...prev, [key]: arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value] };
     });
   };
+
+  const toggleLimitedArray = (key: "primary_goals" | "financial_pains", value: string, max: number) => {
+    setForm(prev => {
+      const arr = (prev[key] as string[] | undefined) || [];
+      if (arr.includes(value)) return { ...prev, [key]: arr.filter(v => v !== value) };
+      if (arr.length >= max) {
+        toast({ title: `Pick up to ${max}`, description: "Uncheck one to change your selection." });
+        return prev;
+      }
+      return { ...prev, [key]: [...arr, value] };
+    });
+  };
+
+  // Auto-save: localStorage for direct mode; debounced server draft for token mode.
+  useEffect(() => {
+    if (loading || submitted) return;
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    autosaveTimer.current = setTimeout(async () => {
+      if (isDirectMode) {
+        try {
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+          setAutosaveStatus("saved");
+        } catch {
+          // ignore quota errors
+        }
+        return;
+      }
+      if (!token) return;
+      setAutosaveStatus("saving");
+      try {
+        await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify({ ...form, status: "in_progress" }),
+          }
+        );
+        setAutosaveStatus("saved");
+      } catch {
+        setAutosaveStatus("idle");
+      }
+    }, AUTOSAVE_DEBOUNCE_MS);
+    return () => {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    };
+  }, [form, loading, submitted, isDirectMode, token]);
 
   const handleSubmit = async () => {
     if (isDirectMode && (!form.contact_email || !form.contact_email.trim())) {
@@ -265,6 +321,10 @@ export default function IntakeSurveyPage() {
       }
 
       setSubmitted(true);
+      // Clear direct-mode local draft on successful submit
+      if (isDirectMode) {
+        try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch { /* ignore */ }
+      }
 
       // Log intake_submitted event + tag
       void postFunnelEvent({
@@ -397,9 +457,14 @@ export default function IntakeSurveyPage() {
           </p>
           <p className="text-xs text-muted-foreground">
             {isDirectMode
-              ? "About 3–5 minutes total. Your answers save when you submit at the end."
-              : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically when you click Save Draft.`}
+              ? "About 3–5 minutes total. Your answers save automatically in this browser."
+              : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically as you type.`}
           </p>
+          {autosaveStatus !== "idle" && (
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              {autosaveStatus === "saving" ? "Saving…" : "Saved"}
+            </p>
+          )}
         </div>
 
         {/* Step A */}
