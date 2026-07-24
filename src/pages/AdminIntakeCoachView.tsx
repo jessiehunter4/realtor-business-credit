@@ -22,6 +22,7 @@ import { COHORT_TIME_SLOTS } from "./IntakeSurveyPage";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import PhoneInput from "@/components/shared/PhoneInput";
+import GoalStatement from "@/components/intake/GoalStatement";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
