@@ -396,7 +396,6 @@ export type Database = {
         Row: {
           access_token: string
           accounting_software_name: string | null
-          additional_goals: string[] | null
           additional_notes: string | null
           address_type: string | null
           agent_id: string | null
@@ -411,14 +410,14 @@ export type Database = {
           created_at: string
           credit_reporting_bureaus: string[] | null
           desired_funding_types: string[] | null
-          desired_monthly_credit_capacity: string | null
+          draft_email: string | null
           entity_type: string | null
           filled_by: string
+          financial_pains: string[]
           first_name: string | null
           full_name: string | null
           funding_gap_methods: string[] | null
           gci_last_12_months: string | null
-          goal_time_horizon: string | null
           goals_notes: string | null
           has_business_address: string | null
           has_business_bank_account: string | null
@@ -438,15 +437,11 @@ export type Database = {
           preferred_cohort_time_1: string | null
           preferred_cohort_time_2: string | null
           preferred_support_format: string | null
-          primary_goal: string | null
+          primary_goals: string[]
           sides_closed_last_12_months: string | null
           state: string | null
           status: string
           submitted_at: string | null
-          target_funding_amount: string | null
-          top_financial_goal: string | null
-          top_financial_need: string | null
-          top_financial_pain: string | null
           updated_at: string
           uses_accounting_software: string | null
           vendor_tradelines: string | null
@@ -455,7 +450,6 @@ export type Database = {
         Insert: {
           access_token?: string
           accounting_software_name?: string | null
-          additional_goals?: string[] | null
           additional_notes?: string | null
           address_type?: string | null
           agent_id?: string | null
@@ -470,14 +464,14 @@ export type Database = {
           created_at?: string
           credit_reporting_bureaus?: string[] | null
           desired_funding_types?: string[] | null
-          desired_monthly_credit_capacity?: string | null
+          draft_email?: string | null
           entity_type?: string | null
           filled_by?: string
+          financial_pains?: string[]
           first_name?: string | null
           full_name?: string | null
           funding_gap_methods?: string[] | null
           gci_last_12_months?: string | null
-          goal_time_horizon?: string | null
           goals_notes?: string | null
           has_business_address?: string | null
           has_business_bank_account?: string | null
@@ -497,15 +491,11 @@ export type Database = {
           preferred_cohort_time_1?: string | null
           preferred_cohort_time_2?: string | null
           preferred_support_format?: string | null
-          primary_goal?: string | null
+          primary_goals?: string[]
           sides_closed_last_12_months?: string | null
           state?: string | null
           status?: string
           submitted_at?: string | null
-          target_funding_amount?: string | null
-          top_financial_goal?: string | null
-          top_financial_need?: string | null
-          top_financial_pain?: string | null
           updated_at?: string
           uses_accounting_software?: string | null
           vendor_tradelines?: string | null
@@ -514,7 +504,6 @@ export type Database = {
         Update: {
           access_token?: string
           accounting_software_name?: string | null
-          additional_goals?: string[] | null
           additional_notes?: string | null
           address_type?: string | null
           agent_id?: string | null
@@ -529,14 +518,14 @@ export type Database = {
           created_at?: string
           credit_reporting_bureaus?: string[] | null
           desired_funding_types?: string[] | null
-          desired_monthly_credit_capacity?: string | null
+          draft_email?: string | null
           entity_type?: string | null
           filled_by?: string
+          financial_pains?: string[]
           first_name?: string | null
           full_name?: string | null
           funding_gap_methods?: string[] | null
           gci_last_12_months?: string | null
-          goal_time_horizon?: string | null
           goals_notes?: string | null
           has_business_address?: string | null
           has_business_bank_account?: string | null
@@ -556,15 +545,11 @@ export type Database = {
           preferred_cohort_time_1?: string | null
           preferred_cohort_time_2?: string | null
           preferred_support_format?: string | null
-          primary_goal?: string | null
+          primary_goals?: string[]
           sides_closed_last_12_months?: string | null
           state?: string | null
           status?: string
           submitted_at?: string | null
-          target_funding_amount?: string | null
-          top_financial_goal?: string | null
-          top_financial_need?: string | null
-          top_financial_pain?: string | null
           updated_at?: string
           uses_accounting_software?: string | null
           vendor_tradelines?: string | null
