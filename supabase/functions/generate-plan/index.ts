@@ -425,6 +425,7 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
           lead_id: survey.lead_id,
           created_by: userId,
           updated_at: new Date().toISOString(),
+          ...(isUserGenerated ? { status: "published", published_at: new Date().toISOString() } : {}),
         })
         .eq("id", existingDraft.id)
         .select("id")
@@ -455,7 +456,8 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
           contact_name: survey.contact_name,
           contact_email: survey.contact_email,
           plan_data: planData,
-          status: "draft",
+          status: isUserGenerated ? "published" : "draft",
+          ...(isUserGenerated ? { published_at: new Date().toISOString() } : {}),
           created_by: userId,
         })
         .select("id")
