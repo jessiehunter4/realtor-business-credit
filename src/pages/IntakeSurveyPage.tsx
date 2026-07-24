@@ -149,6 +149,31 @@ export default function IntakeSurveyPage() {
   const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hydratedFromDraft = useRef(false);
+  const planEventLogged = useRef(false);
+
+  // Log plan generation outcome funnel events once per outcome.
+  useEffect(() => {
+    if (planState.status === "success" && !planEventLogged.current) {
+      planEventLogged.current = true;
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "plan_generation_succeeded",
+        metadata: { plan_id: planState.planId, source: "user" },
+      }).catch(() => {});
+      if (contactId) {
+        supabase.functions
+          .invoke("tag-ghl-contact", { body: { contactId, tags: ["f-plan-generated"] } })
+          .catch(() => {});
+      }
+    }
+    if (planState.status === "error") {
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "plan_generation_failed",
+        metadata: { message: planState.message },
+      }).catch(() => {});
+    }
+  }, [planState, contactId]);
 
   // Log intake_started on mount
   useEffect(() => {
