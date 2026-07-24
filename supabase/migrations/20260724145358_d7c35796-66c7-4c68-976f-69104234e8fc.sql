@@ -1,0 +1,1 @@
+ALTER TABLE public.custom_plans ALTER COLUMN created_by DROP NOT NULL;
