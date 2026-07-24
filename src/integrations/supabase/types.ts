@@ -212,7 +212,6 @@ export type Database = {
           recommended_program_slug: string | null
           status: string
           updated_at: string
-          user_id: string | null
         }
         Insert: {
           agent_id?: string | null
@@ -234,7 +233,6 @@ export type Database = {
           recommended_program_slug?: string | null
           status?: string
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
           agent_id?: string | null
@@ -256,7 +254,6 @@ export type Database = {
           recommended_program_slug?: string | null
           status?: string
           updated_at?: string
-          user_id?: string | null
         }
         Relationships: [
           {
@@ -446,7 +443,6 @@ export type Database = {
           status: string
           submitted_at: string | null
           updated_at: string
-          user_id: string | null
           uses_accounting_software: string | null
           vendor_tradelines: string | null
           years_in_real_estate: string | null
@@ -501,7 +497,6 @@ export type Database = {
           status?: string
           submitted_at?: string | null
           updated_at?: string
-          user_id?: string | null
           uses_accounting_software?: string | null
           vendor_tradelines?: string | null
           years_in_real_estate?: string | null
@@ -556,7 +551,6 @@ export type Database = {
           status?: string
           submitted_at?: string | null
           updated_at?: string
-          user_id?: string | null
           uses_accounting_software?: string | null
           vendor_tradelines?: string | null
           years_in_real_estate?: string | null
@@ -593,7 +587,6 @@ export type Database = {
           source: string
           state: string
           updated_at: string
-          user_id: string | null
           wants_fundability_scan: boolean
         }
         Insert: {
@@ -610,7 +603,6 @@ export type Database = {
           source?: string
           state: string
           updated_at?: string
-          user_id?: string | null
           wants_fundability_scan?: boolean
         }
         Update: {
@@ -627,7 +619,6 @@ export type Database = {
           source?: string
           state?: string
           updated_at?: string
-          user_id?: string | null
           wants_fundability_scan?: boolean
         }
         Relationships: []
@@ -713,39 +704,6 @@ export type Database = {
           task_key?: string
           task_label?: string | null
           updated_at?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          email: string | null
-          first_name: string | null
-          ghl_contact_id: string | null
-          last_name: string | null
-          phone: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          email?: string | null
-          first_name?: string | null
-          ghl_contact_id?: string | null
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          email?: string | null
-          first_name?: string | null
-          ghl_contact_id?: string | null
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
