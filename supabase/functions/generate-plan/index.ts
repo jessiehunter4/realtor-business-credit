@@ -100,11 +100,6 @@ serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -114,26 +109,75 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Verify admin
-    const userClient = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const userId = claimsData.claims.sub as string;
-
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
-    const { data: roleData } = await adminClient.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: "Admin access required" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    const body = await req.json().catch(() => ({}));
+    const { intake_survey_id, intake_token, source } = body as {
+      intake_survey_id?: string;
+      intake_token?: string;
+      source?: "user" | "admin";
+    };
+
+    // Authorize the request. Accept either:
+    //   (a) an admin JWT via Authorization header, OR
+    //   (b) a matching intake access_token (public user path).
+    let userId: string | null = null;
+    let isAdmin = false;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ") && !intake_token) {
+      const userClient = createClient(supabaseUrl, supabaseKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const token = authHeader.replace("Bearer ", "");
+      const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+      if (!claimsError && claimsData?.claims) {
+        userId = claimsData.claims.sub as string;
+        const { data: roleData } = await adminClient.rpc("has_role", { _user_id: userId, _role: "admin" });
+        isAdmin = !!roleData;
+      }
     }
 
-    const { intake_survey_id } = await req.json();
     if (!intake_survey_id) {
       return new Response(JSON.stringify({ error: "intake_survey_id required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // If not an admin, require a valid intake access token that matches this survey.
+    if (!isAdmin) {
+      if (!intake_token) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const { data: tokenRow, error: tokenErr } = await adminClient
+        .from("intake_surveys")
+        .select("id, status")
+        .eq("id", intake_survey_id)
+        .eq("access_token", intake_token)
+        .maybeSingle();
+      if (tokenErr || !tokenRow) {
+        return new Response(JSON.stringify({ error: "Invalid intake token" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (tokenRow.status !== "submitted") {
+        return new Response(JSON.stringify({ error: "Survey must be submitted before generating a plan." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
+    const isUserGenerated = !isAdmin;
+
+    // Idempotency: if a draft or published plan for this intake was created <60s ago, return it.
+    {
+      const { data: recent } = await adminClient
+        .from("custom_plans")
+        .select("id, created_at, status")
+        .eq("intake_survey_id", intake_survey_id)
+        .in("status", ["draft", "published"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (recent?.created_at && Date.now() - new Date(recent.created_at).getTime() < 60_000) {
+        return new Response(JSON.stringify({ plan_id: recent.id, superseded: false, idempotent: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     // Fetch survey + notes
