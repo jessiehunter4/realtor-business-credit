@@ -4,11 +4,28 @@ import {
   Text,
   View,
   Link,
+  Image,
   StyleSheet,
 } from '@react-pdf/renderer';
+import heroImg from '@/assets/guide/hero-agent.jpg';
+import jessieHeadshot from '@/assets/jessie-hunter-headshot.png.asset.json';
+import structureDiagram from '@/assets/guide-structure-diagram.png.asset.json';
+import structureHowItWorks from '@/assets/guide-structure-how-it-works.png.asset.json';
 
-const CTA_URL = 'https://realtorbusinesscredit.com/one-on-one';
-const REALTOR_URL = 'https://realtorbusinesscredit.com';
+const SITE_URL = 'https://reprobusinesscredit.com';
+const PLAN_URL = 'https://reprobusinesscredit.com/intake';
+
+// CDN asset pointers are same-origin paths (/__l5e/assets-v1/...).
+// The PDF is rendered client-side, so we resolve to absolute URLs at render time.
+const cdn = (path: string) => {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}${path}`;
+  }
+  return `${SITE_URL}${path}`;
+};
+const headshotSrc = cdn(jessieHeadshot.url);
+const structureDiagramSrc = cdn(structureDiagram.url);
+const structureHowItWorksSrc = cdn(structureHowItWorks.url);
 
 // Brand palette (mirrors --rbc-* tokens)
 const NAVY = '#0B1F3B';
