@@ -201,7 +201,11 @@ const GuidePage = () => {
     try {
       const toDataUrl = async (url: string) => {
         const res = await fetch(url);
+        if (!res.ok) throw new Error(`fetch ${url} ${res.status}`);
         const blob = await res.blob();
+        if (!blob.type.startsWith("image/")) {
+          throw new Error(`not image: ${blob.type}`);
+        }
         return await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result as string);
