@@ -1040,11 +1040,18 @@ export default function IntakeSurveyPage() {
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between">
+          </div>
+        </div>
+
+        {/* Navigation — sticky bottom action bar */}
+        <div className="sticky bottom-4 z-20 mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-full border border-border bg-background/95 px-4 py-3 shadow-[var(--rbc-shadow)] backdrop-blur">
           <div className="flex gap-2">
             {step > 0 && (
               <Button variant="outline" onClick={() => setStep(s => s - 1)}>Previous</Button>
             )}
+          </div>
+          <div className="hidden sm:block text-[11px] uppercase tracking-wide text-muted-foreground">
+            {autosaveStatus === "saving" ? "Saving…" : autosaveStatus === "saved" ? "Saved" : `Step ${step + 1} of ${steps.length}`}
           </div>
           <div className="flex gap-2">
             {step < steps.length - 1 ? (
