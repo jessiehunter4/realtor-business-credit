@@ -47,6 +47,34 @@ const SECTIONS = [
   { key: "program", label: "Program Fit", icon: Handshake },
 ] as const;
 
+const SECTION_VIDEO_META: Record<SectionKey, { step: number; title: string; description: string }> = {
+  profile: {
+    step: 1,
+    title: "Profile & Production",
+    description: "Who the agent is, where they work, and what their business looks like today.",
+  },
+  goals: {
+    step: 2,
+    title: "Goals & Financial Needs",
+    description: "The money moments that matter most and the gaps they need to close.",
+  },
+  structure: {
+    step: 3,
+    title: "Business Structure & Fundability",
+    description: "Entity, address, phone, banking, and the credibility pieces lenders see.",
+  },
+  credit: {
+    step: 4,
+    title: "Credit & Funding",
+    description: "Current business credit profile, funding habits, and comfort with guarantees.",
+  },
+  program: {
+    step: 5,
+    title: "Program Fit",
+    description: "Preferred support style, cohort timing, and readiness to get started.",
+  },
+};
+
 const GOAL_OPTIONS = [
   "Cover overhead between closings",
   "Grow marketing spend",
