@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, Share2 } from "lucide-react";
+import jessieHeadshot from "@/assets/jessie-hunter-headshot.png.asset.json";
 import {
   Callout,
   StoryBox,

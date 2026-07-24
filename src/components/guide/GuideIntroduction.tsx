@@ -8,6 +8,7 @@ import {
   PlanCTAButton,
 } from "./GuideComponents";
 import { BookOpen, ClipboardList, Rocket } from "lucide-react";
+import jessieHeadshot from "@/assets/jessie-hunter-headshot.png.asset.json";
 
 const GuideIntroduction = () => (
   <section id="introduction" className="scroll-mt-20 container mx-auto px-4 py-16">
@@ -15,6 +16,15 @@ const GuideIntroduction = () => (
       <ChapterHeader title="Welcome from Jessie Hunter" />
 
       <SectionHeading>I learned this the hard way</SectionHeading>
+      <div className="float-none sm:float-right sm:ml-6 sm:mb-4 mb-6 flex flex-col items-center">
+        <img
+          src={jessieHeadshot.url}
+          alt="Jessie Hunter, Founder of RE Pro Business Credit"
+          loading="lazy"
+          className="w-40 h-40 sm:w-44 sm:h-44 rounded-full object-cover object-top ring-4 ring-primary/20 shadow-lg bg-background"
+        />
+        <p className="mt-2 text-xs text-muted-foreground italic text-center">Jessie Hunter, Founder</p>
+      </div>
       <Paragraph>I hate running out of money.</Paragraph>
       <Paragraph>It hasn't happened often during my 16+ years in real estate, but there have been a handful of times when the market changed quickly and my income slowed down. The 2008 financial crisis was one of those times. The pandemic was another.</Paragraph>
       <Paragraph>Each time, I survived by relying on my personal credit, personal savings, and personal assets. What surprises me most is that <strong>no one ever taught me another way.</strong></Paragraph>
