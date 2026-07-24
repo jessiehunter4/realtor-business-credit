@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { ArrowRight, Lightbulb, Compass, Sparkles } from "lucide-react";
 
 interface CalloutProps {
   variant?: "default" | "warning" | "important" | "info";
@@ -67,15 +69,112 @@ export const QuoteBlock = ({ attribution, children }: QuoteBlockProps) => (
 export const BookSessionCTA = () => (
   <div className="mt-8 p-5 md:p-6 bg-primary/8 border-l-4 border-primary rounded-r-2xl">
     <p className="m-0 italic text-foreground">
-      Ready to put this into action? Book a free one-on-one. We'll walk through your RE Pro Business Financial Needs Analysis together and you'll leave with a custom plan.
+      Ready to put this into action? Create your free Customized Plan in about five minutes and it lands in your private RE Pro dashboard.
     </p>
     <p className="mt-3 mb-0">
-      <Link to="/one-on-one" data-analytics-id="cta-book-guide-inline" className="font-bold text-primary hover:underline">
-        Book your free 1:1 →
+      <Link to="/intake" data-analytics-id="cta-plan-guide-inline" className="font-bold text-primary hover:underline">
+        Create My Free Customized Plan →
       </Link>
     </p>
   </div>
 );
+
+/* ============================================================
+ * Jessie's Real-World Note — first-person aside
+ * ============================================================ */
+export const JessieNote = ({
+  title = "Jessie's real-world note",
+  children,
+}: {
+  title?: string;
+  children: React.ReactNode;
+}) => (
+  <div className="my-6 rounded-2xl border border-primary/25 bg-primary/5 p-5 md:p-6 break-inside-avoid">
+    <div className="flex items-center gap-2 mb-2">
+      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
+        <Compass className="h-4 w-4" />
+      </span>
+      <p className="m-0 text-xs uppercase tracking-widest text-primary font-bold">
+        {title}
+      </p>
+    </div>
+    <div className="text-base md:text-lg leading-relaxed text-foreground/90 [&>p]:my-2">
+      {children}
+    </div>
+  </div>
+);
+
+/* ============================================================
+ * Good Nugget — a memorable insight worth saving
+ * ============================================================ */
+export const GoodNugget = ({ children }: { children: React.ReactNode }) => (
+  <div className="my-6 rounded-2xl border-l-4 border-[hsl(var(--accent))] bg-[hsl(var(--accent)/0.12)] p-5 md:p-6 break-inside-avoid">
+    <div className="flex items-center gap-2 mb-2">
+      <Lightbulb className="h-4 w-4 text-[hsl(var(--accent))]" />
+      <p className="m-0 text-xs uppercase tracking-widest text-[hsl(var(--accent))] font-bold">
+        Good nugget
+      </p>
+    </div>
+    <p className="m-0 text-base md:text-lg leading-relaxed text-foreground">
+      {children}
+    </p>
+  </div>
+);
+
+/* ============================================================
+ * Your Next Move — one immediate action
+ * ============================================================ */
+export const NextMove = ({ children }: { children: React.ReactNode }) => (
+  <div className="my-6 rounded-2xl border border-[hsl(var(--sky)/0.35)] bg-[hsl(var(--sky)/0.08)] p-5 md:p-6 break-inside-avoid">
+    <div className="flex items-center gap-2 mb-2">
+      <Sparkles className="h-4 w-4 text-[hsl(var(--sky))]" />
+      <p className="m-0 text-xs uppercase tracking-widest text-[hsl(var(--sky))] font-bold">
+        Your next move
+      </p>
+    </div>
+    <div className="text-base md:text-lg leading-relaxed text-foreground [&>p]:my-2">
+      {children}
+    </div>
+  </div>
+);
+
+/* ============================================================
+ * ChapterTakeaway — one-sentence chapter summary
+ * ============================================================ */
+export const ChapterTakeaway = ({ children }: { children: React.ReactNode }) => (
+  <div className="my-8 rounded-2xl border-2 border-primary/40 bg-primary/8 p-5 md:p-6 break-inside-avoid">
+    <p className="m-0 text-xs uppercase tracking-widest text-primary font-bold mb-2">
+      Chapter takeaway
+    </p>
+    <p className="m-0 text-base md:text-lg leading-relaxed text-foreground font-medium">
+      {children}
+    </p>
+  </div>
+);
+
+/* ============================================================
+ * PlanCTAButton — link into /intake with identity forwarded
+ * ============================================================ */
+export const PlanCTAButton = ({
+  label = "Create My Free Customized Plan",
+  className = "",
+}: {
+  label?: string;
+  className?: string;
+}) => {
+  const { buildForwardParams } = useContactIdentity();
+  const params = buildForwardParams();
+  const href = `/intake${params ? `?${params}` : ""}`;
+  return (
+    <Link
+      to={href}
+      className={`inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 ${className}`}
+    >
+      {label}
+      <ArrowRight className="h-4 w-4" />
+    </Link>
+  );
+};
 
 export const ChapterHeader = ({ number, title }: { number?: string; title: string }) => (
   <div className="mb-8 md:mb-10">

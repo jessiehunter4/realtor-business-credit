@@ -1,48 +1,63 @@
-import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway } from "../GuideComponents";
-import { GuideChecklist, StatusItem } from "../GuideMedia";
+import { ChapterHeader, SectionHeading, Paragraph, ChapterTakeaway, JessieNote, GoodNugget } from "../GuideComponents";
 
-const items = [
-  "Business legal name matches entity documents",
-  "EIN issued (if applicable to your structure)",
-  "Business address (physical, virtual, or home — not a PO box)",
-  "Business phone listed and discoverable",
-  "Domain-based email (not Gmail / Yahoo / Outlook)",
-  "Business website present (a one-pager is fine)",
-  "Business bank account established and used consistently",
-  "Business licensing and profile listings consistent across directories",
-  "Professional online presence: LinkedIn, Google Business Profile (where appropriate)",
+const runwayMonths = [
+  { m: "0 mo", pct: 5, label: "Danger zone", color: "hsl(var(--coral))" },
+  { m: "1 mo", pct: 20, label: "Fragile", color: "hsl(var(--coral))" },
+  { m: "3 mo", pct: 50, label: "Stable", color: "hsl(var(--accent))" },
+  { m: "6 mo", pct: 100, label: "Strong", color: "hsl(var(--primary))" },
 ];
 
 const Ch08 = () => (
   <section id="chapter-8" className="scroll-mt-20 bg-muted/30 py-16">
     <div className="container mx-auto px-4">
       <div className="max-w-4xl mx-auto">
-        <ChapterHeader number="CHAPTER 8" title="Fundability signals: the business identity checklist" />
+        <ChapterHeader number="CHAPTER 8" title="Build reserves before you desperately need credit" />
 
-        <Paragraph>Underwriters and bureaus pattern-match. They look for the same business across many surfaces — your bank, your applications, your website, public directories — and the moment those signals contradict, your file slows down or stops.</Paragraph>
+        <Paragraph>One of the greatest lessons I learned is this: <strong>credit should be arranged before the emergency.</strong></Paragraph>
 
-        <GuideChecklist title="Your fundability signal checklist" items={items} />
+        <Paragraph>When income is strong, it's easy to believe the next closing will solve everything. But real estate can change quickly. A delayed transaction can become a canceled transaction. A market shift can slow an entire pipeline.</Paragraph>
 
-        <SectionHeading>A sample "where do I stand?" snapshot</SectionHeading>
-        <Paragraph>During your free 1:1 we generate this for you. It looks like:</Paragraph>
+        <SectionHeading>Where reserves belong</SectionHeading>
+        <Paragraph>Your business should work toward reserves for:</Paragraph>
+        <ul className="list-disc pl-6 space-y-1 text-base md:text-lg text-foreground/90 my-4">
+          <li>Operating expenses and marketing</li>
+          <li>Taxes and estimated payments</li>
+          <li>Debt payments</li>
+          <li>Slow commission periods</li>
+          <li>Emergencies</li>
+          <li>Growth opportunities you want to say yes to</li>
+        </ul>
 
-        <div className="my-6 rounded-2xl bg-card border border-border p-6 shadow-[0_8px_18px_rgba(11,31,59,.06)]">
-          <StatusItem status="strong" label="Business bank account opened and active" />
-          <StatusItem status="strong" label="EIN issued" />
-          <StatusItem status="watch" label="Business email — Gmail address still in use" />
-          <StatusItem status="watch" label="Business phone — not yet listed in directories" />
-          <StatusItem status="missing" label="Business website on owned domain" />
-          <StatusItem status="missing" label="D-U-N-S number registered" />
+        <SectionHeading>Your financial runway, visualized</SectionHeading>
+        <div className="my-8 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-[0_8px_18px_rgba(11,31,59,.06)]">
+          <p className="text-xs uppercase tracking-widest text-primary font-bold mb-4">Months of business operating reserves</p>
+          <div className="space-y-4">
+            {runwayMonths.map((r) => (
+              <div key={r.m}>
+                <div className="flex justify-between text-sm font-semibold text-foreground mb-1.5">
+                  <span>{r.m} · {r.label}</span>
+                  <span className="tabular-nums text-muted-foreground">{r.pct}%</span>
+                </div>
+                <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${r.pct}%`, background: r.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-5 text-xs text-muted-foreground">Illustrative. Six months of business operating reserves is a widely used comfort target.</p>
         </div>
 
-        <KeyTakeaway>
-          <h4 className="font-bold text-secondary mt-0 mb-3">Chapter 8 takeaways</h4>
-          <ul className="list-disc pl-6 space-y-1 text-base text-foreground/90">
-            <li>Fundability is a pattern, not a single score.</li>
-            <li>Consistency across surfaces matters more than perfection on any one.</li>
-            <li>The free 1:1 produces your personalized Strong / Watch / Missing snapshot.</li>
-          </ul>
-        </KeyTakeaway>
+        <JessieNote>
+          <p>Business credit should support good financial management — not replace it. Credit used without a repayment plan becomes another problem. Credit combined with reserves, clean records, and dependable cash flow becomes a powerful business tool.</p>
+        </JessieNote>
+
+        <GoodNugget>
+          Lenders prefer prepared businesses, not desperate applications.
+        </GoodNugget>
+
+        <ChapterTakeaway>
+          The best time to build access to capital is before your business urgently needs it.
+        </ChapterTakeaway>
       </div>
     </div>
   </section>

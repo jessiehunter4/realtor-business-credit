@@ -1,63 +1,68 @@
-import { Link } from "react-router-dom";
-import { Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway, Callout } from "../GuideComponents";
-import { GuideImage } from "../GuideMedia";
-import coachImg from "@/assets/guide/coach-session.jpg";
+import { ChapterHeader, SectionHeading, Paragraph, ChapterTakeaway, JessieNote, GoodNugget, PlanCTAButton } from "../GuideComponents";
+
+const paths = [
+  {
+    tag: "Free · Freemium",
+    title: "Do It Yourself",
+    body: "Use the guide, the customized plan, and the RE Pro dashboard to implement at your own pace with limited resources.",
+    fit: "Best if you already have time, discipline, and confidence with financial systems.",
+  },
+  {
+    tag: "Paid · Group",
+    title: "Cohort",
+    body: "Join a small group of fellow real estate pros. Weekly guided implementation, financial-partner introductions, and shared accountability.",
+    fit: "Best if you want structure, peer support, and access to vetted resources.",
+  },
+  {
+    tag: "Paid · Premium",
+    title: "Cohort + One-on-One Coach",
+    body: "Everything in the Cohort plus regular one-on-one sessions with a coach and expanded access to advanced resources and lender relationships.",
+    fit: "Best if you want the fastest path with dedicated guidance and expanded resources.",
+  },
+];
 
 const Ch13 = () => (
   <section id="chapter-13" className="scroll-mt-20 container mx-auto px-4 py-16">
     <div className="max-w-4xl mx-auto">
-      <ChapterHeader number="CHAPTER 13" title="The next step: Custom Plan + Program" />
+      <ChapterHeader number="CHAPTER 13" title="Your three implementation options" />
 
-      <Paragraph>This guide gives you the map. The free 1:1 gives you the route. The optional program executes it with you.</Paragraph>
+      <Paragraph>Everything in this guide points to one moment: choosing <em>how</em> you'll implement. Reading is step one. Planning is step two. Implementation is where results actually happen — and there are three supported ways to move.</Paragraph>
 
-      <GuideImage src={coachImg} alt="Realtor and coach reviewing the RE Pro Business Financial Needs Analysis together at a bright table" caption="The free 1:1 — your Needs Analysis becomes your custom plan in one sitting." />
-
-      <SectionHeading>What happens in your free 1:1</SectionHeading>
-      <ol className="list-decimal pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
-        <li>We complete the <strong>RE Pro Business Financial Needs Analysis</strong> together — about 5 minutes.</li>
-        <li>We identify the top 3–5 structural gaps blocking your fundability today.</li>
-        <li>You receive your <strong>Custom RE Pro Business Structure, Finance &amp; Credit Plan</strong> — click-and-read page plus downloadable PDF, with prioritized 90-day action steps.</li>
-      </ol>
-
-      <Callout variant="info">
-        <Paragraph className="m-0"><strong>No cost. No obligation.</strong> The guide is free. The 1:1 is free. The custom plan is free. You only invest if you decide to enter the optional implementation program.</Paragraph>
-      </Callout>
-
-      <SectionHeading>If you want help executing — the program</SectionHeading>
-      <ul className="list-disc pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
-        <li><strong>Realtor Financial Credit Coach</strong> — one-on-one support against your plan.</li>
-        <li><strong>Realtor Financial Credit Cohort</strong> — small group (5–10 Realtors) for accountability and momentum.</li>
-        <li><strong>Credit Suite portal access</strong> — the platform and tools behind the build.</li>
-        <li><strong>Business funding directory</strong> — vendors, cards, LOCs aligned to your stage.</li>
-      </ul>
-
-      <div className="text-center mt-12 mb-4">
-        <Button
-          asChild
-          size="lg"
-          className="text-lg px-8 py-6 rounded-full"
-          data-analytics-id="cta-book-guide-final"
-        >
-          <Link to="/one-on-one">
-            <Calendar className="mr-2 h-5 w-5" />
-            Book your free 1:1
-          </Link>
-        </Button>
-        <p className="text-sm text-muted-foreground mt-4 italic">
-          The guide is free. The 1:1 is free. The custom plan is free.
-        </p>
+      <div className="grid md:grid-cols-3 gap-5 my-8">
+        {paths.map((p, i) => (
+          <div
+            key={p.title}
+            className={`rounded-2xl border p-6 shadow-[0_8px_20px_rgba(11,31,59,.07)] flex flex-col ${
+              i === 1 ? "bg-primary/5 border-primary/40" : "bg-card border-border"
+            }`}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">{p.tag}</span>
+            <h4 className="mt-0 mb-2 text-secondary font-extrabold text-lg">{p.title}</h4>
+            <p className="m-0 mb-3 text-sm text-foreground/85 leading-relaxed">{p.body}</p>
+            <p className="mt-auto mb-0 text-xs text-muted-foreground italic">{p.fit}</p>
+          </div>
+        ))}
       </div>
 
-      <KeyTakeaway>
-        <h4 className="font-bold text-secondary mt-0 mb-3">Chapter 13 takeaways</h4>
-        <ul className="list-disc pl-6 space-y-1 text-base text-foreground/90">
-          <li>The Needs Analysis is completed live in the free 1:1 — that's its only purpose.</li>
-          <li>The output of the 1:1 is your custom plan, not a sales pitch.</li>
-          <li>The optional program turns the plan into actual structure, finance, and credit.</li>
-        </ul>
-      </KeyTakeaway>
+      <SectionHeading>The freemium promise</SectionHeading>
+      <Paragraph>The guide is free. The customized plan is free. The RE Pro dashboard is free. My goal is not to gate the foundation — it's to make sure thousands of real estate pros across the country finally have a properly structured business with real access to capital. Everything paid comes <em>after</em> that foundation is in place, and only if you decide a supported path is right for you.</Paragraph>
+
+      <JessieNote>
+        <p>I built this because I wish someone had built it for me in 2010. If you take nothing else from this guide, take this: your business deserves the same financial care and structure you give to your clients' transactions. Start with the plan. Everything else follows from there.</p>
+      </JessieNote>
+
+      <GoodNugget>
+        The best time to build access to capital is <em>before</em> your business urgently needs it. The second-best time is today.
+      </GoodNugget>
+
+      <div className="my-10 text-center">
+        <PlanCTAButton />
+        <p className="mt-3 text-xs text-muted-foreground">Free · 5 quick steps · Your custom plan generates instantly</p>
+      </div>
+
+      <ChapterTakeaway>
+        Guide. Plan. Implement. You've read the guide — the next step is your plan. Everything else follows.
+      </ChapterTakeaway>
     </div>
   </section>
 );

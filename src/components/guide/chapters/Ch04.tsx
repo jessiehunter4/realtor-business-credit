@@ -1,41 +1,68 @@
-import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway, Callout } from "../GuideComponents";
-import { BrokerCPADisclaimer } from "../GuideMedia";
+import { ChapterHeader, SectionHeading, Paragraph, ChapterTakeaway, JessieNote, GoodNugget } from "../GuideComponents";
+import { ArrowRight } from "lucide-react";
+
+const bridgeSteps = [
+  { label: "Personal-credit dependence", tint: "hsl(var(--coral))" },
+  { label: "Owner-supported business accounts", tint: "hsl(var(--accent))" },
+  { label: "Blended owner + business underwriting", tint: "hsl(var(--sky))" },
+  { label: "Business credit supported by revenue", tint: "hsl(var(--primary))" },
+  { label: "Standalone business financing where qualified", tint: "hsl(var(--primary))" },
+];
 
 const Ch04 = () => (
   <section id="chapter-4" className="scroll-mt-20 bg-muted/30 py-16">
     <div className="container mx-auto px-4">
       <div className="max-w-4xl mx-auto">
-        <ChapterHeader number="CHAPTER 4" title="Compliance reality: commission-to-entity pathways" />
+        <ChapterHeader number="CHAPTER 4" title="Personal credit is often the bridge — not the final destination" />
 
-        <Paragraph>This is where Realtors get tripped up — and where you protect yourself and your fundability.</Paragraph>
+        <Paragraph>Here's something important, and I wish someone had said it to me clearly early on: <strong>you may need your personal credit at the beginning.</strong> That does not mean you're doing anything wrong.</Paragraph>
 
-        <Callout variant="warning">
-          <h3 className="font-bold text-secondary text-lg mt-0 mb-2">Compliance notice</h3>
-          <Paragraph className="m-0">Commission handling — whether paid to the individual licensee or to an authorized corporation / entity — must comply with your state's real estate licensing laws, your brokerage's supervision policies, and CPA / attorney guidance. RBC does not provide legal advice; we provide education and a planning framework, and the right pathway must be confirmed with your professionals.</Paragraph>
-        </Callout>
-
-        <SectionHeading>Why this matters for funding</SectionHeading>
-        <Paragraph>Business credit and funding readiness depend on <strong>consistent</strong> business banking. That means income routed through your business accounts, business expenses paid from business accounts, and documentation that matches your applications.</Paragraph>
-        <Paragraph>When commissions are paid in a way that <em>blocks</em> consistent business banking — for example, deposited entirely to a personal account and then transferred sporadically — fundability drops. Statements look chaotic, deposits don't tie to your entity, and underwriters can't tell what's the business and what's you.</Paragraph>
-
-        <SectionHeading>What good looks like</SectionHeading>
-        <ul className="list-disc pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
-          <li>A compliant pathway your broker and CPA both sign off on.</li>
-          <li>Income deposited (where allowed) into a clearly named business account.</li>
-          <li>All business expenses paid from that account or a linked business card.</li>
-          <li>A monthly rhythm a stranger could read and understand in 60 seconds.</li>
+        <Paragraph>When a business has limited operating history, lenders often look to the owner for extra support. That's normal. In the early stage, the owner may provide:</Paragraph>
+        <ul className="list-disc pl-6 space-y-1 text-base md:text-lg text-foreground/90 my-4">
+          <li>A personal guarantee</li>
+          <li>Personal credit history</li>
+          <li>Personal liquidity or startup capital</li>
+          <li>Proof of financial responsibility</li>
         </ul>
 
-        <BrokerCPADisclaimer />
+        <SectionHeading>What has to shift over time</SectionHeading>
+        <Paragraph>The important distinction is what happens after that first step. The business should increasingly become the <strong>borrower, account holder, user of the funds, and source of repayment.</strong></Paragraph>
 
-        <KeyTakeaway>
-          <h4 className="font-bold text-secondary mt-0 mb-3">Chapter 4 takeaways</h4>
-          <ul className="list-disc pl-6 space-y-1 text-base text-foreground/90">
-            <li>Commission handling must respect state law, brokerage policy, and CPA guidance.</li>
-            <li>Fundability rewards clean, consistent business banking month after month.</li>
-            <li>The free 1:1 maps your specific pathway before you make any structural moves.</li>
-          </ul>
-        </KeyTakeaway>
+        <Paragraph>A business card guaranteed by the owner can still be part of a business-credit strategy when it is issued to the business, used for business expenses, paid from business funds, and reported to business bureaus. That's very different from permanently charging all business expenses to a personal consumer card.</Paragraph>
+
+        <SectionHeading>The natural progression</SectionHeading>
+        <div className="my-8 rounded-2xl bg-card border border-border p-5 md:p-6 shadow-[0_8px_18px_rgba(11,31,59,.06)]">
+          <div className="flex flex-col gap-3">
+            {bridgeSteps.map((s, i) => (
+              <div key={s.label} className="flex items-start gap-3">
+                <span
+                  className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ background: s.tint }}
+                >
+                  {i + 1}
+                </span>
+                <div className="flex-1">
+                  <span className="text-base md:text-lg text-foreground font-medium">{s.label}</span>
+                </div>
+                {i < bridgeSteps.length - 1 && (
+                  <ArrowRight className="mt-1 h-4 w-4 text-muted-foreground/60 rotate-90 md:rotate-0" aria-hidden />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <JessieNote>
+          <p>Personal guarantees aren't a sign of failure — they're a starting point. Some products may eventually offer reduced or no-PG requirements. Others will continue to require one under lender policy. Both can coexist inside a healthy business.</p>
+        </JessieNote>
+
+        <GoodNugget>
+          Personal credit is often the bridge. It doesn't have to be the destination.
+        </GoodNugget>
+
+        <ChapterTakeaway>
+          Personal credit may launch your business-credit profile. The long-term goal is a business that qualifies increasingly on its own strength.
+        </ChapterTakeaway>
       </div>
     </div>
   </section>

@@ -1,162 +1,50 @@
-## Goal
 
-Rebuild the Intake Survey (public `/intake` and admin `/admin/intake/:id`) around:
+# RE Pro Business Finance & Credit Guide — v2
 
-1. Multi-select **Primary Financial Goals (Top 3)** and **Financial Pains (Up to 3)**.
-2. A live **Goal Statement** that reads the selections back in plain English.
-3. **4 steps** — Profile · Goals · Business Structure · Credit & Funding — with a **Generate Plan** button at the bottom of Credit & Funding. The old Step E (Program Fit) is removed as a step; its inputs move onto the plan / dashboard experience after generation.
-4. **Auto-save** on every field change: localStorage first, promote to a server draft as soon as an email is captured (or immediately when a token exists).
-5. Remove **Time Horizon** and **Desired Monthly Credit Capacity** fields everywhere.
-6. Post-generation UX: a congratulations screen, then the user's personal dashboard/plan is built and opened.
+Rewrites the online guide and its PDF twin around the new draft you supplied. The existing scaffolding (13 chapter files, floating TOC, progress bar, opt-in gate, `GuidePDF.tsx`) stays; the content, callouts, CTAs, and visuals change.
 
-## Impact analysis
+## 1. Scope of changes
 
-Files/systems affected (confirmed by search):
+**Content — all 13 chapters + intro + conclusion**
+Replace copy in `src/components/guide/chapters/Ch01.tsx` … `Ch13.tsx`, `GuideIntroduction.tsx`, `GuideCover.tsx`, `GuideConclusion.tsx` with the new draft. Expand the outline into short narrative paragraphs in Jessie's first-person voice (not bullet dumps), keeping each chapter to a 2–4 minute read. Every chapter ends with a **Chapter Takeaway** and, where the draft calls for them, a **Jessie's Real-World Note**, **Good Nugget**, and **Your Next Move** callout — new variants added to `GuideComponents.tsx`.
 
-- `src/pages/IntakeSurveyPage.tsx` — steps, inputs, submit flow.
-- `src/pages/AdminIntakeCoachView.tsx` — mirrors public inputs; coach edit view.
-- `src/pages/AdminIntakeList.tsx` — no field refs (safe).
-- `supabase/functions/intake-survey/index.ts` — `EDITABLE_SURVEY_FIELDS` whitelist, direct-submit + PUT handlers; will grow a POST `mode=direct-draft` (upsert-by-email) for anonymous auto-save promotion.
-- `supabase/functions/generate-plan/index.ts` — prompt lines 175–181 reference the removed/renamed fields; rewrite to consume arrays and drop horizon/capacity.
-- `src/integrations/supabase/types.ts` — regenerated automatically after migration.
-- `src/components/intake/IntakePricingAndReadiness.tsx`, `src/components/plan/InlinePricingAccordion.tsx`, `src/components/plan/NextStepPanel.tsx` — currently rendered inside Step E of intake; move to plan portal only (they already exist there via `PortalPlanView`/`AdminIntakeCoachView`, so intake usage is just removed).
-- DB schema: `intake_surveys` — add `primary_goals text[]`, `financial_pains text[]`; drop `goal_time_horizon`, `desired_monthly_credit_capacity`, `primary_goal`, `additional_goals`, `top_financial_goal`, `top_financial_pain`, `target_funding_amount`, `top_financial_need`. Add `draft_email text` for anonymous draft upsert key + partial unique index on `(lower(draft_email))` where `status = 'in_progress' and access_token is null`.
-- Analytics / CRM: funnel events (`intake_started`, `intake_submitted`) unchanged. New event `plan_generated` already fires from `generate-plan` (verify) — no additional CRM changes required.
-- Plan display (`PortalPlanView`, `AdminPlanView`, `PlanDocument`, `PlanPDF`) reads the AI-generated plan JSON, not raw survey fields — no changes needed.
-- Dashboard/reporting: no direct references to the removed columns.
+**Funnel / CTAs**
+- Retire the "Book a One-on-One Session" model inside the guide. Replace `ChapterBookCTA` at the end of each chapter with a new `ChapterPlanCTA` ("Create My Free Customized Plan" → `/intake`).
+- Replace `FloatingBookCTA` with `FloatingPlanCTA` (same behavior, new label + link).
+- Chapter 12 becomes the "Now create your plan" chapter with the primary CTA; Chapter 13 introduces DIY / Cohort / Cohort+ implementation tiers.
+- `GuideConclusion.tsx` closes with the three-step recap (Guide ✓ → Plan → Implementation) and the primary "Create My Plan" button.
 
-Not affected: MLS import, submit-lead, tag-ghl-contact, log-funnel-event, guide, landing.
+**Framing pages**
+- `GuideCover.tsx`: new title "Real Estate Professional Business Finance & Credit Guide", subtitle "Build the financial structure behind your real estate career…", presented by RE Pro Business Credit / My Better Business Credit.
+- `GuideIntroduction.tsx`: "Welcome from Jessie Hunter" + "Your Three-Step RE Pro Path" section (Read → Plan → Implement) with the freemium promise block.
+- `GuideTOC.tsx` / `GuideFloatingTOC.tsx` / `GuideSkim.tsx`: retitle chapters to match new outline.
 
-## UX recommendations
+**Visuals (AI-generated where noted in the draft)**
+Generated into `src/assets/guide/` and referenced from both web and PDF:
+- Ch1: split visual — personal cards/savings vs business banking/reserves
+- Ch2: business-identity wheel (EIN, banking, website, email, address, accounting, credit, licensing)
+- Ch3: reuse the RE Pro Business Credit Structure graphic you attached (drop into `src/assets/guide/structure-diagram.*`)
+- Ch4: "bridge" illustration — Personal Credit Support → Business-Supported Capital
+- Ch5: reuse the five-stage progression graphic you attached
+- Ch6: lender-readiness component row
+- Ch7: NAICS decision tree (brokerage / property mgmt / ownership / admin ops)
+- Ch8: 0–6 month financial runway gauge
+- Ch9: capital-use icon row
+- Ch10: dashboard mockup (green / navy / teal / amber with Strong / In Progress / Needs Attention / Not Started status chips)
+- Cover / hero: new RE Pro Business Credit logo (from your attachment)
 
-**Multi-select for Goals & Pains**
-- Use a checkbox grid (same visual as today's "Additional goals") with an inline counter: "2 of 3 selected". After 3 are checked, the remaining boxes disable and show tooltip "Pick your top 3". Optional numeric ordering via drag handle is out of scope for v1; instead, selection order is preserved in the array so the first-checked is treated as #1.
-- Rationale: matches existing shadcn primitives, works on mobile, no new dependency.
+If any of the two attached graphics or the new logo aren't already in the project when I start building, I'll pause and ask you to re-upload before generating replacements.
 
-**Live Goal Statement**
-- Inline on Step B directly under the goals grid, rendered in an accent card:
-  > "I want my real estate business to **cover overhead between closings**, **grow marketing spend**, and **build reserves** — and the biggest thing standing in the way is **cash flow gaps between commissions**."
-- Repeated on a final in-page review block above the "Generate Plan" button (bottom of Credit & Funding step) so the user confirms before generating.
-- Empty state: "Pick at least one goal to see your goal statement."
+**PDF parity (`src/components/GuidePDF.tsx`)**
+Same chapter order, copy, callouts, and images as the web version. Explicit `break` on every `<ChapterStart>` so each chapter starts on a new page; `wrap={false}` on takeaway/nugget/CTA boxes so they don't split across pages. New cover and closing page mirror the web framing. Manual TOC page-number array updated after a full render pass (per project memory).
 
-**Auto-save strategy**
-- **Debounced 800 ms** after any field change, plus flush on step change and `visibilitychange = hidden`.
-- **Direct mode (no token):**
-  - Immediately: write full form to `localStorage["rbc_intake_draft_v2"]` keyed by contact identity email (falls back to anonymous).
-  - As soon as `contact_email` is valid (regex + on blur), call `POST /intake-survey?mode=direct-draft` which upserts an `intake_surveys` row by `draft_email` and returns `{ id, access_token }`. Store the token in localStorage so subsequent visits resume from the server row.
-  - Show subtle "Saved · just now" indicator in the header.
-- **Token mode:** debounced PUT with `status: "in_progress"` (already supported); silent unless it fails.
-- **Conflict handling:** server response includes `updated_at`; client stores it and sends `If-Match`-style `expected_updated_at`. On mismatch, toast "Your answers were updated in another tab — reloading" and refetch. (Low probability; acceptable safeguard.)
-- **Resume:** on mount, if URL has `token` → fetch server draft; else if localStorage has token → append `?token=...` to URL and fetch; else hydrate from localStorage.
-- **Completion:** on "Generate Plan" click → final PUT with `status=submitted`, invoke `generate-plan`, then route to congratulations → `/portal/plan/:id`. Clear localStorage draft.
+## 2. Technical details
 
-**Post-generation flow**
-- Full-screen success card: "Your plan is ready 🎉" with a 2-second progress bar animation while the plan renders, then auto-redirect to `/portal/plan/:id`. Manual button for users who want to jump.
+- **New components in `src/components/guide/`**: `ChapterPlanCTA.tsx`, `FloatingPlanCTA.tsx`, plus `JessieNote`, `GoodNugget`, `NextMove` exports added to `GuideComponents.tsx` (web) with matching styled blocks in `GuidePDF.tsx`.
+- **Routing/data**: no schema or edge-function changes. `/intake` remains the plan-generation entry point; guide-completion → dashboard access is already handled by `GuideOptInGate` + existing localStorage flag.
+- **Removals**: `ChapterBookCTA.tsx` and `FloatingBookCTA.tsx` deleted after references are swapped; any remaining "Book a 1:1" / EveryCatch booking links inside the guide surface only are removed. Booking flows elsewhere on the site are untouched in this task.
+- **QA**: after edits I run `bun run build`, then render the PDF and visually inspect every page for overflow, orphaned takeaway boxes, missing images, and correct chapter breaks; sync the TOC page-number array; re-render until clean.
 
-## Technical architecture
+## 3. Out of scope for this task
 
-**Database migration (single migration):**
-```sql
-alter table public.intake_surveys
-  add column if not exists primary_goals text[] default '{}'::text[],
-  add column if not exists financial_pains text[] default '{}'::text[],
-  add column if not exists draft_email text;
-
--- Backfill from legacy columns before dropping
-update public.intake_surveys
-  set primary_goals = coalesce(
-        array_remove(array_prepend(primary_goal, additional_goals), null),
-        '{}'::text[])
-  where primary_goals = '{}'::text[];
-
-update public.intake_surveys
-  set financial_pains = case
-        when top_financial_pain is not null then array[top_financial_pain]
-        else '{}'::text[] end
-  where financial_pains = '{}'::text[];
-
-alter table public.intake_surveys
-  drop column if exists primary_goal,
-  drop column if exists additional_goals,
-  drop column if exists top_financial_goal,
-  drop column if exists top_financial_pain,
-  drop column if exists top_financial_need,
-  drop column if exists goal_time_horizon,
-  drop column if exists desired_monthly_credit_capacity,
-  drop column if exists target_funding_amount;
-
-create unique index if not exists intake_surveys_draft_email_idx
-  on public.intake_surveys (lower(draft_email))
-  where status = 'in_progress';
-```
-
-**Edge function changes**
-- `intake-survey/index.ts`:
-  - Update `EDITABLE_SURVEY_FIELDS` (add `primary_goals`, `financial_pains`; remove obsolete).
-  - Add `mode=direct-draft` POST branch: upsert by `lower(draft_email)`, return `{ id, access_token }`.
-  - Add optimistic concurrency: accept `expected_updated_at` and 409 on mismatch.
-- `generate-plan/index.ts`: rewrite the survey summary section:
-  ```
-  - Primary Goals (top 3): ${(survey.primary_goals||[]).join("; ") || "N/A"}
-  - Financial Pains: ${(survey.financial_pains||[]).join("; ") || "N/A"}
-  - Goal Statement: <computed server-side to match UI>
-  ```
-  Remove references to horizon/capacity/target_funding.
-
-**Frontend**
-- New shared helper `src/lib/intakeGoalStatement.ts` — deterministic string builder used by UI, review card, and edge function (duplicate in Deno-safe form).
-- New `src/components/intake/MultiSelectLimited.tsx` — reusable capped checkbox grid.
-- New `src/components/intake/GoalStatement.tsx` — accent card renderer.
-- New `src/hooks/useIntakeAutosave.ts` — debounce + localStorage + server promotion; returns `{ status, lastSavedAt, save }`.
-- `IntakeSurveyPage.tsx`:
-  - Reduce `steps` to 4 (Profile, Goals, Business Structure, Credit & Funding).
-  - Delete Step E block; remove `IntakePricingAndReadiness` import/usage from intake (still used on plan portal).
-  - Step D footer: replace Next with **Generate Plan** primary CTA + Goal Statement recap.
-  - Add success screen with redirect on plan-ready.
-- `AdminIntakeCoachView.tsx`:
-  - Same field swap (multi-select goals/pains, drop horizon/capacity/notes-of-goals-legacy).
-  - Coach view keeps Program Fit inputs on a separate tab since coach may still edit them post-generation (existing tab structure retained).
-
-## Backward compatibility
-
-- Old submissions: `primary_goals` backfill preserves prior answers so historical plans still show meaningful data. `goal_time_horizon`, `desired_monthly_credit_capacity`, `target_funding_amount` values are discarded (per your choice to drop columns) — the AI-generated plan text already stored on those old rows is unchanged.
-- Any external export or GHL sync referencing removed columns: none found in code.
-
-## Risks & edge cases
-
-- Multi-tab editing on the same draft — mitigated by `expected_updated_at`.
-- User closes browser mid-Step-A before email — draft lives only in localStorage; acceptable.
-- Backfill array_prepend nuance on nulls — migration uses `array_remove(..., null)`.
-- Generate Plan is a heavy call; if it fails, keep the survey submitted and show retry button rather than reverting status.
-
-## Phased implementation
-
-**Phase 1 — Schema & backend (blocking)**
-- Migration: add new columns, backfill, drop old, index.
-- Update `intake-survey` edge function whitelist + add `mode=direct-draft`.
-- Update `generate-plan` prompt.
-- _Complexity: M_
-
-**Phase 2 — Shared helpers**
-- `intakeGoalStatement.ts`, `MultiSelectLimited`, `GoalStatement`, `useIntakeAutosave` hook.
-- _Complexity: M_ · depends on Phase 1 types regeneration.
-
-**Phase 3 — Public /intake rebuild**
-- Collapse to 4 steps, wire multi-select + Goal Statement + autosave + Generate Plan CTA + success screen.
-- _Complexity: L_ · depends on Phase 2.
-
-**Phase 4 — Admin coach view parity**
-- Mirror field changes in `AdminIntakeCoachView.tsx`.
-- _Complexity: M_ · parallel to Phase 3.
-
-**Phase 5 — QA & cleanup**
-- Manual pass: token resume, anonymous → email promotion, multi-tab conflict, Generate Plan happy path + failure retry, mobile layouts for admin dashboard, backfilled historical record renders.
-- Remove dead constants (`HORIZON_OPTIONS`, `FUNDING_AMOUNT_OPTIONS`, `CREDIT_CAPACITY_OPTIONS`) and unused imports.
-- _Complexity: S_
-
-## Out of scope
-
-- Redesigning the plan portal / dashboard itself.
-- Moving Program Fit inputs onto the dashboard UI (data model retained; UI relocation is a follow-up).
-- Drag-to-reorder for goal ranking (selection order used instead).
-- CRM tag changes beyond existing `f-intake-started` / `f-intake-submitted`.
+Homepage, pricing page, intake survey, admin, and the rest of the site keep their current copy. If you want the "1-on-1" language scrubbed elsewhere or the pricing page reframed around DIY / Cohort / Cohort+, that's a follow-up plan.

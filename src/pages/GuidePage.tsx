@@ -30,8 +30,8 @@ import GuideResources from "@/components/guide/GuideResources";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
-import ChapterBookCTA from "@/components/guide/ChapterBookCTA";
-import FloatingBookCTA from "@/components/guide/FloatingBookCTA";
+import ChapterPlanCTA from "@/components/guide/ChapterPlanCTA";
+import FloatingPlanCTA from "@/components/guide/FloatingPlanCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
@@ -42,7 +42,6 @@ const guideNavLinks = [
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
-  { to: "/one-on-one", label: "1:1 Session" },
   { to: "/business-credit-cards-for-realtors", label: "Cards" },
 ];
 
@@ -225,8 +224,8 @@ const GuidePage = () => {
   return (
     <div className="min-h-screen bg-background scroll-smooth">
       <Seo
-        title="RE Pro Business Structure, Finance & Credit Guide (Free)"
-        description="A bright, comprehensive guide for Realtors and brokers: business entity structure, the 3-account financial foundation, fundability signals, and the credit ladder — with a free 1:1 and custom plan."
+        title="Real Estate Professional Business Finance & Credit Guide (Free)"
+        description="A free Realtor-specific guide to business structure, finance, and credit — plus a 5-step interactive process to generate your own Customized Plan and a private RE Pro dashboard."
         path="/guide"
       />
       {/* Sticky CTA Bar */}
@@ -276,11 +275,11 @@ const GuidePage = () => {
             {/* Primary CTA stays visible on all breakpoints */}
             <Button asChild size="sm" className="text-xs sm:text-sm px-2.5 sm:px-3">
               <Link
-                to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
+                to={`/intake${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
               >
                 <Calendar className="sm:mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Book a One-on-One Session</span>
-                <span className="sm:hidden">Book 1:1</span>
+                <span className="hidden sm:inline">Create My Plan</span>
+                <span className="sm:hidden">My Plan</span>
               </Link>
             </Button>
             {/* Mobile hamburger */}
@@ -341,11 +340,11 @@ const GuidePage = () => {
             </Button>
             <Button asChild size="sm" className="w-full justify-center">
               <Link
-                to={`/one-on-one${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
+                to={`/intake${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                Book a One-on-One Session
+                Create My Customized Plan
               </Link>
             </Button>
           </div>
@@ -358,31 +357,31 @@ const GuidePage = () => {
       <GuideTOC />
       <GuideIntroduction />
       <Ch01 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch02 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch03 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch04 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch05 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch06 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch07 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch08 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch09 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch10 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch11 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch12 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <Ch13 />
-      <ChapterBookCTA />
+      <ChapterPlanCTA />
       <section className="container mx-auto max-w-3xl px-4 py-12">
         <StateEntityWidget />
       </section>
@@ -392,7 +391,7 @@ const GuidePage = () => {
       <div className="h-20 sm:h-24" aria-hidden="true" />
 
       <GuideFloatingTOC />
-      <FloatingBookCTA />
+      <FloatingPlanCTA />
       <SiteFooter />
     </div>
   );
