@@ -1,35 +1,57 @@
-## Update PDF guide to match the online guide
+# Fix downloaded PDF — bring it fully in sync with the web guide
 
-Bring `src/components/GuidePDF.tsx` into parity with the web guide's cover, brand palette, and imagery. Copy edits only — no chapter structure changes.
+## What the uploaded PDF shows
 
-### 1. Cover page — mirror `GuideCover.tsx`
-- Replace navy full-bleed cover with the web hero look: light gradient background band on top, brand eyebrow "RE Pro Business Credit · Free Guide", updated title "Real Estate Professional **Business Finance & Credit** Guide" with teal middle span, subtitle "Build the financial structure behind your real estate career…", "A specialized program of My Better Business Credit." italic, author byline "by Jessie Hunter · Real Estate Broker · California & Georgia".
-- Place the hero image (`src/assets/guide/hero-agent.jpg`) below the title in a rounded framed container matching the web card treatment.
-- Footer strip on the cover with CTA text pointing at `reprobusinesscredit.com` / "Create My Free Plan After Reading" instead of the old 1:1 booking language.
+Your file `Realtor-Business-Credit-Guide_7-24-26.pdf` is from an earlier build:
+- Cover still says "custom plan built with you in your free 1:1"
+- Footer still says `© 2026 RealtorBusinessCredit.com`
+- No embedded headshot / structure diagrams
+- Filename still uses the old "Realtor Business Credit" name
 
-### 2. Update stale copy & links project-wide in the PDF
-- Replace `CTA_URL` and `REALTOR_URL` constants and every visible URL from `realtorbusinesscredit.com`/`/one-on-one` to `reprobusinesscredit.com` and `/intake` (Create My Plan). Update `BookCTA` heading/body from "Book your free 1:1" to "Create your free customized plan" using the same Guide → Plan → Implement language as the web `ChapterPlanCTA`.
-- Update footer copyright to `© 2026 REProBusinessCredit.com`.
+The cover code has since been rebranded, but two issues remain that will still bite the next download:
 
-### 3. Embed the four images already used online
-Use `@react-pdf/renderer`'s `Image` component. Because CDN pointers are same-origin relative paths (`/__l5e/assets-v1/...`), build absolute URLs at render time with `` `${window.location.origin}${asset.url}` `` (safe — PDF is rendered client-side via `PDFDownloadLink`). Add a small `pdfAssetUrl()` helper.
+1. **Body copy across ~8 chapters still says "free 1:1"** (Ch 3, 4, 6, 8, 12, 13, Resources). The web guide replaced these with "Create My Plan / Guide → Plan → Implement" during the freemium rebrand. The PDF was never updated to match.
+2. **Images still don't render** — headshot (Ch 1 sidebar + About the Author), structure diagram (Ch 4), and "How it works" (Ch 5) all point to `/__l5e/assets-v1/…` URLs. `@react-pdf/renderer` fetches those at render time; in dev they return HTML, and even in prod they can fail silently — leaving empty teal circles / blank caption blocks (confirmed in the last QA).
+3. **Stale download**: because the file is named `Realtor-Business-Credit-Guide.pdf`, browsers and the CDN may serve a cached copy.
 
-Placements (matching the web guide exactly):
-- **Cover** → `hero-agent.jpg` (rounded card, ~380pt wide).
-- **Introduction / Ch 1 sidebar** → `jessie-hunter-headshot.png.asset.json` (circular ~90pt) beside the "Founder sidebar" story box.
-- **About the Author (Conclusion page)** → same headshot at ~120pt beside bio.
-- **Chapter 4** → `guide-structure-diagram.png.asset.json` as a figure with caption "RE Pro Business Credit Structure — personal credit as a temporary bridge."
-- **Chapter 5** → `guide-structure-how-it-works.png.asset.json` as a figure with caption "How the RE Pro Business Credit Structure Works."
+## Changes
 
-Each image wrapped in a `<View wrap={false}>` figure with border/rounded look and small caption using the existing `MUTED` color.
+### 1. Rewrite every "free 1:1" reference in `src/components/GuidePDF.tsx`
+Replace with the freemium / Create-My-Plan language already used on the web guide:
 
-### 4. Brand palette parity
-The existing `NAVY/TEAL/SKY/CORAL/AMBER/BG/CARD/BORDER/TEXT/MUTED` constants already mirror `--rbc-*` tokens exactly — no changes needed. Verify visually by rendering; no swap required unless the audit turns up drift.
+| Location | Old | New |
+|---|---|---|
+| Intro bullets | "Hands off to the free 1:1…" | "Hands off to your free custom Plan — generated from your Needs Analysis." |
+| Ch 3 / 4 takeaways | "The free 1:1 maps the right starting structure…" | "Your custom Plan maps the right starting structure for your situation." |
+| Ch 6 | "During your free 1:1 we generate this for you." | "Your free custom Plan generates this for you. It looks like:" |
+| Ch 8 takeaway | "The free 1:1 produces your Strong / Watch / Missing snapshot." | "Your custom Plan produces your Strong / Watch / Missing snapshot." |
+| Ch 12 | "Your specific actions get customized in your free 1:1." | "Your specific actions get customized in your free Plan." |
+| Ch 13 | "The free 1:1 gives you the route." + "What happens in your free 1:1" + "The 1:1 is free…" | "The Plan gives you the route." + "What happens when you Create Your Plan" + "The guide is free. The Plan is free…" |
+| Resources | (any remaining 1:1 mentions) | Match the web `GuideResources` copy exactly (Read → Create Plan → Implement). |
 
-### QA
-After edits, use existing `<PDFDownloadLink>` preview in the app (already wired). Manual visual check of the cover + Ch 4/5 image pages via the download button — no automated PDF QA loop needed for a copy/image update.
+### 2. Fix image embedding
+Convert CDN-hosted images to base64 data URIs before rendering, so `react-pdf` never has to fetch across origins.
 
-### Files touched
-- `src/components/GuidePDF.tsx` (only file).
+- In `src/pages/GuidePage.tsx#handleDownload`, before `pdf(<GuidePDF …/>).toBlob()`:
+  - `fetch(url)` → `blob()` → `FileReader.readAsDataURL()` for `jessieHeadshot.url`, `structureDiagram.url`, `structureHowItWorks.url`.
+  - `Promise.all` the three so they run in parallel.
+- Pass results as props: `<GuidePDF headshotSrc={…} structureSrc={…} howItWorksSrc={…} />`.
+- Update `GuidePDF` signature to accept those props (fallback to the CDN URL if a prop isn't supplied, so the standalone component still works).
+- Keep the bundled `heroImg` cover image as-is (already same-origin via Vite).
 
-No web-guide changes, no backend changes, no new deps.
+### 3. Cache-bust the download
+Rename the output file so cached copies can't win:
+- `a.download = "RE-Pro-Business-Credit-Guide.pdf"` in `GuidePage.handleDownload`.
+
+### 4. QA
+- Trigger the download via Playwright against localhost, save the PDF, and:
+  - `pdftotext` — confirm zero remaining "1:1" strings and footer says `REProBusinessCredit.com`.
+  - `pdfimages -list` — confirm 4 embedded images (hero + headshot + 2 diagrams) with non-zero sizes.
+  - `pdftoppm` a few pages and visually inspect the headshot circles and diagram blocks are no longer empty.
+
+## Files touched
+- `src/components/GuidePDF.tsx` — copy rewrite + optional image-src props
+- `src/pages/GuidePage.tsx` — prefetch images as data URIs, pass as props, new filename
+
+## Out of scope
+- No changes to the web guide, database, or CDN pointers. Assets themselves are already correct — only the PDF renderer's fetch path is being changed.
