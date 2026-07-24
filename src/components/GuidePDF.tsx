@@ -152,7 +152,7 @@ const OL = ({ num, children }: { num: number; children: React.ReactNode }) => (
 
 const PageFooter = () => (
   <View style={s.footer} fixed>
-    <Text style={s.footerLeft}>© 2026 RealtorBusinessCredit.com</Text>
+    <Text style={s.footerLeft}>© 2026 REProBusinessCredit.com</Text>
     <Text style={s.footerRight} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
   </View>
 );
@@ -176,12 +176,12 @@ const Takeaway = ({ chapter, items }: { chapter: string; items: string[] }) => (
 
 const BookCTA = () => (
   <View style={s.bigCtaBox} wrap={false}>
-    <Text style={s.bigCtaTitle}>Book your free 1:1</Text>
+    <Text style={s.bigCtaTitle}>Create your free customized plan</Text>
     <Text style={s.bigCtaText}>
-      5 minutes for the Needs Analysis. 30 minutes together.{'\n'}
-      You leave with your Custom RE Pro Business Structure, Finance &amp; Credit Plan.
+      Guide → Plan → Implement.{'\n'}
+      Answer a few questions and get your own RE Pro Business Finance &amp; Credit Plan — plus a free private dashboard.
     </Text>
-    <Link src={CTA_URL} style={s.bigCtaLink}>RealtorBusinessCredit.com/one-on-one →</Link>
+    <Link src={PLAN_URL} style={s.bigCtaLink}>REProBusinessCredit.com/intake →</Link>
     <Text style={[s.bigCtaText, { marginTop: 8, fontSize: 9, color: '#8AA0BE' }]}>
       No cost. No obligation. No pressure.
     </Text>
@@ -207,22 +207,31 @@ export const GuidePDF = () => (
   >
     {/* COVER */}
     <Page size="LETTER" style={s.coverPage}>
-      <View style={{ alignItems: 'center' }}>
-        <Text style={s.coverEyebrow}>RE PRO BUSINESS CREDIT</Text>
+      <View style={s.coverAccentBand} />
+      <View style={s.coverInner}>
+        <Text style={s.coverEyebrow}>RE PRO BUSINESS CREDIT · FREE GUIDE</Text>
         <Text style={s.coverTitle}>
-          The Realtor Business{'\n'}
-          <Text style={s.coverHighlight}>Structure, Finance &amp; Credit</Text>{'\n'}Guide
+          Real Estate Professional{'\n'}
+          <Text style={s.coverHighlight}>Business Finance &amp; Credit</Text>{'\n'}Guide
         </Text>
         <Text style={s.coverSubtitle}>
-          A practical, Realtor-specific path to a fundable business — and a custom plan built with you in your free 1:1.
+          Build the financial structure behind your real estate career — and create a path to capital that does not depend forever on your personal credit.
         </Text>
+        <Text style={s.coverProgramNote}>A specialized program of My Better Business Credit.</Text>
         <Text style={s.coverAuthor}>by Jessie Hunter</Text>
-        <Text style={{ fontSize: 10, color: '#CFE3FF', textAlign: 'center', marginTop: 4 }}>
-          Real Estate Broker · California &amp; Georgia
-        </Text>
-        <Text style={s.coverBrand}>RE Pro Business Credit</Text>
+        <Text style={s.coverAuthorMeta}>Real Estate Broker · California &amp; Georgia</Text>
+
+        <View style={s.coverHeroWrap}>
+          <Image src={heroImg} style={s.coverHeroImg} />
+        </View>
+
+        <View style={s.coverCta}>
+          <Text style={s.coverCtaText}>Create My Free Plan After Reading →</Text>
+          <Text style={s.coverCtaSub}>Free guide. Free plan. Free dashboard. No credit card required.</Text>
+        </View>
+
         <Text style={s.coverCopyright}>
-          © 2026 RealtorBusinessCredit.com — All Rights Reserved.{'\n'}Educational purposes only.
+          © 2026 REProBusinessCredit.com — All Rights Reserved.{'\n'}Educational purposes only.
         </Text>
       </View>
     </Page>
