@@ -1,103 +1,127 @@
+# Intake Survey Redesign — Steps 1–5
 
-# Plan Generation UX — Public & Admin
+Note: The current survey has 5 steps (Profile, Goals, Business Structure, Credit & Funding, Program Fit). The request says "Steps 1–4" — I'll treat this as **all form steps** for consistency. Confirm if you want Step 5 excluded.
 
-## Goals
-- Let visitors generate their own personalized plan at the end of the Intake Survey.
-- Deliver a polished success moment (confetti + message) and hand off to Visitor Portal (login/signup) to view the plan.
-- Keep admin generation fast: same underlying pipeline, lighter success UI, jump straight to the plan.
+## UX Review — Current State
 
-## Current state (verified)
-- `IntakeSurveyPage.handleSubmit` (src/pages/IntakeSurveyPage.tsx:280) submits the intake and shows a static "Thank You" card. No plan is generated.
-- `generate-plan` edge function (supabase/functions/generate-plan/index.ts) requires an authenticated admin (Bearer + `has_role admin`). Only caller today is `AdminIntakeCoachView.tsx:213`.
-- `custom_plans` rows are created with `status: draft`, keyed by `intake_survey_id`, and viewable via `PortalPlanView` / `AdminPlanView`.
-- Auth for visitors doesn't yet exist (prior plan pending); this plan assumes we integrate with whatever visitor auth ships (Supabase email/password) and, until then, gate portal access by intake token/email.
+- Single-page stepper in `src/pages/IntakeSurveyPage.tsx` (~1047 lines) using shadcn `Card` + `CardHeader/CardContent`.
+- No instructional media on any step; heading + description only.
+- Dense forms (Steps A, C, D each render 6–10 fields in one card) with `space-y-4` — desktop feels cramped, mobile feels long.
+- Progress indicator, autosave (`AUTOSAVE_DEBOUNCE_MS`, localStorage `rbc_intake_draft_v2`), Prev/Next nav, validation, and plan-preview handoff all live in this one file.
 
-## Public Flow (end-to-end)
+Pain points:
+- No visual anchor at the top of each step — user drops straight into fields.
+- Field grouping is flat; related fields (e.g. business address block, business identity toggles) aren't visually grouped.
+- On desktop the single-column card wastes horizontal space; on mobile the CTAs sit far below the fold.
+
+## Proposed Layout
+
+Two-column on desktop (≥lg), stacked on mobile:
 
 ```text
-Step 5 (Program Fit) → [Submit intake]
-   ↓ intake saved (status=submitted)
-Plan Preview screen  ── "Here's what you'll get" (5 bullets + sample thumbnail)
-   ↓ [Generate My Personalized Plan] (centered, primary)
-Loading state (progress copy, ~15–30s, cancel disabled)
-   ↓ plan_id returned
-Success screen: confetti + headline + summary + auto-redirect timer
-   ↓ (3s or click)
-/portal/login?next=/portal/plan/:id  (or /portal/signup if new)
-   ↓ auth success
-/portal/plan/:id  (personalized plan view)
+lg (≥1024px)                          md/sm (<1024px)
+┌──────────────┬──────────────────┐   ┌──────────────────┐
+│ Video        │ Step Header      │   │ Step Header      │
+│ Placeholder  │ ─────────────    │   ├──────────────────┤
+│ 16:9         │ Form fieldsets   │   │ Video (16:9)     │
+│ sticky top-24│ (grouped)        │   ├──────────────────┤
+│              │ Prev / Next CTAs │   │ Form fieldsets   │
+└──────────────┴──────────────────┘   │ Prev / Next CTAs │
+                                      └──────────────────┘
 ```
 
-Key UX details:
-- **Button placement:** centered, full-width on mobile, max-w-md on desktop, bottom of the final step *after* submit succeeds — not a second click on Step 5. Submit + Generate are collapsed conceptually but sequenced: submit first (saves data), then reveal the Preview + Generate CTA in-place (no navigation).
-- **Preview card** (before click): title "Your Personalized RE Pro Business Credit Plan", 5 bullets — Goals Snapshot, Fundability Assessment, 90-Day Action Plan, 6–12 Month Roadmap, Funding Opportunities & Program Recommendation. Small sample thumbnail linking to `/sample-plan`.
-- **Loading:** replace CTA with animated stepper ("Analyzing your answers… Building your roadmap… Finalizing recommendations…") on ~5s intervals; disable back nav; use `AbortController` + idempotency (see Technical).
-- **Success:** `canvas-confetti` burst (2s), "🎉 Your Plan Is Ready" headline, 2-line explanation, primary CTA "View My Plan" → auth gate, secondary "Email me the link". Auto-advance after 4s if user is idle.
-- **Handoff to portal:** if visitor session exists → `/portal/plan/:id`; else `/auth?mode=signup&next=/portal/plan/:id&email=<prefill>`. Until visitor auth ships, use a signed magic link emailed via existing tag/GHL workflow and land on a token-gated `/portal/plan/:id?token=…`.
+Proportions: `lg:grid-cols-[minmax(0,420px)_1fr]`, gap-8. Video sticks (`lg:sticky lg:top-24`) so it stays visible while the form scrolls. On mobile the video sits above the form and is collapsible ("Watch intro ▾") to keep fields near the fold.
 
-## Admin Flow
-- `AdminIntakeCoachView` "Generate Plan" button unchanged in placement.
-- Replace current inline toast-only feedback with a small success toast (`sonner`) — no confetti — plus auto-navigation to `/admin/plan/:id` in the same tab (current behavior kept, made explicit).
-- Show the same 3-step loading stepper for parity/consistency, but no preview screen (admin already knows what's generated).
-- Add "Regenerate" affordance already exists via supersede logic — surface it clearly with a confirm dialog.
+## Video Placeholder Component
+
+New `src/components/intake/StepVideoPlaceholder.tsx`:
+
+Props:
+- `stepNumber: number`
+- `title: string` (e.g. "Step 1 · Profile walkthrough")
+- `description?: string` ("2 min · What Jessie covers on this page")
+- `videoUrl?: string` — when provided, renders `<HeroVideo>`-style player; when absent, renders placeholder
+- `storagePath?: string` — supabase storage key for future upload
+- `posterUrl?: string`
+
+Placeholder visuals:
+- 16:9 `aspect-video` container, `rounded-2xl border border-border bg-hero-grad`
+- Centered play icon (Lucide `PlayCircle`, ~64px) in brand teal, subtle ring
+- Title + "Video coming soon" chip in top-left
+- Duration/description caption below
+- Skeleton shimmer overlay (subtle, respects `prefers-reduced-motion`)
+
+Reuses `HeroVideo.tsx` playback path when a `storagePath` is added later — swap is one prop change per step. Upload is already managed via `AdminVideoUpload` page; we'll add step slots (`intake-step-1.mp4` … `intake-step-5.mp4`) there.
+
+## Form Experience Improvements
+
+- Split each step into `<fieldset>` groupings with subtle divider + section eyebrow (e.g. Step A: "You" / "Your Business" / "Production"; Step C: "Entity" / "Address & Contact" / "Banking & Accounting"; Step D: "Cards & Tradelines" / "Bureaus" / "Funding Needs").
+- Two-column field grid inside groups on `md+` (`grid md:grid-cols-2 gap-4`) where fields are short (name, city, state, zip, phone, license type…). Textareas + multi-selects remain full width.
+- Consistent `Label` + helper text pattern; inline validation messages under fields (aria-describedby) instead of toast-only.
+- Sticky action bar at the bottom of the form column (`sticky bottom-0 bg-background/95 backdrop-blur border-t`) containing Prev/Next + autosave status ("Saved just now"). Improves reachability on mobile.
+- Progress: keep numeric step count, add a slim `Progress` bar and step labels above the two-column area, sticky under the header.
 
 ## Impact Analysis
-| Area | Change |
-|---|---|
-| `src/pages/IntakeSurveyPage.tsx` | New post-submit states: `preview`, `generating`, `success`, `error`. Replace static Thank You card. |
-| New `src/components/intake/PlanPreviewCard.tsx` | Preview + CTA |
-| New `src/components/intake/PlanGenerationLoader.tsx` | Rotating step copy + spinner |
-| New `src/components/intake/PlanSuccessCelebration.tsx` | Confetti + CTAs (shared with admin sans confetti via prop) |
-| `supabase/functions/generate-plan/index.ts` | Allow public invocation via intake token or direct-mode identity; keep admin path. Add idempotency: if a `draft` plan for the intake already exists AND was generated <60s ago, return it instead of regenerating. |
-| `supabase/config.toml` | `generate-plan` stays `verify_jwt = false`; auth checks moved inside the function (admin JWT OR valid intake token OR direct-mode email match). |
-| `AdminIntakeCoachView.tsx` | Reuse loader + success components; toast success. |
-| `PortalPlanView` / auth | Accept `?token=` fallback until Supabase visitor auth lands; then honor session. |
-| Analytics (`logFunnelEvent`) | New events: `plan_generation_started`, `plan_generation_succeeded`, `plan_generation_failed`, `plan_viewed`. GHL tags: `f-plan-generated`, `f-plan-viewed`. |
-| Package | Add `canvas-confetti` (+ types). |
-| DB | No schema changes required. Optional: add `generation_source` (`user` | `admin`) enum to `custom_plans` for reporting. |
 
-## Technical / UX Recommendations
-- **Duplicate-submit guard:** disable button on click; server-side idempotency key = `intake_survey_id` + 60s window; return existing draft.
-- **Timeout:** client `AbortController` at 60s → friendly retry error; server-side already surfaces 429/402/403.
-- **Loader:** rotating copy every 5s so 20–30s AI latency feels intentional; never show raw spinner alone.
-- **Accessibility:** confetti wrapped in `prefers-reduced-motion` guard (fallback: simple check-mark scale-in); success screen uses `role="status" aria-live="polite"`; button min 44px tap target; focus moved to success heading.
-- **Mobile:** single-column stacked layout; sticky bottom CTA in preview state; confetti origin y=0.3 to stay visible.
-- **Error handling:** distinct copy for 429 (rate limit → retry countdown), 402/403 (credits/limit → contact support), network (retry now).
-- **Extensibility:** extract a `usePlanGeneration({ source, intakeId, token })` hook so future plan variants (e.g., "Refresh my plan", "Cohort readiness plan") reuse the same state machine.
-- **Analytics:** capture time-to-generate, retry count, path to first plan view.
+Files touched:
+- `src/pages/IntakeSurveyPage.tsx` — layout scaffold, per-step wrappers, sticky action bar, grouping. Business logic (autosave, validation, plan generation handoff) unchanged.
+- New `src/components/intake/StepVideoPlaceholder.tsx`.
+- New `src/components/intake/StepShell.tsx` — reusable two-column shell (video slot + form slot + header + sticky footer). Keeps each step block small.
+- Optional: extract each step's fields into `src/components/intake/steps/StepProfile.tsx`, `StepGoals.tsx`, `StepStructure.tsx`, `StepCredit.tsx`, `StepProgramFit.tsx` to shrink the 1047-line page. Recommended but scoped as Phase 2.
+- `src/pages/AdminVideoUpload.tsx` — add upload slots for `intake-step-{1..5}.mp4` (Phase 3, optional).
+
+Unaffected (verified): autosave debounce + `DRAFT_STORAGE_KEY`, `usePlanGeneration` handoff, `PlanPreviewCard/Loader/Celebration`, edge functions (`intake-survey`, `generate-plan`), DB schema, admin coach view.
+
+## Responsive Behavior
+
+- `<768px`: single column, video collapsible above form, sticky bottom action bar, groups full-width.
+- `768–1023px`: single column but form uses 2-col field grid inside groups; video full-width above.
+- `≥1024px`: two-column shell, video sticky, form scrolls; max content width `max-w-6xl`.
+- Respect `prefers-reduced-motion` on shimmer/transitions.
+- Touch targets ≥44px on inputs and Prev/Next.
+
+## Accessibility
+
+- Placeholder uses `role="img"` with `aria-label`; real video uses `<video controls>` with captions track (mirrors `HeroVideo`).
+- Fieldsets with `<legend>` (visually styled as eyebrows).
+- Live region announces "Saved" and step changes.
+- Focus moves to step heading on Next/Prev.
+
+## Performance
+
+- Placeholder is pure CSS + one SVG icon — zero network cost.
+- When real videos land, reuse `HeroVideo` signed-URL flow (already lazy, `preload="metadata"`).
+- Extracting steps into subcomponents enables per-step code-splitting later if needed (not required now).
+
+## Risks & Testing
+
+Risks:
+- Sticky footer overlapping mobile keyboards on iOS — mitigate with `pb-[env(safe-area-inset-bottom)]` and non-sticky variant when a text input is focused (feature-detect).
+- Two-column shell on tablets in landscape at 1024px can feel tight — cap video column at 420px and allow form to flex.
+- Autosave status placement change — ensure existing "Saved"/"Saving" state wiring still fires.
+
+Testing:
+- Manual: all 5 steps at 375 / 768 / 1024 / 1440 widths; keyboard-only nav; screen reader step announcements; autosave still writes to `rbc_intake_draft_v2` and edge PUT.
+- Regression: token flow (`?token=`), direct-access mode, plan generation handoff, admin coach view unchanged.
+- Visual: dark mode not currently used on `/intake`, so no dark-mode QA needed.
 
 ## Phased Implementation
 
-**Phase 1 — Backend enablement (foundation)**
-- Extend `generate-plan` to accept intake-token or direct-mode identity; add idempotency; add `generation_source` field.
-- Update `AdminIntakeCoachView` to send explicit `source: "admin"`.
-- *Risk:* auth logic bug could allow cross-intake plan generation → mitigate with strict `intake_survey_id` match to token/email.
+1. **Phase 1 — Shell + placeholder (no logic change).**
+   - Build `StepVideoPlaceholder` and `StepShell`.
+   - Wrap each of the 5 existing step Cards in `StepShell` with the placeholder in the video slot.
+   - Add sticky action bar, move Prev/Next inside it.
+   - Ship — visually redesigned, behaviorally identical.
 
-**Phase 2 — Shared UI primitives**
-- Build `PlanPreviewCard`, `PlanGenerationLoader`, `PlanSuccessCelebration` with `variant="user"|"admin"` prop.
-- Add `usePlanGeneration` hook. Install `canvas-confetti`.
+2. **Phase 2 — Field grouping & 2-col grids.**
+   - Introduce fieldset groups + `md:grid-cols-2` inside each step.
+   - Inline validation messages under fields.
+   - Optional: extract steps into `src/components/intake/steps/*` for maintainability.
 
-**Phase 3 — Public intake integration**
-- Rework post-submit state machine in `IntakeSurveyPage`. Wire funnel events.
-- Add reduced-motion + mobile polish.
+3. **Phase 3 — Real video wiring (when assets exist).**
+   - Add `intake-step-{n}.mp4` slots in `AdminVideoUpload`.
+   - Pass `storagePath` to `StepVideoPlaceholder`; it delegates to `HeroVideo` when the file exists (reuses the existence-check pattern to avoid 404 noise).
 
-**Phase 4 — Admin integration**
-- Swap admin generate button to use shared hook + loader. Toast-only success. Auto-nav to `/admin/plan/:id`.
+## Open Question
 
-**Phase 5 — Portal handoff**
-- If visitor auth exists: post-success routes through `/auth?next=…`.
-- Interim: token-gated `/portal/plan/:id?token=…` + emailed magic link via GHL.
-
-**Phase 6 — QA & analytics**
-- Cross-browser + mobile pass. Verify event stream and GHL tags. Load-test concurrent generations (rate-limit behavior).
-
-## Dependencies & Risks
-- Depends on visitor auth plan for the final handoff; interim token link is acceptable and reversible.
-- AI latency variance — mitigated by loader messaging + timeout.
-- Cost/credits — idempotency prevents accidental double-spend; admin regenerate requires confirm.
-
-## Testing
-- Unit: `usePlanGeneration` state transitions incl. abort/timeout/error branches.
-- Integration: public direct-mode intake → generate → success → portal token link.
-- E2E (Playwright): full happy path desktop + mobile; reduced-motion; 429 error path (mock).
-- Manual: admin regenerate supersede path; verify `custom_plans` row states.
+- Confirm scope: redesign **all 5 steps** (Profile, Goals, Structure, Credit & Funding, Program Fit) or only Steps 1–4 excluding "Program Fit"?
