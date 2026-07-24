@@ -199,7 +199,17 @@ const StatusItem = ({ status, label }: { status: 'Strong' | 'Watch' | 'Missing';
 };
 
 // ============= DOCUMENT =============
-export const GuidePDF = () => (
+export interface GuidePDFProps {
+  headshotSrc?: string;
+  structureSrc?: string;
+  howItWorksSrc?: string;
+}
+
+export const GuidePDF = ({
+  headshotSrc = defaultHeadshotSrc,
+  structureSrc = defaultStructureDiagramSrc,
+  howItWorksSrc = defaultStructureHowItWorksSrc,
+}: GuidePDFProps = {}) => (
   <Document
     title="RE Pro Business Structure, Finance & Credit Guide"
     author="Jessie Hunter"
