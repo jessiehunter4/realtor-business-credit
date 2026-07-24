@@ -1,13 +1,13 @@
 import { Zap } from "lucide-react";
 
 const takeaways = [
-  { id: "chapter-1",  text: "Real estate education skips business architecture — credit is downstream of structure." },
-  { id: "chapter-2",  text: "Lumpy income + steady expenses = fundability matters more than production." },
-  { id: "chapter-3",  text: "Sole Prop / LLC / S-Corp / C-Corp each serve a stage — your state and broker constrain the menu." },
-  { id: "chapter-6",  text: "The 3-account system (Operating · Tax Reserve · Opportunity) automates everything." },
-  { id: "chapter-8",  text: "Fundability is a pattern of consistent identity signals, not a single score." },
-  { id: "chapter-10", text: "The Realtor Credit Ladder: Foundation → Bureaus → Tradelines → Cards → Growth funding." },
-  { id: "chapter-13", text: "Next step: free 1:1, live Needs Analysis, free custom plan, optional program." },
+  { id: "chapter-1",  text: "If your business can't operate without your personal credit, you don't yet have real financial separation." },
+  { id: "chapter-2",  text: "An EIN creates identity — banking, accounting, revenue and payment history create financial credibility." },
+  { id: "chapter-4",  text: "Personal credit may launch your business-credit profile. The long-term goal is for the business to qualify on its own strength." },
+  { id: "chapter-5",  text: "Business credit grows in five stages as the business proves it can earn, manage and repay." },
+  { id: "chapter-6",  text: "A credit score opens the door — cash flow, records, and repayment ability decide how far you go." },
+  { id: "chapter-8",  text: "The best time to build access to capital is before your business urgently needs it." },
+  { id: "chapter-12", text: "Your plan should be based on your real situation — not a generic checklist made for every business." },
 ];
 
 const GuideSkim = () => (
