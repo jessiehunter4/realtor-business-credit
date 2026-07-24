@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2, Menu, X } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { GuidePDF } from "@/components/GuidePDF";
+import jessieHeadshot from "@/assets/jessie-hunter-headshot.png.asset.json";
+import structureDiagram from "@/assets/guide-structure-diagram.png.asset.json";
+import structureHowItWorks from "@/assets/guide-structure-how-it-works.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
@@ -196,11 +199,36 @@ const GuidePage = () => {
   const handleDownload = useCallback(async () => {
     setGenerating(true);
     try {
-      const blob = await pdf(<GuidePDF />).toBlob();
+      const toDataUrl = async (url: string) => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`fetch ${url} ${res.status}`);
+        const blob = await res.blob();
+        if (!blob.type.startsWith("image/")) {
+          throw new Error(`not image: ${blob.type}`);
+        }
+        return await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+      const [headshotSrc, structureSrc, howItWorksSrc] = await Promise.all([
+        toDataUrl(jessieHeadshot.url).catch(() => undefined),
+        toDataUrl(structureDiagram.url).catch(() => undefined),
+        toDataUrl(structureHowItWorks.url).catch(() => undefined),
+      ]);
+      const blob = await pdf(
+        <GuidePDF
+          headshotSrc={headshotSrc}
+          structureSrc={structureSrc}
+          howItWorksSrc={howItWorksSrc}
+        />
+      ).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "Realtor-Business-Credit-Guide.pdf";
+      a.download = "RE-Pro-Business-Credit-Guide.pdf";
       a.click();
       URL.revokeObjectURL(url);
 

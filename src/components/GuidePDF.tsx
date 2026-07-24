@@ -23,9 +23,9 @@ const cdn = (path: string) => {
   }
   return `${SITE_URL}${path}`;
 };
-const headshotSrc = cdn(jessieHeadshot.url);
-const structureDiagramSrc = cdn(structureDiagram.url);
-const structureHowItWorksSrc = cdn(structureHowItWorks.url);
+const defaultHeadshotSrc = cdn(jessieHeadshot.url);
+const defaultStructureDiagramSrc = cdn(structureDiagram.url);
+const defaultStructureHowItWorksSrc = cdn(structureHowItWorks.url);
 
 // Brand palette (mirrors --rbc-* tokens)
 const NAVY = '#0B1F3B';
@@ -199,7 +199,17 @@ const StatusItem = ({ status, label }: { status: 'Strong' | 'Watch' | 'Missing';
 };
 
 // ============= DOCUMENT =============
-export const GuidePDF = () => (
+export interface GuidePDFProps {
+  headshotSrc?: string;
+  structureSrc?: string;
+  howItWorksSrc?: string;
+}
+
+export const GuidePDF = ({
+  headshotSrc = defaultHeadshotSrc,
+  structureSrc = defaultStructureDiagramSrc,
+  howItWorksSrc = defaultStructureHowItWorksSrc,
+}: GuidePDFProps = {}) => (
   <Document
     title="RE Pro Business Structure, Finance & Credit Guide"
     author="Jessie Hunter"
@@ -279,7 +289,7 @@ export const GuidePDF = () => (
       <Bullet>Shows you the structure underneath a real Realtor business.</Bullet>
       <Bullet>Explains how lenders and bureaus actually evaluate you.</Bullet>
       <Bullet>Walks you through the 13-chapter map: structure → finance → credit.</Bullet>
-      <Bullet>Hands off to the free 1:1, where we build your custom plan together.</Bullet>
+      <Bullet>Hands off to your free custom Plan — generated from your Needs Analysis.</Bullet>
       <Text style={s.h2}>Who it's for</Text>
       <Bullet>Residential and commercial agents and brokers.</Bullet>
       <Bullet>Realtors who are tired of mixing personal and business finances.</Bullet>
@@ -366,7 +376,7 @@ export const GuidePDF = () => (
       <Takeaway chapter="Chapter 3" items={[
         'There is no universal "best" entity — only the right one for your state, broker, income and goals.',
         'Structure choices affect taxes, liability and fundability all at once.',
-        'The free 1:1 maps the right starting structure for your situation.',
+        'Your custom Plan maps the right starting structure for your situation.',
       ]} />
       <PageFooter />
     </Page>
@@ -377,7 +387,7 @@ export const GuidePDF = () => (
       <P>This is where Realtors get tripped up — and where you protect yourself and your fundability.</P>
       <View style={s.figure} wrap={false}>
         <View style={s.figureFrame}>
-          <Image src={structureDiagramSrc} style={s.figureImg} />
+          <Image src={structureSrc} style={s.figureImg} />
         </View>
         <Text style={s.figureCaption}>RE Pro Business Credit Structure — personal credit as a temporary bridge to business-supported capital.</Text>
       </View>
@@ -396,7 +406,7 @@ export const GuidePDF = () => (
       <Takeaway chapter="Chapter 4" items={[
         'Commission handling must respect state law, brokerage policy and CPA guidance.',
         'Fundability rewards clean, consistent business banking every month.',
-        'The free 1:1 maps your pathway before you make structural moves.',
+        'Your custom Plan maps your pathway before you make structural moves.',
       ]} />
       <PageFooter />
     </Page>
@@ -407,7 +417,7 @@ export const GuidePDF = () => (
       <P>Most Realtors think asset protection equals "I need an LLC." Real asset protection is <B>layered</B>.</P>
       <View style={s.figure} wrap={false}>
         <View style={s.figureFrame}>
-          <Image src={structureHowItWorksSrc} style={s.figureImg} />
+          <Image src={howItWorksSrc} style={s.figureImg} />
         </View>
         <Text style={s.figureCaption}>How the RE Pro Business Credit Structure Works — objectives and five progressive steps.</Text>
       </View>
@@ -499,7 +509,7 @@ export const GuidePDF = () => (
       <Bullet>D-U-N-S Number and bureau profiles forming.</Bullet>
       <Bullet>Identity matches across every surface.</Bullet>
       <Text style={s.h2}>Sample "where do I stand?" snapshot</Text>
-      <P>During your free 1:1 we generate this for you. It looks like:</P>
+      <P>Your free custom Plan generates this for you. It looks like:</P>
       <View style={{ marginVertical: 6 }}>
         <StatusItem status="Strong" label="Business bank account with consistent deposits" />
         <StatusItem status="Strong" label="EIN in use across applications" />
@@ -511,7 +521,7 @@ export const GuidePDF = () => (
       <Takeaway chapter="Chapter 8" items={[
         'Fundability is a pattern, not a single score.',
         'Consistency across surfaces matters more than perfection on any one.',
-        'The free 1:1 produces your personalized Strong / Watch / Missing snapshot.',
+        'Your custom Plan produces your personalized Strong / Watch / Missing snapshot.',
       ]} />
       <PageFooter />
     </Page>
@@ -599,7 +609,7 @@ export const GuidePDF = () => (
     {/* CHAPTER 12 */}
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CHAPTER 12" title="Your 30 / 60 / 90-day action plan" />
-      <P>Your specific actions get customized in your free 1:1. But every Realtor's first 90 days looks roughly like this.</P>
+      <P>Your specific actions get customized in your free Plan. But every Realtor's first 90 days looks roughly like this.</P>
       <Text style={s.h2}>Days 1–30 — Structure &amp; banking</Text>
       <Bullet>Confirm entity pathway with CPA / attorney / broker.</Bullet>
       <Bullet>EIN in place; business name and address locked.</Bullet>
@@ -630,14 +640,14 @@ export const GuidePDF = () => (
     {/* CHAPTER 13 */}
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CHAPTER 13" title="The next step: Custom Plan + Program" />
-      <P>This guide gives you the map. The free 1:1 gives you the route. The optional program executes it with you.</P>
-      <Text style={s.h2}>What happens in your free 1:1</Text>
+      <P>This guide gives you the map. Your custom Plan gives you the route. The optional program executes it with you.</P>
+      <Text style={s.h2}>What happens when you Create Your Plan</Text>
       <OL num={1}>We complete the <B>RE Pro Business Financial Needs Analysis</B> together — about 5 minutes.</OL>
       <OL num={2}>We identify the top 3–5 structural gaps blocking your fundability today.</OL>
       <OL num={3}>You receive your <B>Custom RE Pro Business Structure, Finance &amp; Credit Plan</B> — a click-and-read page plus downloadable PDF with prioritized 90-day action steps.</OL>
       <View style={s.calloutInfo} wrap={false}>
         <Text style={s.calloutTitle}>No cost. No obligation.</Text>
-        <Text style={s.calloutText}>The guide is free. The 1:1 is free. The plan generated from your Needs Analysis is yours to keep, whether you join the program or not.</Text>
+        <Text style={s.calloutText}>The guide is free. The Plan is free. The Plan generated from your Needs Analysis is yours to keep, whether you join the program or not.</Text>
       </View>
       <Text style={s.h2}>If you want help executing — the program</Text>
       <Bullet>Coaching support tailored to Realtors.</Bullet>
