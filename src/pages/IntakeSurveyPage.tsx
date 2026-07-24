@@ -602,47 +602,27 @@ export default function IntakeSurveyPage() {
           <Card>
             <CardHeader>
               <CardTitle>Goals</CardTitle>
-              <CardDescription>Tell us what you want your business to do — pick each goal separately so your plan can be tailored.</CardDescription>
+              <CardDescription>Pick the goals and pain points that matter most — your live goal statement updates as you choose.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Primary financial goal <span className="text-red-600">*</span></Label>
-                <p className="text-xs text-muted-foreground">Pick the one goal that matters most right now.</p>
-                <RadioGroup value={form.primary_goal || ""} onValueChange={v => {
-                  updateField("primary_goal", v);
-                  // keep it out of "additional goals"
-                  const extras = (form.additional_goals || []).filter(g => g !== v);
-                  updateField("additional_goals", extras);
-                  // mirror to legacy field for backward compat
-                  updateField("top_financial_goal", v);
-                }}>
-                  {GOAL_OPTIONS.map(opt => (
-                    <div key={opt} className="flex items-center space-x-2">
-                      <RadioGroupItem value={opt} id={`pg-${opt}`} />
-                      <Label htmlFor={`pg-${opt}`} className="font-normal">{opt}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Additional goals (optional)</Label>
-                <p className="text-xs text-muted-foreground">Select any other goals that also matter to you.</p>
+                <Label>Primary Financial Goals (Top 3) <span className="text-red-600">*</span></Label>
+                <p className="text-xs text-muted-foreground">
+                  Selected {(form.primary_goals || []).length} of {MAX_GOALS} — pick the goals that matter most.
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {GOAL_OPTIONS.filter(o => o !== form.primary_goal).map(opt => {
-                    const checked = (form.additional_goals || []).includes(opt);
+                  {GOAL_OPTIONS.map(opt => {
+                    const checked = (form.primary_goals || []).includes(opt);
+                    const disabled = !checked && (form.primary_goals || []).length >= MAX_GOALS;
                     return (
                       <div key={opt} className="flex items-start space-x-2">
                         <Checkbox
-                          id={`ag-${opt}`}
+                          id={`pg-${opt}`}
                           checked={checked}
-                          onCheckedChange={() => {
-                            const cur = form.additional_goals || [];
-                            const next = cur.includes(opt) ? cur.filter(v => v !== opt) : [...cur, opt];
-                            updateField("additional_goals", next);
-                          }}
+                          disabled={disabled}
+                          onCheckedChange={() => toggleLimitedArray("primary_goals", opt, MAX_GOALS)}
                         />
-                        <Label htmlFor={`ag-${opt}`} className="font-normal">{opt}</Label>
+                        <Label htmlFor={`pg-${opt}`} className={`font-normal ${disabled ? "opacity-50" : ""}`}>{opt}</Label>
                       </div>
                     );
                   })}
@@ -650,50 +630,34 @@ export default function IntakeSurveyPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Top financial pain right now</Label>
-                <RadioGroup value={form.top_financial_pain || ""} onValueChange={v => {
-                  updateField("top_financial_pain", v);
-                  updateField("top_financial_need", v);
-                }}>
-                  {PAIN_OPTIONS.map(opt => (
-                    <div key={opt} className="flex items-center space-x-2">
-                      <RadioGroupItem value={opt} id={`pain-${opt}`} />
-                      <Label htmlFor={`pain-${opt}`} className="font-normal">{opt}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Time horizon for the primary goal</Label>
-                  <Select value={form.goal_time_horizon || ""} onValueChange={v => updateField("goal_time_horizon", v)}>
-                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                    <SelectContent>
-                      {HORIZON_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Target funding amount for the primary goal</Label>
-                  <Select value={form.target_funding_amount || ""} onValueChange={v => updateField("target_funding_amount", v)}>
-                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                    <SelectContent>
-                      {FUNDING_AMOUNT_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                <Label>Financial Pains (Up to 3)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Selected {(form.financial_pains || []).length} of {MAX_PAINS} — what's holding you back right now?
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {PAIN_OPTIONS.map(opt => {
+                    const checked = (form.financial_pains || []).includes(opt);
+                    const disabled = !checked && (form.financial_pains || []).length >= MAX_PAINS;
+                    return (
+                      <div key={opt} className="flex items-start space-x-2">
+                        <Checkbox
+                          id={`pain-${opt}`}
+                          checked={checked}
+                          disabled={disabled}
+                          onCheckedChange={() => toggleLimitedArray("financial_pains", opt, MAX_PAINS)}
+                        />
+                        <Label htmlFor={`pain-${opt}`} className={`font-normal ${disabled ? "opacity-50" : ""}`}>{opt}</Label>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Desired monthly business credit capacity</Label>
-                <Select value={form.desired_monthly_credit_capacity || ""} onValueChange={v => updateField("desired_monthly_credit_capacity", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                  <SelectContent>
-                    {CREDIT_CAPACITY_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+              <GoalStatement
+                goals={form.primary_goals || []}
+                pains={form.financial_pains || []}
+                name={form.first_name || form.contact_name}
+              />
 
               <div className="space-y-2">
                 <Label>Anything else about your goals? (optional)</Label>
