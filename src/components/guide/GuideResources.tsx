@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, Share2 } from "lucide-react";
+import jessieHeadshot from "@/assets/jessie-hunter-headshot.png.asset.json";
 import {
   Callout,
   StoryBox,
@@ -52,10 +53,21 @@ const GuideResources = () => (
 
           <SectionHeading>About the Author</SectionHeading>
           <StoryBox>
-            <h3 className="font-bold text-lg text-primary mt-0 mb-3">Jessie Hunter</h3>
-            <Paragraph>
-              Jessie Hunter is a licensed real estate broker in California and Georgia with over 15 years of experience in residential and commercial real estate.
-            </Paragraph>
+            <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 items-center sm:items-start">
+              <img
+                src={jessieHeadshot.url}
+                alt="Jessie Hunter, Founder of RE Pro Business Credit"
+                loading="lazy"
+                className="w-36 h-36 sm:w-40 sm:h-40 rounded-full object-cover object-top ring-4 ring-primary/20 shadow-lg bg-background flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-lg text-primary mt-0 mb-1">Jessie Hunter</h3>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Founder, RE Pro Business Credit</p>
+                <Paragraph className="mt-0">
+                  Jessie Hunter is a licensed real estate broker in California and Georgia with over 15 years of experience in residential and commercial real estate.
+                </Paragraph>
+              </div>
+            </div>
             <Paragraph>
               Like many of us, he built his business using personal credit for marketing, tech, staging, and everyday operating costs. When he finally discovered business credit, he calculated what that delay had cost him—and decided no other real estate professional should have to learn the same lesson the hard way.
             </Paragraph>
