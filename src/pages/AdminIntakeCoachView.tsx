@@ -23,6 +23,7 @@ import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadi
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import PhoneInput from "@/components/shared/PhoneInput";
 import GoalStatement from "@/components/intake/GoalStatement";
+import StepVideoPlaceholder from "@/components/intake/StepVideoPlaceholder";
 import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 
 type IntakeSurvey = Tables<"intake_surveys">;
