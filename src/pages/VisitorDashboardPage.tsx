@@ -12,7 +12,7 @@ import PhoneInput from "@/components/shared/PhoneInput";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import Seo from "@/components/shared/Seo";
-import { readAllScrollMemory } from "@/lib/guideScrollMemory";
+import { readGuideScroll } from "@/lib/guideScrollMemory";
 
 interface ProfileRow {
   user_id: string;
@@ -68,10 +68,12 @@ export default function VisitorDashboardPage() {
       setPlans((planRows as PlanRow[]) ?? []);
 
       try {
-        const mem = readAllScrollMemory?.() ?? {};
-        const chapters = Object.keys(mem);
-        // Guide has ~13 chapters; rough progress signal.
-        setGuideProgress(Math.min(100, Math.round((chapters.length / 13) * 100)));
+        // Best-effort progress signal: scroll position (0-100) / doc height.
+        const scrolled = readGuideScroll();
+        if (scrolled != null && scrolled > 0) {
+          // Rough estimate — the guide is long; treat 6000px as 100%.
+          setGuideProgress(Math.min(100, Math.round((scrolled / 6000) * 100)));
+        }
       } catch {
         setGuideProgress(0);
       }
