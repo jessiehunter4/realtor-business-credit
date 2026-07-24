@@ -14,6 +14,7 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
+import GoalStatement from "@/components/intake/GoalStatement";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -55,27 +56,10 @@ const PAIN_OPTIONS = [
   "Other",
 ];
 
-const HORIZON_OPTIONS = ["0–3 months", "3–6 months", "6–12 months", "12–24 months"];
-
-const FUNDING_AMOUNT_OPTIONS = [
-  "Under $10K",
-  "$10K–$25K",
-  "$25K–$50K",
-  "$50K–$100K",
-  "$100K–$250K",
-  "$250K+",
-  "Not sure",
-];
-
-const CREDIT_CAPACITY_OPTIONS = [
-  "Under $5K",
-  "$5K–$10K",
-  "$10K–$25K",
-  "$25K–$50K",
-  "$50K–$100K",
-  "$100K+",
-  "Not sure",
-];
+const MAX_GOALS = 3;
+const MAX_PAINS = 3;
+const AUTOSAVE_DEBOUNCE_MS = 1200;
+const DRAFT_STORAGE_KEY = "rbc_intake_draft_v2";
 
 export const COHORT_TIME_SLOTS = [
   "Monday 7:00 AM PT",
@@ -105,15 +89,9 @@ interface SurveyData {
   years_in_real_estate?: string;
   gci_last_12_months?: string;
   sides_closed_last_12_months?: string;
-  // B
-  top_financial_goal?: string;
-  top_financial_need?: string;
-  desired_monthly_credit_capacity?: string;
-  primary_goal?: string;
-  additional_goals?: string[];
-  top_financial_pain?: string;
-  goal_time_horizon?: string;
-  target_funding_amount?: string;
+  // B — Goals (multi-select, top 3 each)
+  primary_goals?: string[];
+  financial_pains?: string[];
   goals_notes?: string;
   // C
   has_business_entity?: string;
@@ -160,6 +138,9 @@ export default function IntakeSurveyPage() {
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
+  const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hydratedFromDraft = useRef(false);
 
   // Log intake_started on mount
   useEffect(() => {
@@ -198,10 +179,22 @@ export default function IntakeSurveyPage() {
     if (isDirectMode) {
       // Pre-populate from contact identity
       const defaultName = [firstName, lastName].filter(Boolean).join(" ");
+      // Restore any locally saved draft first
+      let localDraft: SurveyData = {};
+      try {
+        const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+        if (raw) localDraft = JSON.parse(raw) as SurveyData;
+      } catch {
+        // ignore
+      }
+      hydratedFromDraft.current = !!Object.keys(localDraft).length;
       setForm(prev => ({
         ...prev,
-        contact_name: prev.contact_name || defaultName || "",
-        contact_email: prev.contact_email || identityEmail || "",
+        ...localDraft,
+        contact_name: localDraft.contact_name || prev.contact_name || defaultName || "",
+        contact_email: localDraft.contact_email || prev.contact_email || identityEmail || "",
+        first_name: localDraft.first_name || prev.first_name || firstName || "",
+        last_name: localDraft.last_name || prev.last_name || lastName || "",
       }));
       setLoading(false);
       return;
@@ -236,6 +229,53 @@ export default function IntakeSurveyPage() {
       return { ...prev, [key]: arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value] };
     });
   };
+
+  const toggleLimitedArray = (key: "primary_goals" | "financial_pains", value: string, max: number) => {
+    setForm(prev => {
+      const arr = (prev[key] as string[] | undefined) || [];
+      if (arr.includes(value)) return { ...prev, [key]: arr.filter(v => v !== value) };
+      if (arr.length >= max) {
+        toast({ title: `Pick up to ${max}`, description: "Uncheck one to change your selection." });
+        return prev;
+      }
+      return { ...prev, [key]: [...arr, value] };
+    });
+  };
+
+  // Auto-save: localStorage for direct mode; debounced server draft for token mode.
+  useEffect(() => {
+    if (loading || submitted) return;
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    autosaveTimer.current = setTimeout(async () => {
+      if (isDirectMode) {
+        try {
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+          setAutosaveStatus("saved");
+        } catch {
+          // ignore quota errors
+        }
+        return;
+      }
+      if (!token) return;
+      setAutosaveStatus("saving");
+      try {
+        await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify({ ...form, status: "in_progress" }),
+          }
+        );
+        setAutosaveStatus("saved");
+      } catch {
+        setAutosaveStatus("idle");
+      }
+    }, AUTOSAVE_DEBOUNCE_MS);
+    return () => {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    };
+  }, [form, loading, submitted, isDirectMode, token]);
 
   const handleSubmit = async () => {
     if (isDirectMode && (!form.contact_email || !form.contact_email.trim())) {
@@ -281,6 +321,10 @@ export default function IntakeSurveyPage() {
       }
 
       setSubmitted(true);
+      // Clear direct-mode local draft on successful submit
+      if (isDirectMode) {
+        try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch { /* ignore */ }
+      }
 
       // Log intake_submitted event + tag
       void postFunnelEvent({
@@ -413,9 +457,14 @@ export default function IntakeSurveyPage() {
           </p>
           <p className="text-xs text-muted-foreground">
             {isDirectMode
-              ? "About 3–5 minutes total. Your answers save when you submit at the end."
-              : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically when you click Save Draft.`}
+              ? "About 3–5 minutes total. Your answers save automatically in this browser."
+              : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically as you type.`}
           </p>
+          {autosaveStatus !== "idle" && (
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              {autosaveStatus === "saving" ? "Saving…" : "Saved"}
+            </p>
+          )}
         </div>
 
         {/* Step A */}
@@ -553,47 +602,27 @@ export default function IntakeSurveyPage() {
           <Card>
             <CardHeader>
               <CardTitle>Goals</CardTitle>
-              <CardDescription>Tell us what you want your business to do — pick each goal separately so your plan can be tailored.</CardDescription>
+              <CardDescription>Pick the goals and pain points that matter most — your live goal statement updates as you choose.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Primary financial goal <span className="text-red-600">*</span></Label>
-                <p className="text-xs text-muted-foreground">Pick the one goal that matters most right now.</p>
-                <RadioGroup value={form.primary_goal || ""} onValueChange={v => {
-                  updateField("primary_goal", v);
-                  // keep it out of "additional goals"
-                  const extras = (form.additional_goals || []).filter(g => g !== v);
-                  updateField("additional_goals", extras);
-                  // mirror to legacy field for backward compat
-                  updateField("top_financial_goal", v);
-                }}>
-                  {GOAL_OPTIONS.map(opt => (
-                    <div key={opt} className="flex items-center space-x-2">
-                      <RadioGroupItem value={opt} id={`pg-${opt}`} />
-                      <Label htmlFor={`pg-${opt}`} className="font-normal">{opt}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Additional goals (optional)</Label>
-                <p className="text-xs text-muted-foreground">Select any other goals that also matter to you.</p>
+                <Label>Primary Financial Goals (Top 3) <span className="text-red-600">*</span></Label>
+                <p className="text-xs text-muted-foreground">
+                  Selected {(form.primary_goals || []).length} of {MAX_GOALS} — pick the goals that matter most.
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {GOAL_OPTIONS.filter(o => o !== form.primary_goal).map(opt => {
-                    const checked = (form.additional_goals || []).includes(opt);
+                  {GOAL_OPTIONS.map(opt => {
+                    const checked = (form.primary_goals || []).includes(opt);
+                    const disabled = !checked && (form.primary_goals || []).length >= MAX_GOALS;
                     return (
                       <div key={opt} className="flex items-start space-x-2">
                         <Checkbox
-                          id={`ag-${opt}`}
+                          id={`pg-${opt}`}
                           checked={checked}
-                          onCheckedChange={() => {
-                            const cur = form.additional_goals || [];
-                            const next = cur.includes(opt) ? cur.filter(v => v !== opt) : [...cur, opt];
-                            updateField("additional_goals", next);
-                          }}
+                          disabled={disabled}
+                          onCheckedChange={() => toggleLimitedArray("primary_goals", opt, MAX_GOALS)}
                         />
-                        <Label htmlFor={`ag-${opt}`} className="font-normal">{opt}</Label>
+                        <Label htmlFor={`pg-${opt}`} className={`font-normal ${disabled ? "opacity-50" : ""}`}>{opt}</Label>
                       </div>
                     );
                   })}
@@ -601,50 +630,34 @@ export default function IntakeSurveyPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Top financial pain right now</Label>
-                <RadioGroup value={form.top_financial_pain || ""} onValueChange={v => {
-                  updateField("top_financial_pain", v);
-                  updateField("top_financial_need", v);
-                }}>
-                  {PAIN_OPTIONS.map(opt => (
-                    <div key={opt} className="flex items-center space-x-2">
-                      <RadioGroupItem value={opt} id={`pain-${opt}`} />
-                      <Label htmlFor={`pain-${opt}`} className="font-normal">{opt}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Time horizon for the primary goal</Label>
-                  <Select value={form.goal_time_horizon || ""} onValueChange={v => updateField("goal_time_horizon", v)}>
-                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                    <SelectContent>
-                      {HORIZON_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Target funding amount for the primary goal</Label>
-                  <Select value={form.target_funding_amount || ""} onValueChange={v => updateField("target_funding_amount", v)}>
-                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                    <SelectContent>
-                      {FUNDING_AMOUNT_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                <Label>Financial Pains (Up to 3)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Selected {(form.financial_pains || []).length} of {MAX_PAINS} — what's holding you back right now?
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {PAIN_OPTIONS.map(opt => {
+                    const checked = (form.financial_pains || []).includes(opt);
+                    const disabled = !checked && (form.financial_pains || []).length >= MAX_PAINS;
+                    return (
+                      <div key={opt} className="flex items-start space-x-2">
+                        <Checkbox
+                          id={`pain-${opt}`}
+                          checked={checked}
+                          disabled={disabled}
+                          onCheckedChange={() => toggleLimitedArray("financial_pains", opt, MAX_PAINS)}
+                        />
+                        <Label htmlFor={`pain-${opt}`} className={`font-normal ${disabled ? "opacity-50" : ""}`}>{opt}</Label>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Desired monthly business credit capacity</Label>
-                <Select value={form.desired_monthly_credit_capacity || ""} onValueChange={v => updateField("desired_monthly_credit_capacity", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-                  <SelectContent>
-                    {CREDIT_CAPACITY_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+              <GoalStatement
+                goals={form.primary_goals || []}
+                pains={form.financial_pains || []}
+                name={form.first_name || form.contact_name}
+              />
 
               <div className="space-y-2">
                 <Label>Anything else about your goals? (optional)</Label>
@@ -937,7 +950,6 @@ export default function IntakeSurveyPage() {
             )}
           </div>
           <div className="flex gap-2">
-            {!isDirectMode && <Button variant="ghost" onClick={saveDraft}>Save Progress</Button>}
             {step < steps.length - 1 ? (
               <Button onClick={() => setStep(s => s + 1)}>Next</Button>
             ) : (
