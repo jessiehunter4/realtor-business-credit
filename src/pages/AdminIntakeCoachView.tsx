@@ -23,6 +23,7 @@ import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadi
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import PhoneInput from "@/components/shared/PhoneInput";
 import GoalStatement from "@/components/intake/GoalStatement";
+import StepVideoPlaceholder from "@/components/intake/StepVideoPlaceholder";
 import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 
 type IntakeSurvey = Tables<"intake_surveys">;
@@ -45,6 +46,34 @@ const SECTIONS = [
   { key: "credit", label: "Credit & Funding", icon: CreditCard },
   { key: "program", label: "Program Fit", icon: Handshake },
 ] as const;
+
+const SECTION_VIDEO_META: Record<SectionKey, { step: number; title: string; description: string }> = {
+  profile: {
+    step: 1,
+    title: "Profile & Production",
+    description: "Who the agent is, where they work, and what their business looks like today.",
+  },
+  goals: {
+    step: 2,
+    title: "Goals & Financial Needs",
+    description: "The money moments that matter most and the gaps they need to close.",
+  },
+  structure: {
+    step: 3,
+    title: "Business Structure & Fundability",
+    description: "Entity, address, phone, banking, and the credibility pieces lenders see.",
+  },
+  credit: {
+    step: 4,
+    title: "Credit & Funding",
+    description: "Current business credit profile, funding habits, and comfort with guarantees.",
+  },
+  program: {
+    step: 5,
+    title: "Program Fit",
+    description: "Preferred support style, cohort timing, and readiness to get started.",
+  },
+};
 
 const GOAL_OPTIONS = [
   "Cover overhead between closings",
@@ -333,6 +362,13 @@ export default function AdminIntakeCoachView() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
+        <div className="max-w-3xl mx-auto mb-6">
+          <StepVideoPlaceholder
+            stepNumber={SECTION_VIDEO_META[activeTab as SectionKey].step}
+            title={SECTION_VIDEO_META[activeTab as SectionKey].title}
+            description={SECTION_VIDEO_META[activeTab as SectionKey].description}
+          />
+        </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="mb-6 -mx-4 px-4 overflow-x-auto">
             <TabsList className="inline-flex w-max h-auto gap-1">
