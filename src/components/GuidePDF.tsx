@@ -308,8 +308,13 @@ export const GuidePDF = () => (
       </View>
       <View style={s.storyBox} wrap={false}>
         <Text style={s.storyTitle}>FOUNDER SIDEBAR — "I waited 15 years to find this out"</Text>
-        <Text style={s.calloutText}>I'm Jessie Hunter — broker in CA &amp; GA since 2010. Hundreds of closings, dozens of trainings — and not one taught me my real estate business could have its own credit profile, cards, and funding.</Text>
-        <Text style={[s.calloutText, { marginTop: 6 }]}>When I needed capital to grow, I did what most Realtors do: maxed personal cards at 18–24%, took a personal loan, then tapped home equity. The concept I was funding wasn't the mistake. <Text style={s.bold}>How I funded it was.</Text></Text>
+        <View style={s.founderRow}>
+          <Image src={headshotSrc} style={s.headshot} />
+          <View style={s.founderCol}>
+            <Text style={s.calloutText}>I'm Jessie Hunter — broker in CA &amp; GA since 2010. Hundreds of closings, dozens of trainings — and not one taught me my real estate business could have its own credit profile, cards, and funding.</Text>
+            <Text style={[s.calloutText, { marginTop: 6 }]}>When I needed capital to grow, I did what most Realtors do: maxed personal cards at 18–24%, took a personal loan, then tapped home equity. The concept I was funding wasn't the mistake. <Text style={s.bold}>How I funded it was.</Text></Text>
+          </View>
+        </View>
       </View>
       <Takeaway chapter="Chapter 1" items={[
         'Real estate education skips business architecture almost entirely.',
@@ -370,6 +375,12 @@ export const GuidePDF = () => (
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CHAPTER 4" title="Commission-to-entity compliance" />
       <P>This is where Realtors get tripped up — and where you protect yourself and your fundability.</P>
+      <View style={s.figure} wrap={false}>
+        <View style={s.figureFrame}>
+          <Image src={structureDiagramSrc} style={s.figureImg} />
+        </View>
+        <Text style={s.figureCaption}>RE Pro Business Credit Structure — personal credit as a temporary bridge to business-supported capital.</Text>
+      </View>
       <View style={s.calloutSky} wrap={false}>
         <Text style={s.calloutTitle}>Compliance notice</Text>
         <Text style={s.calloutText}>Commission handling — whether paid to the individual licensee or to an authorized corporation/entity — must comply with state law, brokerage supervision, and CPA/attorney guidance. RBC provides education and a planning framework only.</Text>
@@ -394,6 +405,12 @@ export const GuidePDF = () => (
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CHAPTER 5" title="Asset protection basics — and where trusts fit" />
       <P>Most Realtors think asset protection equals "I need an LLC." Real asset protection is <B>layered</B>.</P>
+      <View style={s.figure} wrap={false}>
+        <View style={s.figureFrame}>
+          <Image src={structureHowItWorksSrc} style={s.figureImg} />
+        </View>
+        <Text style={s.figureCaption}>How the RE Pro Business Credit Structure Works — objectives and five progressive steps.</Text>
+      </View>
       <Text style={s.h2}>The five layers</Text>
       <OL num={1}><B>Correct entity</B> for how you actually operate.</OL>
       <OL num={2}><B>Correct insurance</B> — E&amp;O, general liability, and personal umbrella.</OL>
@@ -635,10 +652,17 @@ export const GuidePDF = () => (
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CONCLUSION" title="You just closed. Now build a better future." />
       <P>Every commission is a chance to build something — or to just survive the next few weeks. The structure, finance and credit foundation you build in the next 90 days decides which one your business actually does.</P>
-      <P>You don't have to figure it out alone. That's literally what the free 1:1 is for.</P>
+      <P>You don't have to figure it out alone. That's literally what your free customized plan is for.</P>
+      <View style={s.founderRow} wrap={false}>
+        <Image src={headshotSrc} style={s.headshotLg} />
+        <View style={s.founderCol}>
+          <Text style={[s.h2, { marginTop: 0 }]}>About the Author</Text>
+          <Text style={s.body}><B>Jessie Hunter</B> — Founder, RE Pro Business Credit. Licensed real estate broker in California and Georgia with 15+ years and hundreds of closings. Certified partner with Credit Suite.</Text>
+        </View>
+      </View>
       <Text style={s.h2}>Resources</Text>
-      <P><B>Website:</B> <Link src={REALTOR_URL} style={s.link}>RealtorBusinessCredit.com</Link></P>
-      <P><B>Book the free 1:1:</B> <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link></P>
+      <P><B>Website:</B> <Link src={SITE_URL} style={s.link}>REProBusinessCredit.com</Link></P>
+      <P><B>Create your free plan:</B> <Link src={PLAN_URL} style={s.link}>REProBusinessCredit.com/intake</Link></P>
       <Text style={s.h2}>Important disclaimers</Text>
       <P>This guide is educational. It is not legal, tax, accounting, or investment advice. Always confirm entity, commission-handling, and asset-protection decisions with your state licensing board, broker, CPA, and attorney.</P>
       <P>No specific funding outcome, approval amount, credit limit or timeline is guaranteed. Results vary by individual circumstances, credit profile, and execution.</P>
