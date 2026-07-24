@@ -1,34 +1,60 @@
-import { ChapterHeader, SectionHeading, Paragraph, KeyTakeaway, Callout } from "../GuideComponents";
+import { Megaphone, Cpu, ClipboardList, Users, Car, GraduationCap, Building, TrendingUp } from "lucide-react";
+import { ChapterHeader, SectionHeading, Paragraph, ChapterTakeaway, JessieNote, GoodNugget, NextMove } from "../GuideComponents";
+
+const capitalUses = [
+  { Icon: Megaphone, label: "Marketing & lead generation" },
+  { Icon: Cpu, label: "Technology & CRM systems" },
+  { Icon: ClipboardList, label: "Transaction coordination" },
+  { Icon: Users, label: "Assistants & staff" },
+  { Icon: Building, label: "Office & operations" },
+  { Icon: Car, label: "Equipment & vehicles" },
+  { Icon: GraduationCap, label: "Education & training" },
+  { Icon: TrendingUp, label: "Team growth & acquisitions" },
+];
 
 const Ch09 = () => (
   <section id="chapter-9" className="scroll-mt-20 container mx-auto px-4 py-16">
     <div className="max-w-4xl mx-auto">
-      <ChapterHeader number="CHAPTER 9" title="Business credit: how it really works" />
+      <ChapterHeader number="CHAPTER 9" title="Use capital to create capacity" />
 
-      <Paragraph>"Business credit" gets thrown around like it's magic money. It isn't. Here's the honest version.</Paragraph>
+      <Paragraph>The purpose of business credit is not simply to say you have it. The purpose is to help your business <strong>operate and grow.</strong></Paragraph>
 
-      <SectionHeading>The mechanics</SectionHeading>
-      <ul className="list-disc pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
-        <li>Business credit profiles are built through <strong>reporting behavior</strong> and <strong>identity consistency</strong>, not just by having an EIN.</li>
-        <li>The major business bureaus — <strong>Dun &amp; Bradstreet, Experian Business, Equifax Small Business</strong> — are separate from your personal bureaus and use different scoring models.</li>
-        <li>What earns scores: accounts that actually <em>report</em> to those bureaus, paid on time, in matching identity.</li>
-      </ul>
+      <SectionHeading>Common productive uses of capital</SectionHeading>
+      <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3 my-6">
+        {capitalUses.map(({ Icon, label }) => (
+          <div key={label} className="rounded-2xl bg-card border border-border p-4 text-center shadow-[0_4px_14px_rgba(11,31,59,.05)]">
+            <span className="mx-auto mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Icon className="h-5 w-5" />
+            </span>
+            <p className="m-0 text-sm text-foreground/85 font-medium">{label}</p>
+          </div>
+        ))}
+      </div>
 
-      <SectionHeading>What "separate" really means</SectionHeading>
-      <Paragraph>Many early-stage business cards still require a personal guarantee — that's normal. The long-term objective is to build enough reporting history and revenue depth that your business can carry more capacity on its own, with less personal exposure over time.</Paragraph>
+      <SectionHeading>Ask five questions before you borrow</SectionHeading>
+      <ol className="list-decimal pl-6 space-y-2 text-base md:text-lg text-foreground/90 my-4">
+        <li>What will the money be used for?</li>
+        <li>How will it produce or protect revenue?</li>
+        <li>What is the repayment source?</li>
+        <li>Can the business manage the payment during a slow period?</li>
+        <li>Does the financing term match the purpose?</li>
+      </ol>
 
-      <Callout variant="warning">
-        <Paragraph className="m-0">Anyone promising "no PG, $100K in 30 days" is selling you something. Real fundability grows over months and rewards patience. The good news: months pass either way — you may as well be building.</Paragraph>
-      </Callout>
+      <JessieNote>
+        <p>Short-term financing for long-term problems is where most business-credit mistakes happen. Match the tool to the job — a card is not a substitute for savings, and a line of credit is not a substitute for a plan.</p>
+      </JessieNote>
 
-      <KeyTakeaway>
-        <h4 className="font-bold text-secondary mt-0 mb-3">Chapter 9 takeaways</h4>
-        <ul className="list-disc pl-6 space-y-1 text-base text-foreground/90">
-          <li>Business credit scores are built from reporting behavior, not just an EIN.</li>
-          <li>D&amp;B, Experian Business and Equifax Small Business are the bureaus that matter.</li>
-          <li>Early personal guarantees are normal — long-term we work to reduce them.</li>
-        </ul>
-      </KeyTakeaway>
+      <GoodNugget>
+        Good capital improves capacity, stability, or profitability — not merely postpones an operating problem.
+      </GoodNugget>
+
+      <NextMove>
+        <p>Before your next application, write the five questions above at the top of a page and answer them. If you can't, your business isn't ready to use that capital yet — and that's valuable information too.</p>
+      </NextMove>
+
+      <ChapterTakeaway>
+        Capital is a tool. Use it to build capacity you can measure, not to patch problems you haven't diagnosed.
+      </ChapterTakeaway>
     </div>
   </section>
 );
