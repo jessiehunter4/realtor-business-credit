@@ -23,6 +23,8 @@ import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadi
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import PhoneInput from "@/components/shared/PhoneInput";
 import GoalStatement from "@/components/intake/GoalStatement";
+import PlanGenerationLoader from "@/components/intake/PlanGenerationLoader";
+import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
@@ -209,17 +211,7 @@ export default function AdminIntakeCoachView() {
   const handleGeneratePlan = async () => {
     if (!id) return;
     setGeneratingPlan(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-plan", {
-        body: { intake_survey_id: id },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      toast.success(data?.superseded ? "Plan updated (existing draft refreshed)" : "Plan generated!");
-      navigate(`/admin/plan/${data.plan_id}`);
-    } catch (e: any) {
-      toast.error(e.message || "Failed to generate plan");
-    }
+    await planGen.generate({ intakeSurveyId: id, source: "admin" });
     setGeneratingPlan(false);
   };
 
