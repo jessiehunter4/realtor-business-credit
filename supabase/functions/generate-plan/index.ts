@@ -172,12 +172,8 @@ Profile:
 - Sides Closed: ${survey.sides_closed_last_12_months || "N/A"}
 
 Goals:
-- Primary Goal: ${survey.primary_goal || survey.top_financial_goal || "N/A"}
-- Additional Goals: ${(survey.additional_goals || []).join(", ") || "None"}
-- Top Financial Pain: ${survey.top_financial_pain || survey.top_financial_need || "N/A"}
-- Time Horizon for Primary Goal: ${survey.goal_time_horizon || "N/A"}
-- Target Funding Amount for Primary Goal: ${survey.target_funding_amount || "N/A"}
-- Desired Monthly Credit Capacity: ${survey.desired_monthly_credit_capacity || "N/A"}
+- Primary Financial Goals (up to 3, in the order picked; treat the first as the top priority): ${(survey.primary_goals || []).join(" | ") || "N/A"}
+- Financial Pains (up to 3, in priority order): ${(survey.financial_pains || []).join(" | ") || "N/A"}
 - Goals Notes: ${survey.goals_notes || "N/A"}
 
 Business Structure:
