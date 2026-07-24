@@ -23,6 +23,7 @@ import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadi
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
 import PhoneInput from "@/components/shared/PhoneInput";
 import GoalStatement from "@/components/intake/GoalStatement";
+import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 
 type IntakeSurvey = Tables<"intake_surveys">;
 type CoachNote = Tables<"intake_coach_notes">;
@@ -85,6 +86,21 @@ export default function AdminIntakeCoachView() {
   const [noteTexts, setNoteTexts] = useState<Record<string, string>>({});
   const [savingNote, setSavingNote] = useState<string | null>(null);
   const [generatingPlan, setGeneratingPlan] = useState(false);
+  const planGen = usePlanGeneration();
+
+  // Surface generation outcome as admin toast + auto-nav.
+  useEffect(() => {
+    if (planGen.state.status === "success") {
+      const s = planGen.state;
+      toast.success(s.superseded ? "Plan updated (existing draft refreshed)" : "Plan generated!");
+      navigate(`/admin/plan/${s.planId}`);
+      planGen.reset();
+    } else if (planGen.state.status === "error") {
+      toast.error(planGen.state.message);
+      planGen.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planGen.state]);
   const [existingPlanId, setExistingPlanId] = useState<string | null>(null);
   const [existingPlanStatus, setExistingPlanStatus] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
@@ -209,17 +225,7 @@ export default function AdminIntakeCoachView() {
   const handleGeneratePlan = async () => {
     if (!id) return;
     setGeneratingPlan(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-plan", {
-        body: { intake_survey_id: id },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      toast.success(data?.superseded ? "Plan updated (existing draft refreshed)" : "Plan generated!");
-      navigate(`/admin/plan/${data.plan_id}`);
-    } catch (e: any) {
-      toast.error(e.message || "Failed to generate plan");
-    }
+    await planGen.generate({ intakeSurveyId: id, source: "admin" });
     setGeneratingPlan(false);
   };
 

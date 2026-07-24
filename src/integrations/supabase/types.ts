@@ -197,7 +197,7 @@ export type Database = {
           contact_email: string | null
           contact_name: string | null
           created_at: string
-          created_by: string
+          created_by: string | null
           id: string
           intake_survey_id: string
           lead_id: string | null
@@ -219,7 +219,7 @@ export type Database = {
           contact_email?: string | null
           contact_name?: string | null
           created_at?: string
-          created_by: string
+          created_by?: string | null
           id?: string
           intake_survey_id: string
           lead_id?: string | null
@@ -241,7 +241,7 @@ export type Database = {
           contact_email?: string | null
           contact_name?: string | null
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           id?: string
           intake_survey_id?: string
           lead_id?: string | null

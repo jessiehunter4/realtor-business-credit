@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
             status: "submitted",
             submitted_at: new Date().toISOString(),
           })
-          .select("id")
+          .select("id, access_token")
           .single();
 
         if (error) {
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
           );
         }
 
-        return new Response(JSON.stringify({ success: true, id: data.id }), {
+        return new Response(JSON.stringify({ success: true, id: data.id, access_token: data.access_token }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
