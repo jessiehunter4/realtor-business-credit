@@ -24,6 +24,10 @@ const ALLOWED_EVENTS = [
   'intake_started',
   'intake_submitted',
   'intake_session',
+  'plan_generation_started',
+  'plan_generation_succeeded',
+  'plan_generation_failed',
+  'plan_viewed',
 ];
 
 const parseRequestBody = async (req: Request) => {
