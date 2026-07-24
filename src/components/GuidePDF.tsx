@@ -23,9 +23,9 @@ const cdn = (path: string) => {
   }
   return `${SITE_URL}${path}`;
 };
-const headshotSrc = cdn(jessieHeadshot.url);
-const structureDiagramSrc = cdn(structureDiagram.url);
-const structureHowItWorksSrc = cdn(structureHowItWorks.url);
+const defaultHeadshotSrc = cdn(jessieHeadshot.url);
+const defaultStructureDiagramSrc = cdn(structureDiagram.url);
+const defaultStructureHowItWorksSrc = cdn(structureHowItWorks.url);
 
 // Brand palette (mirrors --rbc-* tokens)
 const NAVY = '#0B1F3B';
