@@ -497,8 +497,17 @@ export default function IntakeSurveyPage() {
     { title: "Program Fit", key: "E" },
   ];
 
+  const stepVideoMeta: Record<number, { title: string; description: string }> = {
+    0: { title: "Walkthrough: Profile", description: "Jessie explains what production and location details help us tailor your plan." },
+    1: { title: "Walkthrough: Goals", description: "How to pick the goals and pain points that shape your custom 90-day plan." },
+    2: { title: "Walkthrough: Business Structure", description: "The credibility signals lenders and bureaus look for in a real estate business." },
+    3: { title: "Walkthrough: Credit & Funding", description: "How your current credit and funding mix maps to the right next steps." },
+    4: { title: "Walkthrough: Program Fit", description: "How coaching, cohort, and self-paced tracks work — and how to pick." },
+  };
+  const activeVideo = stepVideoMeta[step] ?? stepVideoMeta[0];
+
   return (
-    <div className="min-h-screen bg-muted/30 py-8 px-4">
+    <div className="min-h-screen bg-muted/30 pb-24 pt-8 px-4">
       <SiteHeader />
       <Seo
         title="RE Pro Business Financial Needs Analysis"
@@ -506,7 +515,7 @@ export default function IntakeSurveyPage() {
         path="/intake"
         noindex
       />
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold text-secondary">
@@ -518,7 +527,7 @@ export default function IntakeSurveyPage() {
         </div>
 
         {/* Step indicator */}
-        <div className="flex gap-1">
+        <div className="flex gap-1 max-w-2xl mx-auto w-full">
           {steps.map((s, i) => (
             <button
               key={s.key}
@@ -546,6 +555,15 @@ export default function IntakeSurveyPage() {
           )}
         </div>
 
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-8 lg:items-start">
+          <div className="lg:sticky lg:top-24">
+            <StepVideoPlaceholder
+              stepNumber={step + 1}
+              title={activeVideo.title}
+              description={activeVideo.description}
+            />
+          </div>
+          <div className="space-y-6 min-w-0">
         {/* Step A */}
         {step === 0 && (
           <Card>
