@@ -64,9 +64,8 @@ const PAIN_OPTIONS = [
   "Tax bill / quarterly estimates",
   "Other",
 ];
-const HORIZON_OPTIONS = ["0–3 months", "3–6 months", "6–12 months", "12–24 months"];
-const FUNDING_AMOUNT_OPTIONS = ["Under $10K","$10K–$25K","$25K–$50K","$50K–$100K","$100K–$250K","$250K+","Not sure"];
-const CREDIT_CAPACITY_OPTIONS = ["Under $5K","$5K–$10K","$10K–$25K","$25K–$50K","$50K–$100K","$100K+","Not sure"];
+const MAX_GOALS = 3;
+const MAX_PAINS = 3;
 
 type SectionKey = typeof SECTIONS[number]["key"];
 
