@@ -411,7 +411,7 @@ export default function IntakeSurveyPage() {
   }
 
   const steps = [
-    { title: "Profile & Production", key: "A" },
+    { title: "Profile", key: "A" },
     { title: "Goals", key: "B" },
     { title: "Business Structure", key: "C" },
     { title: "Credit & Funding", key: "D" },
@@ -471,7 +471,7 @@ export default function IntakeSurveyPage() {
         {step === 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Profile & Production</CardTitle>
+              <CardTitle>Profile</CardTitle>
               <CardDescription>Tell us about your real estate practice.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
