@@ -362,6 +362,13 @@ export default function AdminIntakeCoachView() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
+        <div className="max-w-3xl mx-auto mb-6">
+          <StepVideoPlaceholder
+            stepNumber={SECTION_VIDEO_META[activeTab as SectionKey].step}
+            title={SECTION_VIDEO_META[activeTab as SectionKey].title}
+            description={SECTION_VIDEO_META[activeTab as SectionKey].description}
+          />
+        </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="mb-6 -mx-4 px-4 overflow-x-auto">
             <TabsList className="inline-flex w-max h-auto gap-1">
