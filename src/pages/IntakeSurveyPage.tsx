@@ -14,6 +14,7 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
+import GoalStatement from "@/components/intake/GoalStatement";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -55,27 +56,10 @@ const PAIN_OPTIONS = [
   "Other",
 ];
 
-const HORIZON_OPTIONS = ["0–3 months", "3–6 months", "6–12 months", "12–24 months"];
-
-const FUNDING_AMOUNT_OPTIONS = [
-  "Under $10K",
-  "$10K–$25K",
-  "$25K–$50K",
-  "$50K–$100K",
-  "$100K–$250K",
-  "$250K+",
-  "Not sure",
-];
-
-const CREDIT_CAPACITY_OPTIONS = [
-  "Under $5K",
-  "$5K–$10K",
-  "$10K–$25K",
-  "$25K–$50K",
-  "$50K–$100K",
-  "$100K+",
-  "Not sure",
-];
+const MAX_GOALS = 3;
+const MAX_PAINS = 3;
+const AUTOSAVE_DEBOUNCE_MS = 1200;
+const DRAFT_STORAGE_KEY = "rbc_intake_draft_v2";
 
 export const COHORT_TIME_SLOTS = [
   "Monday 7:00 AM PT",
