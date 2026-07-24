@@ -54,18 +54,36 @@ const s = StyleSheet.create({
 
   // Cover
   coverPage: {
-    backgroundColor: NAVY,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 60,
+    backgroundColor: BG,
+    padding: 0,
   },
-  coverEyebrow: { fontSize: 11, color: TEAL, letterSpacing: 2, marginBottom: 16, fontFamily: 'Helvetica-Bold' },
-  coverTitle: { fontSize: 30, fontFamily: 'Helvetica-Bold', color: '#FFFFFF', textAlign: 'center', marginBottom: 18, lineHeight: 1.25 },
+  coverAccentBand: { height: 8, backgroundColor: TEAL },
+  coverInner: { paddingTop: 60, paddingBottom: 48, paddingHorizontal: 64, alignItems: 'center' },
+  coverEyebrow: { fontSize: 10.5, color: TEAL, letterSpacing: 2.5, marginBottom: 14, fontFamily: 'Helvetica-Bold', textAlign: 'center' },
+  coverTitle: { fontSize: 28, fontFamily: 'Helvetica-Bold', color: NAVY, textAlign: 'center', marginBottom: 14, lineHeight: 1.22 },
   coverHighlight: { color: TEAL },
-  coverSubtitle: { fontSize: 14, color: '#CFE3FF', textAlign: 'center', marginBottom: 32, lineHeight: 1.5, maxWidth: 380 },
-  coverAuthor: { fontSize: 12, color: '#FFFFFF', textAlign: 'center', marginTop: 40 },
-  coverBrand: { fontSize: 13, fontFamily: 'Helvetica-Bold', color: TEAL, textAlign: 'center', marginTop: 6 },
-  coverCopyright: { fontSize: 9, color: '#8AA0BE', textAlign: 'center', marginTop: 28, lineHeight: 1.5 },
+  coverSubtitle: { fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 6, lineHeight: 1.55, maxWidth: 420 },
+  coverProgramNote: { fontSize: 10, color: MUTED, textAlign: 'center', fontStyle: 'italic', marginBottom: 18 },
+  coverAuthor: { fontSize: 11, color: NAVY, textAlign: 'center', fontFamily: 'Helvetica-Bold' },
+  coverAuthorMeta: { fontSize: 10, color: MUTED, textAlign: 'center', marginTop: 2 },
+  coverHeroWrap: { marginTop: 20, marginBottom: 24, width: 400, borderRadius: 12, overflow: 'hidden', border: `1 solid ${BORDER}` },
+  coverHeroImg: { width: 400, height: 220, objectFit: 'cover' },
+  coverCta: { marginTop: 6, backgroundColor: NAVY, borderRadius: 10, paddingVertical: 12, paddingHorizontal: 22, alignItems: 'center' },
+  coverCtaText: { fontSize: 12, color: '#FFFFFF', fontFamily: 'Helvetica-Bold', textAlign: 'center' },
+  coverCtaSub: { fontSize: 9, color: '#CFE3FF', textAlign: 'center', marginTop: 4 },
+  coverCopyright: { fontSize: 8.5, color: MUTED, textAlign: 'center', marginTop: 22, lineHeight: 1.5 },
+
+  // Figures (in-chapter images)
+  figure: { marginVertical: 14, alignItems: 'center' },
+  figureFrame: { borderRadius: 8, border: `1 solid ${BORDER}`, overflow: 'hidden', backgroundColor: CARD },
+  figureImg: { width: 460 },
+  figureCaption: { fontSize: 9, color: MUTED, textAlign: 'center', marginTop: 6, fontStyle: 'italic', maxWidth: 460 },
+
+  // Founder row with headshot
+  founderRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', marginVertical: 12 },
+  headshot: { width: 78, height: 78, borderRadius: 39, border: `2 solid ${TEAL}` },
+  headshotLg: { width: 110, height: 110, borderRadius: 55, border: `3 solid ${TEAL}` },
+  founderCol: { flex: 1 },
 
   // Headings
   eyebrow: { fontSize: 10, fontFamily: 'Helvetica-Bold', color: TEAL, marginBottom: 6, letterSpacing: 1.5 },
