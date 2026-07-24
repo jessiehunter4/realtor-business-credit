@@ -1,5 +1,6 @@
 import { ChapterHeader, SectionHeading, Paragraph, ChapterTakeaway, JessieNote, GoodNugget } from "../GuideComponents";
 import { ArrowRight } from "lucide-react";
+import structureDiagram from "@/assets/guide-structure-diagram.png.asset.json";
 
 const bridgeSteps = [
   { label: "Personal-credit dependence", tint: "hsl(var(--coral))" },
@@ -24,6 +25,18 @@ const Ch04 = () => (
           <li>Personal liquidity or startup capital</li>
           <li>Proof of financial responsibility</li>
         </ul>
+
+        <figure className="my-8 rounded-2xl bg-card border border-border p-3 md:p-4 shadow-[0_8px_18px_rgba(11,31,59,.06)]">
+          <img
+            src={structureDiagram.url}
+            alt="RE Pro Business Credit Structure: licensed RE Pro entity, admin/finance entity, personal credit bridge, and business credit growth path."
+            className="w-full h-auto rounded-lg"
+            loading="lazy"
+          />
+          <figcaption className="mt-3 text-center text-sm italic text-muted-foreground">
+            The personal-credit bridge sits between your licensed activity and business-supported capital — it is a stage, not the destination.
+          </figcaption>
+        </figure>
 
         <SectionHeading>What has to shift over time</SectionHeading>
         <Paragraph>The important distinction is what happens after that first step. The business should increasingly become the <strong>borrower, account holder, user of the funds, and source of repayment.</strong></Paragraph>

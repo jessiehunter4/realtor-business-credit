@@ -1,4 +1,5 @@
 import { ChapterHeader, SectionHeading, Paragraph, ChapterTakeaway, GoodNugget } from "../GuideComponents";
+import howItWorks from "@/assets/guide-structure-how-it-works.png.asset.json";
 
 const stages = [
   {
@@ -34,6 +35,18 @@ const Ch05 = () => (
       <ChapterHeader number="CHAPTER 5" title="The five stages of building business credit" />
 
       <Paragraph>Business credit is not one application or one account. It develops in stages — and every stage exists for a reason.</Paragraph>
+
+      <figure className="my-8 rounded-2xl bg-card border border-border p-3 md:p-4 shadow-[0_8px_18px_rgba(11,31,59,.06)]">
+        <img
+          src={howItWorks.url}
+          alt="How the RE Pro Business Credit Structure works: objectives and five progressive steps from licensed activity to independent business capital."
+          className="w-full h-auto rounded-lg"
+          loading="lazy"
+        />
+        <figcaption className="mt-3 text-center text-sm italic text-muted-foreground">
+          The objective and the progressive steps behind the five stages below.
+        </figcaption>
+      </figure>
 
       <SectionHeading>The five stages</SectionHeading>
       <div className="my-8 space-y-4">
