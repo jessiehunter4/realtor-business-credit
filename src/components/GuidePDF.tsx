@@ -4,11 +4,28 @@ import {
   Text,
   View,
   Link,
+  Image,
   StyleSheet,
 } from '@react-pdf/renderer';
+import heroImg from '@/assets/guide/hero-agent.jpg';
+import jessieHeadshot from '@/assets/jessie-hunter-headshot.png.asset.json';
+import structureDiagram from '@/assets/guide-structure-diagram.png.asset.json';
+import structureHowItWorks from '@/assets/guide-structure-how-it-works.png.asset.json';
 
-const CTA_URL = 'https://realtorbusinesscredit.com/one-on-one';
-const REALTOR_URL = 'https://realtorbusinesscredit.com';
+const SITE_URL = 'https://reprobusinesscredit.com';
+const PLAN_URL = 'https://reprobusinesscredit.com/intake';
+
+// CDN asset pointers are same-origin paths (/__l5e/assets-v1/...).
+// The PDF is rendered client-side, so we resolve to absolute URLs at render time.
+const cdn = (path: string) => {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}${path}`;
+  }
+  return `${SITE_URL}${path}`;
+};
+const headshotSrc = cdn(jessieHeadshot.url);
+const structureDiagramSrc = cdn(structureDiagram.url);
+const structureHowItWorksSrc = cdn(structureHowItWorks.url);
 
 // Brand palette (mirrors --rbc-* tokens)
 const NAVY = '#0B1F3B';
@@ -37,18 +54,36 @@ const s = StyleSheet.create({
 
   // Cover
   coverPage: {
-    backgroundColor: NAVY,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 60,
+    backgroundColor: BG,
+    padding: 0,
   },
-  coverEyebrow: { fontSize: 11, color: TEAL, letterSpacing: 2, marginBottom: 16, fontFamily: 'Helvetica-Bold' },
-  coverTitle: { fontSize: 30, fontFamily: 'Helvetica-Bold', color: '#FFFFFF', textAlign: 'center', marginBottom: 18, lineHeight: 1.25 },
+  coverAccentBand: { height: 8, backgroundColor: TEAL },
+  coverInner: { paddingTop: 60, paddingBottom: 48, paddingHorizontal: 64, alignItems: 'center' },
+  coverEyebrow: { fontSize: 10.5, color: TEAL, letterSpacing: 2.5, marginBottom: 14, fontFamily: 'Helvetica-Bold', textAlign: 'center' },
+  coverTitle: { fontSize: 28, fontFamily: 'Helvetica-Bold', color: NAVY, textAlign: 'center', marginBottom: 14, lineHeight: 1.22 },
   coverHighlight: { color: TEAL },
-  coverSubtitle: { fontSize: 14, color: '#CFE3FF', textAlign: 'center', marginBottom: 32, lineHeight: 1.5, maxWidth: 380 },
-  coverAuthor: { fontSize: 12, color: '#FFFFFF', textAlign: 'center', marginTop: 40 },
-  coverBrand: { fontSize: 13, fontFamily: 'Helvetica-Bold', color: TEAL, textAlign: 'center', marginTop: 6 },
-  coverCopyright: { fontSize: 9, color: '#8AA0BE', textAlign: 'center', marginTop: 28, lineHeight: 1.5 },
+  coverSubtitle: { fontSize: 13, color: TEXT, textAlign: 'center', marginBottom: 6, lineHeight: 1.55, maxWidth: 420 },
+  coverProgramNote: { fontSize: 10, color: MUTED, textAlign: 'center', fontStyle: 'italic', marginBottom: 18 },
+  coverAuthor: { fontSize: 11, color: NAVY, textAlign: 'center', fontFamily: 'Helvetica-Bold' },
+  coverAuthorMeta: { fontSize: 10, color: MUTED, textAlign: 'center', marginTop: 2 },
+  coverHeroWrap: { marginTop: 20, marginBottom: 24, width: 400, borderRadius: 12, overflow: 'hidden', border: `1 solid ${BORDER}` },
+  coverHeroImg: { width: 400, height: 220, objectFit: 'cover' },
+  coverCta: { marginTop: 6, backgroundColor: NAVY, borderRadius: 10, paddingVertical: 12, paddingHorizontal: 22, alignItems: 'center' },
+  coverCtaText: { fontSize: 12, color: '#FFFFFF', fontFamily: 'Helvetica-Bold', textAlign: 'center' },
+  coverCtaSub: { fontSize: 9, color: '#CFE3FF', textAlign: 'center', marginTop: 4 },
+  coverCopyright: { fontSize: 8.5, color: MUTED, textAlign: 'center', marginTop: 22, lineHeight: 1.5 },
+
+  // Figures (in-chapter images)
+  figure: { marginVertical: 14, alignItems: 'center' },
+  figureFrame: { borderRadius: 8, border: `1 solid ${BORDER}`, overflow: 'hidden', backgroundColor: CARD },
+  figureImg: { width: 460 },
+  figureCaption: { fontSize: 9, color: MUTED, textAlign: 'center', marginTop: 6, fontStyle: 'italic', maxWidth: 460 },
+
+  // Founder row with headshot
+  founderRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', marginVertical: 12 },
+  headshot: { width: 78, height: 78, borderRadius: 39, border: `2 solid ${TEAL}` },
+  headshotLg: { width: 110, height: 110, borderRadius: 55, border: `3 solid ${TEAL}` },
+  founderCol: { flex: 1 },
 
   // Headings
   eyebrow: { fontSize: 10, fontFamily: 'Helvetica-Bold', color: TEAL, marginBottom: 6, letterSpacing: 1.5 },
@@ -117,7 +152,7 @@ const OL = ({ num, children }: { num: number; children: React.ReactNode }) => (
 
 const PageFooter = () => (
   <View style={s.footer} fixed>
-    <Text style={s.footerLeft}>© 2026 RealtorBusinessCredit.com</Text>
+    <Text style={s.footerLeft}>© 2026 REProBusinessCredit.com</Text>
     <Text style={s.footerRight} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
   </View>
 );
@@ -141,12 +176,12 @@ const Takeaway = ({ chapter, items }: { chapter: string; items: string[] }) => (
 
 const BookCTA = () => (
   <View style={s.bigCtaBox} wrap={false}>
-    <Text style={s.bigCtaTitle}>Book your free 1:1</Text>
+    <Text style={s.bigCtaTitle}>Create your free customized plan</Text>
     <Text style={s.bigCtaText}>
-      5 minutes for the Needs Analysis. 30 minutes together.{'\n'}
-      You leave with your Custom RE Pro Business Structure, Finance &amp; Credit Plan.
+      Guide → Plan → Implement.{'\n'}
+      Answer a few questions and get your own RE Pro Business Finance &amp; Credit Plan — plus a free private dashboard.
     </Text>
-    <Link src={CTA_URL} style={s.bigCtaLink}>RealtorBusinessCredit.com/one-on-one →</Link>
+    <Link src={PLAN_URL} style={s.bigCtaLink}>REProBusinessCredit.com/intake →</Link>
     <Text style={[s.bigCtaText, { marginTop: 8, fontSize: 9, color: '#8AA0BE' }]}>
       No cost. No obligation. No pressure.
     </Text>
@@ -172,22 +207,31 @@ export const GuidePDF = () => (
   >
     {/* COVER */}
     <Page size="LETTER" style={s.coverPage}>
-      <View style={{ alignItems: 'center' }}>
-        <Text style={s.coverEyebrow}>RE PRO BUSINESS CREDIT</Text>
+      <View style={s.coverAccentBand} />
+      <View style={s.coverInner}>
+        <Text style={s.coverEyebrow}>RE PRO BUSINESS CREDIT · FREE GUIDE</Text>
         <Text style={s.coverTitle}>
-          The Realtor Business{'\n'}
-          <Text style={s.coverHighlight}>Structure, Finance &amp; Credit</Text>{'\n'}Guide
+          Real Estate Professional{'\n'}
+          <Text style={s.coverHighlight}>Business Finance &amp; Credit</Text>{'\n'}Guide
         </Text>
         <Text style={s.coverSubtitle}>
-          A practical, Realtor-specific path to a fundable business — and a custom plan built with you in your free 1:1.
+          Build the financial structure behind your real estate career — and create a path to capital that does not depend forever on your personal credit.
         </Text>
+        <Text style={s.coverProgramNote}>A specialized program of My Better Business Credit.</Text>
         <Text style={s.coverAuthor}>by Jessie Hunter</Text>
-        <Text style={{ fontSize: 10, color: '#CFE3FF', textAlign: 'center', marginTop: 4 }}>
-          Real Estate Broker · California &amp; Georgia
-        </Text>
-        <Text style={s.coverBrand}>RE Pro Business Credit</Text>
+        <Text style={s.coverAuthorMeta}>Real Estate Broker · California &amp; Georgia</Text>
+
+        <View style={s.coverHeroWrap}>
+          <Image src={heroImg} style={s.coverHeroImg} />
+        </View>
+
+        <View style={s.coverCta}>
+          <Text style={s.coverCtaText}>Create My Free Plan After Reading →</Text>
+          <Text style={s.coverCtaSub}>Free guide. Free plan. Free dashboard. No credit card required.</Text>
+        </View>
+
         <Text style={s.coverCopyright}>
-          © 2026 RealtorBusinessCredit.com — All Rights Reserved.{'\n'}Educational purposes only.
+          © 2026 REProBusinessCredit.com — All Rights Reserved.{'\n'}Educational purposes only.
         </Text>
       </View>
     </Page>
@@ -264,8 +308,13 @@ export const GuidePDF = () => (
       </View>
       <View style={s.storyBox} wrap={false}>
         <Text style={s.storyTitle}>FOUNDER SIDEBAR — "I waited 15 years to find this out"</Text>
-        <Text style={s.calloutText}>I'm Jessie Hunter — broker in CA &amp; GA since 2010. Hundreds of closings, dozens of trainings — and not one taught me my real estate business could have its own credit profile, cards, and funding.</Text>
-        <Text style={[s.calloutText, { marginTop: 6 }]}>When I needed capital to grow, I did what most Realtors do: maxed personal cards at 18–24%, took a personal loan, then tapped home equity. The concept I was funding wasn't the mistake. <Text style={s.bold}>How I funded it was.</Text></Text>
+        <View style={s.founderRow}>
+          <Image src={headshotSrc} style={s.headshot} />
+          <View style={s.founderCol}>
+            <Text style={s.calloutText}>I'm Jessie Hunter — broker in CA &amp; GA since 2010. Hundreds of closings, dozens of trainings — and not one taught me my real estate business could have its own credit profile, cards, and funding.</Text>
+            <Text style={[s.calloutText, { marginTop: 6 }]}>When I needed capital to grow, I did what most Realtors do: maxed personal cards at 18–24%, took a personal loan, then tapped home equity. The concept I was funding wasn't the mistake. <Text style={s.bold}>How I funded it was.</Text></Text>
+          </View>
+        </View>
       </View>
       <Takeaway chapter="Chapter 1" items={[
         'Real estate education skips business architecture almost entirely.',
@@ -326,6 +375,12 @@ export const GuidePDF = () => (
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CHAPTER 4" title="Commission-to-entity compliance" />
       <P>This is where Realtors get tripped up — and where you protect yourself and your fundability.</P>
+      <View style={s.figure} wrap={false}>
+        <View style={s.figureFrame}>
+          <Image src={structureDiagramSrc} style={s.figureImg} />
+        </View>
+        <Text style={s.figureCaption}>RE Pro Business Credit Structure — personal credit as a temporary bridge to business-supported capital.</Text>
+      </View>
       <View style={s.calloutSky} wrap={false}>
         <Text style={s.calloutTitle}>Compliance notice</Text>
         <Text style={s.calloutText}>Commission handling — whether paid to the individual licensee or to an authorized corporation/entity — must comply with state law, brokerage supervision, and CPA/attorney guidance. RBC provides education and a planning framework only.</Text>
@@ -350,6 +405,12 @@ export const GuidePDF = () => (
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CHAPTER 5" title="Asset protection basics — and where trusts fit" />
       <P>Most Realtors think asset protection equals "I need an LLC." Real asset protection is <B>layered</B>.</P>
+      <View style={s.figure} wrap={false}>
+        <View style={s.figureFrame}>
+          <Image src={structureHowItWorksSrc} style={s.figureImg} />
+        </View>
+        <Text style={s.figureCaption}>How the RE Pro Business Credit Structure Works — objectives and five progressive steps.</Text>
+      </View>
       <Text style={s.h2}>The five layers</Text>
       <OL num={1}><B>Correct entity</B> for how you actually operate.</OL>
       <OL num={2}><B>Correct insurance</B> — E&amp;O, general liability, and personal umbrella.</OL>
@@ -591,10 +652,17 @@ export const GuidePDF = () => (
     <Page size="LETTER" style={s.page}>
       <ChapterStart label="CONCLUSION" title="You just closed. Now build a better future." />
       <P>Every commission is a chance to build something — or to just survive the next few weeks. The structure, finance and credit foundation you build in the next 90 days decides which one your business actually does.</P>
-      <P>You don't have to figure it out alone. That's literally what the free 1:1 is for.</P>
+      <P>You don't have to figure it out alone. That's literally what your free customized plan is for.</P>
+      <View style={s.founderRow} wrap={false}>
+        <Image src={headshotSrc} style={s.headshotLg} />
+        <View style={s.founderCol}>
+          <Text style={[s.h2, { marginTop: 0 }]}>About the Author</Text>
+          <Text style={s.body}><B>Jessie Hunter</B> — Founder, RE Pro Business Credit. Licensed real estate broker in California and Georgia with 15+ years and hundreds of closings. Certified partner with Credit Suite.</Text>
+        </View>
+      </View>
       <Text style={s.h2}>Resources</Text>
-      <P><B>Website:</B> <Link src={REALTOR_URL} style={s.link}>RealtorBusinessCredit.com</Link></P>
-      <P><B>Book the free 1:1:</B> <Link src={CTA_URL} style={s.link}>RealtorBusinessCredit.com/one-on-one</Link></P>
+      <P><B>Website:</B> <Link src={SITE_URL} style={s.link}>REProBusinessCredit.com</Link></P>
+      <P><B>Create your free plan:</B> <Link src={PLAN_URL} style={s.link}>REProBusinessCredit.com/intake</Link></P>
       <Text style={s.h2}>Important disclaimers</Text>
       <P>This guide is educational. It is not legal, tax, accounting, or investment advice. Always confirm entity, commission-handling, and asset-protection decisions with your state licensing board, broker, CPA, and attorney.</P>
       <P>No specific funding outcome, approval amount, credit limit or timeline is guaranteed. Results vary by individual circumstances, credit profile, and execution.</P>
