@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
@@ -394,6 +395,8 @@ export default function IntakeSurveyPage() {
   }
 
   if (submitted) {
+    const emailForSignup = form.contact_email?.trim() || "";
+    const signupHref = `/signup?next=${encodeURIComponent("/dashboard")}${emailForSignup ? `&email=${encodeURIComponent(emailForSignup)}` : ""}`;
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <Card className="max-w-md w-full">
@@ -404,6 +407,19 @@ export default function IntakeSurveyPage() {
               Your RE Pro Business Financial Needs Analysis has been submitted. 
               We'll review your answers before our session together.
             </p>
+            <div className="pt-2 space-y-2">
+              <p className="text-sm font-medium text-foreground">
+                Save your plan and track progress — create your free account.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button asChild>
+                  <Link to={signupHref}>Create free account</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to={`/login?next=${encodeURIComponent("/dashboard")}`}>I already have one</Link>
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
