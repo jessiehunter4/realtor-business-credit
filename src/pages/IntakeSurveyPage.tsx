@@ -25,6 +25,7 @@ import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import PhoneInput from "@/components/shared/PhoneInput";
 import Seo from "@/components/shared/Seo";
+import StepVideoPlaceholder from "@/components/intake/StepVideoPlaceholder";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
