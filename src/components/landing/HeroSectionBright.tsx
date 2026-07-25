@@ -44,7 +44,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
           <div className="relative mt-4 sm:mt-5 w-full max-w-[min(560px,100%)] mx-auto">
             <div className="absolute -inset-3 sm:-inset-5 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
-            <div className="relative aspect-video w-full max-h-[32vh] rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
+            <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
                 alt="Jessie Hunter explains why Realtors need separate business credit"
                 className="rounded-2xl sm:rounded-3xl"
