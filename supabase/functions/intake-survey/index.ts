@@ -206,13 +206,43 @@ Deno.serve(async (req) => {
           .from("intake_surveys")
           .update(updatePayload)
           .eq("id", intakeId)
-          .eq("filled_by", "self")
           .select("id, access_token")
-          .single();
+          .maybeSingle();
         if (error) {
           return new Response(
             JSON.stringify({ error: error.message }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (!data) {
+          // Stale intake_id from client (row missing/deleted). Create a new draft instead.
+          if (!body.contact_email || !String(body.contact_email).trim()) {
+            return new Response(
+              JSON.stringify({ error: "Email is required to start saving" }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          const { data: created, error: createErr } = await supabaseAdmin
+            .from("intake_surveys")
+            .insert({
+              ...surveyFields,
+              contact_email: String(body.contact_email).trim(),
+              contact_name: body.contact_name?.trim() || null,
+              filled_by: "self",
+              status: finalize ? "submitted" : "in_progress",
+              submitted_at: finalize ? new Date().toISOString() : null,
+            })
+            .select("id, access_token")
+            .single();
+          if (createErr) {
+            return new Response(
+              JSON.stringify({ error: createErr.message }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          return new Response(
+            JSON.stringify({ success: true, id: created.id, access_token: created.access_token }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
         return new Response(
