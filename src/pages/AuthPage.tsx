@@ -24,29 +24,32 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        if (next) {
-          window.location.replace(next);
-        } else {
-          navigate("/admin");
-        }
-      }
-    });
+  const checkAdminAndRoute = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (data) {
+      if (next) window.location.replace(next);
+      else navigate("/admin");
+    } else {
+      toast.error("This login is for administrators. Redirecting you to the visitor login…");
+      await supabase.auth.signOut();
+      setTimeout(() => navigate("/mock-login"), 1500);
+    }
+  };
 
-    // Listen for auth changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) checkAdminAndRoute(session.user.id);
+    });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        if (next) {
-          window.location.replace(next);
-        } else {
-          navigate("/admin");
-        }
+        setTimeout(() => checkAdminAndRoute(session.user.id), 0);
       }
     });
-
     return () => subscription.unsubscribe();
   }, [navigate, next]);
 
