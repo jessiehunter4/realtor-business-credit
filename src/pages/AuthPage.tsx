@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,29 +23,37 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const adminCheckInFlight = useRef(false);
 
   const checkAdminAndRoute = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (data) {
-      if (next) window.location.replace(next);
-      else navigate("/admin");
-    } else {
-      // Attempt to bootstrap as the first admin (only succeeds if no admin exists yet).
-      const { data: bootstrap, error: bootstrapError } = await supabase.functions.invoke("setup-admin");
-      if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
-        toast.success("Admin access granted!");
+    if (adminCheckInFlight.current) return;
+    adminCheckInFlight.current = true;
+
+    try {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (data) {
         if (next) window.location.replace(next);
         else navigate("/admin");
-        return;
+      } else {
+        // Attempt to grant admin access for users signing in through /auth.
+        const { data: bootstrap, error: bootstrapError } = await supabase.functions.invoke("setup-admin");
+        if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
+          toast.success("Admin access granted!");
+          if (next) window.location.replace(next);
+          else navigate("/admin");
+          return;
+        }
+        toast.error("This account isn't an admin. Ask an existing admin to grant access.");
+        await supabase.auth.signOut();
+        setTimeout(() => navigate("/mock-login"), 1500);
       }
-      toast.error("This account isn't an admin. Ask an existing admin to grant access.");
-      await supabase.auth.signOut();
-      setTimeout(() => navigate("/mock-login"), 1500);
+    } finally {
+      adminCheckInFlight.current = false;
     }
   };
 
