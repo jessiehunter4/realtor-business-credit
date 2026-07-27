@@ -64,7 +64,35 @@ const PAIN_OPTIONS = [
 const MAX_GOALS = 3;
 const MAX_PAINS = 3;
 const AUTOSAVE_DEBOUNCE_MS = 1200;
-const DRAFT_STORAGE_KEY = "rbc_intake_draft_v2";
+const DRAFT_STORAGE_KEY = "rbc_intake_draft_v3";
+const LEGACY_DRAFT_KEY = "rbc_intake_draft_v2";
+const ENABLE_PROGRAM_FIT_STEP = false;
+
+interface DraftEnvelope {
+  intake_id?: string | null;
+  access_token?: string | null;
+  form: SurveyData;
+}
+
+const readDraft = (): DraftEnvelope | null => {
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as DraftEnvelope;
+    const legacy = localStorage.getItem(LEGACY_DRAFT_KEY);
+    if (legacy) return { form: JSON.parse(legacy) as SurveyData };
+  } catch {
+    // ignore
+  }
+  return null;
+};
+
+const writeDraft = (env: DraftEnvelope) => {
+  try {
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(env));
+  } catch {
+    // ignore
+  }
+};
 
 export const COHORT_TIME_SLOTS = [
   "Monday 7:00 AM PT",
