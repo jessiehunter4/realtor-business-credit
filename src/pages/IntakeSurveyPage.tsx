@@ -160,7 +160,7 @@ export default function IntakeSurveyPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
-  const { contactId, email: identityEmail, firstName, lastName } = useContactIdentity();
+  const { contactId, email: identityEmail, firstName, lastName, leadId } = useContactIdentity();
   const { toast } = useToast();
   const mountLogged = useRef(false);
   const mountTime = useRef(Date.now());
@@ -366,6 +366,7 @@ export default function IntakeSurveyPage() {
           body: JSON.stringify({
             ...form,
             intake_id: intakeId || undefined,
+            lead_id: leadId || undefined,
             finalize: !!opts?.finalize,
           }),
         }
