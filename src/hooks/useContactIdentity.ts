@@ -9,6 +9,7 @@ interface ContactIdentity {
   lastName: string;
   email: string;
   phone: string;
+  leadId: string;
 }
 
 const IDENTITY_KEYS: (keyof ContactIdentity)[] = [
@@ -17,6 +18,7 @@ const IDENTITY_KEYS: (keyof ContactIdentity)[] = [
   "lastName",
   "email",
   "phone",
+  "leadId",
 ];
 
 const URL_KEY_ALIASES: Record<keyof ContactIdentity, string[]> = {
@@ -35,6 +37,7 @@ const URL_KEY_ALIASES: Record<keyof ContactIdentity, string[]> = {
   lastName: ["lastName", "lastname", "last_name", "LastName"],
   email: ["email", "Email"],
   phone: ["phone", "Phone"],
+  leadId: ["leadId", "leadID", "lead_id", "LeadId"],
 };
 
 function getFirstSearchParam(searchParams: URLSearchParams, candidates: string[]): string | null {
@@ -94,6 +97,7 @@ export function useContactIdentity() {
         lastName: merged.lastName ?? "",
         email: merged.email ?? "",
         phone: merged.phone ?? "",
+        leadId: merged.leadId ?? "",
       };
     }
 
@@ -105,6 +109,7 @@ export function useContactIdentity() {
       lastName: stored.lastName ?? "",
       email: stored.email ?? "",
       phone: stored.phone ?? "",
+      leadId: stored.leadId ?? "",
     };
   }, [searchParams]);
 
