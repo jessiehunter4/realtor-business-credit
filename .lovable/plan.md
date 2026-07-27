@@ -1,115 +1,191 @@
-## Lead Authentication After Plan Generation
+## Visitor Dashboard Onboarding — Implementation Plan
 
-Gate the newly generated plan behind account creation. Instead of a "View My Plan" button that navigates straight to the portal, the celebration screen collects a password, provisions a Supabase auth user, links the intake + plan to `user_id`, signs the user in, then redirects to `/portal/plan/:id`.
-
----
-
-### 1. UX Flow
-
-**Happy path (new user)**
-1. User finishes Step 4 → `Generate My Plan` → loader → celebration screen.
-2. Celebration screen shows: 🎉 heading, plan-ready subtext, then an inline **"Create your account to view your plan"** card:
-   - Email (pre-filled, read-only with a small "Edit" link to reveal an input)
-   - Password (min 8 chars, show/hide toggle)
-   - Confirm Password
-   - Primary button: **View My Plan** (disabled until valid)
-   - Fine print: "By creating an account you agree to Terms & Privacy."
-3. Submit → button spinner "Creating your account…" → auto sign-in → redirect to `/portal/plan/:id`.
-
-**Existing user detected** (email already has an auth account)
-- Signup returns "User already registered" (or our pre-check flags it). The form flips into **Sign in** mode: email pre-filled + password + "Forgot password?" link. On success, we link the intake/plan to the returning `user_id` and redirect to `/portal/plan/:id`.
-- If they enter the wrong password, show inline error + "Forgot password?" that calls `resetPasswordForEmail` (redirect `/reset-password`).
-
-**Edge cases**
-- Password mismatch / too short → inline field errors, button stays disabled.
-- Network / Supabase error → non-blocking toast + retry; celebration card is not dismissed.
-- User closes tab before creating account: plan still exists in DB (public-read policy already permits `status='published'` access via `/portal/plan/:id`), and the intake row keeps its `access_token` so they can resume. We also email them the portal link (out of scope for this plan — flagged as follow-up).
-- Confetti fires once on mount; the auth card is not part of the `aria-live` region so screen readers hear celebration then focus moves to the email/password form.
-
-**Placement & responsiveness**
-- Auth form lives inside the same `Card` as the celebration, below the CTA row. Single column, `max-w-xl`. On mobile: full-width inputs, larger tap targets, sticky primary button at bottom of card.
-- Accessibility: labels for every input, `aria-invalid` on errors, focus moves to first invalid field, password strength hint uses `aria-describedby`.
+Turn the current UI-only `/mock-dashboard` into a real, auth-gated `/dashboard` that becomes the landing surface immediately after a visitor generates their plan and creates an account. Prioritize the personalized plan, add a one-time welcome experience, and drive all metrics from real intake + plan data.
 
 ---
 
-### 2. Technical Architecture
+### 1. End-to-End User Journey
 
-**Auth**
-- Enable email/password sign-up via `supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } })`.
-- Auto-confirm: **do NOT enable** by default — but for this flow we need the user signed in immediately without an email click. Recommendation: enable `auto_confirm_email = true` for this project so signup returns a session synchronously. (Call this out for user approval; it's the standard trade-off for instant-access post-generation flows.)
-- Google OAuth: add as a secondary "Continue with Google" button (project standard). Handled the same way — after sign-in, run the linking step.
+```
+/intake  →  Generate Plan  →  PostPlanAuthCard (signup)
+                          →  link-intake-to-user (stamps user_id)
+                          →  /dashboard?firstLogin=1  (NOT /portal/plan/:id)
+                                    ↓
+                          Welcome modal + video (first time only)
+                                    ↓
+                          Dashboard with "View Your Plan" hero card
+                                    ↓ (click)
+                          /portal/plan/:id  (in-app, Back-to-Dashboard bar)
+```
 
-**Linking intake + plan to `user_id`**
-- Both `custom_plans` and `intake_surveys` already have a `user_id uuid` column with a `Users can view own …` SELECT policy.
-- Add a new edge function `link-intake-to-user` (verify_jwt=true) that:
-  1. Reads caller from JWT.
-  2. Accepts `{ intake_id, access_token }`.
-  3. Verifies `access_token` matches the intake row (proves the caller "owns" this anonymous submission).
-  4. Uses service role to `UPDATE intake_surveys SET user_id = <caller>` and `UPDATE custom_plans SET user_id = <caller> WHERE intake_survey_id = <intake_id>`.
-  5. Also patches `profiles` (first/last/phone from intake) via the existing `handle_new_user` trigger — no schema change needed; the trigger already inserts a profile row on signup from `raw_user_meta_data`, so we pass first/last/phone in `signUp` options.
-- Client-side path used because we need to run as the signed-in user *and* atomically link — an edge function is safer than trusting client updates.
-
-**Existing user detection**
-- Simplest: attempt `signUp`; Supabase returns an error string containing "already registered" → flip UI to sign-in mode. No separate lookup (avoids user enumeration).
-- After successful `signInWithPassword`, run the same linking function (it's idempotent — re-linking to the same user_id is a no-op).
-
-**Route protection**
-- `/portal/plan/:id` currently allows anonymous reads for `status='published'`. Keep as-is (accounts don't break anonymous links we already emailed). Optional follow-up: add a `requireAuth` variant later.
-
-**State machine (celebration screen)**
-- Local `authState`: `"idle" | "signup" | "signin" | "submitting" | "linking" | "done" | "error"`.
-- On success → `navigate('/portal/plan/:id')` (drop token from URL since the user is now authenticated).
+Change from today: after `PostPlanAuthCard` succeeds, redirect to `/dashboard` (not straight to the plan). The plan becomes the top CTA on the dashboard.
 
 ---
 
-### 3. Database Impact
+### 2. First-Time vs Returning Login
 
-No schema migrations required — `user_id` columns and RLS policies already exist on `intake_surveys` and `custom_plans`. `profiles` auto-populates via `handle_new_user`.
+Track first login on the `profiles` table (server-side, single source of truth):
+- `onboarding_completed_at timestamptz null`
+- `welcome_video_viewed_at timestamptz null`
 
-**Auth settings change** (via `supabase--configure_auth`):
-- `auto_confirm_email: true` (needs user approval)
-- `password_hibp_enabled: true` (best practice)
-- Leave `disable_signup: false`
+Rules:
+- If `onboarding_completed_at IS NULL` on dashboard mount → open Welcome dialog automatically with intro video, "Take the tour" CTA, and "Skip for now" link. Closing sets `onboarding_completed_at = now()`.
+- If not null → dashboard renders normally with a persistent "Watch welcome video" button in the header menu that reopens the same dialog.
+- `?firstLogin=1` query param is a hint only — the DB flag is authoritative to survive re-installs and multi-device.
 
----
-
-### 4. Files to Change
-
-**New**
-- `supabase/functions/link-intake-to-user/index.ts` — links intake + plan to caller.
-- `src/components/intake/PostPlanAuthCard.tsx` — email/password form with signup ↔ signin toggle, validation, submit.
-
-**Modified**
-- `src/components/intake/PlanSuccessCelebration.tsx` — replace CTA row with `<PostPlanAuthCard />`; keep confetti + heading unchanged.
-- `src/pages/IntakeSurveyPage.tsx` — pass `intakeId`, `intakeToken`, `contactEmail`, and post-auth navigation into the celebration.
-- `supabase/config.toml` — register new function with `verify_jwt = true`.
-- One-shot `configure_auth` call to enable auto-confirm + HIBP.
-
-**Not touched**
-- Existing `/auth` page, `ProtectedRoute`, portal view, RLS policies.
+Welcome video source: reuse `HeroVideo` component with a new storage path (`welcome-dashboard.mp4`) in the existing `site-videos` bucket. Uploadable from `/admin/video-upload`.
 
 ---
 
-### 5. Phased Rollout
+### 3. Dashboard Information Architecture
 
-**Phase 1 — Backend prep**
-- Deploy `link-intake-to-user` edge function.
-- Call `configure_auth` (auto-confirm + HIBP).
+Reorganize `MockDashboardPage` around the plan. New top-to-bottom order:
 
-**Phase 2 — UI**
-- Build `PostPlanAuthCard` (signup mode only, with inline "already have an account? Sign in" toggle).
-- Wire it into `PlanSuccessCelebration`; celebration owns the confetti, card owns the form + submit.
-- On success → link function → `navigate('/portal/plan/:id')`.
+1. **Header** — greeting + avatar + "Watch welcome video" + Log out.
+2. **Plan Hero Card** (new, replaces current KPI row as visual anchor):
+   - Title of user's plan, recommended program, generated date.
+   - Big "View Your Plan" primary button → `/portal/plan/:id`.
+   - Secondary "Download PDF".
+3. **KPI strip** — driven by real plan/task data (see §5).
+4. **Next Action** card — first uncompleted task from `plan_task_progress`.
+5. **Roadmap stepper** — from `plan_data.roadmap` phases.
+6. **Two-column**: Upcoming tasks | Fundability radial.
+7. **Recommendations** — from `plan_data.recommendations`.
+8. **Recent activity** — from `funnel_events` filtered to this user.
+9. Tabs (Overview / My Plan / 90-Day / Goals / Guides / Purchases) stay, but Overview is what loads.
 
-**Phase 3 — Polish**
-- Error copy, password strength meter, "Forgot password?" link → `resetPasswordForEmail`.
-- Analytics: `auth_signup_started`, `auth_signup_succeeded`, `auth_signin_from_celebration`, `plan_linked_to_user` (add to `log-funnel-event` allowlist).
-- Optional Google button.
+Mobile: single column, sticky tab bar, KPIs collapse to 2×2, hero card full width.
 
 ---
 
-### 6. Open Questions
+### 4. Plan Viewing Experience
 
-1. **Auto-confirm email**: OK to enable so the user is signed in instantly after signup? (Alternative: send a magic-link and keep the plan link accessible without account until they confirm.)
-2. **Google sign-in on this screen**: include now or Phase 3?
-3. **Hard gate vs soft gate**: should we keep a "Skip for now — email me the link" escape hatch, or fully require account creation before viewing? (Recommend hard gate per your spec.)
+Keep `/portal/plan/:id` in the same window. Add:
+- Sticky top bar: "← Back to Dashboard" + plan title + Download PDF.
+- Bottom footer bar: same "← Back to Dashboard" button.
+- When arriving from `/dashboard`, preserve scroll on return via existing `ScrollMemory`.
+- Remove any `target="_blank"` on plan links from the dashboard.
+
+---
+
+### 5. Dashboard Data Model — Real, Not Mock
+
+Replace `src/data/mockDashboard.ts` usage with data fetched from:
+
+| Widget | Source |
+|---|---|
+| Greeting name | `profiles.first_name` |
+| Plan hero | `custom_plans` for `user_id = auth.uid()`, latest published |
+| Recommended program | `custom_plans.recommended_program_slug` + `programs` |
+| 90-day checklist | `plan_task_progress` joined to plan; falls back to `plan_data.action_plan` |
+| Overall progress % | completed tasks / total tasks |
+| Fundability score | derived from intake_surveys structure fields (existing status logic in `PlanDocument`) |
+| Goals | `intake_surveys.primary_goals` + plan roadmap |
+| Recommendations | `plan_data.recommendations` |
+| Recent activity | `funnel_events` where `lead_id/user_id` matches |
+| Purchases | placeholder now; schema-ready for future Stripe |
+
+**Recommended primary metrics** (highest value, low effort):
+- 90-day plan completion %
+- Fundability status (Strong / Warning / Missing counts)
+- Next action due
+- Days since plan generated
+
+Defer for later: business credit score trend, funding readiness composite (needs more data captured over time).
+
+---
+
+### 6. Auth & Data Architecture Changes
+
+**RLS / policies — already in place:**
+- `custom_plans`: "Users can view own custom plans" (`auth.uid() = user_id`) ✓
+- `intake_surveys`: "Users can view own intake surveys" ✓
+- `profiles`: user can select/update own ✓
+
+**New work:**
+- Add columns to `profiles`: `onboarding_completed_at`, `welcome_video_viewed_at`, `last_login_at`.
+- Add RLS policy on `plan_task_progress` for `authenticated` users to select/update rows where the parent `custom_plans.user_id = auth.uid()` (currently only public-for-published-plans + admin).
+- Add RLS SELECT on `funnel_events` for `authenticated` where `lead_id` maps to the user (via a security-definer helper, since `funnel_events` doesn't have `user_id`).
+- Wrap `/dashboard` in `ProtectedRoute` (already exists).
+- Add `/dashboard` route to `App.tsx`; keep `/mock-dashboard` for internal previews or remove.
+- Post-auth redirect in `PostPlanAuthCard.onAuthenticated` → `/dashboard?firstLogin=1` instead of `/portal/plan/:id`.
+- Session: rely on existing `onAuthStateChange` + `getSession()` pattern in `ProtectedRoute`.
+
+**Session lifecycle:**
+- Add a lightweight `AuthProvider` context so dashboard, header, and plan view all share session + profile without refetching.
+- On sign-out from dashboard → navigate to `/`.
+
+---
+
+### 7. Loading / Error / Empty States
+
+- Dashboard skeleton with card placeholders during initial fetch.
+- If user has auth but no linked plan (edge case): show "Finish your intake" empty state linking to `/intake`.
+- If plan fetch fails: inline retry, don't block the whole dashboard.
+- Welcome video: graceful fallback if the storage file isn't uploaded yet (skip auto-open, hide "Watch welcome video" button).
+
+---
+
+### 8. UX / Accessibility / Performance / Future
+
+- Welcome dialog: focus-trap, ESC to close, `role="dialog"` `aria-labelledby`, closes flagged on any dismissal.
+- All KPI numbers announced with `aria-live="polite"` when they change.
+- Prefetch plan data on hover of "View Your Plan" using React Query.
+- Code-split `/portal/plan/:id` and PDF renderer (already heavy).
+- Future-proof: dashboard sections read from a `useDashboardData()` hook so new modules (Stripe purchases, cohort schedule, credit monitor) plug in without page-level changes.
+
+---
+
+### 9. Phased Delivery
+
+**Phase 1 — Auth Redirect + Real Dashboard Route (small)**
+- Add `/dashboard` route + `ProtectedRoute`.
+- Repoint `PostPlanAuthCard` redirect to `/dashboard?firstLogin=1`.
+- Copy `MockDashboardPage` → `DashboardPage`; keep mock imports temporarily.
+- Add sign-out wired to real Supabase.
+
+**Phase 2 — Profiles Onboarding Flags + Welcome Modal (small)**
+- Migration: add `onboarding_completed_at`, `welcome_video_viewed_at` to `profiles`.
+- Build `WelcomeDialog` with `HeroVideo` (storage path `welcome-dashboard.mp4`).
+- Auto-open on first login; persistent "Watch welcome video" button after.
+
+**Phase 3 — Plan Hero + In-App Plan Viewing (medium)**
+- New `PlanHeroCard` at top of dashboard.
+- Add Back-to-Dashboard bars (top + bottom) to `PortalPlanView`.
+- Ensure all plan links are same-window.
+
+**Phase 4 — Real Data Wiring (medium/large)**
+- `useDashboardData()` hook: fetch profile, plan, task progress, recommendations, activity.
+- Replace mock arrays in KPIs, Next Action, Checklist, Goals, Recommendations, Activity.
+- Add RLS policy for authenticated `plan_task_progress` access.
+- Keep `mockDashboard.ts` only for `/mock-dashboard` preview route.
+
+**Phase 5 — Polish (small)**
+- Skeletons, empty states, retry, prefetch on hover.
+- A11y pass, mobile QA, Lighthouse pass.
+
+**Dependencies:** Phase 2 needs Phase 1. Phase 4 needs Phase 3 (plan hero). Phase 5 runs last.
+
+---
+
+### 10. Risks & Testing
+
+Risks:
+- `funnel_events` has no `user_id` → activity feed needs a mapping via `leads`/`profiles` or a new `user_id` column (add in Phase 4 if needed).
+- Users with intakes not linked (`user_id` NULL) will land on an empty dashboard — mitigated by the "Finish your intake" empty state and by the existing `link-intake-to-user` flow.
+- Auto-open dialog on tab-switch back could annoy — use one-shot flag, not URL-based.
+
+Testing:
+- Playwright script: complete `/intake` → sign up → verify redirect to `/dashboard` → welcome dialog appears once → reload → dialog does NOT appear → click View Plan → Back to Dashboard preserves scroll.
+- SQL check: `profiles.onboarding_completed_at` set after first dismissal.
+- RLS: attempt to read another user's plan/tasks as anon and as another authenticated user — must fail.
+- Mobile viewport 375px screenshot check on dashboard hero + checklist.
+
+---
+
+### Technical details (for the engineer)
+
+- Files to add: `src/pages/DashboardPage.tsx`, `src/components/dashboard/PlanHeroCard.tsx`, `src/components/dashboard/WelcomeDialog.tsx`, `src/hooks/useDashboardData.ts`, `src/hooks/useAuthProfile.ts`.
+- Files to edit: `src/App.tsx` (add route), `src/components/intake/PostPlanAuthCard.tsx` (change `onAuthenticated` redirect target), `src/pages/PortalPlanView.tsx` (Back bars), `src/components/shared/SiteHeader.tsx` (Watch welcome video + Sign out when authed).
+- Migration: add profile columns + new policy on `plan_task_progress` for authenticated owners (with matching GRANTs already present).
+- Storage: upload `welcome-dashboard.mp4` via `/admin/video-upload` (no code change needed there).
