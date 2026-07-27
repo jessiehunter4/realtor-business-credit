@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Download, FileText, ListChecks } from "lucide-react";
+import { Loader2, Download, FileText, ListChecks, ArrowLeft } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -110,6 +110,13 @@ export default function PortalPlanView() {
   return (
     <div className="min-h-screen bg-muted/30 py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        <div className="mb-4">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="rounded-full">
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
+            </Button>
+          </Link>
+        </div>
         <Tabs defaultValue="plan" className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <TabsList>
@@ -141,6 +148,13 @@ export default function PortalPlanView() {
             {id && <PlanTaskChecklist planId={id} planData={planData} />}
           </TabsContent>
         </Tabs>
+        <div className="mt-8 flex justify-center">
+          <Link to="/dashboard">
+            <Button variant="outline" className="rounded-full">
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

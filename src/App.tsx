@@ -27,6 +27,7 @@ import TermsPage from "./pages/TermsPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
 import MockDashboardPage from "./pages/MockDashboardPage";
+import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import ScrollMemory from "./components/ScrollMemory";
@@ -109,6 +110,14 @@ const App = () => (
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/mock-login" element={<MockLoginPage />} />
           <Route path="/mock-dashboard" element={<MockDashboardPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

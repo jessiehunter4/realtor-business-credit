@@ -590,8 +590,7 @@ export default function IntakeSurveyPage() {
     // Post-submit flow: preview → generating → success (with confetti) → portal.
     const goToPortal = () => {
       if (planState.status !== "success") return;
-      const url = `/portal/plan/${planState.planId}`;
-      navigate(url);
+      navigate(`/dashboard?firstLogin=1`);
     };
 
     return (
