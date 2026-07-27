@@ -63,9 +63,12 @@ serve(async (req) => {
     // idempotent outcome rather than a runtime failure.
     const { error: insertError } = await supabaseClient
       .from('user_roles')
-      .insert({
+      .upsert({
         user_id: user.id,
         role: 'admin'
+      }, {
+        onConflict: 'user_id,role',
+        ignoreDuplicates: true
       });
 
     if (insertError) {
