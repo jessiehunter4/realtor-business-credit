@@ -484,7 +484,7 @@ export default function IntakeSurveyPage() {
           {
             method: "POST",
             headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
-            body: JSON.stringify(form),
+            body: JSON.stringify({ ...form, lead_id: leadId || undefined }),
           }
         );
         if (!res.ok) {
