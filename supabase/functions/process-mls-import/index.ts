@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { requireAdmin } from '../_shared/requireAdmin.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -90,22 +91,15 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const guard = await requireAdmin(req);
+    if (guard instanceof Response) return guard;
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Get authenticated user
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
-
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    const userId = guard.userId;
 
     const { filename, content } = await req.json();
 
@@ -114,7 +108,7 @@ Deno.serve(async (req) => {
       .from('import_batches')
       .insert({
         filename,
-        uploaded_by: user.id,
+        uploaded_by: userId,
         status: 'processing',
       })
       .select()
