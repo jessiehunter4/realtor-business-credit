@@ -65,6 +65,7 @@ const LandingPage = () => {
       />
       <SiteHeader />
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
+      <GuideIntroduction />
       <ProgramCurriculum guideLink={guideLink} />
       <CustomPlanPreview />
       <IsThisForMe />
