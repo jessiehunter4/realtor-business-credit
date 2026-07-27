@@ -74,7 +74,7 @@ const SiteHeader = () => {
           ) : (
             <>
               <Link
-                to="/mock-login"
+                to="/auth"
                 className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
               >
                 Log in
