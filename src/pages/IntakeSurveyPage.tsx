@@ -18,6 +18,7 @@ import GoalStatement from "@/components/intake/GoalStatement";
 import PlanPreviewCard from "@/components/intake/PlanPreviewCard";
 import PlanGenerationLoader from "@/components/intake/PlanGenerationLoader";
 import PlanSuccessCelebration from "@/components/intake/PlanSuccessCelebration";
+import PostPlanAuthCard from "@/components/intake/PostPlanAuthCard";
 import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
@@ -589,7 +590,7 @@ export default function IntakeSurveyPage() {
     // Post-submit flow: preview → generating → success (with confetti) → portal.
     const goToPortal = () => {
       if (planState.status !== "success") return;
-      const url = `/portal/plan/${planState.planId}${intakeToken ? `?token=${encodeURIComponent(intakeToken)}` : ""}`;
+      const url = `/portal/plan/${planState.planId}`;
       navigate(url);
     };
 
@@ -601,8 +602,21 @@ export default function IntakeSurveyPage() {
             <PlanSuccessCelebration
               planId={planState.planId}
               contactEmail={form.contact_email}
-              onPrimary={goToPortal}
-              primaryLabel="View My Plan"
+              hidePrimary
+              subheading="Create your account below to unlock and save your personalized plan."
+              footer={
+                intakeId && intakeToken && form.contact_email ? (
+                  <PostPlanAuthCard
+                    intakeId={intakeId}
+                    accessToken={intakeToken}
+                    defaultEmail={form.contact_email}
+                    firstName={form.first_name}
+                    lastName={form.last_name}
+                    phone={form.business_phone}
+                    onAuthenticated={goToPortal}
+                  />
+                ) : null
+              }
             />
           ) : planState.status === "generating" ? (
             <PlanGenerationLoader />

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PartyPopper } from "lucide-react";
@@ -6,12 +6,14 @@ import { PartyPopper } from "lucide-react";
 interface Props {
   planId: string;
   contactEmail?: string;
-  onPrimary: () => void;
+  onPrimary?: () => void;
   primaryLabel?: string;
   secondary?: { label: string; onClick: () => void };
   heading?: string;
   subheading?: string;
   autoAdvanceMs?: number;
+  footer?: ReactNode;
+  hidePrimary?: boolean;
 }
 
 export default function PlanSuccessCelebration({
@@ -22,6 +24,8 @@ export default function PlanSuccessCelebration({
   heading = "🎉 Your Plan Is Ready",
   subheading = "Your personalized RE Pro Business Credit Plan has been generated and saved. Let's take a look.",
   autoAdvanceMs,
+  footer,
+  hidePrimary,
 }: Props) {
   const firedRef = useRef(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -46,7 +50,7 @@ export default function PlanSuccessCelebration({
   }, []);
 
   useEffect(() => {
-    if (!autoAdvanceMs) return;
+    if (!autoAdvanceMs || !onPrimary) return;
     const t = setTimeout(onPrimary, autoAdvanceMs);
     return () => clearTimeout(t);
   }, [autoAdvanceMs, onPrimary]);
@@ -61,16 +65,21 @@ export default function PlanSuccessCelebration({
           {heading}
         </h2>
         <p className="text-muted-foreground max-w-md mx-auto">{subheading}</p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Button size="lg" onClick={onPrimary} className="w-full sm:w-auto sm:min-w-[220px]">
-            {primaryLabel}
-          </Button>
-          {secondary && (
-            <Button size="lg" variant="outline" onClick={secondary.onClick} className="w-full sm:w-auto">
-              {secondary.label}
-            </Button>
-          )}
-        </div>
+        {!hidePrimary && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            {onPrimary && (
+              <Button size="lg" onClick={onPrimary} className="w-full sm:w-auto sm:min-w-[220px]">
+                {primaryLabel}
+              </Button>
+            )}
+            {secondary && (
+              <Button size="lg" variant="outline" onClick={secondary.onClick} className="w-full sm:w-auto">
+                {secondary.label}
+              </Button>
+            )}
+          </div>
+        )}
+        {footer}
         <p className="text-xs text-muted-foreground">Plan ID: {planId.slice(0, 8)}</p>
       </CardContent>
     </Card>
