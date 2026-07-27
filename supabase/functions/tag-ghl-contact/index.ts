@@ -1,4 +1,4 @@
-import { requireAdmin, corsHeaders } from '../_shared/requireAdmin.ts';
+import { corsHeaders } from '../_shared/requireAdmin.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -6,9 +6,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const guard = await requireAdmin(req);
-    if (guard instanceof Response) return guard;
-
     const { contactId, tags, removeTags } = await req.json();
 
     if (!contactId) {
