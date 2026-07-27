@@ -722,30 +722,39 @@ export type Database = {
           email: string | null
           first_name: string | null
           ghl_contact_id: string | null
+          last_login_at: string | null
           last_name: string | null
+          onboarding_completed_at: string | null
           phone: string | null
           updated_at: string
           user_id: string
+          welcome_video_viewed_at: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           first_name?: string | null
           ghl_contact_id?: string | null
+          last_login_at?: string | null
           last_name?: string | null
+          onboarding_completed_at?: string | null
           phone?: string | null
           updated_at?: string
           user_id: string
+          welcome_video_viewed_at?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           first_name?: string | null
           ghl_contact_id?: string | null
+          last_login_at?: string | null
           last_name?: string | null
+          onboarding_completed_at?: string | null
           phone?: string | null
           updated_at?: string
           user_id?: string
+          welcome_video_viewed_at?: string | null
         }
         Relationships: []
       }
