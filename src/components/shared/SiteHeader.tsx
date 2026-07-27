@@ -19,12 +19,12 @@ const SiteHeader = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center shrink-0" aria-label="RE Pro Business Credit home">
           <img
             src={logoAsset.url}
             alt="RE Pro Business Credit"
-            className="h-10 md:h-12 w-auto"
+            className="h-12 md:h-16 w-auto"
           />
         </Link>
 
