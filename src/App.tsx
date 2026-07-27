@@ -28,7 +28,9 @@ import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
 import MockDashboardPage from "./pages/MockDashboardPage";
 import DashboardPage from "./pages/DashboardPage";
-import ProtectedRoute from "./components/ProtectedRoute";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+import { RequireAdmin, RequireVisitor } from "./components/auth/RoleGuards";
+import { AuthRoleProvider } from "./hooks/useAuthRole";
 import NotFound from "./pages/NotFound";
 import ScrollMemory from "./components/ScrollMemory";
 
@@ -41,6 +43,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollMemory />
+        <AuthRoleProvider>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/guide" element={<GuidePage />} />
@@ -49,54 +52,13 @@ const App = () => (
           <Route path="/one-on-one" element={<OneOnOnePage />} />
           <Route path="/intake" element={<IntakeSurveyPage />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/mls-import" 
-            element={
-              <ProtectedRoute>
-                <MLSImport />
-              </ProtectedRoute>
-            } 
-          />
-          <Route
-            path="/admin/video-upload"
-            element={
-              <ProtectedRoute>
-                <AdminVideoUpload />
-              </ProtectedRoute>
-            }
-          />
-          <Route 
-            path="/admin/intake" 
-            element={
-              <ProtectedRoute>
-                <AdminIntakeList />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/intake/:id" 
-            element={
-              <ProtectedRoute>
-                <AdminIntakeCoachView />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/plan/:id" 
-            element={
-              <ProtectedRoute>
-                <AdminPlanView />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
+          <Route path="/admin/mls-import" element={<RequireAdmin><MLSImport /></RequireAdmin>} />
+          <Route path="/admin/video-upload" element={<RequireAdmin><AdminVideoUpload /></RequireAdmin>} />
+          <Route path="/admin/intake" element={<RequireAdmin><AdminIntakeList /></RequireAdmin>} />
+          <Route path="/admin/intake/:id" element={<RequireAdmin><AdminIntakeCoachView /></RequireAdmin>} />
+          <Route path="/admin/plan/:id" element={<RequireAdmin><AdminPlanView /></RequireAdmin>} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/portal/plan/:id" element={<PortalPlanView />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
@@ -110,17 +72,11 @@ const App = () => (
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/mock-login" element={<MockLoginPage />} />
           <Route path="/mock-dashboard" element={<MockDashboardPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </AuthRoleProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
