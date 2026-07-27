@@ -64,7 +64,35 @@ const PAIN_OPTIONS = [
 const MAX_GOALS = 3;
 const MAX_PAINS = 3;
 const AUTOSAVE_DEBOUNCE_MS = 1200;
-const DRAFT_STORAGE_KEY = "rbc_intake_draft_v2";
+const DRAFT_STORAGE_KEY = "rbc_intake_draft_v3";
+const LEGACY_DRAFT_KEY = "rbc_intake_draft_v2";
+const ENABLE_PROGRAM_FIT_STEP = false;
+
+interface DraftEnvelope {
+  intake_id?: string | null;
+  access_token?: string | null;
+  form: SurveyData;
+}
+
+const readDraft = (): DraftEnvelope | null => {
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as DraftEnvelope;
+    const legacy = localStorage.getItem(LEGACY_DRAFT_KEY);
+    if (legacy) return { form: JSON.parse(legacy) as SurveyData };
+  } catch {
+    // ignore
+  }
+  return null;
+};
+
+const writeDraft = (env: DraftEnvelope) => {
+  try {
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(env));
+  } catch {
+    // ignore
+  }
+};
 
 export const COHORT_TIME_SLOTS = [
   "Monday 7:00 AM PT",
@@ -213,15 +241,12 @@ export default function IntakeSurveyPage() {
     if (isDirectMode) {
       // Pre-populate from contact identity
       const defaultName = [firstName, lastName].filter(Boolean).join(" ");
-      // Restore any locally saved draft first
-      let localDraft: SurveyData = {};
-      try {
-        const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-        if (raw) localDraft = JSON.parse(raw) as SurveyData;
-      } catch {
-        // ignore
-      }
+      // Restore any locally saved draft first (server-persisted id + form)
+      const env = readDraft();
+      const localDraft: SurveyData = env?.form || {};
       hydratedFromDraft.current = !!Object.keys(localDraft).length;
+      if (env?.intake_id) setIntakeId(env.intake_id);
+      if (env?.access_token) setIntakeToken(env.access_token);
       setForm(prev => ({
         ...prev,
         ...localDraft,
@@ -283,7 +308,7 @@ export default function IntakeSurveyPage() {
     autosaveTimer.current = setTimeout(async () => {
       if (isDirectMode) {
         try {
-          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+          writeDraft({ intake_id: intakeId, access_token: intakeToken, form });
           setAutosaveStatus("saved");
         } catch {
           // ignore quota errors
@@ -309,7 +334,135 @@ export default function IntakeSurveyPage() {
     return () => {
       if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     };
-  }, [form, loading, submitted, isDirectMode, token]);
+  }, [form, loading, submitted, isDirectMode, token, intakeId, intakeToken]);
+
+  // Scroll to top on step change
+  const isInitialStep = useRef(true);
+  useEffect(() => {
+    if (isInitialStep.current) {
+      isInitialStep.current = false;
+      return;
+    }
+    try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, [step]);
+
+  // Server-side incremental save for direct mode. No-op if email missing or in token mode.
+  const persistStep = async (opts?: { finalize?: boolean }): Promise<{ id: string; access_token: string } | null> => {
+    if (!isDirectMode) return null;
+    const email = form.contact_email?.trim();
+    if (!email) return null;
+    try {
+      setAutosaveStatus("saving");
+      const res = await fetch(
+        `${SUPABASE_URL}/functions/v1/intake-survey?mode=direct-draft`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+          body: JSON.stringify({
+            ...form,
+            intake_id: intakeId || undefined,
+            finalize: !!opts?.finalize,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      if (data?.id) {
+        setIntakeId(data.id);
+        if (data.access_token) setIntakeToken(data.access_token);
+        writeDraft({ intake_id: data.id, access_token: data.access_token ?? intakeToken, form });
+      }
+      setAutosaveStatus("saved");
+      return data;
+    } catch (e) {
+      setAutosaveStatus("idle");
+      return null;
+    }
+  };
+
+  const goNext = async () => {
+    // Fire-and-forget server save; local draft is safety net
+    void persistStep();
+    setStep(s => s + 1);
+  };
+
+  const validateAllRequired = (): { ok: true } | { ok: false; step: number; message: string } => {
+    if (isDirectMode) {
+      if (!form.first_name?.trim()) return { ok: false, step: 0, message: "Please enter your first name." };
+      if (!form.last_name?.trim()) return { ok: false, step: 0, message: "Please enter your last name." };
+      const email = form.contact_email?.trim() || "";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, step: 0, message: "Please enter a valid email." };
+    }
+    if (!form.primary_goals || form.primary_goals.length < 1) {
+      return { ok: false, step: 1, message: "Pick at least one primary goal." };
+    }
+    return { ok: true };
+  };
+
+  const handleGenerate = async () => {
+    const v = validateAllRequired();
+    if (v.ok === false) {
+      toast({ title: "Missing info", description: v.message, variant: "destructive" });
+      setStep(v.step);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      let finalId = intakeId;
+      let finalToken = intakeToken;
+      if (isDirectMode) {
+        const saved = await persistStep({ finalize: true });
+        if (!saved?.id) throw new Error("Could not save your answers. Please try again.");
+        finalId = saved.id;
+        finalToken = saved.access_token || finalToken;
+      } else {
+        // Token mode: finalize via existing PUT
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify({ ...form, status: "submitted" }),
+          }
+        );
+        if (!res.ok) {
+          const d = await res.json().catch(() => null);
+          throw new Error(d?.error || "Failed to submit");
+        }
+        if (form.id) finalId = form.id;
+      }
+
+      setIntakeId(finalId);
+      setIntakeToken(finalToken);
+      setSubmitted(true);
+      if (isDirectMode) {
+        try { localStorage.removeItem(DRAFT_STORAGE_KEY); localStorage.removeItem(LEGACY_DRAFT_KEY); } catch { /* ignore */ }
+      }
+
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "intake_submitted",
+      }).catch(() => {});
+      if (contactId) {
+        supabase.functions.invoke("tag-ghl-contact", { body: { contactId, tags: ["f-intake-submitted"] } }).catch(() => {});
+      }
+
+      // Immediately kick off plan generation
+      if (finalId) {
+        void postFunnelEvent({ contactId: contactId || undefined, eventType: "plan_generation_started" }).catch(() => {});
+        generatePlan({ intakeSurveyId: finalId, intakeToken: finalToken, source: "user" });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (isDirectMode && (!form.contact_email || !form.contact_email.trim())) {
@@ -494,8 +647,9 @@ export default function IntakeSurveyPage() {
     { title: "Goals", key: "B" },
     { title: "Business Structure", key: "C" },
     { title: "Credit & Funding", key: "D" },
-    { title: "Program Fit", key: "E" },
+    ...(ENABLE_PROGRAM_FIT_STEP ? [{ title: "Program Fit", key: "E" }] : []),
   ];
+  const isFinalStep = step === steps.length - 1;
 
   const stepVideoMeta: Record<number, { title: string; description: string }> = {
     0: { title: "Walkthrough: Profile", description: "Jessie explains what production and location details help us tailor your plan." },
@@ -930,8 +1084,8 @@ export default function IntakeSurveyPage() {
           </Card>
         )}
 
-        {/* Step E */}
-        {step === 4 && (
+        {/* Step E — hidden from public flow; preserved for future/admin use */}
+        {ENABLE_PROGRAM_FIT_STEP && step === 4 && (
           <Card>
             <CardHeader>
               <CardTitle>Program Fit & Support Preferences</CardTitle>
@@ -1037,7 +1191,26 @@ export default function IntakeSurveyPage() {
           </Card>
         )}
 
-        {/* Navigation */}
+        {/* Final-step centered CTA */}
+        {isFinalStep && (
+          <div className="max-w-3xl mx-auto pt-2 pb-4 text-center space-y-3">
+            <Button
+              size="lg"
+              onClick={handleGenerate}
+              disabled={submitting}
+              className="h-14 px-10 text-base font-semibold"
+            >
+              {submitting ? (
+                <><Loader2 className="h-5 w-5 animate-spin mr-2" /> Preparing your plan…</>
+              ) : (
+                <>Generate My Plan →</>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              We'll save your answers and generate your personalized plan in about 20–40 seconds.
+            </p>
+          </div>
+        )}
           </div>
         </div>
 
@@ -1052,12 +1225,8 @@ export default function IntakeSurveyPage() {
             {autosaveStatus === "saving" ? "Saving…" : autosaveStatus === "saved" ? "Saved" : `Step ${step + 1} of ${steps.length}`}
           </div>
           <div className="flex gap-2">
-            {step < steps.length - 1 ? (
-              <Button onClick={() => setStep(s => s + 1)}>Next</Button>
-            ) : (
-              <Button onClick={handleSubmit} disabled={submitting}>
-                {submitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Submitting...</> : "Submit"}
-              </Button>
+            {!isFinalStep && (
+              <Button onClick={goNext}>Next</Button>
             )}
           </div>
         </div>
