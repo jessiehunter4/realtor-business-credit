@@ -157,6 +157,70 @@ Deno.serve(async (req) => {
       const authHeader = req.headers.get("Authorization");
       const mode = url.searchParams.get("mode");
 
+      // Public incremental draft mode (no auth required)
+      // Creates a new row if intake_id is not provided, otherwise updates by id.
+      // Set finalize=true to mark the row submitted.
+      if (mode === "direct-draft") {
+        const body = await req.json();
+        const finalize = body.finalize === true;
+        const intakeId = typeof body.intake_id === "string" ? body.intake_id : null;
+        const surveyFields = pickEditableSurveyFields(body);
+
+        if (!intakeId) {
+          if (!body.contact_email || !String(body.contact_email).trim()) {
+            return new Response(
+              JSON.stringify({ error: "Email is required to start saving" }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          const { data, error } = await supabaseAdmin
+            .from("intake_surveys")
+            .insert({
+              ...surveyFields,
+              contact_email: String(body.contact_email).trim(),
+              contact_name: body.contact_name?.trim() || null,
+              filled_by: "self",
+              status: finalize ? "submitted" : "in_progress",
+              submitted_at: finalize ? new Date().toISOString() : null,
+            })
+            .select("id, access_token")
+            .single();
+          if (error) {
+            return new Response(
+              JSON.stringify({ error: error.message }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          return new Response(
+            JSON.stringify({ success: true, id: data.id, access_token: data.access_token }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const updatePayload: Record<string, unknown> = {
+          ...surveyFields,
+          status: finalize ? "submitted" : "in_progress",
+        };
+        if (finalize) updatePayload.submitted_at = new Date().toISOString();
+        const { data, error } = await supabaseAdmin
+          .from("intake_surveys")
+          .update(updatePayload)
+          .eq("id", intakeId)
+          .eq("filled_by", "self")
+          .select("id, access_token")
+          .single();
+        if (error) {
+          return new Response(
+            JSON.stringify({ error: error.message }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        return new Response(
+          JSON.stringify({ success: true, id: data.id, access_token: data.access_token }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       // Public direct-submit mode (no auth required)
       if (mode === "direct") {
         const body = await req.json();
