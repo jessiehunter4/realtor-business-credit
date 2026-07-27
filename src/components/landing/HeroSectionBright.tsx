@@ -42,7 +42,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             {tagline}
           </p>
 
-          <div className="relative mt-4 sm:mt-5 w-full max-w-[min(560px,100%)] mx-auto">
+          <div className="relative mt-4 sm:mt-5 w-full max-w-[min(640px,100%)] mx-auto">
             <div className="absolute -inset-3 sm:-inset-5 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
             <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
