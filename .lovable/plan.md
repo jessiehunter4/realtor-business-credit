@@ -1,127 +1,76 @@
-# Intake Survey Redesign — Steps 1–5
 
-Note: The current survey has 5 steps (Profile, Goals, Business Structure, Credit & Funding, Program Fit). The request says "Steps 1–4" — I'll treat this as **all form steps** for consistency. Confirm if you want Step 5 excluded.
+## Goal
+Streamline `/intake` to 4 public steps, ensure scroll-to-top on step change, incrementally auto-save server-side (create record on step 1, update on each step), and replace the final Submit with a centered "Generate My Plan" button that validates → saves → generates → runs the existing preview/portal flow. Preserve Step 5 (Program Fit) code and DB columns for admin/future use.
 
-## UX Review — Current State
+## 1. Remove Step 5 from public flow (preserve for admin)
 
-- Single-page stepper in `src/pages/IntakeSurveyPage.tsx` (~1047 lines) using shadcn `Card` + `CardHeader/CardContent`.
-- No instructional media on any step; heading + description only.
-- Dense forms (Steps A, C, D each render 6–10 fields in one card) with `space-y-4` — desktop feels cramped, mobile feels long.
-- Progress indicator, autosave (`AUTOSAVE_DEBOUNCE_MS`, localStorage `rbc_intake_draft_v2`), Prev/Next nav, validation, and plan-preview handoff all live in this one file.
+- In `src/pages/IntakeSurveyPage.tsx`:
+  - Trim the public `steps` array to 4 entries (Profile, Goals, Business Structure, Credit & Funding). Keep `stepVideoMeta` entries 0–3.
+  - Leave the `{step === 4 && ...}` JSX block AND its imports (`IntakePricingAndReadiness`, `InlinePricingAccordion`) in the file, but wrap it in `{false && ...}` (or an `ENABLE_PROGRAM_FIT_STEP = false` flag) so it's dead-code-eliminated yet trivially re-enabled. No DB / edge function changes.
+  - Progress indicator, "Step X of Y", and sticky footer counter automatically reflect `steps.length = 4`.
+- `AdminIntakeCoachView` and the underlying columns (`preferred_support_format`, `interest_in_cohort`, `preferred_cohort_time_1/2`, `investment_readiness`, `additional_notes`) are untouched. The admin coach view continues to render the Program tab.
+- No changes to `intake-survey` edge function `EDITABLE_SURVEY_FIELDS` — server still accepts those columns if a user is resumed via an admin-issued token that had them set.
 
-Pain points:
-- No visual anchor at the top of each step — user drops straight into fields.
-- Field grouping is flat; related fields (e.g. business address block, business identity toggles) aren't visually grouped.
-- On desktop the single-column card wastes horizontal space; on mobile the CTAs sit far below the fold.
+## 2. Scroll to top on step change
 
-## Proposed Layout
+- Add a `useEffect([step])` in `IntakeSurveyPage` that calls `window.scrollTo({ top: 0, behavior: "smooth" })` on step change (skip on initial mount).
+- `ScrollMemory` operates on `location.pathname` only, so it won't interfere with same-route step transitions.
+- No changes needed for desktop/tablet/mobile beyond this — the layout is already single-column.
 
-Two-column on desktop (≥lg), stacked on mobile:
+## 3. Incremental server-side auto-save (direct mode)
 
-```text
-lg (≥1024px)                          md/sm (<1024px)
-┌──────────────┬──────────────────┐   ┌──────────────────┐
-│ Video        │ Step Header      │   │ Step Header      │
-│ Placeholder  │ ─────────────    │   ├──────────────────┤
-│ 16:9         │ Form fieldsets   │   │ Video (16:9)     │
-│ sticky top-24│ (grouped)        │   ├──────────────────┤
-│              │ Prev / Next CTAs │   │ Form fieldsets   │
-└──────────────┴──────────────────┘   │ Prev / Next CTAs │
-                                      └──────────────────┘
-```
+Today direct mode only saves to `localStorage` until final submit. Move to server-persisted incremental save so users can resume from any device.
 
-Proportions: `lg:grid-cols-[minmax(0,420px)_1fr]`, gap-8. Video sticks (`lg:sticky lg:top-24`) so it stays visible while the form scrolls. On mobile the video sits above the form and is collapsible ("Watch intro ▾") to keep fields near the fold.
+- Add a POST `mode=direct-draft` branch to `supabase/functions/intake-survey/index.ts`:
+  - Body: `{ intake_id?, ...editable fields }`.
+  - If no `intake_id`: require `contact_email`, insert a new `intake_surveys` row with `filled_by: "self"`, `status: "in_progress"`, return `{ id, access_token }`.
+  - If `intake_id`: update the row by id (still `status: "in_progress"`), no `submitted_at`.
+  - Reuse existing `pickEditableSurveyFields` — no field allowlist changes.
+- Client changes in `IntakeSurveyPage.tsx`:
+  - Track `intakeId` + `intakeToken` (already state) as the persisted record identity.
+  - On the "Next" button click AND on step-index change, call a `persistStep()` helper:
+    - If `!intakeId` and `contact_email` present → POST `mode=direct-draft` to create; store returned `id` and `access_token` in state and `localStorage` (existing draft key extended to include `{intake_id, access_token, form}`).
+    - If `intakeId` → POST `mode=direct-draft` with `intake_id` to patch.
+    - Failure: keep local draft, show a subtle "Saved locally — will retry" toast; do not block navigation.
+  - Keep the existing debounced localStorage save as a background safety net.
+  - On mount: if the stored draft contains `intake_id` + `access_token`, prefer server hydration (`GET ?token=...`) and reuse that token; falls back to local form if the row is missing.
+- Token-mode (admin-issued link) is unchanged — it already PUTs on every debounce.
+- Duplicate prevention: identity is the row `id` in draft storage; we never insert twice because subsequent saves carry `intake_id`. If a user clears storage and re-starts, we create a fresh row (acceptable; admin can dedupe by email later — same as today).
 
-## Video Placeholder Component
+## 4. "Generate My Plan" on Step 4
 
-New `src/components/intake/StepVideoPlaceholder.tsx`:
+Replace the current two-stage flow (Submit → then PlanPreviewCard) with a single centered CTA on Step 4:
 
-Props:
-- `stepNumber: number`
-- `title: string` (e.g. "Step 1 · Profile walkthrough")
-- `description?: string` ("2 min · What Jessie covers on this page")
-- `videoUrl?: string` — when provided, renders `<HeroVideo>`-style player; when absent, renders placeholder
-- `storagePath?: string` — supabase storage key for future upload
-- `posterUrl?: string`
+- Add a `validateAllRequired()` that checks: `first_name`, `last_name`, `contact_email` (email regex), and `primary_goals.length >= 1`. On failure, jump to the first failing step and toast the missing field.
+- New button on Step 4 (centered, primary, large), label "Generate My Plan → ", replacing the current sticky footer "Submit". Sticky footer on Step 4 shows only "Previous"; primary CTA lives inside the card for visibility.
+- Handler `handleGenerate()`:
+  1. Run `validateAllRequired()`.
+  2. Call `persistStep()` and wait — this now sends the FINAL PUT with `status: "submitted"` and `submitted_at` (add a `finalize: true` flag to the `mode=direct-draft` endpoint, or reuse the existing direct-submit path when finalizing). Result must include `{ id, access_token }`.
+  3. Set `submitted = true`, `intakeId`, `intakeToken`.
+  4. Fire `intake_submitted` funnel event + GHL tag (same as today).
+  5. Immediately call `generatePlan({ intakeSurveyId, intakeToken, source: "user" })` — skip the manual `PlanPreviewCard` click, going straight to `PlanGenerationLoader` → `PlanSuccessCelebration` → `View My Plan` → `/portal/plan/:id`. Existing error card + retry stays.
+- The `PlanPreviewCard` component remains available for token/admin flows; for the direct public flow we bypass it. (If you want to keep an "explanation" moment, we can leave PlanPreviewCard rendered for ~800ms before auto-clicking — flag as optional.)
 
-Placeholder visuals:
-- 16:9 `aspect-video` container, `rounded-2xl border border-border bg-hero-grad`
-- Centered play icon (Lucide `PlayCircle`, ~64px) in brand teal, subtle ring
-- Title + "Video coming soon" chip in top-left
-- Duration/description caption below
-- Skeleton shimmer overlay (subtle, respects `prefers-reduced-motion`)
+## 5. Impact review
 
-Reuses `HeroVideo.tsx` playback path when a `storagePath` is added later — swap is one prop change per step. Upload is already managed via `AdminVideoUpload` page; we'll add step slots (`intake-step-1.mp4` … `intake-step-5.mp4`) there.
+- `usePlanGeneration`, `generate-plan` edge function, `log-funnel-event`: no changes.
+- `AdminIntakeCoachView`: unchanged (still shows all 5 tabs).
+- `AdminIntakeList`, RLS, `custom_plans`, `plan_task_progress`: unchanged.
+- Analytics: same event types (`intake_started`, `intake_submitted`, `plan_generation_started/succeeded/failed`, `intake_session`). Add an optional `intake_step_saved` metadata event per step (nice-to-have; skip if we want zero new event types).
+- Accessibility: focus first heading on step change alongside scroll-to-top; retain existing `aria-label`s.
+- Mobile: sticky bottom bar stays; on Step 4 the bar hides its primary action and the inline CTA takes over (avoids double-primary).
 
-## Form Experience Improvements
+## Technical section
 
-- Split each step into `<fieldset>` groupings with subtle divider + section eyebrow (e.g. Step A: "You" / "Your Business" / "Production"; Step C: "Entity" / "Address & Contact" / "Banking & Accounting"; Step D: "Cards & Tradelines" / "Bureaus" / "Funding Needs").
-- Two-column field grid inside groups on `md+` (`grid md:grid-cols-2 gap-4`) where fields are short (name, city, state, zip, phone, license type…). Textareas + multi-selects remain full width.
-- Consistent `Label` + helper text pattern; inline validation messages under fields (aria-describedby) instead of toast-only.
-- Sticky action bar at the bottom of the form column (`sticky bottom-0 bg-background/95 backdrop-blur border-t`) containing Prev/Next + autosave status ("Saved just now"). Improves reachability on mobile.
-- Progress: keep numeric step count, add a slim `Progress` bar and step labels above the two-column area, sticky under the header.
+- Files touched:
+  - `src/pages/IntakeSurveyPage.tsx` — steps array trim, scroll effect, persistStep helper, handleGenerate, Step 4 CTA, feature-flag Step E block.
+  - `supabase/functions/intake-survey/index.ts` — add `mode=direct-draft` POST handling (create or update by id) and a `finalize` flag that sets `status: "submitted"` + `submitted_at`.
+  - `src/components/intake/PlanPreviewCard.tsx` — no code change; usage becomes optional.
+- Draft storage key: bump to `rbc_intake_draft_v3` with shape `{ intake_id, access_token, form }`; migrate v2 by treating it as form-only.
+- Rollback: flip `ENABLE_PROGRAM_FIT_STEP = true` to restore Step 5 publicly; delete the `mode=direct-draft` branch to revert to submit-only.
 
-## Impact Analysis
+## Phasing
 
-Files touched:
-- `src/pages/IntakeSurveyPage.tsx` — layout scaffold, per-step wrappers, sticky action bar, grouping. Business logic (autosave, validation, plan generation handoff) unchanged.
-- New `src/components/intake/StepVideoPlaceholder.tsx`.
-- New `src/components/intake/StepShell.tsx` — reusable two-column shell (video slot + form slot + header + sticky footer). Keeps each step block small.
-- Optional: extract each step's fields into `src/components/intake/steps/StepProfile.tsx`, `StepGoals.tsx`, `StepStructure.tsx`, `StepCredit.tsx`, `StepProgramFit.tsx` to shrink the 1047-line page. Recommended but scoped as Phase 2.
-- `src/pages/AdminVideoUpload.tsx` — add upload slots for `intake-step-{1..5}.mp4` (Phase 3, optional).
-
-Unaffected (verified): autosave debounce + `DRAFT_STORAGE_KEY`, `usePlanGeneration` handoff, `PlanPreviewCard/Loader/Celebration`, edge functions (`intake-survey`, `generate-plan`), DB schema, admin coach view.
-
-## Responsive Behavior
-
-- `<768px`: single column, video collapsible above form, sticky bottom action bar, groups full-width.
-- `768–1023px`: single column but form uses 2-col field grid inside groups; video full-width above.
-- `≥1024px`: two-column shell, video sticky, form scrolls; max content width `max-w-6xl`.
-- Respect `prefers-reduced-motion` on shimmer/transitions.
-- Touch targets ≥44px on inputs and Prev/Next.
-
-## Accessibility
-
-- Placeholder uses `role="img"` with `aria-label`; real video uses `<video controls>` with captions track (mirrors `HeroVideo`).
-- Fieldsets with `<legend>` (visually styled as eyebrows).
-- Live region announces "Saved" and step changes.
-- Focus moves to step heading on Next/Prev.
-
-## Performance
-
-- Placeholder is pure CSS + one SVG icon — zero network cost.
-- When real videos land, reuse `HeroVideo` signed-URL flow (already lazy, `preload="metadata"`).
-- Extracting steps into subcomponents enables per-step code-splitting later if needed (not required now).
-
-## Risks & Testing
-
-Risks:
-- Sticky footer overlapping mobile keyboards on iOS — mitigate with `pb-[env(safe-area-inset-bottom)]` and non-sticky variant when a text input is focused (feature-detect).
-- Two-column shell on tablets in landscape at 1024px can feel tight — cap video column at 420px and allow form to flex.
-- Autosave status placement change — ensure existing "Saved"/"Saving" state wiring still fires.
-
-Testing:
-- Manual: all 5 steps at 375 / 768 / 1024 / 1440 widths; keyboard-only nav; screen reader step announcements; autosave still writes to `rbc_intake_draft_v2` and edge PUT.
-- Regression: token flow (`?token=`), direct-access mode, plan generation handoff, admin coach view unchanged.
-- Visual: dark mode not currently used on `/intake`, so no dark-mode QA needed.
-
-## Phased Implementation
-
-1. **Phase 1 — Shell + placeholder (no logic change).**
-   - Build `StepVideoPlaceholder` and `StepShell`.
-   - Wrap each of the 5 existing step Cards in `StepShell` with the placeholder in the video slot.
-   - Add sticky action bar, move Prev/Next inside it.
-   - Ship — visually redesigned, behaviorally identical.
-
-2. **Phase 2 — Field grouping & 2-col grids.**
-   - Introduce fieldset groups + `md:grid-cols-2` inside each step.
-   - Inline validation messages under fields.
-   - Optional: extract steps into `src/components/intake/steps/*` for maintainability.
-
-3. **Phase 3 — Real video wiring (when assets exist).**
-   - Add `intake-step-{n}.mp4` slots in `AdminVideoUpload`.
-   - Pass `storagePath` to `StepVideoPlaceholder`; it delegates to `HeroVideo` when the file exists (reuses the existence-check pattern to avoid 404 noise).
-
-## Open Question
-
-- Confirm scope: redesign **all 5 steps** (Profile, Goals, Structure, Credit & Funding, Program Fit) or only Steps 1–4 excluding "Program Fit"?
+1. **Phase 1 (client-only, low risk):** remove Step 5 from public list, add scroll-to-top, wire centered "Generate My Plan" on Step 4 that runs the existing direct-submit path then auto-triggers `generatePlan`. Ship & verify.
+2. **Phase 2 (server incremental save):** add `mode=direct-draft` endpoint, persist on Next, hydrate on resume. Ship & verify with a fresh browser session.
+3. **Phase 3 (polish):** optional `intake_step_saved` analytics, focus-management on step change, unit-test `validateAllRequired`.
