@@ -50,7 +50,7 @@ serve(async (req) => {
 
     const { data: survey, error: fetchError } = await admin
       .from("intake_surveys")
-      .select("id, access_token, user_id")
+      .select("id, access_token, user_id, contact_email, lead_id")
       .eq("id", intake_id)
       .maybeSingle();
 
@@ -87,6 +87,26 @@ serve(async (req) => {
       .update({ user_id: userId })
       .eq("intake_survey_id", intake_id);
     if (planUpdateError) throw planUpdateError;
+
+    // Also link the originating lead (by explicit lead_id, else by email match)
+    // so the visitor can see their lead record in their dashboard.
+    try {
+      if (survey.lead_id) {
+        await admin
+          .from("leads")
+          .update({ user_id: userId })
+          .eq("id", survey.lead_id)
+          .is("user_id", null);
+      } else if (survey.contact_email) {
+        await admin
+          .from("leads")
+          .update({ user_id: userId })
+          .ilike("email", survey.contact_email)
+          .is("user_id", null);
+      }
+    } catch (linkLeadErr) {
+      console.error("Failed to link lead to user (non-fatal):", linkLeadErr);
+    }
 
     return new Response(JSON.stringify({ ok: true, user_id: userId }), {
       status: 200,
