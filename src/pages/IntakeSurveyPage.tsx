@@ -647,8 +647,9 @@ export default function IntakeSurveyPage() {
     { title: "Goals", key: "B" },
     { title: "Business Structure", key: "C" },
     { title: "Credit & Funding", key: "D" },
-    { title: "Program Fit", key: "E" },
+    ...(ENABLE_PROGRAM_FIT_STEP ? [{ title: "Program Fit", key: "E" }] : []),
   ];
+  const isFinalStep = step === steps.length - 1;
 
   const stepVideoMeta: Record<number, { title: string; description: string }> = {
     0: { title: "Walkthrough: Profile", description: "Jessie explains what production and location details help us tailor your plan." },
@@ -1083,8 +1084,8 @@ export default function IntakeSurveyPage() {
           </Card>
         )}
 
-        {/* Step E */}
-        {step === 4 && (
+        {/* Step E — hidden from public flow; preserved for future/admin use */}
+        {ENABLE_PROGRAM_FIT_STEP && step === 4 && (
           <Card>
             <CardHeader>
               <CardTitle>Program Fit & Support Preferences</CardTitle>
