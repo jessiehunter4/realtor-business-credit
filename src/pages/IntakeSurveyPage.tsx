@@ -405,7 +405,7 @@ export default function IntakeSurveyPage() {
 
   const handleGenerate = async () => {
     const v = validateAllRequired();
-    if (!v.ok) {
+    if (v.ok !== true) {
       toast({ title: "Missing info", description: v.message, variant: "destructive" });
       setStep(v.step);
       return;
