@@ -1,76 +1,115 @@
+## Lead Authentication After Plan Generation
 
-## Goal
-Streamline `/intake` to 4 public steps, ensure scroll-to-top on step change, incrementally auto-save server-side (create record on step 1, update on each step), and replace the final Submit with a centered "Generate My Plan" button that validates → saves → generates → runs the existing preview/portal flow. Preserve Step 5 (Program Fit) code and DB columns for admin/future use.
+Gate the newly generated plan behind account creation. Instead of a "View My Plan" button that navigates straight to the portal, the celebration screen collects a password, provisions a Supabase auth user, links the intake + plan to `user_id`, signs the user in, then redirects to `/portal/plan/:id`.
 
-## 1. Remove Step 5 from public flow (preserve for admin)
+---
 
-- In `src/pages/IntakeSurveyPage.tsx`:
-  - Trim the public `steps` array to 4 entries (Profile, Goals, Business Structure, Credit & Funding). Keep `stepVideoMeta` entries 0–3.
-  - Leave the `{step === 4 && ...}` JSX block AND its imports (`IntakePricingAndReadiness`, `InlinePricingAccordion`) in the file, but wrap it in `{false && ...}` (or an `ENABLE_PROGRAM_FIT_STEP = false` flag) so it's dead-code-eliminated yet trivially re-enabled. No DB / edge function changes.
-  - Progress indicator, "Step X of Y", and sticky footer counter automatically reflect `steps.length = 4`.
-- `AdminIntakeCoachView` and the underlying columns (`preferred_support_format`, `interest_in_cohort`, `preferred_cohort_time_1/2`, `investment_readiness`, `additional_notes`) are untouched. The admin coach view continues to render the Program tab.
-- No changes to `intake-survey` edge function `EDITABLE_SURVEY_FIELDS` — server still accepts those columns if a user is resumed via an admin-issued token that had them set.
+### 1. UX Flow
 
-## 2. Scroll to top on step change
+**Happy path (new user)**
+1. User finishes Step 4 → `Generate My Plan` → loader → celebration screen.
+2. Celebration screen shows: 🎉 heading, plan-ready subtext, then an inline **"Create your account to view your plan"** card:
+   - Email (pre-filled, read-only with a small "Edit" link to reveal an input)
+   - Password (min 8 chars, show/hide toggle)
+   - Confirm Password
+   - Primary button: **View My Plan** (disabled until valid)
+   - Fine print: "By creating an account you agree to Terms & Privacy."
+3. Submit → button spinner "Creating your account…" → auto sign-in → redirect to `/portal/plan/:id`.
 
-- Add a `useEffect([step])` in `IntakeSurveyPage` that calls `window.scrollTo({ top: 0, behavior: "smooth" })` on step change (skip on initial mount).
-- `ScrollMemory` operates on `location.pathname` only, so it won't interfere with same-route step transitions.
-- No changes needed for desktop/tablet/mobile beyond this — the layout is already single-column.
+**Existing user detected** (email already has an auth account)
+- Signup returns "User already registered" (or our pre-check flags it). The form flips into **Sign in** mode: email pre-filled + password + "Forgot password?" link. On success, we link the intake/plan to the returning `user_id` and redirect to `/portal/plan/:id`.
+- If they enter the wrong password, show inline error + "Forgot password?" that calls `resetPasswordForEmail` (redirect `/reset-password`).
 
-## 3. Incremental server-side auto-save (direct mode)
+**Edge cases**
+- Password mismatch / too short → inline field errors, button stays disabled.
+- Network / Supabase error → non-blocking toast + retry; celebration card is not dismissed.
+- User closes tab before creating account: plan still exists in DB (public-read policy already permits `status='published'` access via `/portal/plan/:id`), and the intake row keeps its `access_token` so they can resume. We also email them the portal link (out of scope for this plan — flagged as follow-up).
+- Confetti fires once on mount; the auth card is not part of the `aria-live` region so screen readers hear celebration then focus moves to the email/password form.
 
-Today direct mode only saves to `localStorage` until final submit. Move to server-persisted incremental save so users can resume from any device.
+**Placement & responsiveness**
+- Auth form lives inside the same `Card` as the celebration, below the CTA row. Single column, `max-w-xl`. On mobile: full-width inputs, larger tap targets, sticky primary button at bottom of card.
+- Accessibility: labels for every input, `aria-invalid` on errors, focus moves to first invalid field, password strength hint uses `aria-describedby`.
 
-- Add a POST `mode=direct-draft` branch to `supabase/functions/intake-survey/index.ts`:
-  - Body: `{ intake_id?, ...editable fields }`.
-  - If no `intake_id`: require `contact_email`, insert a new `intake_surveys` row with `filled_by: "self"`, `status: "in_progress"`, return `{ id, access_token }`.
-  - If `intake_id`: update the row by id (still `status: "in_progress"`), no `submitted_at`.
-  - Reuse existing `pickEditableSurveyFields` — no field allowlist changes.
-- Client changes in `IntakeSurveyPage.tsx`:
-  - Track `intakeId` + `intakeToken` (already state) as the persisted record identity.
-  - On the "Next" button click AND on step-index change, call a `persistStep()` helper:
-    - If `!intakeId` and `contact_email` present → POST `mode=direct-draft` to create; store returned `id` and `access_token` in state and `localStorage` (existing draft key extended to include `{intake_id, access_token, form}`).
-    - If `intakeId` → POST `mode=direct-draft` with `intake_id` to patch.
-    - Failure: keep local draft, show a subtle "Saved locally — will retry" toast; do not block navigation.
-  - Keep the existing debounced localStorage save as a background safety net.
-  - On mount: if the stored draft contains `intake_id` + `access_token`, prefer server hydration (`GET ?token=...`) and reuse that token; falls back to local form if the row is missing.
-- Token-mode (admin-issued link) is unchanged — it already PUTs on every debounce.
-- Duplicate prevention: identity is the row `id` in draft storage; we never insert twice because subsequent saves carry `intake_id`. If a user clears storage and re-starts, we create a fresh row (acceptable; admin can dedupe by email later — same as today).
+---
 
-## 4. "Generate My Plan" on Step 4
+### 2. Technical Architecture
 
-Replace the current two-stage flow (Submit → then PlanPreviewCard) with a single centered CTA on Step 4:
+**Auth**
+- Enable email/password sign-up via `supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } })`.
+- Auto-confirm: **do NOT enable** by default — but for this flow we need the user signed in immediately without an email click. Recommendation: enable `auto_confirm_email = true` for this project so signup returns a session synchronously. (Call this out for user approval; it's the standard trade-off for instant-access post-generation flows.)
+- Google OAuth: add as a secondary "Continue with Google" button (project standard). Handled the same way — after sign-in, run the linking step.
 
-- Add a `validateAllRequired()` that checks: `first_name`, `last_name`, `contact_email` (email regex), and `primary_goals.length >= 1`. On failure, jump to the first failing step and toast the missing field.
-- New button on Step 4 (centered, primary, large), label "Generate My Plan → ", replacing the current sticky footer "Submit". Sticky footer on Step 4 shows only "Previous"; primary CTA lives inside the card for visibility.
-- Handler `handleGenerate()`:
-  1. Run `validateAllRequired()`.
-  2. Call `persistStep()` and wait — this now sends the FINAL PUT with `status: "submitted"` and `submitted_at` (add a `finalize: true` flag to the `mode=direct-draft` endpoint, or reuse the existing direct-submit path when finalizing). Result must include `{ id, access_token }`.
-  3. Set `submitted = true`, `intakeId`, `intakeToken`.
-  4. Fire `intake_submitted` funnel event + GHL tag (same as today).
-  5. Immediately call `generatePlan({ intakeSurveyId, intakeToken, source: "user" })` — skip the manual `PlanPreviewCard` click, going straight to `PlanGenerationLoader` → `PlanSuccessCelebration` → `View My Plan` → `/portal/plan/:id`. Existing error card + retry stays.
-- The `PlanPreviewCard` component remains available for token/admin flows; for the direct public flow we bypass it. (If you want to keep an "explanation" moment, we can leave PlanPreviewCard rendered for ~800ms before auto-clicking — flag as optional.)
+**Linking intake + plan to `user_id`**
+- Both `custom_plans` and `intake_surveys` already have a `user_id uuid` column with a `Users can view own …` SELECT policy.
+- Add a new edge function `link-intake-to-user` (verify_jwt=true) that:
+  1. Reads caller from JWT.
+  2. Accepts `{ intake_id, access_token }`.
+  3. Verifies `access_token` matches the intake row (proves the caller "owns" this anonymous submission).
+  4. Uses service role to `UPDATE intake_surveys SET user_id = <caller>` and `UPDATE custom_plans SET user_id = <caller> WHERE intake_survey_id = <intake_id>`.
+  5. Also patches `profiles` (first/last/phone from intake) via the existing `handle_new_user` trigger — no schema change needed; the trigger already inserts a profile row on signup from `raw_user_meta_data`, so we pass first/last/phone in `signUp` options.
+- Client-side path used because we need to run as the signed-in user *and* atomically link — an edge function is safer than trusting client updates.
 
-## 5. Impact review
+**Existing user detection**
+- Simplest: attempt `signUp`; Supabase returns an error string containing "already registered" → flip UI to sign-in mode. No separate lookup (avoids user enumeration).
+- After successful `signInWithPassword`, run the same linking function (it's idempotent — re-linking to the same user_id is a no-op).
 
-- `usePlanGeneration`, `generate-plan` edge function, `log-funnel-event`: no changes.
-- `AdminIntakeCoachView`: unchanged (still shows all 5 tabs).
-- `AdminIntakeList`, RLS, `custom_plans`, `plan_task_progress`: unchanged.
-- Analytics: same event types (`intake_started`, `intake_submitted`, `plan_generation_started/succeeded/failed`, `intake_session`). Add an optional `intake_step_saved` metadata event per step (nice-to-have; skip if we want zero new event types).
-- Accessibility: focus first heading on step change alongside scroll-to-top; retain existing `aria-label`s.
-- Mobile: sticky bottom bar stays; on Step 4 the bar hides its primary action and the inline CTA takes over (avoids double-primary).
+**Route protection**
+- `/portal/plan/:id` currently allows anonymous reads for `status='published'`. Keep as-is (accounts don't break anonymous links we already emailed). Optional follow-up: add a `requireAuth` variant later.
 
-## Technical section
+**State machine (celebration screen)**
+- Local `authState`: `"idle" | "signup" | "signin" | "submitting" | "linking" | "done" | "error"`.
+- On success → `navigate('/portal/plan/:id')` (drop token from URL since the user is now authenticated).
 
-- Files touched:
-  - `src/pages/IntakeSurveyPage.tsx` — steps array trim, scroll effect, persistStep helper, handleGenerate, Step 4 CTA, feature-flag Step E block.
-  - `supabase/functions/intake-survey/index.ts` — add `mode=direct-draft` POST handling (create or update by id) and a `finalize` flag that sets `status: "submitted"` + `submitted_at`.
-  - `src/components/intake/PlanPreviewCard.tsx` — no code change; usage becomes optional.
-- Draft storage key: bump to `rbc_intake_draft_v3` with shape `{ intake_id, access_token, form }`; migrate v2 by treating it as form-only.
-- Rollback: flip `ENABLE_PROGRAM_FIT_STEP = true` to restore Step 5 publicly; delete the `mode=direct-draft` branch to revert to submit-only.
+---
 
-## Phasing
+### 3. Database Impact
 
-1. **Phase 1 (client-only, low risk):** remove Step 5 from public list, add scroll-to-top, wire centered "Generate My Plan" on Step 4 that runs the existing direct-submit path then auto-triggers `generatePlan`. Ship & verify.
-2. **Phase 2 (server incremental save):** add `mode=direct-draft` endpoint, persist on Next, hydrate on resume. Ship & verify with a fresh browser session.
-3. **Phase 3 (polish):** optional `intake_step_saved` analytics, focus-management on step change, unit-test `validateAllRequired`.
+No schema migrations required — `user_id` columns and RLS policies already exist on `intake_surveys` and `custom_plans`. `profiles` auto-populates via `handle_new_user`.
+
+**Auth settings change** (via `supabase--configure_auth`):
+- `auto_confirm_email: true` (needs user approval)
+- `password_hibp_enabled: true` (best practice)
+- Leave `disable_signup: false`
+
+---
+
+### 4. Files to Change
+
+**New**
+- `supabase/functions/link-intake-to-user/index.ts` — links intake + plan to caller.
+- `src/components/intake/PostPlanAuthCard.tsx` — email/password form with signup ↔ signin toggle, validation, submit.
+
+**Modified**
+- `src/components/intake/PlanSuccessCelebration.tsx` — replace CTA row with `<PostPlanAuthCard />`; keep confetti + heading unchanged.
+- `src/pages/IntakeSurveyPage.tsx` — pass `intakeId`, `intakeToken`, `contactEmail`, and post-auth navigation into the celebration.
+- `supabase/config.toml` — register new function with `verify_jwt = true`.
+- One-shot `configure_auth` call to enable auto-confirm + HIBP.
+
+**Not touched**
+- Existing `/auth` page, `ProtectedRoute`, portal view, RLS policies.
+
+---
+
+### 5. Phased Rollout
+
+**Phase 1 — Backend prep**
+- Deploy `link-intake-to-user` edge function.
+- Call `configure_auth` (auto-confirm + HIBP).
+
+**Phase 2 — UI**
+- Build `PostPlanAuthCard` (signup mode only, with inline "already have an account? Sign in" toggle).
+- Wire it into `PlanSuccessCelebration`; celebration owns the confetti, card owns the form + submit.
+- On success → link function → `navigate('/portal/plan/:id')`.
+
+**Phase 3 — Polish**
+- Error copy, password strength meter, "Forgot password?" link → `resetPasswordForEmail`.
+- Analytics: `auth_signup_started`, `auth_signup_succeeded`, `auth_signin_from_celebration`, `plan_linked_to_user` (add to `log-funnel-event` allowlist).
+- Optional Google button.
+
+---
+
+### 6. Open Questions
+
+1. **Auto-confirm email**: OK to enable so the user is signed in instantly after signup? (Alternative: send a magic-link and keep the plan link accessible without account until they confirm.)
+2. **Google sign-in on this screen**: include now or Phase 3?
+3. **Hard gate vs soft gate**: should we keep a "Skip for now — email me the link" escape hatch, or fully require account creation before viewing? (Recommend hard gate per your spec.)
