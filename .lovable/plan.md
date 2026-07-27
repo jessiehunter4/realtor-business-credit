@@ -1,191 +1,208 @@
-## Visitor Dashboard Onboarding — Implementation Plan
+# RBAC Implementation Plan — Admin vs Visitor
 
-Turn the current UI-only `/mock-dashboard` into a real, auth-gated `/dashboard` that becomes the landing surface immediately after a visitor generates their plan and creates an account. Prioritize the personalized plan, add a one-time welcome experience, and drive all metrics from real intake + plan data.
+Goal: cleanly separate Admin and Visitor (Lead) authentication and authorization on top of Supabase Auth, using the existing `user_roles` table and `has_role()` security-definer function. No shared dashboards, no cross-role access, no client-tamperable role checks.
 
 ---
 
-### 1. End-to-End User Journey
+## 1. Security Review — Current State
 
+Findings from the existing codebase:
+
+- One shared `ProtectedRoute` gates `/admin`, `/admin/*`, and `/dashboard` on **session only** — any authenticated user can reach every admin page today.
+- `/auth` (AuthPage) is the only real login and is used by admins; `/mock-login` is a UI-only stub that navigates to `/mock-dashboard` with no Supabase call.
+- `user_roles` table + `has_role(uuid, app_role)` exist and are used by some table RLS, but the **frontend never checks role** before rendering admin pages.
+- Edge functions (`generate-plan`, `intake-survey`, `link-intake-to-user`, `setup-admin`, `test-ghl-connection`) — only `setup-admin` and `test-ghl-connection` verify the caller; other admin-adjacent functions rely on RLS. Needs an audit pass to confirm no admin-only mutations are reachable by a visitor JWT.
+- No "Unauthorized" page; role tampering in `localStorage`/client state would currently be irrelevant only because the client never reads role — but this becomes critical the moment we branch UI by role.
+- After login, both roles land at whatever page they came from; no role-based post-login routing.
+
+Concrete risks to eliminate:
+
+1. Visitor JWT hitting `/admin` and reading data via any table whose RLS is not admin-gated.
+2. Admin accidentally landing on `/dashboard` and seeing a broken/empty visitor view.
+3. Client-side role flags (localStorage, context) being trusted for gating — must always re-derive from Supabase.
+4. Edge functions that assume "if you have a JWT you're allowed" — need explicit `has_role` checks for admin actions.
+5. Direct-URL navigation to protected routes (fixed by role-aware guards, not just session guards).
+
+---
+
+## 2. Authentication Architecture
+
+Two login surfaces, one Supabase Auth backend, one role source of truth.
+
+```text
+                 ┌──────────────────────┐
+   Visitors ───▶ │  /mock-login (real)  │ ─┐
+                 └──────────────────────┘  │
+                                           ▼
+                                    Supabase Auth
+                                           ▲
+                 ┌──────────────────────┐  │
+   Admins   ───▶ │   /auth (existing)   │ ─┘
+                 └──────────────────────┘
+                            │
+                            ▼
+                 useAuthRole() reads
+                 public.user_roles via
+                 has_role() (server-trusted)
+                            │
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+     role = 'admin' → /admin      role = 'user' → /dashboard
 ```
-/intake  →  Generate Plan  →  PostPlanAuthCard (signup)
-                          →  link-intake-to-user (stamps user_id)
-                          →  /dashboard?firstLogin=1  (NOT /portal/plan/:id)
-                                    ↓
-                          Welcome modal + video (first time only)
-                                    ↓
-                          Dashboard with "View Your Plan" hero card
-                                    ↓ (click)
-                          /portal/plan/:id  (in-app, Back-to-Dashboard bar)
-```
 
-Change from today: after `PostPlanAuthCard` succeeds, redirect to `/dashboard` (not straight to the plan). The plan becomes the top CTA on the dashboard.
+Key decisions:
+
+- **Single Supabase project, single `auth.users` table.** Role is stored only in `public.user_roles` (already the case). Never on `profiles`, never in JWT claims we mint ourselves, never in `localStorage`.
+- `/mock-login` becomes a **real** email/password login (same Supabase call as `/auth`), but branded for visitors and hard-wired to redirect to `/dashboard`. Keeping the URL means we can later swap the visual/flow without route churn. When production visitor auth is ready, this page is what ships — no route rename needed.
+- `/auth` stays the admin login. Post-login it routes to `/admin` if the user has admin role, otherwise it signs them back out with an error ("This login is for administrators. Please use the visitor login.") to prevent admins-only pages from ever rendering for a non-admin.
+- Signup on `/mock-login` creates a user with **no role row** — visitor is the implicit default (absence of admin). Admin role is only granted via the existing `setup-admin` edge function or a direct DB insert.
 
 ---
 
-### 2. First-Time vs Returning Login
+## 3. Authorization Strategy
 
-Track first login on the `profiles` table (server-side, single source of truth):
-- `onboarding_completed_at timestamptz null`
-- `welcome_video_viewed_at timestamptz null`
+Server-trusted, cached on the client for UX only.
 
-Rules:
-- If `onboarding_completed_at IS NULL` on dashboard mount → open Welcome dialog automatically with intro video, "Take the tour" CTA, and "Skip for now" link. Closing sets `onboarding_completed_at = now()`.
-- If not null → dashboard renders normally with a persistent "Watch welcome video" button in the header menu that reopens the same dialog.
-- `?firstLogin=1` query param is a hint only — the DB flag is authoritative to survive re-installs and multi-device.
-
-Welcome video source: reuse `HeroVideo` component with a new storage path (`welcome-dashboard.mp4`) in the existing `site-videos` bucket. Uploadable from `/admin/video-upload`.
+- **Source of truth:** `public.user_roles` + `has_role(auth.uid(), 'admin')`. RLS on every admin-only table already routes through this.
+- **Client hook:** new `useAuthRole()` returns `{ session, role: 'admin' | 'user' | null, loading }`. It calls `supabase.from('user_roles').select('role').eq('user_id', uid)` on every auth state change. Cached in a React context so we don't refetch per component.
+- **No JWT custom claims** for role in this phase — avoids a signing-key migration and keeps the model simple. If we later need per-request role in edge functions without a DB roundtrip, we add a claim then.
+- **Edge functions** that perform admin actions call `has_role(user.id, 'admin')` (or select from `user_roles`) via the service role client before proceeding. Any function that mutates cross-user data must do this.
 
 ---
 
-### 3. Dashboard Information Architecture
+## 4. Route Protection Plan
 
-Reorganize `MockDashboardPage` around the plan. New top-to-bottom order:
+Replace the single `ProtectedRoute` with three composable guards:
 
-1. **Header** — greeting + avatar + "Watch welcome video" + Log out.
-2. **Plan Hero Card** (new, replaces current KPI row as visual anchor):
-   - Title of user's plan, recommended program, generated date.
-   - Big "View Your Plan" primary button → `/portal/plan/:id`.
-   - Secondary "Download PDF".
-3. **KPI strip** — driven by real plan/task data (see §5).
-4. **Next Action** card — first uncompleted task from `plan_task_progress`.
-5. **Roadmap stepper** — from `plan_data.roadmap` phases.
-6. **Two-column**: Upcoming tasks | Fundability radial.
-7. **Recommendations** — from `plan_data.recommendations`.
-8. **Recent activity** — from `funnel_events` filtered to this user.
-9. Tabs (Overview / My Plan / 90-Day / Goals / Guides / Purchases) stay, but Overview is what loads.
+- `<RequireAuth>` — session required, role-agnostic (used for `/dashboard` and any future visitor-only route).
+- `<RequireAdmin>` — session required AND `role === 'admin'`. Non-admins → `/unauthorized`.
+- `<RequireVisitor>` — session required AND `role !== 'admin'`. Admins → `/admin` (silent redirect, not an error — admins landing here is a bookmark mistake, not an attack).
 
-Mobile: single column, sticky tab bar, KPIs collapse to 2×2, hero card full width.
+Route map after change:
 
----
+| Route | Guard | Notes |
+|---|---|---|
+| `/` `/guide` `/about` `/pricing` `/one-on-one` `/intake` `/checkout` `/booking-confirmed` `/sample-plan` `/business-credit-cards-for-realtors` `/privacy` `/terms` | none | public |
+| `/auth` | none | admin login; redirects admins to `/admin`, signs out non-admins with message |
+| `/mock-login` | none | visitor login; redirects visitors to `/dashboard`, admins to `/admin` |
+| `/admin`, `/admin/*` | `RequireAdmin` | includes mls-import, video-upload, intake list/coach, plan view |
+| `/dashboard` | `RequireVisitor` | |
+| `/portal/plan/:id` | `RequireAuth` + row-level check | plan owner OR admin; already RLS-scoped, add UI check |
+| `/mock-dashboard` | none for now | UI-only mock; leave until phase 4 removes it |
+| `/unauthorized` | none | new page |
+| `*` | none | NotFound |
 
-### 4. Plan Viewing Experience
-
-Keep `/portal/plan/:id` in the same window. Add:
-- Sticky top bar: "← Back to Dashboard" + plan title + Download PDF.
-- Bottom footer bar: same "← Back to Dashboard" button.
-- When arriving from `/dashboard`, preserve scroll on return via existing `ScrollMemory`.
-- Remove any `target="_blank"` on plan links from the dashboard.
+`SiteHeader` becomes role-aware: unauthenticated shows "Log in" (→ `/mock-login`) + "Start Here"; visitor shows "Dashboard" + "Sign out"; admin shows "Admin" + "Sign out". No admin link is ever shown to a visitor.
 
 ---
 
-### 5. Dashboard Data Model — Real, Not Mock
+## 5. Database Impact
 
-Replace `src/data/mockDashboard.ts` usage with data fetched from:
+Minimal — the schema already fits.
 
-| Widget | Source |
-|---|---|
-| Greeting name | `profiles.first_name` |
-| Plan hero | `custom_plans` for `user_id = auth.uid()`, latest published |
-| Recommended program | `custom_plans.recommended_program_slug` + `programs` |
-| 90-day checklist | `plan_task_progress` joined to plan; falls back to `plan_data.action_plan` |
-| Overall progress % | completed tasks / total tasks |
-| Fundability score | derived from intake_surveys structure fields (existing status logic in `PlanDocument`) |
-| Goals | `intake_surveys.primary_goals` + plan roadmap |
-| Recommendations | `plan_data.recommendations` |
-| Recent activity | `funnel_events` where `lead_id/user_id` matches |
-| Purchases | placeholder now; schema-ready for future Stripe |
+- **Keep:** `user_roles`, `app_role` enum (`admin`, `user`), `has_role()`.
+- **No new columns on `profiles`.** Role stays out of profiles to prevent privilege escalation.
+- **New (optional, phase 2):** `public.assign_default_visitor_role()` trigger on `auth.users` insert. Decision: **skip** — absence of an admin row already means "visitor", and adding a `user` row for every signup is noise. Document this convention.
+- **RLS audit pass:** for every `public.*` table, confirm policies either (a) scope by `auth.uid()`, or (b) require `has_role(auth.uid(), 'admin')`. Tables to double-check based on current schema: `agents`, `transactions`, `import_batches`, `contact_syncs`, `opt_outs`, `funnel_events`, `app_settings`, `programs`, `intake_coach_notes`. Any table intended as admin-only must have its `authenticated` policies rewritten to require admin.
+- **Grants audit:** confirm every `public` table has explicit `GRANT`s matching its policies (per project rule).
 
-**Recommended primary metrics** (highest value, low effort):
-- 90-day plan completion %
-- Fundability status (Strong / Warning / Missing counts)
-- Next action due
-- Days since plan generated
-
-Defer for later: business credit score trend, funding readiness composite (needs more data captured over time).
+Deliverable: a single migration that (1) tightens any admin-only table policies to `has_role(auth.uid(), 'admin')`, (2) removes any lingering broad `authenticated` grants on admin-only tables. Exact policy diffs produced after the RLS audit in Phase 2.
 
 ---
 
-### 6. Auth & Data Architecture Changes
+## 6. Edge Function Hardening
 
-**RLS / policies — already in place:**
-- `custom_plans`: "Users can view own custom plans" (`auth.uid() = user_id`) ✓
-- `intake_surveys`: "Users can view own intake surveys" ✓
-- `profiles`: user can select/update own ✓
+For each function, add an admin check where applicable:
 
-**New work:**
-- Add columns to `profiles`: `onboarding_completed_at`, `welcome_video_viewed_at`, `last_login_at`.
-- Add RLS policy on `plan_task_progress` for `authenticated` users to select/update rows where the parent `custom_plans.user_id = auth.uid()` (currently only public-for-published-plans + admin).
-- Add RLS SELECT on `funnel_events` for `authenticated` where `lead_id` maps to the user (via a security-definer helper, since `funnel_events` doesn't have `user_id`).
-- Wrap `/dashboard` in `ProtectedRoute` (already exists).
-- Add `/dashboard` route to `App.tsx`; keep `/mock-dashboard` for internal previews or remove.
-- Post-auth redirect in `PostPlanAuthCard.onAuthenticated` → `/dashboard?firstLogin=1` instead of `/portal/plan/:id`.
-- Session: rely on existing `onAuthStateChange` + `getSession()` pattern in `ProtectedRoute`.
+- `process-mls-import`, `list-ghl-appointments`, `sync-to-ghl`, `tag-ghl-contact`, `test-ghl-connection`, `setup-admin` → **require admin**.
+- `generate-plan`, `intake-survey`, `link-intake-to-user`, `submit-lead`, `log-funnel-event` → keep current auth model (public or user-scoped); confirm they can't be coerced into cross-user writes.
 
-**Session lifecycle:**
-- Add a lightweight `AuthProvider` context so dashboard, header, and plan view all share session + profile without refetching.
-- On sign-out from dashboard → navigate to `/`.
+Shared helper: small `requireAdmin(req)` util that resolves the user from the bearer token and checks `user_roles`. Returns 401/403 with consistent shape.
 
 ---
 
-### 7. Loading / Error / Empty States
+## 7. UX Recommendations
 
-- Dashboard skeleton with card placeholders during initial fetch.
-- If user has auth but no linked plan (edge case): show "Finish your intake" empty state linking to `/intake`.
-- If plan fetch fails: inline retry, don't block the whole dashboard.
-- Welcome video: graceful fallback if the storage file isn't uploaded yet (skip auto-open, hide "Watch welcome video" button).
-
----
-
-### 8. UX / Accessibility / Performance / Future
-
-- Welcome dialog: focus-trap, ESC to close, `role="dialog"` `aria-labelledby`, closes flagged on any dismissal.
-- All KPI numbers announced with `aria-live="polite"` when they change.
-- Prefetch plan data on hover of "View Your Plan" using React Query.
-- Code-split `/portal/plan/:id` and PDF renderer (already heavy).
-- Future-proof: dashboard sections read from a `useDashboardData()` hook so new modules (Stripe purchases, cohort schedule, credit monitor) plug in without page-level changes.
+- **Two distinct login pages** with different visual treatments so admins can't confuse them: `/auth` = compact admin form with an "Admin sign-in" heading; `/mock-login` = branded visitor sign-in/sign-up with "Log in to your dashboard".
+- **Post-login redirect:** always role-aware. If a user arrived via a `?next=` param, honor it only if their role is allowed for that path — otherwise send them to their role's home.
+- **`/unauthorized` page:** friendly copy, one primary CTA ("Go to my dashboard" for visitors, "Go to admin" for admins), and a "Sign out" link. No leak of what the protected page contained.
+- **Header:** never render an "Admin" link for non-admins, even hidden — the DOM is inspectable and it's a bad signal.
+- **Error messaging on wrong-portal login:** "This account isn't an admin. Redirecting you to your dashboard…" and auto-redirect after 2s, so visitors who mistakenly hit `/auth` aren't stranded.
+- **Future-proofing:** the `useAuthRole()` hook returns `role` as a string so adding `coach`, `partner`, etc. is a matter of extending the enum + guards. Guards accept an array (`<RequireRole roles={['admin','coach']}>`) so composition scales.
 
 ---
 
-### 9. Phased Delivery
+## 8. Phased Implementation
 
-**Phase 1 — Auth Redirect + Real Dashboard Route (small)**
-- Add `/dashboard` route + `ProtectedRoute`.
-- Repoint `PostPlanAuthCard` redirect to `/dashboard?firstLogin=1`.
-- Copy `MockDashboardPage` → `DashboardPage`; keep mock imports temporarily.
-- Add sign-out wired to real Supabase.
+Each phase is independently shippable and testable.
 
-**Phase 2 — Profiles Onboarding Flags + Welcome Modal (small)**
-- Migration: add `onboarding_completed_at`, `welcome_video_viewed_at` to `profiles`.
-- Build `WelcomeDialog` with `HeroVideo` (storage path `welcome-dashboard.mp4`).
-- Auto-open on first login; persistent "Watch welcome video" button after.
+### Phase 1 — Foundations (low risk)
 
-**Phase 3 — Plan Hero + In-App Plan Viewing (medium)**
-- New `PlanHeroCard` at top of dashboard.
-- Add Back-to-Dashboard bars (top + bottom) to `PortalPlanView`.
-- Ensure all plan links are same-window.
+Scope:
+- Add `src/hooks/useAuthRole.ts` and `AuthRoleProvider` context.
+- Add `src/components/auth/RequireAuth.tsx`, `RequireAdmin.tsx`, `RequireVisitor.tsx`.
+- Add `src/pages/UnauthorizedPage.tsx` and route.
+- Refactor `App.tsx` to use the new guards (drop-in swap for `ProtectedRoute` on `/admin/*` and `/dashboard`).
+- Header shows correct links per role.
 
-**Phase 4 — Real Data Wiring (medium/large)**
-- `useDashboardData()` hook: fetch profile, plan, task progress, recommendations, activity.
-- Replace mock arrays in KPIs, Next Action, Checklist, Goals, Recommendations, Activity.
-- Add RLS policy for authenticated `plan_task_progress` access.
-- Keep `mockDashboard.ts` only for `/mock-dashboard` preview route.
+Dependencies: none.
+Risk: low — behavior for existing admins unchanged if they already have the admin role row.
+Tests: manual — admin can still reach every `/admin/*` page; a fresh visitor account is redirected from `/admin` to `/unauthorized`.
+Complexity: **S**.
 
-**Phase 5 — Polish (small)**
-- Skeletons, empty states, retry, prefetch on hover.
-- A11y pass, mobile QA, Lighthouse pass.
+### Phase 2 — Real visitor login + role-aware post-login routing
 
-**Dependencies:** Phase 2 needs Phase 1. Phase 4 needs Phase 3 (plan hero). Phase 5 runs last.
+Scope:
+- Convert `/mock-login` to a real Supabase email/password sign-in + sign-up (mirroring `/auth`), branded for visitors.
+- `/auth` gains a post-login check: non-admins are signed out with a friendly message and pointed to `/mock-login`.
+- Both pages redirect based on role after success.
+- Update `PostPlanAuthCard` redirect target to `/dashboard` (already does) and confirm the new visitor flow works end-to-end.
+- Delete `/mock-dashboard` route + page once `/dashboard` covers the same ground (already true).
+
+Dependencies: Phase 1.
+Risk: medium — touches the intake→auth→dashboard funnel. Regression test the full path.
+Tests: signup as new visitor from intake completion; sign in on `/mock-login`; try `/admin` (should bounce); try `/auth` with visitor creds (should refuse + redirect).
+Complexity: **M**.
+
+### Phase 3 — RLS + Edge function hardening
+
+Scope:
+- RLS audit migration for admin-only tables (see §5).
+- `requireAdmin` helper in `supabase/functions/_shared/` (create dir) and applied to admin-only functions (see §6).
+- Grants audit and fix.
+
+Dependencies: Phase 1 (so we can validate behavior with a real visitor account).
+Risk: medium-high — a wrong RLS tighten can lock admins out. Ship migration + code in same turn and smoke-test admin dashboard immediately.
+Tests: as a visitor JWT, hit each admin edge function → 403; select from each admin-only table via anon+JWT → empty/denied; as admin, everything still works.
+Complexity: **M**.
+
+### Phase 4 — UX polish + future-proofing
+
+Scope:
+- `<RequireRole roles={[...]}>` generic guard replacing the two specific ones.
+- `?next=` support in both login pages with role validation.
+- Loading skeletons on guards (avoid layout flash).
+- Docs note in `README` describing how to grant admin role and the RBAC model.
+
+Dependencies: Phase 1–3.
+Risk: low.
+Complexity: **S**.
 
 ---
 
-### 10. Risks & Testing
+## 9. Testing Recommendations
 
-Risks:
-- `funnel_events` has no `user_id` → activity feed needs a mapping via `leads`/`profiles` or a new `user_id` column (add in Phase 4 if needed).
-- Users with intakes not linked (`user_id` NULL) will land on an empty dashboard — mitigated by the "Finish your intake" empty state and by the existing `link-intake-to-user` flow.
-- Auto-open dialog on tab-switch back could annoy — use one-shot flag, not URL-based.
-
-Testing:
-- Playwright script: complete `/intake` → sign up → verify redirect to `/dashboard` → welcome dialog appears once → reload → dialog does NOT appear → click View Plan → Back to Dashboard preserves scroll.
-- SQL check: `profiles.onboarding_completed_at` set after first dismissal.
-- RLS: attempt to read another user's plan/tasks as anon and as another authenticated user — must fail.
-- Mobile viewport 375px screenshot check on dashboard hero + checklist.
+- **Matrix test:** for each of {anonymous, visitor, admin} × each protected route, verify expected outcome (allow / redirect-to-login / redirect-to-unauthorized / redirect-to-role-home).
+- **Edge function matrix:** same three principals × each function, verify 200/401/403.
+- **Session edge cases:** expired token, refreshed token mid-session, role revoked mid-session (guard should re-check on next navigation).
+- **Direct URL entry:** paste `/admin/mls-import` as a visitor → `/unauthorized`; paste `/dashboard` as an admin → `/admin`.
+- **Regression:** intake survey → generate plan → sign up → `/dashboard` → open plan → back to dashboard.
 
 ---
 
-### Technical details (for the engineer)
+## 10. Out of Scope (called out intentionally)
 
-- Files to add: `src/pages/DashboardPage.tsx`, `src/components/dashboard/PlanHeroCard.tsx`, `src/components/dashboard/WelcomeDialog.tsx`, `src/hooks/useDashboardData.ts`, `src/hooks/useAuthProfile.ts`.
-- Files to edit: `src/App.tsx` (add route), `src/components/intake/PostPlanAuthCard.tsx` (change `onAuthenticated` redirect target), `src/pages/PortalPlanView.tsx` (Back bars), `src/components/shared/SiteHeader.tsx` (Watch welcome video + Sign out when authed).
-- Migration: add profile columns + new policy on `plan_task_progress` for authenticated owners (with matching GRANTs already present).
-- Storage: upload `welcome-dashboard.mp4` via `/admin/video-upload` (no code change needed there).
+- OAuth providers, magic links, MFA — additive later; the guard architecture is provider-agnostic.
+- Custom JWT claims for role — deferred until we hit a real perf/DX need.
+- Per-resource ACLs (e.g. sharing a plan with a co-agent) — separate feature.
+- Migrating `/mock-login` to a new URL — deliberately keeping the path stable so production cutover is a copy change, not a routing change.
