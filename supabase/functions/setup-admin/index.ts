@@ -58,7 +58,9 @@ serve(async (req) => {
       );
     }
 
-    // Assign admin role
+    // Assign admin role. This function may be invoked more than once during
+    // auth state hydration, so duplicate-key conflicts are a successful,
+    // idempotent outcome rather than a runtime failure.
     const { error: insertError } = await supabaseClient
       .from('user_roles')
       .insert({
@@ -67,6 +69,17 @@ serve(async (req) => {
       });
 
     if (insertError) {
+      if (insertError.code === '23505') {
+        console.log(`Admin role already exists for ${user.email}`);
+        return new Response(
+          JSON.stringify({ 
+            message: 'User already has admin role',
+            user: { email: user.email, id: user.id }
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       console.error('Error assigning admin role:', insertError);
       return new Response(
         JSON.stringify({ error: 'Failed to assign admin role', details: insertError.message }),
