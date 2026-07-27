@@ -4,6 +4,8 @@ import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/logo.png.asset.json";
+import { useAuthRole } from "@/hooks/useAuthRole";
+import { supabase } from "@/integrations/supabase/client";
 
 const navLinks = [
   { to: "/guide", label: "Guide" },
@@ -16,6 +18,14 @@ const navLinks = [
 
 const SiteHeader = () => {
   const [open, setOpen] = useState(false);
+  const { session, role } = useAuthRole();
+  const isAdmin = role === "admin";
+  const authedHome = isAdmin ? "/admin" : "/dashboard";
+  const authedLabel = isAdmin ? "Admin" : "Dashboard";
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
@@ -46,19 +56,38 @@ const SiteHeader = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <Link
-            to="/auth"
-            className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            to="/one-on-one"
-            data-analytics-id="cta-start-here-header"
-            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
-          >
-            Start Here
-          </Link>
+          {session ? (
+            <>
+              <Link
+                to={authedHome}
+                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+              >
+                {authedLabel}
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/mock-login"
+                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/one-on-one"
+                data-analytics-id="cta-start-here-header"
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
+              >
+                Start Here
+              </Link>
+            </>
+          )}
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
@@ -87,22 +116,43 @@ const SiteHeader = () => {
               ))}
             </nav>
             <div className="mt-auto flex flex-col gap-2">
-              <SheetClose asChild>
-                <Link
-                  to="/auth"
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
-                >
-                  Log in
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link
-                  to="/one-on-one"
-                  className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
-                >
-                  Start Here
-                </Link>
-              </SheetClose>
+              {session ? (
+                <>
+                  <SheetClose asChild>
+                    <Link
+                      to={authedHome}
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
+                    >
+                      {authedLabel}
+                    </Link>
+                  </SheetClose>
+                  <button
+                    onClick={handleSignOut}
+                    className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <SheetClose asChild>
+                    <Link
+                      to="/mock-login"
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
+                    >
+                      Log in
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/one-on-one"
+                      className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+                    >
+                      Start Here
+                    </Link>
+                  </SheetClose>
+                </>
+              )}
             </div>
           </SheetContent>
         </Sheet>
