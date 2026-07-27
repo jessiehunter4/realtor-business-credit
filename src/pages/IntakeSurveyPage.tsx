@@ -1191,7 +1191,26 @@ export default function IntakeSurveyPage() {
           </Card>
         )}
 
-        {/* Navigation */}
+        {/* Final-step centered CTA */}
+        {isFinalStep && (
+          <div className="max-w-3xl mx-auto pt-2 pb-4 text-center space-y-3">
+            <Button
+              size="lg"
+              onClick={handleGenerate}
+              disabled={submitting}
+              className="h-14 px-10 text-base font-semibold"
+            >
+              {submitting ? (
+                <><Loader2 className="h-5 w-5 animate-spin mr-2" /> Preparing your plan…</>
+              ) : (
+                <>Generate My Plan →</>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              We'll save your answers and generate your personalized plan in about 20–40 seconds.
+            </p>
+          </div>
+        )}
           </div>
         </div>
 
@@ -1206,12 +1225,8 @@ export default function IntakeSurveyPage() {
             {autosaveStatus === "saving" ? "Saving…" : autosaveStatus === "saved" ? "Saved" : `Step ${step + 1} of ${steps.length}`}
           </div>
           <div className="flex gap-2">
-            {step < steps.length - 1 ? (
-              <Button onClick={() => setStep(s => s + 1)}>Next</Button>
-            ) : (
-              <Button onClick={handleSubmit} disabled={submitting}>
-                {submitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Submitting...</> : "Submit"}
-              </Button>
+            {!isFinalStep && (
+              <Button onClick={goNext}>Next</Button>
             )}
           </div>
         </div>
