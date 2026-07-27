@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,13 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { mergeContactIdentity } from "@/lib/contactIdentityStore";
 
 interface GuideOptInGateProps {
   onAccessGranted: (contactId: string) => void;
 }
 
 const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
-  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -47,6 +46,7 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
       if (error) throw error;
 
       const returnedContactId = data?.ghlContactId || "";
+      const returnedLeadId = data?.leadId || "";
 
       // Tag with c-clicked-rbc-guide if we got a contactId back
       if (returnedContactId) {
@@ -65,15 +65,20 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
         // ignore storage errors
       }
 
-      // UI-only prototype: after opt-in, route through a mock login before
-      // unlocking the guide/dashboard. Real auth will replace this later.
-      navigate("/mock-login", {
-        state: {
-          firstName: firstName.trim(),
-          email: email.trim(),
-          contactId: returnedContactId,
-        },
+      // Persist identity + leadId so the Intake page can prefill and link
+      // the survey back to this Lead.
+      mergeContactIdentity({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        contactId: returnedContactId,
+        leadId: returnedLeadId,
       });
+
+      // Unlock the guide in place. The "Create My Customized Plan" CTA
+      // takes them to /intake when they're ready.
+      onAccessGranted(returnedContactId);
     } catch (err) {
       console.error("Opt-in submission failed:", err);
       toast.error("Something went wrong. Please try again.");
