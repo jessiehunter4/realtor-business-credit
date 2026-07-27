@@ -164,6 +164,7 @@ Deno.serve(async (req) => {
         const body = await req.json();
         const finalize = body.finalize === true;
         const intakeId = typeof body.intake_id === "string" ? body.intake_id : null;
+        const leadId = typeof body.lead_id === "string" && body.lead_id ? body.lead_id : null;
         const surveyFields = pickEditableSurveyFields(body);
 
         if (!intakeId) {
@@ -179,6 +180,7 @@ Deno.serve(async (req) => {
               ...surveyFields,
               contact_email: String(body.contact_email).trim(),
               contact_name: body.contact_name?.trim() || null,
+              lead_id: leadId,
               filled_by: "self",
               status: finalize ? "submitted" : "in_progress",
               submitted_at: finalize ? new Date().toISOString() : null,
@@ -202,6 +204,7 @@ Deno.serve(async (req) => {
           status: finalize ? "submitted" : "in_progress",
         };
         if (finalize) updatePayload.submitted_at = new Date().toISOString();
+        if (leadId) updatePayload.lead_id = leadId;
         const { data, error } = await supabaseAdmin
           .from("intake_surveys")
           .update(updatePayload)
@@ -228,6 +231,7 @@ Deno.serve(async (req) => {
               ...surveyFields,
               contact_email: String(body.contact_email).trim(),
               contact_name: body.contact_name?.trim() || null,
+              lead_id: leadId,
               filled_by: "self",
               status: finalize ? "submitted" : "in_progress",
               submitted_at: finalize ? new Date().toISOString() : null,
@@ -263,6 +267,7 @@ Deno.serve(async (req) => {
         }
 
         const surveyFields = pickEditableSurveyFields(body);
+        const leadId = typeof body.lead_id === "string" && body.lead_id ? body.lead_id : null;
 
         const { data, error } = await supabaseAdmin
           .from("intake_surveys")
@@ -270,6 +275,7 @@ Deno.serve(async (req) => {
             ...surveyFields,
             contact_email: body.contact_email.trim(),
             contact_name: body.contact_name?.trim() || null,
+            lead_id: leadId,
             filled_by: "self",
             status: "submitted",
             submitted_at: new Date().toISOString(),

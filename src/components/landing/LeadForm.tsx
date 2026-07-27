@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import PhoneInput from "@/components/shared/PhoneInput";
+import { mergeContactIdentity } from "@/lib/contactIdentityStore";
 
 interface LeadFormProps {
   defaultValues: {
@@ -41,7 +42,7 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
       return;
     }
     try {
-      const { error } = await supabase.functions.invoke("submit-lead", {
+      const { data, error } = await supabase.functions.invoke("submit-lead", {
         body: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -58,6 +59,14 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
         toast.error("Failed to submit form. Please try again.");
         return;
       }
+      mergeContactIdentity({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        contactId: (data?.ghlContactId as string) || defaultValues.contactId || "",
+        leadId: (data?.leadId as string) || "",
+      });
       toast.success("Thank you! Your guide is on the way!");
       navigate("/guide");
     } catch (error) {
