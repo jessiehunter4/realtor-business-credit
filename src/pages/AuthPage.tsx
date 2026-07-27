@@ -35,7 +35,15 @@ export default function AuthPage() {
       if (next) window.location.replace(next);
       else navigate("/admin");
     } else {
-      toast.error("This login is for administrators. Redirecting you to the visitor login…");
+      // Attempt to bootstrap as the first admin (only succeeds if no admin exists yet).
+      const { data: bootstrap, error: bootstrapError } = await supabase.functions.invoke("setup-admin");
+      if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
+        toast.success("Admin access granted!");
+        if (next) window.location.replace(next);
+        else navigate("/admin");
+        return;
+      }
+      toast.error("This account isn't an admin. Ask an existing admin to grant access.");
       await supabase.auth.signOut();
       setTimeout(() => navigate("/mock-login"), 1500);
     }
