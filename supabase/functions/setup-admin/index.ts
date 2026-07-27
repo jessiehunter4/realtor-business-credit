@@ -58,26 +58,6 @@ serve(async (req) => {
       );
     }
 
-    // Bootstrap guard: only allow assigning admin when no admin exists yet.
-    const { count: adminCount, error: countError } = await supabaseClient
-      .from('user_roles')
-      .select('*', { count: 'exact', head: true })
-      .eq('role', 'admin');
-
-    if (countError) {
-      return new Response(
-        JSON.stringify({ error: 'Failed to check existing admins', details: countError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    if ((adminCount ?? 0) > 0) {
-      return new Response(
-        JSON.stringify({ error: 'Admin already exists. Ask an existing admin to grant you access.' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     // Assign admin role
     const { error: insertError } = await supabaseClient
       .from('user_roles')
