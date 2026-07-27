@@ -26,7 +26,6 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
-import MockDashboardPage from "./pages/MockDashboardPage";
 import DashboardPage from "./pages/DashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { RequireAdmin, RequireVisitor } from "./components/auth/RoleGuards";
@@ -71,7 +70,6 @@ const App = () => (
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/mock-login" element={<MockLoginPage />} />
-          <Route path="/mock-dashboard" element={<MockDashboardPage />} />
           <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

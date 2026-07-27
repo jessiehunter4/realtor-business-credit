@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuthRole } from "@/hooks/useAuthRole";
+import { useAuthRole, type AppRole } from "@/hooks/useAuthRole";
 
 function Spinner() {
   return (
@@ -7,6 +7,24 @@ function Spinner() {
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
     </div>
   );
+}
+
+export function RequireRole({
+  roles,
+  children,
+}: {
+  roles: AppRole[];
+  children: React.ReactNode;
+}) {
+  const { session, role, loading } = useAuthRole();
+  const location = useLocation();
+  if (loading) return <Spinner />;
+  if (!session) {
+    const login = roles.includes("admin") ? "/auth" : "/mock-login";
+    return <Navigate to={`${login}?next=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+  if (!role || !roles.includes(role)) return <Navigate to="/unauthorized" replace />;
+  return <>{children}</>;
 }
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
