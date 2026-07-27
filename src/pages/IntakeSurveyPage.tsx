@@ -241,15 +241,12 @@ export default function IntakeSurveyPage() {
     if (isDirectMode) {
       // Pre-populate from contact identity
       const defaultName = [firstName, lastName].filter(Boolean).join(" ");
-      // Restore any locally saved draft first
-      let localDraft: SurveyData = {};
-      try {
-        const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-        if (raw) localDraft = JSON.parse(raw) as SurveyData;
-      } catch {
-        // ignore
-      }
+      // Restore any locally saved draft first (server-persisted id + form)
+      const env = readDraft();
+      const localDraft: SurveyData = env?.form || {};
       hydratedFromDraft.current = !!Object.keys(localDraft).length;
+      if (env?.intake_id) setIntakeId(env.intake_id);
+      if (env?.access_token) setIntakeToken(env.access_token);
       setForm(prev => ({
         ...prev,
         ...localDraft,
@@ -311,7 +308,7 @@ export default function IntakeSurveyPage() {
     autosaveTimer.current = setTimeout(async () => {
       if (isDirectMode) {
         try {
-          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(form));
+          writeDraft({ intake_id: intakeId, access_token: intakeToken, form });
           setAutosaveStatus("saved");
         } catch {
           // ignore quota errors
@@ -337,7 +334,135 @@ export default function IntakeSurveyPage() {
     return () => {
       if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     };
-  }, [form, loading, submitted, isDirectMode, token]);
+  }, [form, loading, submitted, isDirectMode, token, intakeId, intakeToken]);
+
+  // Scroll to top on step change
+  const isInitialStep = useRef(true);
+  useEffect(() => {
+    if (isInitialStep.current) {
+      isInitialStep.current = false;
+      return;
+    }
+    try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, [step]);
+
+  // Server-side incremental save for direct mode. No-op if email missing or in token mode.
+  const persistStep = async (opts?: { finalize?: boolean }): Promise<{ id: string; access_token: string } | null> => {
+    if (!isDirectMode) return null;
+    const email = form.contact_email?.trim();
+    if (!email) return null;
+    try {
+      setAutosaveStatus("saving");
+      const res = await fetch(
+        `${SUPABASE_URL}/functions/v1/intake-survey?mode=direct-draft`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+          body: JSON.stringify({
+            ...form,
+            intake_id: intakeId || undefined,
+            finalize: !!opts?.finalize,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      if (data?.id) {
+        setIntakeId(data.id);
+        if (data.access_token) setIntakeToken(data.access_token);
+        writeDraft({ intake_id: data.id, access_token: data.access_token ?? intakeToken, form });
+      }
+      setAutosaveStatus("saved");
+      return data;
+    } catch (e) {
+      setAutosaveStatus("idle");
+      return null;
+    }
+  };
+
+  const goNext = async () => {
+    // Fire-and-forget server save; local draft is safety net
+    void persistStep();
+    setStep(s => s + 1);
+  };
+
+  const validateAllRequired = (): { ok: true } | { ok: false; step: number; message: string } => {
+    if (isDirectMode) {
+      if (!form.first_name?.trim()) return { ok: false, step: 0, message: "Please enter your first name." };
+      if (!form.last_name?.trim()) return { ok: false, step: 0, message: "Please enter your last name." };
+      const email = form.contact_email?.trim() || "";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, step: 0, message: "Please enter a valid email." };
+    }
+    if (!form.primary_goals || form.primary_goals.length < 1) {
+      return { ok: false, step: 1, message: "Pick at least one primary goal." };
+    }
+    return { ok: true };
+  };
+
+  const handleGenerate = async () => {
+    const v = validateAllRequired();
+    if (!v.ok) {
+      toast({ title: "Missing info", description: v.message, variant: "destructive" });
+      setStep(v.step);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      let finalId = intakeId;
+      let finalToken = intakeToken;
+      if (isDirectMode) {
+        const saved = await persistStep({ finalize: true });
+        if (!saved?.id) throw new Error("Could not save your answers. Please try again.");
+        finalId = saved.id;
+        finalToken = saved.access_token || finalToken;
+      } else {
+        // Token mode: finalize via existing PUT
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/intake-survey?token=${token}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+            body: JSON.stringify({ ...form, status: "submitted" }),
+          }
+        );
+        if (!res.ok) {
+          const d = await res.json().catch(() => null);
+          throw new Error(d?.error || "Failed to submit");
+        }
+        if (form.id) finalId = form.id;
+      }
+
+      setIntakeId(finalId);
+      setIntakeToken(finalToken);
+      setSubmitted(true);
+      if (isDirectMode) {
+        try { localStorage.removeItem(DRAFT_STORAGE_KEY); localStorage.removeItem(LEGACY_DRAFT_KEY); } catch { /* ignore */ }
+      }
+
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "intake_submitted",
+      }).catch(() => {});
+      if (contactId) {
+        supabase.functions.invoke("tag-ghl-contact", { body: { contactId, tags: ["f-intake-submitted"] } }).catch(() => {});
+      }
+
+      // Immediately kick off plan generation
+      if (finalId) {
+        void postFunnelEvent({ contactId: contactId || undefined, eventType: "plan_generation_started" }).catch(() => {});
+        generatePlan({ intakeSurveyId: finalId, intakeToken: finalToken, source: "user" });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (isDirectMode && (!form.contact_email || !form.contact_email.trim())) {
