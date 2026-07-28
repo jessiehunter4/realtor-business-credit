@@ -47,7 +47,7 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
 
           avatar
             .speak({ text: spokenGreeting, taskType: TaskType.REPEAT })
-            .catch((e) => console.error("[HeyGen] speak error:", e));
+            .catch((e) => console.warn("[HeyGen] speak unavailable:", e));
         });
 
         await avatar.createStartAvatar({
@@ -55,7 +55,7 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
           avatarName,
         });
       } catch (e: any) {
-        console.error("[HeyGen] session error:", e);
+        console.warn("[HeyGen] live avatar unavailable; showing text greeting instead.", e);
         if (!cancelled) {
           setStatus("error");
         }
@@ -74,7 +74,7 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
       await videoRef.current?.play();
       setStatus("ready");
     } catch (e) {
-      console.error("[HeyGen] manual play failed:", e);
+      console.warn("[HeyGen] manual play unavailable:", e);
     }
   };
 
