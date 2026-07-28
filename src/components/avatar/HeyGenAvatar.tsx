@@ -18,10 +18,10 @@ const HeyGenAvatar = ({
   avatarName,
 }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<any>(null);
   const startedRef = useRef(false);
   const [status, setStatus] = useState<AvatarStatus>("loading");
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const spokenGreeting = useMemo(() => greeting.trim(), [greeting]);
 
   useEffect(() => {
@@ -39,10 +39,10 @@ const HeyGenAvatar = ({
         });
 
         if (error) {
-          throw new Error(error.message || "Live avatar unavailable");
+          throw new Error(error.message || "Avatar video unavailable");
         }
 
-        if (!data?.hls_url) {
+        if (!data?.video_url) {
           setErrorDetail(data?.error || "HeyGen did not return a video URL.");
           if (!cancelled) setStatus("fallback");
           return;
@@ -50,63 +50,9 @@ const HeyGenAvatar = ({
 
         if (cancelled) return;
 
-        const video = videoRef.current;
-        if (!video) {
-          setStatus("fallback");
-          return;
-        }
-
-        const canPlayNativeHls =
-          video.canPlayType("application/vnd.apple.mpegurl") !== "";
-
-        if (canPlayNativeHls) {
-          video.src = data.hls_url;
-          video.addEventListener("loadeddata", () => {
-            if (!cancelled) setStatus("ready");
-          });
-          video.addEventListener("error", () => {
-            if (!cancelled) setStatus("fallback");
-          });
-          video
-            .play()
-            .then(() => setStatus("ready"))
-            .catch(() => setStatus("needs-play"));
-        } else {
-          const Hls = (await import("hls.js")).default;
-          if (cancelled) return;
-
-          if (Hls.isSupported()) {
-            const hls = new Hls({
-              maxBufferLength: 30,
-              maxMaxBufferLength: 60,
-            });
-            hlsRef.current = hls;
-            hls.loadSource(data.hls_url);
-            hls.attachMedia(video);
-
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-              video
-                .play()
-                .then(() => setStatus("ready"))
-                .catch(() => setStatus("needs-play"));
-            });
-
-            hls.on(Hls.Events.ERROR, (_event: any, dataError: any) => {
-              console.warn("[HeyGen] HLS error:", dataError);
-              if (dataError?.fatal && !cancelled) {
-                setStatus("fallback");
-              }
-            });
-          } else {
-            video.src = data.hls_url;
-            video
-              .play()
-              .then(() => setStatus("ready"))
-              .catch(() => setStatus("needs-play"));
-          }
-        }
+        setVideoUrl(data.video_url);
       } catch (e) {
-        console.warn("[HeyGen] live avatar unavailable; showing video fallback.", e);
+        console.warn("[HeyGen] avatar video unavailable; showing fallback.", e);
         if (!cancelled) {
           setErrorDetail(e instanceof Error ? e.message : "Unknown error");
           setStatus("fallback");
@@ -116,14 +62,31 @@ const HeyGenAvatar = ({
 
     return () => {
       cancelled = true;
-      try {
-        hlsRef.current?.destroy();
-      } catch {
-        // ignore
-      }
-      hlsRef.current = null;
     };
   }, [spokenGreeting, avatarName]);
+
+  useEffect(() => {
+    if (!videoUrl) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.src = videoUrl;
+    video.load();
+
+    const handleLoaded = () => setStatus("ready");
+    const handleError = () => setStatus("fallback");
+
+    video.addEventListener("loadeddata", handleLoaded);
+    video.addEventListener("error", handleError);
+
+    const playPromise = video.play();
+    playPromise.catch(() => setStatus("needs-play"));
+
+    return () => {
+      video.removeEventListener("loadeddata", handleLoaded);
+      video.removeEventListener("error", handleError);
+    };
+  }, [videoUrl]);
 
   const handleManualPlay = async () => {
     try {
