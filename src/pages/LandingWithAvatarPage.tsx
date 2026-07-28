@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
-import HeyGenAvatar from "@/components/avatar/HeyGenAvatar";
 import HeroSectionBright from "@/components/landing/HeroSectionBright";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
 import ProgramCurriculum from "@/components/landing/ProgramCurriculum";
@@ -11,10 +10,6 @@ import Seo from "@/components/shared/Seo";
 const LandingWithAvatarPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const visitorName = (slug || "").trim();
-  const greeting = visitorName
-    ? `Congratulations on your closing, ${visitorName}! Welcome to RE Pro Business Credit. I'm excited to help you build your business credit and guide you through your personalized funding journey.`
-    : `Welcome to RE Pro Business Credit. I'm excited to help you build your business credit and guide you through your personalized funding journey.`;
-
   return (
     <div className="min-h-screen bg-background">
       <Seo
@@ -34,7 +29,15 @@ const LandingWithAvatarPage = () => {
               Press play if the video doesn't start automatically.
             </p>
           </div>
-          <HeyGenAvatar greeting={greeting} />
+          <div className="max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg border border-border bg-black">
+            <iframe
+              src="https://embed.liveavatar.com/v1/bf17648d-3168-458c-a9c4-44312fc338f0?orientation=horizontal"
+              allow="microphone; autoplay"
+              title="LiveAvatar Embed"
+              className="w-full block"
+              style={{ aspectRatio: "16 / 9", border: 0 }}
+            />
+          </div>
         </div>
       </section>
 
