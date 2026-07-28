@@ -63,7 +63,7 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
           avatarName,
         });
       } catch (e) {
-        console.info("[HeyGen] live avatar unavailable; showing text greeting instead.", e);
+        console.warn("[HeyGen] live avatar unavailable; showing video fallback.", e);
         if (!cancelled) {
           setStatus("fallback");
         }
