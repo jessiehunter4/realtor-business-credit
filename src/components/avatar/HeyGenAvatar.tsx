@@ -7,6 +7,7 @@ import StreamingAvatar, {
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, Sparkles } from "lucide-react";
+import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
   greeting: string;
@@ -87,12 +88,17 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
 
   if (status === "fallback") {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-card max-w-2xl mx-auto text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Sparkles className="h-6 w-6" />
+      <div className="max-w-2xl mx-auto space-y-4">
+        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-secondary shadow-card-hover border border-border">
+          <HeroVideo alt="Personal welcome from Jessie Hunter" />
         </div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-primary">Personal welcome</p>
-        <p className="mt-3 text-secondary text-lg leading-relaxed whitespace-pre-line">{spokenGreeting}</p>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-card text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Personal welcome</p>
+          <p className="mt-2 text-secondary text-base leading-relaxed whitespace-pre-line">{spokenGreeting}</p>
+        </div>
       </div>
     );
   }
