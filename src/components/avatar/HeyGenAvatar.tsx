@@ -1,9 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import StreamingAvatar, {
-  AvatarQuality,
-  StreamingEvents,
-  TaskType,
-} from "@heygen/streaming-avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, Sparkles } from "lucide-react";
@@ -11,19 +6,23 @@ import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
   greeting: string;
+  fallbackMessage?: string;
   avatarName?: string;
 }
 
-const DEFAULT_AVATAR = "Wayne_20240711";
 type AvatarStatus = "loading" | "ready" | "needs-play" | "fallback";
-type StreamReadyEvent = { detail?: MediaStream };
 
-const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
+const HeyGenAvatar = ({
+  greeting,
+  fallbackMessage,
+  avatarName,
+}: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const avatarRef = useRef<StreamingAvatar | null>(null);
   const startedRef = useRef(false);
   const [status, setStatus] = useState<AvatarStatus>("loading");
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const spokenGreeting = useMemo(() => greeting.trim(), [greeting]);
+
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -32,50 +31,59 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
 
     (async () => {
       try {
-        const { data, error } = await supabase.functions.invoke("heygen-token");
+        const { data, error } = await supabase.functions.invoke("heygen-token", {
+          body: {
+            greeting: spokenGreeting,
+            avatar_id: avatarName,
+          },
+        });
+
         if (error) {
-          throw new Error(error.message || "Live avatar unavailable");
+          throw new Error(error.message || "Avatar video unavailable");
         }
-        if (!data?.token) {
+
+        if (!data?.video_url) {
           if (!cancelled) setStatus("fallback");
           return;
         }
+
         if (cancelled) return;
 
-        const avatar = new StreamingAvatar({ token: data.token });
-        avatarRef.current = avatar;
-
-        avatar.on(StreamingEvents.STREAM_READY, (event: StreamReadyEvent) => {
-          if (!videoRef.current || !event.detail) return;
-          videoRef.current.srcObject = event.detail;
-          videoRef.current
-            .play()
-            .then(() => setStatus("ready"))
-            .catch(() => setStatus("needs-play"));
-
-          avatar
-            .speak({ text: spokenGreeting, taskType: TaskType.REPEAT })
-            .catch((e) => console.warn("[HeyGen] speak unavailable:", e));
-        });
-
-        await avatar.createStartAvatar({
-          quality: AvatarQuality.Low,
-          avatarName,
-        });
+        setVideoUrl(data.video_url);
       } catch (e) {
-        console.warn("[HeyGen] live avatar unavailable; showing video fallback.", e);
-        if (!cancelled) {
-          setStatus("fallback");
-        }
+        console.warn("[HeyGen] avatar video unavailable; showing fallback.", e);
+        if (!cancelled) setStatus("fallback");
       }
+
     })();
 
     return () => {
       cancelled = true;
-      avatarRef.current?.stopAvatar().catch(() => {});
-      avatarRef.current = null;
     };
   }, [spokenGreeting, avatarName]);
+
+  useEffect(() => {
+    if (!videoUrl) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.src = videoUrl;
+    video.load();
+
+    const handleLoaded = () => setStatus("ready");
+    const handleError = () => setStatus("fallback");
+
+    video.addEventListener("loadeddata", handleLoaded);
+    video.addEventListener("error", handleError);
+
+    const playPromise = video.play();
+    playPromise.catch(() => setStatus("needs-play"));
+
+    return () => {
+      video.removeEventListener("loadeddata", handleLoaded);
+      video.removeEventListener("error", handleError);
+    };
+  }, [videoUrl]);
 
   const handleManualPlay = async () => {
     try {
@@ -90,16 +98,19 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
     return (
       <div className="max-w-2xl mx-auto space-y-4">
         <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-secondary shadow-card-hover border border-border">
-          <HeroVideo alt="Personal welcome from Jessie Hunter" />
+          <HeroVideo alt="Personal welcome from RE Pro Business Credit" />
         </div>
         <div className="rounded-2xl border border-border bg-card p-6 shadow-card text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Sparkles className="h-5 w-5" />
           </div>
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">Personal welcome</p>
-          <p className="mt-2 text-secondary text-base leading-relaxed whitespace-pre-line">{spokenGreeting}</p>
+          <p className="mt-2 text-secondary text-base leading-relaxed whitespace-pre-line">
+            {fallbackMessage || spokenGreeting}
+          </p>
         </div>
       </div>
+
     );
   }
 
@@ -110,6 +121,8 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
           ref={videoRef}
           autoPlay
           playsInline
+          muted={false}
+          controls
           className="w-full h-full object-cover"
         />
         {status === "loading" && (

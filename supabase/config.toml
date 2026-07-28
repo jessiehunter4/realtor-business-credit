@@ -27,5 +27,8 @@ verify_jwt = false
 [functions.log-funnel-event]
 verify_jwt = false
 
+[functions.heygen-token]
+verify_jwt = false
+
 [functions.link-intake-to-user]
 verify_jwt = true
