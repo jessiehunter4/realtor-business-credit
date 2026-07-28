@@ -29,9 +29,10 @@ interface AvatarLook {
   avatar_type?: string
   default_voice_id?: string | null
   tags?: string[]
+  supported_api_engines?: string[]
 }
 
-async function fetchDefaultAvatar(apiKey: string): Promise<{ avatar_id: string; voice_id: string } | null> {
+async function fetchDefaultAvatar(apiKey: string): Promise<{ avatar_id: string; voice_id: string; engine?: string } | null> {
   try {
     const res = await fetch(
       `${HEYGEN_API_BASE}/v3/avatars/looks?avatar_type=studio_avatar&ownership=public&limit=30`,
@@ -46,7 +47,10 @@ async function fetchDefaultAvatar(apiKey: string): Promise<{ avatar_id: string; 
     const text = await res.text()
     let json: any = null
     try { json = JSON.parse(text) } catch { json = null }
-    if (!json?.data || !Array.isArray(json.data) || json.data.length === 0) return null
+    if (!json?.data || !Array.isArray(json.data) || json.data.length === 0) {
+      console.info('[heygen-token] No public avatar looks returned', { status: res.status, body: summarizeProviderResponse(text) })
+      return null
+    }
 
     const looks: AvatarLook[] = json.data
     const preferred = looks.find((look) =>
@@ -56,58 +60,72 @@ async function fetchDefaultAvatar(apiKey: string): Promise<{ avatar_id: string; 
     if (!preferred?.id) return null
 
     const voiceId = preferred.default_voice_id || '1bd001e7e50f421d8919866c76f3f27f'
-    return { avatar_id: preferred.id, voice_id: voiceId }
+    const engine = preferred.supported_api_engines?.includes('avatar_v')
+      ? 'avatar_v'
+      : preferred.supported_api_engines?.[0]
+
+    return { avatar_id: preferred.id, voice_id: voiceId, engine }
   } catch (e) {
     console.warn('[heygen-token] Failed to fetch default avatar:', e)
     return null
   }
 }
 
-async function createAvatarRealtimeSession(
+async function createAvatarVideo(
   apiKey: string,
   avatar_id: string,
   voice_id: string,
-  greeting: string
-): Promise<{ stream_id: string } | null> {
-  const res = await fetch(`${HEYGEN_API_BASE}/v3/avatar-realtime`, {
+  script: string,
+  engine?: string
+): Promise<{ video_id: string } | null> {
+  const payload: Record<string, any> = {
+    type: 'avatar',
+    avatar_id,
+    voice_id,
+    script,
+    aspect_ratio: '16:9',
+    output_format: 'mp4',
+    title: 'RE Pro Business Credit personalized greeting',
+  }
+
+  if (engine) {
+    payload.engine = { type: engine }
+  }
+
+  const res = await fetch(`${HEYGEN_API_BASE}/v3/videos`, {
     method: 'POST',
     headers: {
       'X-Api-Key': apiKey,
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      type: 'tts',
-      avatar_id,
-      voice_id,
-      text: greeting,
-    }),
+    body: JSON.stringify(payload),
   })
 
   const responseText = await res.text()
   let json: any = null
   try { json = JSON.parse(responseText) } catch { json = null }
 
-  if (!res.ok || !json?.data?.stream_id) {
-    console.info('[heygen-token] Create session failed', {
+  if (!res.ok || !json?.data?.video_id) {
+    console.info('[heygen-token] Create video failed', {
       status: res.status,
       body: summarizeProviderResponse(responseText),
     })
     return null
   }
 
-  return { stream_id: json.data.stream_id }
+  return { video_id: json.data.video_id }
 }
 
-async function pollForHlsUrl(
+async function pollForVideoUrl(
   apiKey: string,
-  stream_id: string,
-  maxAttempts = 30
+  video_id: string,
+  maxAttempts = 40
 ): Promise<string | null> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    await sleep(1500)
+    await sleep(2000)
 
-    const res = await fetch(`${HEYGEN_API_BASE}/v3/avatar-realtime/${stream_id}`, {
+    const res = await fetch(`${HEYGEN_API_BASE}/v3/videos/${video_id}`, {
       method: 'GET',
       headers: {
         'X-Api-Key': apiKey,
@@ -120,20 +138,20 @@ async function pollForHlsUrl(
     try { json = JSON.parse(text) } catch { json = null }
 
     const status = json?.data?.status
-    const hls_url = json?.data?.hls_url
+    const video_url = json?.data?.video_url
 
-    console.info('[heygen-token] Poll session', {
+    console.info('[heygen-token] Poll video', {
       attempt,
       status,
-      hasHls: !!hls_url,
+      hasUrl: !!video_url,
       httpStatus: res.status,
     })
 
-    if (hls_url) return hls_url
-    if (status === 'error' || status === 'completed') {
-      console.info('[heygen-token] Session ended without HLS', {
-        status,
-        error: json?.data?.error_message,
+    if (video_url) return video_url
+    if (status === 'failed' || json?.data?.failure_code) {
+      console.info('[heygen-token] Video render failed', {
+        failure_code: json?.data?.failure_code,
+        failure_message: json?.data?.failure_message,
       })
       return null
     }
@@ -148,7 +166,7 @@ Deno.serve(async (req) => {
   try {
     const apiKey = Deno.env.get('HEYGEN_API_KEY')
     if (!apiKey) {
-      return jsonResponse({ hls_url: null, mode: 'fallback', error: 'HEYGEN_API_KEY not configured' })
+      return jsonResponse({ video_url: null, mode: 'fallback', error: 'HEYGEN_API_KEY not configured' })
     }
 
     let body: { greeting?: string; avatar_id?: string; voice_id?: string; message?: string } = {}
@@ -162,44 +180,46 @@ Deno.serve(async (req) => {
 
     let avatar_id = body.avatar_id?.trim()
     let voice_id = body.voice_id?.trim()
+    let engine: string | undefined
 
     if (!avatar_id || !voice_id) {
       const defaults = await fetchDefaultAvatar(apiKey)
       if (defaults) {
         avatar_id = avatar_id || defaults.avatar_id
         voice_id = voice_id || defaults.voice_id
+        engine = defaults.engine
       }
     }
 
     if (!avatar_id || !voice_id) {
       return jsonResponse({
-        hls_url: null,
+        video_url: null,
         mode: 'fallback',
         error: 'No avatar or voice configured and no public default available.',
       })
     }
 
-    const session = await createAvatarRealtimeSession(apiKey, avatar_id, voice_id, greeting)
+    const session = await createAvatarVideo(apiKey, avatar_id, voice_id, greeting, engine)
     if (!session) {
       return jsonResponse({
-        hls_url: null,
+        video_url: null,
         mode: 'fallback',
-        error: 'HeyGen realtime session could not be created.',
+        error: 'HeyGen video could not be created.',
       })
     }
 
-    const hls_url = await pollForHlsUrl(apiKey, session.stream_id)
-    if (!hls_url) {
+    const video_url = await pollForVideoUrl(apiKey, session.video_id)
+    if (!video_url) {
       return jsonResponse({
-        hls_url: null,
+        video_url: null,
         mode: 'fallback',
-        error: 'HeyGen realtime session did not produce a playable video URL.',
+        error: 'HeyGen video did not finish rendering in time.',
       })
     }
 
-    return jsonResponse({ hls_url, mode: 'live', avatar_id, voice_id })
+    return jsonResponse({ video_url, mode: 'live', avatar_id, voice_id })
   } catch (e) {
     console.error('[heygen-token] Function failed; using fallback', e)
-    return jsonResponse({ hls_url: null, mode: 'fallback', error: 'HeyGen request failed' })
+    return jsonResponse({ video_url: null, mode: 'fallback', error: 'HeyGen request failed' })
   }
 })
