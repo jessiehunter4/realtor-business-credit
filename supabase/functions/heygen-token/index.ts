@@ -67,7 +67,7 @@ async function createAvatarRealtimeSession(
   apiKey: string,
   avatar_id: string,
   voice_id: string,
-  text: string
+  greeting: string
 ): Promise<{ stream_id: string } | null> {
   const res = await fetch(`${HEYGEN_API_BASE}/v3/avatar-realtime`, {
     method: 'POST',
@@ -80,18 +80,18 @@ async function createAvatarRealtimeSession(
       type: 'tts',
       avatar_id,
       voice_id,
-      text,
+      text: greeting,
     }),
   })
 
-  const text = await res.text()
+  const responseText = await res.text()
   let json: any = null
-  try { json = JSON.parse(text) } catch { json = null }
+  try { json = JSON.parse(responseText) } catch { json = null }
 
   if (!res.ok || !json?.data?.stream_id) {
     console.info('[heygen-token] Create session failed', {
       status: res.status,
-      body: summarizeProviderResponse(text),
+      body: summarizeProviderResponse(responseText),
     })
     return null
   }
