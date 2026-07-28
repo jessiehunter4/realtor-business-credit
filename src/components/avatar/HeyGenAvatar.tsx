@@ -15,6 +15,7 @@ interface Props {
 
 const DEFAULT_AVATAR = "Wayne_20240711";
 type AvatarStatus = "loading" | "ready" | "needs-play" | "fallback";
+type StreamReadyEvent = { detail?: MediaStream };
 
 const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -43,8 +44,8 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
         const avatar = new StreamingAvatar({ token: data.token });
         avatarRef.current = avatar;
 
-        avatar.on(StreamingEvents.STREAM_READY, (event: any) => {
-          if (!videoRef.current) return;
+        avatar.on(StreamingEvents.STREAM_READY, (event: StreamReadyEvent) => {
+          if (!videoRef.current || !event.detail) return;
           videoRef.current.srcObject = event.detail;
           videoRef.current
             .play()
@@ -106,7 +107,7 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
           className="w-full h-full object-cover"
         />
         {status === "loading" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/90 text-white gap-3">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/90 text-secondary-foreground gap-3">
             <Loader2 className="h-8 w-8 animate-spin" />
             <p className="text-sm">Preparing your personal greeting…</p>
           </div>
