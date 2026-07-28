@@ -112,8 +112,8 @@ const HeyGenAvatar = ({
             {fallbackMessage || spokenGreeting}
           </p>
         </div>
-
       </div>
+
     );
   }
 
