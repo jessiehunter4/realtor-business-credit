@@ -5,7 +5,7 @@
     "": {
       "name": "vite_react_shadcn_ts",
       "dependencies": {
-        "@heygen/streaming-avatar": "^2.1.1",
+        "@heygen/streaming-avatar": "2.0.17",
         "@hookform/resolvers": "^3.10.0",
         "@lovable.dev/mcp-js": "^0.22.2",
         "@radix-ui/react-accordion": "^1.2.11",
@@ -175,7 +175,7 @@
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.10", "", {}, "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ=="],
 
-    "@heygen/streaming-avatar": ["@heygen/streaming-avatar@2.1.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@heygen/streaming-avatar/-/streaming-avatar-2.1.1.tgz", { "dependencies": { "livekit-client": "2.11.3", "protobufjs": "7.5.0", "webrtc-issue-detector": "1.16.3" } }, "sha512-QsEtIQzW3jBCH+t7N3RV5LqbJ9ExRuFHRsIumAiLhOX+seAswDail0Xr/34HtxOfrmvSci9moeG6QS6+Oj3C/w=="],
+    "@heygen/streaming-avatar": ["@heygen/streaming-avatar@2.0.17", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@heygen/streaming-avatar/-/streaming-avatar-2.0.17.tgz", { "dependencies": { "livekit-client": "2.11.3", "protobufjs": "7.5.0", "webrtc-issue-detector": "1.16.3" } }, "sha512-jlu5k3+M+ciqFbib2UfXt4s5+TNF8ipdr49pwzBlPSMhFIFrI9R6nQrCzh4VZ5+hG50zysUUGoDE+tgh4WXCaQ=="],
 
     "@hono/node-server": ["@hono/node-server@1.19.14", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@hono/node-server/-/node-server-1.19.14.tgz", { "peerDependencies": { "hono": "^4" } }, "sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw=="],
 
