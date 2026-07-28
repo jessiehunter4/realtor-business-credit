@@ -111,10 +111,8 @@ const HeyGenAvatar = ({
           <p className="mt-2 text-secondary text-base leading-relaxed whitespace-pre-line">
             {fallbackMessage || spokenGreeting}
           </p>
-          {errorDetail && (
-            <p className="mt-2 text-xs text-muted-foreground">{errorDetail}</p>
-          )}
         </div>
+
       </div>
     );
   }
