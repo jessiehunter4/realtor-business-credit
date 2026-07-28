@@ -1,65 +1,36 @@
-# HeyGen Interactive Avatar MVP
+## Plan: Fix HeyGen Avatar + Personalized Congratulations Greeting
 
-Add a new route `/landing-page/:slug` that spins up a HeyGen Interactive Avatar and has it greet the visitor by the URL slug. No CRM, DB, or auth — slug is the only dynamic input.
+### Goal
+Make `/landing-page/:slug` reliably attempt to generate a HeyGen live avatar greeting, and when HeyGen cannot create a session, show a polished fallback instead of breaking or silently failing.
 
-## Prerequisite
-You need a HeyGen API key (from HeyGen → Settings → API). Once you're ready, I'll request it via the secure secret form as `HEYGEN_API_KEY`. Everything below can be scaffolded first; the avatar will only work after the key is saved.
+### What I’ll change
+1. **Update the HeyGen token backend function**
+   - Switch the token request to HeyGen’s current documented session-token endpoint if needed.
+   - Keep the API key private in the backend.
+   - Return clean JSON for every outcome: success, missing key, invalid key, unavailable HeyGen endpoint, or non-JSON provider response.
+   - Avoid any 500/HTML parse crash from HeyGen returning an HTML error page.
 
-## Scope
+2. **Harden the frontend avatar component**
+   - Treat `token: null` as a normal fallback state instead of throwing a runtime error.
+   - Start the avatar only when a real token is present.
+   - Keep the autoplay attempt plus “Play greeting” button fallback.
+   - Add safer cleanup so duplicate sessions do not start under React StrictMode.
 
-### In
-- New page + route
-- Slug-based greeting
-- HeyGen Streaming Avatar SDK session (default avatar + voice)
-- Autoplay attempt with a "Play greeting" fallback button
-- Loading + error states, plain-text greeting fallback on failure
+3. **Improve the congratulations message**
+   - Decode and clean the URL slug so `/landing-page/jpeltanal` becomes a friendly display name instead of raw URL text where possible.
+   - Use a clearer greeting such as: “Congratulations on your recent closing, [Name]. Welcome to RE Pro Business Credit…”
+   - Keep the message focused on business structure, financial foundation, and credit-building support.
 
-### Out
-- DB, GoHighLevel, EveryCatch, auth, lead lookup
-- Personalization beyond the slug
-- Analytics / funnel events
+4. **Improve the visual fallback**
+   - If HeyGen is unavailable, show a professional “personal welcome” card with the same congratulations message.
+   - Keep the rest of the landing page usable.
 
-## Architecture
+5. **Verify**
+   - Test the edge function response path.
+   - Test `/landing-page/jpeltanal` in the preview.
+   - Confirm no blank screen and no client-side runtime error when HeyGen is unavailable.
 
-```text
-/landing-page/:slug
-  └─ LandingWithAvatarPage
-       ├─ useParams() → visitorName
-       ├─ greeting = `Congratulations on your closing, ${visitorName}! ...`
-       ├─ HeyGenAvatar component
-       │    ├─ fetch access token from edge function
-       │    ├─ new StreamingAvatar({ token })
-       │    ├─ createStartAvatar({ avatarName: default, voice: default })
-       │    ├─ speak(greeting) on STREAM_READY (with autoplay fallback)
-       │    └─ <video> element bound to MediaStream
-       └─ existing landing sections below
-```
-
-## Files
-
-**New**
-- `src/pages/LandingWithAvatarPage.tsx` — reads `:slug`, builds greeting, renders `HeyGenAvatar` above the existing landing sections (reuses `SiteHeader`, `HeroSectionBright` optional, etc.).
-- `src/components/avatar/HeyGenAvatar.tsx` — encapsulates SDK lifecycle: fetch token → start session → speak → cleanup on unmount. Handles loading spinner, autoplay-blocked button, and error text fallback showing the greeting.
-- `supabase/functions/heygen-token/index.ts` — public edge function that POSTs to `https://api.heygen.com/v1/streaming.create_token` using `HEYGEN_API_KEY` and returns `{ token }`. CORS enabled, no JWT required. Registered in `supabase/config.toml` with `verify_jwt = false`.
-
-**Edited**
-- `src/App.tsx` — add `<Route path="/landing-page/:slug" element={<LandingWithAvatarPage />} />` above the catch-all.
-- `package.json` — add `@heygen/streaming-avatar` dependency (installed via `bun add`).
-
-**Secret**
-- `HEYGEN_API_KEY` (added via secure form when you're ready).
-
-## Behavior details
-
-- **Slug extraction:** `useParams<{ slug: string }>()`; if missing, show generic greeting `"Welcome to RE Pro Business Credit."`.
-- **Greeting template:** `Congratulations on your closing, ${slug}! Welcome to RE Pro Business Credit. I'm excited to help you build your business credit and guide you through your personalized funding journey.`
-- **Session guard:** `useRef` flag + effect cleanup to prevent duplicate `createStartAvatar` calls under React StrictMode.
-- **Autoplay:** call `video.play()` on `STREAM_READY`; if it rejects, reveal a centered "Play greeting" button that calls `play()` on click, then `avatar.speak({ text: greeting })`.
-- **Error path:** any SDK/token failure → hide the video, render greeting as plain text inside a styled card, keep the rest of the page usable.
-- **Cleanup:** `avatar.stopAvatar()` on unmount.
-
-## Future hook (not built)
-`HeyGenAvatar` accepts `greeting` as a prop, so later the slug → CRM lookup can produce a richer greeting without touching the component.
-
-## Testing
-Manual: visit `/landing-page/jpeltanal`, `/landing-page/john`, `/landing-page/sarah`, `/landing-page/realtor123` — each should render the avatar and speak the matching greeting (or show the play-button fallback + plain-text greeting if autoplay/network fails).
+### Technical notes
+- Current code calls `https://api.heygen.com/v1/streaming.create_token` and already handles non-JSON responses, but the current SDK/token flow still needs to be made fully tolerant of HeyGen endpoint failures.
+- The existing package is `@heygen/streaming-avatar@2.0.17`; I’ll keep it unless the codebase requires a package update after verifying the current HeyGen API shape.
+- The app will still need a valid HeyGen API key with streaming/avatar access for the live avatar to render. Without that, the fallback greeting will display cleanly.
