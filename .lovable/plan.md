@@ -1,36 +1,39 @@
-## Plan: Fix HeyGen Avatar + Personalized Congratulations Greeting
+## Goal
 
-### Goal
-Make `/landing-page/:slug` reliably attempt to generate a HeyGen live avatar greeting, and when HeyGen cannot create a session, show a polished fallback instead of breaking or silently failing.
+Make `/landing-page/:slug` load a real HeyGen Interactive Avatar that says: "Congratulations on your recent closing, JP!" — using the slug as the name.
 
-### What I’ll change
-1. **Update the HeyGen token backend function**
-   - Switch the token request to HeyGen’s current documented session-token endpoint if needed.
-   - Keep the API key private in the backend.
-   - Return clean JSON for every outcome: success, missing key, invalid key, unavailable HeyGen endpoint, or non-JSON provider response.
-   - Avoid any 500/HTML parse crash from HeyGen returning an HTML error page.
+## Why it's broken today
 
-2. **Harden the frontend avatar component**
-   - Treat `token: null` as a normal fallback state instead of throwing a runtime error.
-   - Start the avatar only when a real token is present.
-   - Keep the autoplay attempt plus “Play greeting” button fallback.
-   - Add safer cleanup so duplicate sessions do not start under React StrictMode.
+The current `HEYGEN_API_KEY` returns a 404 HTML page from `https://api.heygen.com/v1/streaming.create_token`. HeyGen only issues streaming tokens for API keys on a plan that has **Interactive Avatar / Streaming API** enabled. Free and basic Video-API-only keys get 404 on this endpoint — which is exactly the symptom we see. No amount of code changes fixes a key that isn't entitled.
 
-3. **Improve the congratulations message**
-   - Decode and clean the URL slug so `/landing-page/jpeltanal` becomes a friendly display name instead of raw URL text where possible.
-   - Use a clearer greeting such as: “Congratulations on your recent closing, [Name]. Welcome to RE Pro Business Credit…”
-   - Keep the message focused on business structure, financial foundation, and credit-building support.
+## What you need to do (once)
 
-4. **Improve the visual fallback**
-   - If HeyGen is unavailable, show a professional “personal welcome” card with the same congratulations message.
-   - Keep the rest of the landing page usable.
+1. Sign in at https://app.heygen.com → **Space Settings → Subscriptions**.
+2. Confirm the plan includes **Interactive Avatar / Streaming Avatar API** (Creator, Team, or a Streaming add-on). If not, upgrade or add the Streaming API entitlement.
+3. Go to **Space Settings → API** and copy the API key from a space that has Streaming enabled. (Keys are per-space; a key from a space without Streaming will keep failing.)
+4. Paste it into the secure prompt I'll open for `HEYGEN_API_KEY` after you approve this plan.
 
-5. **Verify**
-   - Test the edge function response path.
-   - Test `/landing-page/jpeltanal` in the preview.
-   - Confirm no blank screen and no client-side runtime error when HeyGen is unavailable.
+## What I'll do
 
-### Technical notes
-- Current code calls `https://api.heygen.com/v1/streaming.create_token` and already handles non-JSON responses, but the current SDK/token flow still needs to be made fully tolerant of HeyGen endpoint failures.
-- The existing package is `@heygen/streaming-avatar@2.0.17`; I’ll keep it unless the codebase requires a package update after verifying the current HeyGen API shape.
-- The app will still need a valid HeyGen API key with streaming/avatar access for the live avatar to render. Without that, the fallback greeting will display cleanly.
+1. **Verify the new key** by calling `POST https://api.heygen.com/v1/streaming.create_token` from the edge function and logging the status/plan info. If it still 404s, I'll surface the exact HeyGen error in the UI so we know it's an account entitlement issue, not code.
+2. **Harden `heygen-token`** to also try the newer `/v1/streaming.new` token-issuing path as a fallback, and pass the requested `avatar_id` through so it can be swapped later.
+3. **Rewrite `HeyGenAvatar.tsx`** for a real interactive session:
+   - Request token → `new StreamingAvatar({ token })` → `createStartAvatar({ quality: Low, avatarName: Wayne_20240711, voice: { rate: 1 } })`.
+   - On `STREAM_READY`, attach `MediaStream` to a `<video>` and call `avatar.speak({ text, taskType: REPEAT })` with the personalized greeting derived from the slug (`"jp"` → `"JP"`, `"john-smith"` → `"John Smith"`).
+   - Show a loading state; if autoplay is blocked, show the existing "Play greeting" button which calls `video.play()`.
+   - On any HeyGen error (still 404, quota exhausted, session limit), fall back to the current Jessie video + text card so the page never breaks.
+4. **Keep the slug-to-name logic** already in `LandingWithAvatarPage.tsx` (`"jp"` → `"JP"`, uppercasing 1–2 letter tokens, title-casing longer ones). The greeting sent to HeyGen becomes:
+   > "Congratulations on your recent closing, JP! Welcome to RE Pro Business Credit…"
+5. **Verify in-browser** with Playwright on `/landing-page/jp` and `/landing-page/john-smith`: confirm the video element gets a `MediaStream`, the avatar speaks, and the fallback triggers cleanly if HeyGen is still blocking.
+
+## Technical notes
+
+- HeyGen streaming sessions cost concurrent-session credits; each page load starts one. We'll close the session on unmount (already wired via `stopAvatar`).
+- Session length is capped (typically 3–5 min for Interactive Avatar); the greeting is ~15s, so no risk.
+- The slug-derived name is sent as plain text to `speak()`. No sanitization needed beyond stripping punctuation, which the existing `cleanVisitorName` already does.
+- Nothing changes on the DB or RLS side.
+
+## Deliverable
+
+- `/landing-page/jp` loads, the avatar appears within a few seconds, and speaks the greeting including "JP".
+- If HeyGen still refuses (wrong plan, quota), the page shows Jessie's video + a text greeting instead of a broken/blank state.
