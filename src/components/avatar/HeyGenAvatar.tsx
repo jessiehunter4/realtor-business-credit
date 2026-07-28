@@ -43,7 +43,6 @@ const HeyGenAvatar = ({
         }
 
         if (!data?.video_url) {
-          setErrorDetail(data?.error || "HeyGen did not return a video URL.");
           if (!cancelled) setStatus("fallback");
           return;
         }
@@ -53,11 +52,9 @@ const HeyGenAvatar = ({
         setVideoUrl(data.video_url);
       } catch (e) {
         console.warn("[HeyGen] avatar video unavailable; showing fallback.", e);
-        if (!cancelled) {
-          setErrorDetail(e instanceof Error ? e.message : "Unknown error");
-          setStatus("fallback");
-        }
+        if (!cancelled) setStatus("fallback");
       }
+
     })();
 
     return () => {
