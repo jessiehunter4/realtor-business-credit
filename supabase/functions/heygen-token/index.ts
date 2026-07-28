@@ -4,7 +4,10 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-const HEYGEN_TOKEN_ENDPOINT = 'https://api.heygen.com/v1/streaming.create_token'
+const HEYGEN_TOKEN_ENDPOINTS = [
+  'https://api.heygen.com/v1/streaming.create_token',
+  'https://api.heygen.com/v1/streaming/create_token',
+]
 
 const jsonResponse = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -33,31 +36,37 @@ Deno.serve(async (req) => {
       return jsonResponse({ token: null, mode: 'fallback', error: 'HEYGEN_API_KEY not configured' })
     }
 
-    const res = await fetch(HEYGEN_TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'X-Api-Key': apiKey,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
-    const text = await res.text()
+    let lastStatus = 0
+    let lastBody = ''
     let json: any = null
-    try { json = JSON.parse(text) } catch { /* non-JSON */ }
-
-    if (!res.ok || !json) {
-      console.info('HeyGen token unavailable; using greeting fallback', {
-        status: res.status,
-        contentType: res.headers.get('content-type'),
-        body: summarizeProviderResponse(text),
+    for (const endpoint of HEYGEN_TOKEN_ENDPOINTS) {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'X-Api-Key': apiKey,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
       })
+      lastStatus = res.status
+      lastBody = await res.text()
+      console.info('HeyGen token attempt', { endpoint, status: res.status })
+      try { json = JSON.parse(lastBody) } catch { json = null }
+      if (res.ok && json) break
+      json = null
+    }
 
+    if (!json) {
+      console.info('HeyGen token unavailable; using greeting fallback', {
+        status: lastStatus,
+        body: summarizeProviderResponse(lastBody),
+      })
       return jsonResponse({
         token: null,
         mode: 'fallback',
         error: 'HeyGen token unavailable',
-        status: res.status,
-        details: summarizeProviderResponse(text),
+        status: lastStatus,
+        details: summarizeProviderResponse(lastBody),
       })
     }
 
