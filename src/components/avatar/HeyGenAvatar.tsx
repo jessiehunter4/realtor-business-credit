@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import StreamingAvatar, {
   AvatarQuality,
   StreamingEvents,
@@ -19,7 +19,7 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
   const avatarRef = useRef<StreamingAvatar | null>(null);
   const startedRef = useRef(false);
   const [status, setStatus] = useState<"loading" | "ready" | "needs-play" | "error">("loading");
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const spokenGreeting = useMemo(() => greeting.trim(), [greeting]);
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -29,7 +29,9 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
     (async () => {
       try {
         const { data, error } = await supabase.functions.invoke("heygen-token");
-        if (error || !data?.token) throw new Error(error?.message || "Missing token");
+        if (error || !data?.token) {
+          throw new Error(data?.error || error?.message || "Live avatar unavailable");
+        }
         if (cancelled) return;
 
         const avatar = new StreamingAvatar({ token: data.token });
@@ -44,8 +46,8 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
             .catch(() => setStatus("needs-play"));
 
           avatar
-            .speak({ text: greeting, taskType: TaskType.REPEAT })
-            .catch((e) => console.error("[HeyGen] speak error:", e));
+            .speak({ text: spokenGreeting, taskType: TaskType.REPEAT })
+            .catch((e) => console.warn("[HeyGen] speak unavailable:", e));
         });
 
         await avatar.createStartAvatar({
@@ -53,9 +55,8 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
           avatarName,
         });
       } catch (e: any) {
-        console.error("[HeyGen] session error:", e);
+        console.warn("[HeyGen] live avatar unavailable; showing text greeting instead.", e);
         if (!cancelled) {
-          setErrorMsg(e?.message || "Failed to start avatar");
           setStatus("error");
         }
       }
@@ -66,24 +67,21 @@ const HeyGenAvatar = ({ greeting, avatarName = DEFAULT_AVATAR }: Props) => {
       avatarRef.current?.stopAvatar().catch(() => {});
       avatarRef.current = null;
     };
-  }, [greeting, avatarName]);
+  }, [spokenGreeting, avatarName]);
 
   const handleManualPlay = async () => {
     try {
       await videoRef.current?.play();
       setStatus("ready");
     } catch (e) {
-      console.error("[HeyGen] manual play failed:", e);
+      console.warn("[HeyGen] manual play unavailable:", e);
     }
   };
 
   if (status === "error") {
     return (
       <div className="rounded-2xl border border-border bg-white p-6 shadow-card max-w-2xl mx-auto text-center">
-        <p className="text-secondary text-lg leading-relaxed whitespace-pre-line">{greeting}</p>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Live avatar unavailable right now{errorMsg ? `: ${errorMsg}` : "."}
-        </p>
+        <p className="text-secondary text-lg leading-relaxed whitespace-pre-line">{spokenGreeting}</p>
       </div>
     );
   }
