@@ -1,4 +1,8 @@
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -16,9 +20,11 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
     })
-    const json = await res.json()
-    if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'HeyGen token error', details: json }), {
+    const text = await res.text()
+    let json: any = null
+    try { json = JSON.parse(text) } catch { /* non-JSON */ }
+    if (!res.ok || !json) {
+      return new Response(JSON.stringify({ error: 'HeyGen token error', status: res.status, details: json ?? text.slice(0, 500) }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
