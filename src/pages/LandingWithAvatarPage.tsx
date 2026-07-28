@@ -8,19 +8,35 @@ import ProgramCurriculum from "@/components/landing/ProgramCurriculum";
 import FinalCTABright from "@/components/landing/FinalCTABright";
 import Seo from "@/components/shared/Seo";
 
+const cleanVisitorName = (slug?: string) => {
+  if (!slug) return "";
+
+  const decoded = decodeURIComponent(slug)
+    .replace(/[+_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!decoded) return "";
+
+  return decoded
+    .split(" ")
+    .map((part) => (part.length > 1 ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part.toUpperCase()))
+    .join(" ");
+};
+
 const LandingWithAvatarPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const visitorName = (slug || "").trim();
+  const visitorName = cleanVisitorName(slug);
   const greeting = visitorName
-    ? `Congratulations on your closing, ${visitorName}! Welcome to RE Pro Business Credit. I'm excited to help you build your business credit and guide you through your personalized funding journey.`
-    : `Welcome to RE Pro Business Credit. I'm excited to help you build your business credit and guide you through your personalized funding journey.`;
+    ? `Congratulations on your recent closing, ${visitorName}. Welcome to RE Pro Business Credit. I'm excited to help you build the business structure, financial foundation, and separate business credit that can support your real estate business when you need it.`
+    : `Congratulations on your recent closing. Welcome to RE Pro Business Credit. I'm excited to help you build the business structure, financial foundation, and separate business credit that can support your real estate business when you need it.`;
 
   return (
     <div className="min-h-screen bg-background">
       <Seo
         title="Your Personal Welcome — RE Pro Business Credit"
         description="Personalized welcome from RE Pro Business Credit."
-        path={`/landing-page/${visitorName}`}
+        path={`/landing-page/${slug || ""}`}
       />
       <SiteHeader />
 
