@@ -27,7 +27,12 @@ const cleanVisitorName = (slug?: string) => {
 const LandingWithAvatarPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const visitorName = cleanVisitorName(slug);
-  const greeting = visitorName
+
+  const spokenGreeting = visitorName
+    ? `Congratulations on your recent closing, ${visitorName}! Welcome to RE Pro Business Credit.`
+    : `Congratulations on your recent closing! Welcome to RE Pro Business Credit.`;
+
+  const fallbackMessage = visitorName
     ? `Congratulations on your recent closing, ${visitorName}. Welcome to RE Pro Business Credit. I'm excited to help you build the business structure, financial foundation, and separate business credit that can support your real estate business when you need it.`
     : `Congratulations on your recent closing. Welcome to RE Pro Business Credit. I'm excited to help you build the business structure, financial foundation, and separate business credit that can support your real estate business when you need it.`;
 
@@ -50,7 +55,7 @@ const LandingWithAvatarPage = () => {
               Press play if the video doesn't start automatically.
             </p>
           </div>
-          <HeyGenAvatar greeting={greeting} />
+          <HeyGenAvatar greeting={spokenGreeting} fallbackMessage={fallbackMessage} />
         </div>
       </section>
 
