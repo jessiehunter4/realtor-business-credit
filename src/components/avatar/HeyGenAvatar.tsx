@@ -20,9 +20,9 @@ const HeyGenAvatar = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const startedRef = useRef(false);
   const [status, setStatus] = useState<AvatarStatus>("loading");
-  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const spokenGreeting = useMemo(() => greeting.trim(), [greeting]);
+
 
   useEffect(() => {
     if (startedRef.current) return;
