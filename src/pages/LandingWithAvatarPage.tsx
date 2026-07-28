@@ -31,7 +31,17 @@ const LandingWithAvatarPage = () => {
           </div>
           <div className="max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg border border-border bg-black">
             <iframe
-              src="https://embed.liveavatar.com/v1/bf17648d-3168-458c-a9c4-44312fc338f0?orientation=horizontal"
+              src={(() => {
+                const params = new URLSearchParams({ orientation: "horizontal" });
+                if (visitorName) {
+                  // Pass the slug under several common variable names so whichever
+                  // one the LiveAvatar script references will resolve.
+                  params.set("name", visitorName);
+                  params.set("first_name", visitorName);
+                  params.set("visitor_name", visitorName);
+                }
+                return `https://embed.liveavatar.com/v1/bf17648d-3168-458c-a9c4-44312fc338f0?${params.toString()}`;
+              })()}
               allow="microphone; autoplay"
               title="LiveAvatar Embed"
               className="w-full block"
