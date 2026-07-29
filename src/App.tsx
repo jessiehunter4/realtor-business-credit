@@ -28,6 +28,8 @@ import TermsPage from "./pages/TermsPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentCancelledPage from "./pages/PaymentCancelledPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { RequireAdmin, RequireVisitor } from "./components/auth/RoleGuards";
 import { AuthRoleProvider } from "./hooks/useAuthRole";
@@ -73,6 +75,8 @@ const App = () => (
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/mock-login" element={<MockLoginPage />} />
           <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
+          <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
