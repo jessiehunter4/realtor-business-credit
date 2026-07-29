@@ -152,8 +152,8 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full" size="lg" disabled={submitting}>
             <SmsConsentCheckbox phone={phone} checked={smsConsent} onCheckedChange={setSmsConsent} />
+            <Button type="submit" className="w-full" size="lg" disabled={submitting}>
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
