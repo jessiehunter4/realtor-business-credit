@@ -23,6 +23,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PRICING_TIERS, STRIPE_LINKS } from "@/data/pricingTiers";
+import { startCheckout } from "@/lib/startCheckout";
 
 const tiers = PRICING_TIERS;
 
@@ -236,10 +237,9 @@ const PricingPage = () => {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={tier.ctaHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => startCheckout(tier.id)}
                   className={
                     "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
                     (tier.highlighted
@@ -249,7 +249,7 @@ const PricingPage = () => {
                 >
                   {tier.ctaLabel}
                   <ArrowRight className="h-4 w-4" />
-                </a>
+                </button>
                 <Link
                   to="/one-on-one"
                   className="mt-3 text-center text-xs font-medium text-primary hover:underline"
@@ -317,13 +317,13 @@ const PricingPage = () => {
                     &nbsp;
                   </th>
                   <td className="p-4 text-center border-t border-border">
-                    <a href={STRIPE_LINKS.selfPaced} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-primary hover:underline">Get Started →</a>
+                    <button type="button" onClick={() => startCheckout("self-paced")} className="text-xs font-semibold text-primary hover:underline">Get Started →</button>
                   </td>
                   <td className="p-4 text-center border-t border-border">
-                    <a href={STRIPE_LINKS.cohort} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-primary hover:underline">Enroll →</a>
+                    <button type="button" onClick={() => startCheckout("cohort")} className="text-xs font-semibold text-primary hover:underline">Enroll →</button>
                   </td>
                   <td className="p-4 text-center border-t border-border">
-                    <a href={STRIPE_LINKS.oneOnOne} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-primary hover:underline">Start 1:1 →</a>
+                    <button type="button" onClick={() => startCheckout("one-on-one")} className="text-xs font-semibold text-primary hover:underline">Start 1:1 →</button>
                   </td>
                 </tr>
               </tbody>
