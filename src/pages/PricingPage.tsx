@@ -166,7 +166,7 @@ const PricingPage = () => {
     setLoadingTier(tierId);
     setErrorByTier((prev) => ({ ...prev, [tierId]: undefined }));
     const result = await startCheckout(tierId);
-    if (!result.ok) {
+    if (result.ok === false) {
       setErrorByTier((prev) => ({ ...prev, [tierId]: result.message }));
       setLoadingTier(null);
     }
@@ -256,17 +256,36 @@ const PricingPage = () => {
                 </ul>
                 <button
                   type="button"
-                  onClick={() => startCheckout(tier.id)}
+                  onClick={() => handleCheckout(tier.id)}
+                  disabled={loadingTier !== null}
                   className={
                     "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
                     (tier.highlighted
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
-                      : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5")
+                      : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                    " disabled:opacity-60 disabled:cursor-not-allowed"
                   }
                 >
-                  {tier.ctaLabel}
-                  <ArrowRight className="h-4 w-4" />
+                  {loadingTier === tier.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Redirecting to Stripe…
+                    </>
+                  ) : (
+                    <>
+                      {tier.ctaLabel}
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </button>
+                {errorByTier[tier.id] && (
+                  <p
+                    role="alert"
+                    className="mt-2 text-center text-xs font-medium text-destructive"
+                  >
+                    {errorByTier[tier.id]}
+                  </p>
+                )}
                 <Link
                   to="/one-on-one"
                   className="mt-3 text-center text-xs font-medium text-primary hover:underline"
