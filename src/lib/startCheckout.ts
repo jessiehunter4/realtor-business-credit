@@ -20,37 +20,40 @@ export async function startCheckout(
   tierId: CheckoutTierId,
   leadId?: string,
 ): Promise<CheckoutResult> {
-  const isFramed = (() => {
-    try {
-      return window.top !== window.self;
-    } catch {
-      return true;
-    }
-  })();
-  const checkoutWindow = isFramed ? window.open("", "_blank") : null;
+  // Pre-open a blank tab synchronously (inside the click handler) so popup
+  // blockers allow it. We'll redirect this tab to Stripe once we have the URL.
+  const checkoutWindow = window.open("about:blank", "_blank");
   if (checkoutWindow) {
-    checkoutWindow.document.title = "Opening secure checkout";
-    checkoutWindow.document.body.innerHTML =
-      '<main style="font-family: system-ui, sans-serif; min-height: 100vh; display: grid; place-items: center; margin: 0; color: #0d1b2a;"><p style="font-size: 18px; font-weight: 600;">Opening secure Stripe checkout…</p></main>';
+    try {
+      checkoutWindow.document.write(
+        '<title>Opening secure checkout…</title><main style="font-family:system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;margin:0;color:#0d1b2a"><p style="font-size:18px;font-weight:600">Opening secure Stripe checkout…</p></main>',
+      );
+    } catch {
+      // ignore — some browsers restrict document.write on about:blank
+    }
   }
 
   const { data: sessionData } = await supabase.auth.getSession();
   const navigate = (url: string) => {
     if (checkoutWindow && !checkoutWindow.closed) {
-      checkoutWindow.opener = null;
-      checkoutWindow.location.replace(url);
-      return;
+      try {
+        checkoutWindow.location.href = url;
+        return;
+      } catch {
+        // fall through
+      }
     }
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (opened) return;
     try {
       if (window.top && window.top !== window.self) {
-        window.top.location.href = url;
+        (window.top as Window).location.href = url;
         return;
       }
     } catch {
-      // Cross-origin top frame — fall through to new tab.
+      // cross-origin top — last resort
     }
-    const opened = window.open(url, "_blank", "noopener,noreferrer");
-    if (!opened) window.location.assign(url);
+    window.location.assign(url);
   };
 
   if (!sessionData.session) {
