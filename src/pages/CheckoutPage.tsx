@@ -26,8 +26,9 @@ const CheckoutPage = () => {
   const [searchParams] = useSearchParams();
   const { contactId } = useContactIdentity();
   const taggedMount = useRef(false);
-  const initialTier = isCheckoutTier(searchParams.get("tier"))
-    ? searchParams.get("tier")
+  const tierParam = searchParams.get("tier");
+  const initialTier: CheckoutTierId = isCheckoutTier(tierParam)
+    ? tierParam
     : "cohort";
   const [selectedTier, setSelectedTier] = useState<CheckoutTierId>(initialTier);
   const [isLoading, setIsLoading] = useState(false);
