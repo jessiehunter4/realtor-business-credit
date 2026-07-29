@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import {
   Check,
   Minus,
@@ -11,6 +12,7 @@ import {
   Star,
   CalendarClock,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -23,7 +25,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PRICING_TIERS, STRIPE_LINKS } from "@/data/pricingTiers";
-import { startCheckout } from "@/lib/startCheckout";
+import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
 
 const tiers = PRICING_TIERS;
 
@@ -156,6 +158,21 @@ const Cell = ({ value }: { value: boolean | string }) => {
 };
 
 const PricingPage = () => {
+  const [loadingTier, setLoadingTier] = useState<CheckoutTierId | null>(null);
+  const [errorByTier, setErrorByTier] = useState<Partial<Record<CheckoutTierId, string>>>({});
+
+  const handleCheckout = async (tierId: CheckoutTierId) => {
+    if (loadingTier) return;
+    setLoadingTier(tierId);
+    setErrorByTier((prev) => ({ ...prev, [tierId]: undefined }));
+    const result = await startCheckout(tierId);
+    if (!result.ok) {
+      setErrorByTier((prev) => ({ ...prev, [tierId]: result.message }));
+      setLoadingTier(null);
+    }
+    // On success the browser navigates away; leave loading state on.
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
