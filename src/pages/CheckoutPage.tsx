@@ -1,10 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   CheckCircle,
   Shield,
   CreditCard,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
@@ -12,12 +14,29 @@ import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/shared/Seo";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
+import { PRICING_TIERS } from "@/data/pricingTiers";
+import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
 
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/00w3cu4RbbqO8vL1YfbfO00";
+const validTierIds: CheckoutTierId[] = ["self-paced", "cohort", "one-on-one"];
+
+const isCheckoutTier = (value: string | null): value is CheckoutTierId =>
+  !!value && validTierIds.includes(value as CheckoutTierId);
 
 const CheckoutPage = () => {
+  const [searchParams] = useSearchParams();
   const { contactId } = useContactIdentity();
   const taggedMount = useRef(false);
+  const initialTier = isCheckoutTier(searchParams.get("tier"))
+    ? searchParams.get("tier")
+    : "cohort";
+  const [selectedTier, setSelectedTier] = useState<CheckoutTierId>(initialTier);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const selectedPlan = useMemo(
+    () => PRICING_TIERS.find((tier) => tier.id === selectedTier),
+    [selectedTier],
+  );
 
   const { logEvent } = useEngagementTracker({
     contactId,
@@ -40,7 +59,8 @@ const CheckoutPage = () => {
     }
   }, [contactId, logEvent]);
 
-  const handlePaymentClick = () => {
+  const handlePaymentClick = async () => {
+    if (isLoading) return;
     logEvent("checkout_clicked");
     if (contactId) {
       supabase.functions
@@ -48,6 +68,13 @@ const CheckoutPage = () => {
           body: { contactId, tags: ["f-checkout-clicked"] },
         })
         .catch((e) => console.error("Failed to tag checkout click:", e));
+    }
+    setIsLoading(true);
+    setError(null);
+    const result = await startCheckout(selectedTier);
+    if (result.ok === false) {
+      setError(result.message);
+      setIsLoading(false);
     }
   };
 
@@ -89,40 +116,70 @@ const CheckoutPage = () => {
           <Card className="bg-card border-border rounded-2xl shadow-card text-left mb-10 max-w-lg mx-auto">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-lg font-semibold text-secondary mb-5">
-                What's Included
+                Choose Your Program
               </h2>
-              <ul className="space-y-4">
-                {[
-                  "Personalized RE Pro Business Credit Plan",
-                  "1-on-1 coaching with a Realtor credit specialist",
-                  "90-day action plan with milestones",
-                  "Credit Suite portal & business funding directory",
-                  "Cohort access with other Realtors building credit",
-                  "Ongoing support and progress tracking",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm text-foreground/90">
-                      {item}
+              <div className="space-y-3">
+                {PRICING_TIERS.map((tier) => (
+                  <button
+                    key={tier.id}
+                    type="button"
+                    onClick={() => setSelectedTier(tier.id)}
+                    disabled={isLoading}
+                    className={
+                      "w-full rounded-xl border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-70 " +
+                      (selectedTier === tier.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border bg-background hover:border-primary/40")
+                    }
+                  >
+                    <span className="flex items-start gap-3">
+                      <CheckCircle
+                        className={
+                          "mt-0.5 h-5 w-5 shrink-0 " +
+                          (selectedTier === tier.id ? "text-primary" : "text-secondary/35")
+                        }
+                      />
+                      <span className="flex-1">
+                        <span className="block text-sm font-semibold text-secondary">
+                          {tier.name} · {tier.price}
+                        </span>
+                        <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                          {tier.who}
+                        </span>
+                      </span>
                     </span>
-                  </li>
+                  </button>
                 ))}
-              </ul>
+              </div>
             </CardContent>
           </Card>
 
           {/* CTA Button */}
-          <a
-            href={STRIPE_PAYMENT_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
             onClick={handlePaymentClick}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
+            disabled={isLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all disabled:cursor-not-allowed disabled:opacity-70"
           >
-            <CreditCard className="h-5 w-5" />
-            Proceed to Payment
-            <ArrowRight className="h-5 w-5" />
-          </a>
+            {isLoading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Redirecting to Stripe…
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-5 w-5" />
+                Proceed to Payment{selectedPlan ? ` — ${selectedPlan.name}` : ""}
+                <ArrowRight className="h-5 w-5" />
+              </>
+            )}
+          </button>
+
+          {error && (
+            <p role="alert" className="mt-3 text-sm font-medium text-destructive">
+              {error}
+            </p>
+          )}
 
           <p className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-1.5">
             <Shield className="h-3.5 w-3.5" />

@@ -50,7 +50,7 @@ const READINESS_OPTIONS: Option[] = [
     accent: "border-primary/40 bg-primary/5",
     showPricing: true,
     pricingDefaultOpen: "cohort",
-    cta: { label: "Enroll & begin", href: "/checkout", icon: CreditCard },
+    cta: { label: "Enroll & begin", href: "/checkout?tier=cohort", icon: CreditCard },
   },
   {
     id: "within_30",

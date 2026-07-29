@@ -20,8 +20,27 @@ export async function startCheckout(
   tierId: CheckoutTierId,
   leadId?: string,
 ): Promise<CheckoutResult> {
+  const isFramed = (() => {
+    try {
+      return window.top !== window.self;
+    } catch {
+      return true;
+    }
+  })();
+  const checkoutWindow = isFramed ? window.open("", "_blank") : null;
+  if (checkoutWindow) {
+    checkoutWindow.document.title = "Opening secure checkout";
+    checkoutWindow.document.body.innerHTML =
+      '<main style="font-family: system-ui, sans-serif; min-height: 100vh; display: grid; place-items: center; margin: 0; color: #0d1b2a;"><p style="font-size: 18px; font-weight: 600;">Opening secure Stripe checkout…</p></main>';
+  }
+
   const { data: sessionData } = await supabase.auth.getSession();
   const navigate = (url: string) => {
+    if (checkoutWindow && !checkoutWindow.closed) {
+      checkoutWindow.opener = null;
+      checkoutWindow.location.replace(url);
+      return;
+    }
     try {
       if (window.top && window.top !== window.self) {
         window.top.location.href = url;
@@ -35,6 +54,7 @@ export async function startCheckout(
   };
 
   if (!sessionData.session) {
+    if (checkoutWindow && !checkoutWindow.closed) checkoutWindow.close();
     const redirect = encodeURIComponent(`/pricing?tier=${tierId}`);
     window.location.assign(`/auth?redirect=${redirect}`);
     return { ok: true };
@@ -49,6 +69,7 @@ export async function startCheckout(
     navigate(data.url);
     return { ok: true };
   } catch (err) {
+    if (checkoutWindow && !checkoutWindow.closed) checkoutWindow.close();
     console.error("Checkout failed:", err);
     const message = friendlyMessage((err as Error).message || "");
     toast({
