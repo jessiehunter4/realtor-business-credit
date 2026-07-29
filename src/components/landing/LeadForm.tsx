@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import PhoneInput from "@/components/shared/PhoneInput";
 import { mergeContactIdentity } from "@/lib/contactIdentityStore";
+import SmsConsentCheckbox from "@/components/shared/SmsConsentCheckbox";
+import { SMS_CONSENT_TEXT } from "@/lib/messagingConsent";
 
 interface LeadFormProps {
   defaultValues: {
@@ -33,6 +35,7 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
     state: defaultValues.state,
     optIn: false,
     fundabilityScan: false,
+    smsConsent: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,6 +55,10 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
           state: formData.state,
           wantsFundabilityScan: formData.fundabilityScan,
           ghlContactId: defaultValues.contactId || undefined,
+          emailConsent: formData.optIn,
+          smsConsent: formData.smsConsent,
+          smsConsentText: formData.smsConsent ? SMS_CONSENT_TEXT : undefined,
+          smsConsentSource: "LandingPageLeadForm",
         },
       });
       if (error) {
@@ -133,9 +140,14 @@ const LeadForm = ({ defaultValues }: LeadFormProps) => {
             <div className="flex items-start space-x-3">
               <Checkbox id="optIn" checked={formData.optIn} onCheckedChange={(checked) => setFormData({ ...formData, optIn: checked as boolean })} required />
               <label htmlFor="optIn" className="text-sm leading-relaxed cursor-pointer">
-                Yes! Send me the complete guide with action plan and information about the launch special. I consent to be contacted by My Better Business Credit via email, phone, or text message. *
+                Yes! Email me the complete guide with action plan and information about the launch special. I can unsubscribe anytime. *
               </label>
             </div>
+            <SmsConsentCheckbox
+              phone={formData.phone}
+              checked={formData.smsConsent}
+              onCheckedChange={(checked) => setFormData({ ...formData, smsConsent: checked })}
+            />
             <div className="flex items-start space-x-3">
               <Checkbox id="fundabilityScan" checked={formData.fundabilityScan} onCheckedChange={(checked) => setFormData({ ...formData, fundabilityScan: checked as boolean })} />
               <label htmlFor="fundabilityScan" className="text-sm leading-relaxed cursor-pointer">
