@@ -21,6 +21,19 @@ export async function startCheckout(
   leadId?: string,
 ): Promise<CheckoutResult> {
   const { data: sessionData } = await supabase.auth.getSession();
+  const navigate = (url: string) => {
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch {
+      // Cross-origin top frame — fall through to new tab.
+    }
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) window.location.assign(url);
+  };
+
   if (!sessionData.session) {
     const redirect = encodeURIComponent(`/pricing?tier=${tierId}`);
     window.location.assign(`/auth?redirect=${redirect}`);
@@ -33,7 +46,7 @@ export async function startCheckout(
     });
     if (error) throw error;
     if (!data?.url) throw new Error("No checkout URL returned");
-    window.location.assign(data.url);
+    navigate(data.url);
     return { ok: true };
   } catch (err) {
     console.error("Checkout failed:", err);
