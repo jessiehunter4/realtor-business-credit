@@ -16,7 +16,26 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const { firstName, lastName, email, phone, agentType, state, wantsFundabilityScan, ghlContactId, source } = await req.json();
+    const {
+      firstName, lastName, email, phone, agentType, state, wantsFundabilityScan, ghlContactId, source,
+      emailConsent, smsConsent, smsConsentText, smsConsentSource,
+    } = await req.json();
+
+    const now = new Date().toISOString();
+    const smsOptIn = smsConsent === true;
+    // Express written consent captured on-form is the ONLY path to SMS eligibility.
+    const consentFields: Record<string, unknown> = {
+      email_consent: emailConsent !== false,
+      email_consent_at: emailConsent !== false ? now : null,
+    };
+    if (smsOptIn) {
+      consentFields.sms_consent = true;
+      consentFields.sms_consent_at = now;
+      consentFields.sms_consent_source = smsConsentSource || source || 'web-form';
+      consentFields.sms_consent_text = smsConsentText || null;
+      consentFields.sms_opted_out_at = null;
+      consentFields.sms_eligible = true;
+    }
 
     console.log('Submitting lead:', { firstName, lastName, email, agentType, state, ghlContactId: ghlContactId ? 'provided' : 'not provided' });
 
@@ -52,7 +71,8 @@ Deno.serve(async (req) => {
           state: state || 'unknown',
           wants_fundability_scan: wantsFundabilityScan || false,
           ghl_contact_id: resolvedGhlContactId,
-          updated_at: new Date().toISOString(),
+          updated_at: now,
+          ...consentFields,
         })
         .eq('id', existingLead.id);
 
@@ -73,6 +93,7 @@ Deno.serve(async (req) => {
           wants_fundability_scan: wantsFundabilityScan || false,
           ghl_contact_id: resolvedGhlContactId,
           source: source || 'LandingPageRealtorBusinessCredit',
+          ...consentFields,
         })
         .select()
         .single();
