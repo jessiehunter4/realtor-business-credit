@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import PlanHeroCard from "@/components/dashboard/PlanHeroCard";
 import WelcomeDialog from "@/components/dashboard/WelcomeDialog";
+import MessagePreferencesCard from "@/components/dashboard/MessagePreferencesCard";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -145,6 +146,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         )}
+
+        <MessagePreferencesCard />
       </main>
 
       <SiteFooter />

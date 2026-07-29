@@ -61,6 +61,8 @@ interface Lead {
   state: string;
   wants_fundability_scan: boolean;
   source: string;
+  sms_consent?: boolean;
+  sms_opted_out_at?: string | null;
 }
 
 const MAX_RETRIES = 5;
@@ -154,7 +156,8 @@ function buildContactFromAgent(agent: Agent): GHLContact {
   const lastName = agent.last_name || names.slice(1).join(' ') || '';
 
   // Determine tags based on agent type
-  const tags = ['JustClosed', 'RealtorBusinessCredit', 'FromMLSImport'];
+  // MLS-imported numbers have NO express written consent: never SMS eligible.
+  const tags = ['JustClosed', 'RealtorBusinessCredit', 'FromMLSImport', 'sms-consent-no', 'no-sms-mls-import'];
   
   // Add specific agent type tag
   if (agent.type === 'Listing Agent') {
@@ -201,6 +204,9 @@ function buildContactFromLead(lead: Lead): GHLContact {
   if (lead.wants_fundability_scan) {
     tags.push('RequestedFundabilityScan');
   }
+  // Only express written consent captured on a form makes a lead SMS eligible.
+  const smsOk = lead.sms_consent === true && !lead.sms_opted_out_at;
+  tags.push(smsOk ? 'sms-consent-yes' : 'sms-consent-no');
 
   return {
     firstName: lead.first_name,
