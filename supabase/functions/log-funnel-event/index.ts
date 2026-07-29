@@ -19,6 +19,8 @@ const ALLOWED_EVENTS = [
   'checkout_visited',
   'checkout_clicked',
   'checkout_session',
+  'checkout_completed',
+  'checkout_cancelled',
   'one_on_one_visited',
   'one_on_one_session',
   'intake_started',
