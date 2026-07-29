@@ -8,6 +8,8 @@ import { BookOpen, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { mergeContactIdentity } from "@/lib/contactIdentityStore";
+import SmsConsentCheckbox from "@/components/shared/SmsConsentCheckbox";
+import { SMS_CONSENT_TEXT } from "@/lib/messagingConsent";
 
 interface GuideOptInGateProps {
   onAccessGranted: (contactId: string) => void;
@@ -18,6 +20,7 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [smsConsent, setSmsConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +43,10 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
           state: "unknown",
           wantsFundabilityScan: false,
           source: "GuideOptIn",
+          emailConsent: true,
+          smsConsent,
+          smsConsentText: smsConsent ? SMS_CONSENT_TEXT : undefined,
+          smsConsentSource: "GuideOptIn",
         },
       });
 
@@ -146,6 +153,7 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
               />
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={submitting}>
+            <SmsConsentCheckbox phone={phone} checked={smsConsent} onCheckedChange={setSmsConsent} />
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
