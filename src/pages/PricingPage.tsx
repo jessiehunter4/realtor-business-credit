@@ -352,15 +352,36 @@ const PricingPage = () => {
                   <th scope="row" className="p-4 text-sm font-medium text-secondary/90 border-t border-border">
                     &nbsp;
                   </th>
-                  <td className="p-4 text-center border-t border-border">
-                    <button type="button" onClick={() => startCheckout("self-paced")} className="text-xs font-semibold text-primary hover:underline">Get Started →</button>
-                  </td>
-                  <td className="p-4 text-center border-t border-border">
-                    <button type="button" onClick={() => startCheckout("cohort")} className="text-xs font-semibold text-primary hover:underline">Enroll →</button>
-                  </td>
-                  <td className="p-4 text-center border-t border-border">
-                    <button type="button" onClick={() => startCheckout("one-on-one")} className="text-xs font-semibold text-primary hover:underline">Start 1:1 →</button>
-                  </td>
+                  {(
+                    [
+                      { id: "self-paced" as const, label: "Get Started" },
+                      { id: "cohort" as const, label: "Enroll" },
+                      { id: "one-on-one" as const, label: "Start 1:1" },
+                    ]
+                  ).map(({ id, label }) => (
+                    <td key={id} className="p-4 text-center border-t border-border align-top">
+                      <button
+                        type="button"
+                        onClick={() => handleCheckout(id)}
+                        disabled={loadingTier !== null}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed"
+                      >
+                        {loadingTier === id ? (
+                          <>
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Redirecting…
+                          </>
+                        ) : (
+                          <>{label} →</>
+                        )}
+                      </button>
+                      {errorByTier[id] && (
+                        <p role="alert" className="mt-1 text-[11px] text-destructive">
+                          {errorByTier[id]}
+                        </p>
+                      )}
+                    </td>
+                  ))}
                 </tr>
               </tbody>
             </table>
