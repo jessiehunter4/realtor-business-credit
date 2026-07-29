@@ -1,33 +1,39 @@
-## Current state
+# Stripe Payment Result Pages
 
-`/pricing` already wires all tier CTAs (3 cards + 3 comparison-table row links) to `startCheckout(tierId)`, which invokes the `create-checkout-session` edge function and redirects to the returned Stripe URL. Missing pieces per the request: per-button loading state and friendly inline error messaging (today errors only surface via toast).
+Add dedicated `/payment-success` and `/payment-cancelled` routes and point Stripe Checkout at them instead of the current `/checkout` and `/pricing?status=cancelled` URLs.
 
-## Changes
+## New pages
 
-### 1. `src/lib/startCheckout.ts`
-- Return a structured result `{ ok: true } | { ok: false, message: string }` so callers can render inline errors.
-- Map common failure cases to friendly copy:
-  - Not signed in → still redirects to `/auth` (unchanged).
-  - `Invalid or missing priceId/tierId` / `Price not configured…` → "This plan isn't available for checkout yet. Please try another option or contact support."
-  - Stripe/network/unknown → "We couldn't start checkout. Please try again in a moment."
-- Keep toast as a secondary signal.
+**`src/pages/PaymentSuccessPage.tsx`** — mounted at `/payment-success`
+- Reads `session_id` and optional `tier` from the query string.
+- Shows a large success state (green check, "Payment received", tier name if present).
+- Sub-copy: "We're confirming your payment with Stripe. You'll be redirected to your dashboard in a few seconds."
+- Fires a `checkout_completed` funnel event via `log-funnel-event` (best-effort, ignore errors).
+- Auto-redirects to `/dashboard` after ~6s using `setTimeout` + `useNavigate`. Includes a manual "Go to Dashboard now" button and a secondary "View Pricing" link.
+- Uses existing bright/navy design tokens and `SiteHeader` for layout parity.
 
-### 2. `src/pages/PricingPage.tsx`
-- Add local state: `loadingTier: TierId | null` and `errorByTier: Record<TierId, string | undefined>`.
-- New handler `handleCheckout(tierId)`:
-  - Sets `loadingTier = tierId`, clears that tier's error.
-  - Awaits `startCheckout`; on failure stores the friendly message, clears loading.
-  - On success, browser navigates away (no cleanup needed).
-- Update the 3 tier card buttons:
-  - `disabled={loadingTier !== null}`.
-  - Label swaps to "Redirecting to Stripe…" with a spinning `Loader2` icon while `loadingTier === tier.id`.
-  - Render inline error text below the button when present (small, red, `role="alert"`).
-- Update the 3 comparison-table row links the same way (compact spinner, disabled while loading, inline error under the row cell).
-- No visual/style changes beyond the spinner + inline error text; existing classes preserved.
+**`src/pages/PaymentCancelledPage.tsx`** — mounted at `/payment-cancelled`
+- Neutral state (amber icon, "No payment was processed").
+- Copy: "Your card was not charged. You can head back to pricing whenever you're ready."
+- Primary CTA: "Return to Pricing" → `/pricing`. Secondary: "Back to Dashboard" → `/dashboard`.
+- Fires `checkout_cancelled` funnel event (best-effort).
 
-### 3. No backend changes
-`create-checkout-session` already validates, uses server-side price allowlist, and returns JSON errors — sufficient for the new UX.
+Both pages are public (no role guard) so Stripe's redirect always lands cleanly, even if the auth session hasn't rehydrated yet.
 
-## Files touched
-- `src/lib/startCheckout.ts`
-- `src/pages/PricingPage.tsx`
+## Wiring
+
+- `src/App.tsx` — register the two routes above the catch-all `NotFound`.
+- `supabase/functions/create-checkout-session/index.ts` — update the URLs sent to Stripe:
+  - `success_url`: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}&tier=<tierId>`
+  - `cancel_url`: `${origin}/payment-cancelled?tier=<tierId>`
+  - Redeploy the function so the new URLs take effect.
+- Leave the existing `/checkout` route untouched (still used elsewhere as a marketing/checkout landing page).
+
+## Funnel events
+
+Add `checkout_completed` and `checkout_cancelled` to the allowlist in `supabase/functions/log-funnel-event/index.ts` if they aren't already present, so the best-effort logging from the new pages doesn't 400.
+
+## Out of scope
+
+- Server-side payment verification / Stripe webhook handling (would require a separate `stripe-webhook` function and a `payments` table). The success page trusts Stripe's redirect and shows a "confirming" message; hard confirmation can be added later.
+- Any change to pricing UI or checkout initiation logic.
