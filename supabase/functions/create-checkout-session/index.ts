@@ -78,8 +78,15 @@ Deno.serve(async (req) => {
     form.append("mode", "payment");
     form.append("line_items[0][price]", priceId);
     form.append("line_items[0][quantity]", "1");
-    form.append("success_url", `${origin}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`);
-    form.append("cancel_url", `${origin}/pricing?status=cancelled`);
+    const tierParam = body.tierId ? `&tier=${encodeURIComponent(body.tierId)}` : "";
+    form.append(
+      "success_url",
+      `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}${tierParam}`,
+    );
+    form.append(
+      "cancel_url",
+      `${origin}/payment-cancelled?${body.tierId ? `tier=${encodeURIComponent(body.tierId)}` : ""}`,
+    );
     form.append("client_reference_id", userId);
     form.append("metadata[user_id]", userId);
     if (body.tierId) form.append("metadata[tier_id]", body.tierId);
