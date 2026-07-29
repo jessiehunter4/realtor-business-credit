@@ -61,6 +61,8 @@ interface Lead {
   state: string;
   wants_fundability_scan: boolean;
   source: string;
+  sms_consent?: boolean;
+  sms_opted_out_at?: string | null;
 }
 
 const MAX_RETRIES = 5;
