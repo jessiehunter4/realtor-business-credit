@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import {
   Check,
   Minus,
@@ -11,6 +12,7 @@ import {
   Star,
   CalendarClock,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
@@ -23,7 +25,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PRICING_TIERS, STRIPE_LINKS } from "@/data/pricingTiers";
-import { startCheckout } from "@/lib/startCheckout";
+import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
 
 const tiers = PRICING_TIERS;
 
@@ -156,6 +158,21 @@ const Cell = ({ value }: { value: boolean | string }) => {
 };
 
 const PricingPage = () => {
+  const [loadingTier, setLoadingTier] = useState<CheckoutTierId | null>(null);
+  const [errorByTier, setErrorByTier] = useState<Partial<Record<CheckoutTierId, string>>>({});
+
+  const handleCheckout = async (tierId: CheckoutTierId) => {
+    if (loadingTier) return;
+    setLoadingTier(tierId);
+    setErrorByTier((prev) => ({ ...prev, [tierId]: undefined }));
+    const result = await startCheckout(tierId);
+    if (result.ok === false) {
+      setErrorByTier((prev) => ({ ...prev, [tierId]: result.message }));
+      setLoadingTier(null);
+    }
+    // On success the browser navigates away; leave loading state on.
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
@@ -239,17 +256,36 @@ const PricingPage = () => {
                 </ul>
                 <button
                   type="button"
-                  onClick={() => startCheckout(tier.id)}
+                  onClick={() => handleCheckout(tier.id)}
+                  disabled={loadingTier !== null}
                   className={
                     "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
                     (tier.highlighted
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
-                      : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5")
+                      : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                    " disabled:opacity-60 disabled:cursor-not-allowed"
                   }
                 >
-                  {tier.ctaLabel}
-                  <ArrowRight className="h-4 w-4" />
+                  {loadingTier === tier.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Redirecting to Stripe…
+                    </>
+                  ) : (
+                    <>
+                      {tier.ctaLabel}
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </button>
+                {errorByTier[tier.id] && (
+                  <p
+                    role="alert"
+                    className="mt-2 text-center text-xs font-medium text-destructive"
+                  >
+                    {errorByTier[tier.id]}
+                  </p>
+                )}
                 <Link
                   to="/one-on-one"
                   className="mt-3 text-center text-xs font-medium text-primary hover:underline"
@@ -316,15 +352,36 @@ const PricingPage = () => {
                   <th scope="row" className="p-4 text-sm font-medium text-secondary/90 border-t border-border">
                     &nbsp;
                   </th>
-                  <td className="p-4 text-center border-t border-border">
-                    <button type="button" onClick={() => startCheckout("self-paced")} className="text-xs font-semibold text-primary hover:underline">Get Started →</button>
-                  </td>
-                  <td className="p-4 text-center border-t border-border">
-                    <button type="button" onClick={() => startCheckout("cohort")} className="text-xs font-semibold text-primary hover:underline">Enroll →</button>
-                  </td>
-                  <td className="p-4 text-center border-t border-border">
-                    <button type="button" onClick={() => startCheckout("one-on-one")} className="text-xs font-semibold text-primary hover:underline">Start 1:1 →</button>
-                  </td>
+                  {(
+                    [
+                      { id: "self-paced" as const, label: "Get Started" },
+                      { id: "cohort" as const, label: "Enroll" },
+                      { id: "one-on-one" as const, label: "Start 1:1" },
+                    ]
+                  ).map(({ id, label }) => (
+                    <td key={id} className="p-4 text-center border-t border-border align-top">
+                      <button
+                        type="button"
+                        onClick={() => handleCheckout(id)}
+                        disabled={loadingTier !== null}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline disabled:opacity-60 disabled:no-underline disabled:cursor-not-allowed"
+                      >
+                        {loadingTier === id ? (
+                          <>
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Redirecting…
+                          </>
+                        ) : (
+                          <>{label} →</>
+                        )}
+                      </button>
+                      {errorByTier[id] && (
+                        <p role="alert" className="mt-1 text-[11px] text-destructive">
+                          {errorByTier[id]}
+                        </p>
+                      )}
+                    </td>
+                  ))}
                 </tr>
               </tbody>
             </table>
