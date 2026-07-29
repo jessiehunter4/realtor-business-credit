@@ -1,49 +1,33 @@
-## Stripe Checkout Session Integration
+## Current state
 
-### 1. Edge Function: `create-checkout-session`
-Create `supabase/functions/create-checkout-session/index.ts`:
-- POST endpoint, `verify_jwt = false` (validate token manually via `getClaims()` for authenticated user).
-- Accepts JSON body:
-  ```
-  { priceId: string, leadId?: string, tierId?: string }
-  ```
-- Validates the authenticated user from `Authorization` header.
-- Validates `priceId` against an **allowlist** of known price IDs (from env vars: `STRIPE_PRICE_SELF_PACED`, `STRIPE_PRICE_COHORT`, `STRIPE_PRICE_ONE_ON_ONE`) — rejects anything else with 400.
-- Uses `STRIPE_SECRET_KEY` (already in Supabase Secrets) to call Stripe REST API `POST /v1/checkout/sessions`:
-  - `mode: payment` (one-time) — all three tiers are one-time per pricing tiers file.
-  - `line_items[0][price] = priceId`, `quantity = 1`.
-  - `success_url = {origin}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`.
-  - `cancel_url = {origin}/pricing?status=cancelled`.
-  - `client_reference_id = userId`.
-  - `metadata`: userId, leadId, tierId.
-  - `customer_email` from user claims when available.
-- Returns `{ url }` on success; JSON `{ error }` with proper status codes on failure.
-- Full CORS headers; try/catch with structured error logging.
+`/pricing` already wires all tier CTAs (3 cards + 3 comparison-table row links) to `startCheckout(tierId)`, which invokes the `create-checkout-session` edge function and redirects to the returned Stripe URL. Missing pieces per the request: per-button loading state and friendly inline error messaging (today errors only surface via toast).
 
-### 2. Config
-Add to `supabase/config.toml`:
-```
-[functions.create-checkout-session]
-verify_jwt = false
-```
+## Changes
 
-### 3. Secrets needed
-Request from user via `add_secret`:
-- `STRIPE_PRICE_SELF_PACED`
-- `STRIPE_PRICE_COHORT`
-- `STRIPE_PRICE_ONE_ON_ONE`
+### 1. `src/lib/startCheckout.ts`
+- Return a structured result `{ ok: true } | { ok: false, message: string }` so callers can render inline errors.
+- Map common failure cases to friendly copy:
+  - Not signed in → still redirects to `/auth` (unchanged).
+  - `Invalid or missing priceId/tierId` / `Price not configured…` → "This plan isn't available for checkout yet. Please try another option or contact support."
+  - Stripe/network/unknown → "We couldn't start checkout. Please try again in a moment."
+- Keep toast as a secondary signal.
 
-(`STRIPE_SECRET_KEY` is already saved.)
+### 2. `src/pages/PricingPage.tsx`
+- Add local state: `loadingTier: TierId | null` and `errorByTier: Record<TierId, string | undefined>`.
+- New handler `handleCheckout(tierId)`:
+  - Sets `loadingTier = tierId`, clears that tier's error.
+  - Awaits `startCheckout`; on failure stores the friendly message, clears loading.
+  - On success, browser navigates away (no cleanup needed).
+- Update the 3 tier card buttons:
+  - `disabled={loadingTier !== null}`.
+  - Label swaps to "Redirecting to Stripe…" with a spinning `Loader2` icon while `loadingTier === tier.id`.
+  - Render inline error text below the button when present (small, red, `role="alert"`).
+- Update the 3 comparison-table row links the same way (compact spinner, disabled while loading, inline error under the row cell).
+- No visual/style changes beyond the spinner + inline error text; existing classes preserved.
 
-### 4. Frontend
-- Extend `src/data/pricingTiers.ts` with a `tierId` mapping used by the frontend to select the price at checkout (server resolves tierId → priceId via env, so no priceId is exposed client-side).
-- Add `src/lib/startCheckout.ts` helper: calls `supabase.functions.invoke('create-checkout-session', { body: { tierId, leadId } })`, redirects to returned URL, requires auth session (redirects to `/auth?redirect=/pricing` when signed out).
-- Update `src/pages/PricingPage.tsx`:
-  - Replace `<a href={tier.ctaHref}>` with `<button onClick={() => startCheckout(tier.id)}>` on all 3 tier cards and the 3 comparison-table row links.
-  - Preserve styling.
+### 3. No backend changes
+`create-checkout-session` already validates, uses server-side price allowlist, and returns JSON errors — sufficient for the new UX.
 
-### 5. Security notes
-- Secret key never touches the client.
-- Price IDs resolved server-side from env allowlist — client cannot pass arbitrary prices.
-- Auth required (401 if missing/invalid JWT).
-- `client_reference_id` + metadata let a future webhook reconcile payments.
+## Files touched
+- `src/lib/startCheckout.ts`
+- `src/pages/PricingPage.tsx`
