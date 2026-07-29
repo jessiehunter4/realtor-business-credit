@@ -75,7 +75,10 @@ const CheckoutPage = () => {
     const result = await startCheckout(selectedTier);
     if (result.ok === false) {
       setError(result.message);
-      setIsLoading(false);
+    }
+    setIsLoading(false);
+    if (result.ok) {
+      window.setTimeout(() => setError(null), 1000);
     }
   };
 

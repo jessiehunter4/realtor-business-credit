@@ -26,7 +26,10 @@ export default function InlinePricingAccordion({
     const result = await startCheckout(tierId);
     if (result.ok === false) {
       setErrorByTier((prev) => ({ ...prev, [tierId]: result.message }));
-      setLoadingTier(null);
+    }
+    setLoadingTier(null);
+    if (result.ok) {
+      window.setTimeout(() => setErrorByTier((prev) => ({ ...prev, [tierId]: undefined })), 1000);
     }
   };
 

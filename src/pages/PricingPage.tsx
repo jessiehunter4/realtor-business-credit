@@ -168,9 +168,11 @@ const PricingPage = () => {
     const result = await startCheckout(tierId);
     if (result.ok === false) {
       setErrorByTier((prev) => ({ ...prev, [tierId]: result.message }));
-      setLoadingTier(null);
     }
-    // On success the browser navigates away; leave loading state on.
+    setLoadingTier(null);
+    if (result.ok) {
+      window.setTimeout(() => setErrorByTier((prev) => ({ ...prev, [tierId]: undefined })), 1000);
+    }
   };
 
   return (
