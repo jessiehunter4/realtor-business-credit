@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, CreditCard, BookOpen, CheckCircle } from "lucide-react";
-import { STRIPE_LINKS } from "@/data/pricingTiers";
 
 interface Props {
   readiness?: string;
@@ -20,7 +19,7 @@ const RESPONSES: Record<string, Response> = {
     body:
       "You'll head to secure Stripe checkout. Once you enroll, your coach kicks off onboarding within one business day.",
     accent: "border-primary/40 bg-primary/5",
-    cta: { label: "Enroll now", href: STRIPE_LINKS.cohort, icon: CreditCard, external: true },
+    cta: { label: "Enroll now", href: "/checkout?tier=cohort", icon: CreditCard },
   },
   "I want to start within 30 days": {
     headline: "No problem — and no pressure.",

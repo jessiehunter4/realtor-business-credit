@@ -1,7 +1,9 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { PRICING_TIERS } from "@/data/pricingTiers";
+import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
 
 interface Props {
   defaultOpen?: string;
@@ -14,6 +16,20 @@ export default function InlinePricingAccordion({
   headline = "See pricing",
   subhead = "Three tiers — pick the level of support that fits how you like to work.",
 }: Props) {
+  const [loadingTier, setLoadingTier] = useState<CheckoutTierId | null>(null);
+  const [errorByTier, setErrorByTier] = useState<Partial<Record<CheckoutTierId, string>>>({});
+
+  const handleCheckout = async (tierId: CheckoutTierId) => {
+    if (loadingTier) return;
+    setLoadingTier(tierId);
+    setErrorByTier((prev) => ({ ...prev, [tierId]: undefined }));
+    const result = await startCheckout(tierId);
+    if (result.ok === false) {
+      setErrorByTier((prev) => ({ ...prev, [tierId]: result.message }));
+      setLoadingTier(null);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-border bg-white p-5 md:p-6 shadow-card">
       <div className="mb-4">
@@ -69,20 +85,30 @@ export default function InlinePricingAccordion({
                     ))}
                   </ul>
                   <div className="flex flex-wrap gap-3 pt-2">
-                    <a
-                      href={tier.ctaHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => handleCheckout(tier.id)}
+                      disabled={loadingTier !== null}
                       className={
                         "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors " +
                         (tier.highlighted
                           ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                          : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5")
+                          : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                        " disabled:cursor-not-allowed disabled:opacity-60"
                       }
                     >
-                      {tier.ctaLabel}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </a>
+                      {loadingTier === tier.id ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Redirecting…
+                        </>
+                      ) : (
+                        <>
+                          {tier.ctaLabel}
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </>
+                      )}
+                    </button>
                     <Link
                       to="/pricing"
                       className="inline-flex items-center text-sm font-medium text-primary hover:underline"
@@ -90,6 +116,11 @@ export default function InlinePricingAccordion({
                       Compare all plans →
                     </Link>
                   </div>
+                  {errorByTier[tier.id] && (
+                    <p role="alert" className="text-xs font-medium text-destructive">
+                      {errorByTier[tier.id]}
+                    </p>
+                  )}
                 </div>
               </AccordionContent>
             </AccordionItem>

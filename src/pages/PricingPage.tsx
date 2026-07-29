@@ -24,7 +24,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { PRICING_TIERS, STRIPE_LINKS } from "@/data/pricingTiers";
+import { PRICING_TIERS } from "@/data/pricingTiers";
 import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
 
 const tiers = PRICING_TIERS;

@@ -16,11 +16,10 @@ export type PricingTier = {
   icon: LucideIcon;
 };
 
-// TODO: replace placeholders with real Stripe Payment Links (one per tier).
 export const STRIPE_LINKS = {
-  selfPaced: "https://buy.stripe.com/REPLACE_SELF_PACED",
-  cohort: "https://buy.stripe.com/REPLACE_COHORT",
-  oneOnOne: "https://buy.stripe.com/REPLACE_ONE_ON_ONE",
+  selfPaced: "/checkout?tier=self-paced",
+  cohort: "/checkout?tier=cohort",
+  oneOnOne: "/checkout?tier=one-on-one",
 } as const;
 
 export const PRICING_TIERS: PricingTier[] = [
