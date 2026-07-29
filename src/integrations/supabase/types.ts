@@ -39,6 +39,7 @@ export type Database = {
           property_street_number: string | null
           property_street_suffix: string | null
           property_zip: string | null
+          sms_eligible: boolean
           source: string
           state: string | null
           type: string | null
@@ -68,6 +69,7 @@ export type Database = {
           property_street_number?: string | null
           property_street_suffix?: string | null
           property_zip?: string | null
+          sms_eligible?: boolean
           source: string
           state?: string | null
           type?: string | null
@@ -97,6 +99,7 @@ export type Database = {
           property_street_number?: string | null
           property_street_suffix?: string | null
           property_zip?: string | null
+          sms_eligible?: boolean
           source?: string
           state?: string | null
           type?: string | null
@@ -583,6 +586,8 @@ export type Database = {
           agent_type: string
           created_at: string
           email: string
+          email_consent: boolean
+          email_consent_at: string | null
           first_name: string
           ghl_contact_id: string | null
           ghl_sync_status: string | null
@@ -590,6 +595,12 @@ export type Database = {
           id: string
           last_name: string
           phone: string
+          sms_consent: boolean
+          sms_consent_at: string | null
+          sms_consent_source: string | null
+          sms_consent_text: string | null
+          sms_eligible: boolean
+          sms_opted_out_at: string | null
           source: string
           state: string
           updated_at: string
@@ -600,6 +611,8 @@ export type Database = {
           agent_type: string
           created_at?: string
           email: string
+          email_consent?: boolean
+          email_consent_at?: string | null
           first_name: string
           ghl_contact_id?: string | null
           ghl_sync_status?: string | null
@@ -607,6 +620,12 @@ export type Database = {
           id?: string
           last_name: string
           phone: string
+          sms_consent?: boolean
+          sms_consent_at?: string | null
+          sms_consent_source?: string | null
+          sms_consent_text?: string | null
+          sms_eligible?: boolean
+          sms_opted_out_at?: string | null
           source?: string
           state: string
           updated_at?: string
@@ -617,6 +636,8 @@ export type Database = {
           agent_type?: string
           created_at?: string
           email?: string
+          email_consent?: boolean
+          email_consent_at?: string | null
           first_name?: string
           ghl_contact_id?: string | null
           ghl_sync_status?: string | null
@@ -624,6 +645,12 @@ export type Database = {
           id?: string
           last_name?: string
           phone?: string
+          sms_consent?: boolean
+          sms_consent_at?: string | null
+          sms_consent_source?: string | null
+          sms_consent_text?: string | null
+          sms_eligible?: boolean
+          sms_opted_out_at?: string | null
           source?: string
           state?: string
           updated_at?: string
