@@ -3,10 +3,19 @@ import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
-import HeroSectionV2 from "@/components/landing/HeroSectionV2";
-import ThreeStepSection from "@/components/landing/ThreeStepSection";
+import HeroSectionBright from "@/components/landing/HeroSectionBright";
+import GuideIntroduction from "@/components/guide/GuideIntroduction";
+import CustomPlanPreview from "@/components/landing/CustomPlanPreview";
+import IsThisForMe from "@/components/landing/IsThisForMe";
+import MoneyWhenYouNeedItStrip from "@/components/landing/MoneyWhenYouNeedItStrip";
+import ThreePillarsDiagram from "@/components/landing/ThreePillarsDiagram";
+import ComparisonBright from "@/components/landing/ComparisonBright";
+import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
+import GuideContentsBright from "@/components/landing/GuideContentsBright";
+import SamplePlanPreview from "@/components/landing/SamplePlanPreview";
+import ProgramCurriculum from "@/components/landing/ProgramCurriculum";
 import TestimonialsBright from "@/components/landing/TestimonialsBright";
-import FinalCTASectionV2 from "@/components/landing/FinalCTASectionV2";
+import FinalCTABright from "@/components/landing/FinalCTABright";
 import StickyMobileCTABar from "@/components/shared/StickyMobileCTABar";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
@@ -55,10 +64,19 @@ const LandingPage = () => {
         }}
       />
       <SiteHeader />
-      <HeroSectionV2 firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
-      <ThreeStepSection />
+      <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
+      <GuideIntroduction />
+      <ProgramCurriculum guideLink={guideLink} />
+      <CustomPlanPreview />
+      <IsThisForMe />
+      <MoneyWhenYouNeedItStrip />
+      <ThreePillarsDiagram />
+      <ComparisonBright />
+      <CashFlowCalculator guideLink={guideLink} />
+      <GuideContentsBright guideLink={guideLink} />
+      <SamplePlanPreview />
       <TestimonialsBright />
-      <FinalCTASectionV2 guideLink={guideLink} />
+      <FinalCTABright guideLink={guideLink} />
       <SiteFooter />
       <StickyMobileCTABar guideLink={guideLink} />
     </div>
