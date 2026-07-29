@@ -147,6 +147,7 @@ Deno.serve(async (req) => {
           // Apply tags separately
           const tagsToApply = ['a-rbc-optin'];
           if (wantsFundabilityScan) tagsToApply.push('a-fund-scan');
+          tagsToApply.push(smsOptIn ? 'sms-consent-yes' : 'sms-consent-no');
 
           const tagsResponse = await fetch(`https://services.leadconnectorhq.com/contacts/${resolvedGhlContactId}/tags`, {
             method: 'POST',
@@ -216,6 +217,8 @@ Deno.serve(async (req) => {
               // Apply tags separately
               const tagsToApply = ['a-rbc-optin'];
               if (wantsFundabilityScan) tagsToApply.push('a-fund-scan');
+              tagsToApply.push(smsOptIn ? 'sms-consent-yes' : 'sms-consent-no');
+          tagsToApply.push(smsOptIn ? 'sms-consent-yes' : 'sms-consent-no');
 
               const tagsResponse = await fetch(`https://services.leadconnectorhq.com/contacts/${newContactId}/tags`, {
                 method: 'POST',
