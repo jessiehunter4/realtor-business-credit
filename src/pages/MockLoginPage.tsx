@@ -237,7 +237,24 @@ const MockLoginPage = () => {
                         </button>
                       </div>
                     </div>
-                    <Button type="submit" size="lg" className="w-full rounded-full" disabled={loading}>
+                    {mode === "signup" && (
+                      <AccountConsentFields
+                        idPrefix="signup"
+                        phone={phone}
+                        onPhoneChange={setPhone}
+                        smsConsent={smsConsent}
+                        onSmsConsentChange={setSmsConsent}
+                        agreed={agreed}
+                        onAgreedChange={setAgreed}
+                        disabled={loading}
+                      />
+                    )}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full rounded-full"
+                      disabled={loading || (mode === "signup" && !agreed)}
+                    >
                       {loading
                         ? mode === "signin"
                           ? "Signing in…"
