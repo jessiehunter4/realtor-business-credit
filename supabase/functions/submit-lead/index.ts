@@ -1,9 +1,26 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { z } from 'https://esm.sh/zod@3.23.8';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const leadSchema = z.object({
+  firstName: z.string().trim().min(1).max(100),
+  lastName: z.string().trim().min(1).max(100),
+  email: z.string().trim().email().max(255),
+  phone: z.string().trim().regex(/^[+()\-.\s0-9]{7,20}$/),
+  agentType: z.string().trim().max(50).optional(),
+  state: z.string().trim().max(50).optional(),
+  wantsFundabilityScan: z.boolean().optional(),
+  ghlContactId: z.string().trim().max(100).optional(),
+  source: z.string().trim().max(100).optional(),
+  emailConsent: z.boolean().optional(),
+  smsConsent: z.boolean().optional(),
+  smsConsentText: z.string().trim().max(1000).optional(),
+  smsConsentSource: z.string().trim().max(100).optional(),
+});
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -16,10 +33,28 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid request body' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const parsed = leadSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Please check the information you entered and try again.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
     const {
       firstName, lastName, email, phone, agentType, state, wantsFundabilityScan, ghlContactId, source,
       emailConsent, smsConsent, smsConsentText, smsConsentSource,
-    } = await req.json();
+    } = parsed.data;
 
     const now = new Date().toISOString();
     const smsOptIn = smsConsent === true;
@@ -38,14 +73,6 @@ Deno.serve(async (req) => {
     }
 
     console.log('Submitting lead:', { firstName, lastName, email, agentType, state, ghlContactId: ghlContactId ? 'provided' : 'not provided' });
-
-    // Validate required fields
-    if (!firstName || !lastName || !email || !phone) {
-      return new Response(JSON.stringify({ error: 'Missing required fields (firstName, lastName, email, phone)' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
 
     // Check if lead already exists
     const { data: existingLead } = await supabaseClient
