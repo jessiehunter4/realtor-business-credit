@@ -151,7 +151,7 @@ const SiteHeader = () => {
                   <SheetClose asChild>
                     <Link
                       to="/mock-login"
-                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
+                      className="hidden inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
                     >
                       Log in
                     </Link>
@@ -159,7 +159,7 @@ const SiteHeader = () => {
                   <SheetClose asChild>
                     <Link
                       to="/one-on-one"
-                      className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+                      className="hidden inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
                     >
                       Start Here
                     </Link>
