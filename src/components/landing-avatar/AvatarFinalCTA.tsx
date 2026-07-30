@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 const AvatarFinalCTA = () => (
   <section className="container mx-auto px-4 pb-16 md:pb-24">
@@ -21,14 +21,6 @@ const AvatarFinalCTA = () => (
           >
             <BookOpen className="h-5 w-5" />
             Read the Guide
-          </Link>
-          <Link
-            to="/one-on-one"
-            data-analytics-id="avatar-cta-book-final"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-8 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
-          >
-            <Calendar className="h-5 w-5" />
-            Book Free 1:1
           </Link>
         </div>
       </div>
