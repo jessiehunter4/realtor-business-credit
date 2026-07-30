@@ -45,6 +45,9 @@ const guideNavLinks = [
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
+];
+
+const guideMobileOnlyLinks = [
   { to: "/business-credit-cards-for-realtors", label: "Cards" },
 ];
 
