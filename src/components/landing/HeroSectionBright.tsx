@@ -66,11 +66,11 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               </Link>
           </div>
 
-          <ul className="mt-4 sm:mt-5 grid grid-cols-2 lg:grid-cols-4 gap-2 max-w-2xl mx-auto">
+          <ul className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-2 bg-white/70 backdrop-blur border border-border rounded-2xl px-3 py-2 text-sm text-secondary shadow-card"
+                  className="h-full flex items-center gap-2 bg-white/70 backdrop-blur border border-border rounded-2xl px-3 py-2 text-sm text-secondary shadow-card"
                 >
                   <Icon className="h-4 w-4 text-primary flex-shrink-0" />
                   <span className="font-medium leading-tight text-left">{label}</span>
