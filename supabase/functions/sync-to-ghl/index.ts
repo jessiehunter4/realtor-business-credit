@@ -104,7 +104,7 @@ async function syncContactToGHL(
     if (!upsertResponse.ok) {
       const errorText = await upsertResponse.text();
       console.error('GHL upsert error:', upsertResponse.status, errorText);
-      throw new Error(`GHL API upsert error: ${upsertResponse.status} - ${errorText}`);
+      throw new Error('Failed to sync contact to CRM');
     }
 
     const data = await upsertResponse.json();
