@@ -78,14 +78,14 @@ const SiteHeader = () => {
             <>
               <Link
                 to="/auth"
-                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                className="hidden inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
               >
                 Log in
               </Link>
               <Link
                 to="/one-on-one"
                 data-analytics-id="cta-start-here-header"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
+                className="hidden inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
               >
                 Start Here
               </Link>
