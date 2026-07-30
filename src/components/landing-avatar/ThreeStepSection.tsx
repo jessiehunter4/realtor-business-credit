@@ -46,10 +46,7 @@ const ThreeStepSection = () => {
           icon={Rocket}
           videoTitle="Step 3 — Implementation"
           videoDescription="Jessie walks through your program options and what to expect."
-          ctas={[
-            { label: "See Program Options", href: "/pricing" },
-            { label: "Book Free 1:1", href: "/one-on-one", variant: "secondary" },
-          ]}
+          ctas={[{ label: "See Program Options", href: "/pricing" }]}
         />
       </div>
     </section>
