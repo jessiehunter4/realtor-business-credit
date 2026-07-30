@@ -128,14 +128,6 @@ const ProgramCurriculum = ({ guideLink = "/guide" }: Props) => {
 
         <div className="mt-12 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            to="/one-on-one"
-            data-analytics-id="cta-book-curriculum"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-          >
-            <Calendar className="h-5 w-5" />
-            Book Free 1:1 Session
-          </Link>
-          <Link
             to={guideLink}
             data-analytics-id="cta-guide-curriculum"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"

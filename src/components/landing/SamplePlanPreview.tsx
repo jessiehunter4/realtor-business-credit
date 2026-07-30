@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FileText, Calendar, ArrowRight, CheckCircle2 } from "lucide-react";
+import { FileText, CheckCircle2 } from "lucide-react";
 import PlanMockupCard from "@/components/oneonone/PlanMockupCard";
 
 const SamplePlanPreview = () => (
@@ -41,15 +41,6 @@ const SamplePlanPreview = () => (
           >
             <FileText className="h-5 w-5" />
             View the Full Sample Plan
-          </Link>
-          <Link
-            to="/one-on-one"
-            data-analytics-id="cta-book-sample-plan"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-          >
-            <Calendar className="h-5 w-5" />
-            Book My Free 1:1
-            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

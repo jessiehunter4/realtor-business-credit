@@ -190,12 +190,6 @@ const CashFlowCalculator = ({ guideLink = "/guide" }: Props) => {
                   Read the Free Guide
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" onClick={handleEngage}>
-                <Link to="/one-on-one">
-                  Book a Free Session
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
 
             <p className="mt-4 text-xs text-muted-foreground text-center">
