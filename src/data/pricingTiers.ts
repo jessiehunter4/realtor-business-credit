@@ -25,7 +25,7 @@ export const STRIPE_LINKS = {
 export const PRICING_TIERS: PricingTier[] = [
   {
     id: "self-paced",
-    name: "Self-Paced Blueprint",
+    name: "DIY (Do it Yourself)",
     price: "$497",
     cadence: "one-time",
     cadenceNote: "Billed once — lifetime access to your plan & portal",
