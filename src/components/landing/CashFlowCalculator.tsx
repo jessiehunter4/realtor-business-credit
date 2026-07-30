@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Calculator, ArrowRight, BookOpen } from "lucide-react";
+import { Calculator, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
@@ -188,12 +188,6 @@ const CashFlowCalculator = ({ guideLink = "/guide" }: Props) => {
                 <Link to={guideLink}>
                   <BookOpen className="mr-2 h-4 w-4" />
                   Read the Free Guide
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" onClick={handleEngage}>
-                <Link to="/one-on-one">
-                  Book a Free Session
-                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>

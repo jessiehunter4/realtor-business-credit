@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 interface Props {
   guideLink?: string;
@@ -18,14 +18,6 @@ const FinalCTABright = ({ guideLink = "/guide" }: Props) => (
           Read the free guide, then book your free 1:1. Walk away with your Custom RE Pro Business Structure, Finance &amp; Credit Plan in one sitting.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            to="/one-on-one"
-            data-analytics-id="cta-book-bottom"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-          >
-            <Calendar className="h-5 w-5" />
-            Book Free 1:1 Session
-          </Link>
           <Link
             to={guideLink}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-8 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
