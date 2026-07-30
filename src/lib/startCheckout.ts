@@ -59,7 +59,7 @@ export async function startCheckout(
   if (!sessionData.session) {
     if (checkoutWindow && !checkoutWindow.closed) checkoutWindow.close();
     const redirect = encodeURIComponent(`/pricing?tier=${tierId}`);
-    window.location.assign(`/auth?redirect=${redirect}`);
+    window.location.assign(`/mock-login?next=${redirect}`);
     return { ok: true };
   }
 
