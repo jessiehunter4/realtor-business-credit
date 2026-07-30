@@ -351,6 +351,21 @@ const GuidePage = () => {
                 {l.label}
               </NavLink>
             ))}
+            {guideMobileOnlyLinks.map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    isActive && "text-secondary-foreground bg-white/10"
+                  )
+                }
+              >
+                {l.label}
+              </NavLink>
+            ))}
             <div className="h-px bg-white/10 my-2" />
             <Button
               variant="outline"
