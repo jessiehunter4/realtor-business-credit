@@ -1,33 +1,45 @@
 ## Goal
 
-Every customer-facing "create account" screen must show a required consent checkbox (Terms of Use + Privacy Policy links), plus a mobile phone field with the standard SMS opt-in checkbox — pre-filled when we already know the number. The Create Account button stays disabled until the required box is checked.
+Give you everything the toll-free verification form asks for: a publicly accessible opt-in proof URL, plus approved use-case and message-content copy.
 
-## Screens in scope
+## 1. Public opt-in proof page (`/sms-opt-in`)
 
-1. `/mock-login` — Create account tab (`src/pages/MockLoginPage.tsx`)
-2. Post-plan account creation card (`src/components/intake/PostPlanAuthCard.tsx`) — phone is already known, so pre-fill it
-3. `/auth` (`src/pages/AuthPage.tsx`) — admin bootstrap, but it exposes a Sign Up tab, so it gets the same required agreement checkbox (no phone/SMS block, since it isn't a marketing entry point)
+A no-index, publicly reachable page at `https://reprobusinesscredit.com/sms-opt-in` that documents the full opt-in workflow. Carriers accept this as the "Opt-In Workflow Image URL."
 
-Sign-in tabs get no checkbox — consent applies to account creation only. Lead forms that already collect consent (`GuideOptInGate`, `LeadForm`) are unchanged.
+Contents:
+- Brand header (RE Pro Business Credit), business name, address, support email/phone.
+- Step-by-step opt-in flow: (1) visitor submits the guide/lead form, (2) creates an account, (3) checks the separate, unchecked-by-default SMS box, (4) confirmation.
+- Screenshots of each real opt-in surface, captured from the live app and stored in `public/opt-in/`:
+  - `/mock-login` → Create account tab (phone + SMS checkbox + Terms checkbox)
+  - `/intake` post-plan account card
+  - Landing page lead form
+  - Dashboard message preferences (opt-out control)
+- Verbatim consent language displayed as text (so carriers can read it without zooming):
+  > "Yes, text me at this number. I agree to receive recurring marketing and service text messages from RE Pro Business Credit. Msg & data rates may apply. Msg frequency varies. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase."
+- Links to `/terms` and `/privacy`.
+- Note that consent is never a condition of purchase, is stored with timestamp + exact text, and MLS-imported contacts are email-only until they opt in.
 
-## New shared pieces
+Also add each screenshot as its own direct image URL (e.g. `https://reprobusinesscredit.com/opt-in/create-account.png`) so you can paste an image link if the form rejects a page URL.
 
-- `src/lib/messagingConsent.ts`: add `TERMS_CONSENT_TEXT` = "I agree to the Terms of Use and Privacy Policy." (stored alongside the SMS text as source of truth).
-- New `src/components/shared/AccountConsentFields.tsx`: renders
-  - required agreement checkbox with inline `/terms` and `/privacy` links,
-  - optional mobile phone field (existing `PhoneInput`, masked `(###) ###-####`, raw digits stored),
-  - the existing `SmsConsentCheckbox` (appears once 10 digits are entered, unchecked by default).
-  Exposes `{ agreed, phone, smsConsent }` via props so each page controls state and button disabling.
+## 2. Form field copy (paste-ready)
 
-## Behavior
+**Opt-In Type:** Web Form
 
-- Phone pre-fill: read `rbc_contact` via `readContactIdentity()`; on `/mock-login` prefer any phone already stored; in `PostPlanAuthCard` use the `phone` prop already passed in. Field remains editable.
-- Create Account button `disabled` until the agreement checkbox is checked (in addition to existing password rules).
-- Consent record: on successful sign-up, store the exact strings shown, timestamps, and source page in Supabase — `profiles` gets `phone` (already exists) plus new columns `terms_accepted_at`, `terms_consent_text`, `sms_consent`, `sms_consent_at`, `sms_consent_text`, `sms_consent_source`. Values are passed through `signUp` user metadata so the existing `handle_new_user` trigger persists them (trigger updated to read the new fields).
-- SMS consent is only stored as `true` when both a valid phone and a checked SMS box are present; otherwise `false`.
+**Use Case Categories:** Account Notifications, Customer Care, Delivery Notifications (drop "Events" / "Security Alert" — they don't match this business).
 
-## Technical notes
+**Use Case Description (under 500 chars):**
+> This number is used to send appointment confirmations, reminders, and coaching program updates to real estate agents and brokers who requested our business credit guide, created an account, or booked a one-on-one session on reprobusinesscredit.com and checked a separate, unchecked-by-default SMS opt-in box. Messages include session reminders, plan-ready notifications, and program follow-ups. Consent is not a condition of purchase. Reply STOP to opt out, HELP for help.
 
-- Migration adds the consent columns to `public.profiles` and updates `handle_new_user`; no new tables, existing RLS/grants on `profiles` continue to apply.
-- Phone stored as raw 10 digits, matching the lead forms.
-- Zod validation extended: phone optional, but if present must be 10 digits; agreement must be `true`.
+**Message Content (under 1000 chars) — 3 samples:**
+> Hi John! This is Jessie from RE Pro Business Credit. Your one-on-one business credit session on July 20 at 11:00 AM is confirmed. Reply STOP to unsubscribe, HELP for help.
+>
+> Hi John, Jessie from RE Pro Business Credit. Your custom 90-day business structure and credit plan is ready in your portal: https://reprobusinesscredit.com/dashboard Reply STOP to unsubscribe.
+>
+> Hi John, this is Jessie with RE Pro Business Credit following up on your session. Want to grab a time this week? https://reprobusinesscredit.com/one-on-one Reply STOP to cancel, HELP for help.
+
+## 3. Technical notes
+
+- New route `src/pages/SmsOptInProofPage.tsx` registered in `App.tsx`; `noindex` via the existing `Seo` component.
+- Screenshots captured headlessly against the running app at desktop width and written to `public/opt-in/`.
+- Copy pulled from `src/lib/messagingConsent.ts` so the page never drifts from the live checkbox text.
+- Page must be published before submitting the form so the URL resolves for carrier review.
