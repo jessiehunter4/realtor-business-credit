@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 const AvatarFinalCTA = () => (
   <section className="container mx-auto px-4 pb-16 md:pb-24">
