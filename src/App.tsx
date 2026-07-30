@@ -25,6 +25,7 @@ import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRe
 import PricingPage from "./pages/PricingPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
+import SmsOptInProofPage from "./pages/SmsOptInProofPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -72,6 +73,7 @@ const App = () => (
           />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/sms-opt-in" element={<SmsOptInProofPage />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/mock-login" element={<MockLoginPage />} />
           <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
