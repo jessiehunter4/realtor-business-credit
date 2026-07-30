@@ -753,6 +753,12 @@ export type Database = {
           last_name: string | null
           onboarding_completed_at: string | null
           phone: string | null
+          sms_consent: boolean
+          sms_consent_at: string | null
+          sms_consent_source: string | null
+          sms_consent_text: string | null
+          terms_accepted_at: string | null
+          terms_consent_text: string | null
           updated_at: string
           user_id: string
           welcome_video_viewed_at: string | null
@@ -766,6 +772,12 @@ export type Database = {
           last_name?: string | null
           onboarding_completed_at?: string | null
           phone?: string | null
+          sms_consent?: boolean
+          sms_consent_at?: string | null
+          sms_consent_source?: string | null
+          sms_consent_text?: string | null
+          terms_accepted_at?: string | null
+          terms_consent_text?: string | null
           updated_at?: string
           user_id: string
           welcome_video_viewed_at?: string | null
@@ -779,6 +791,12 @@ export type Database = {
           last_name?: string | null
           onboarding_completed_at?: string | null
           phone?: string | null
+          sms_consent?: boolean
+          sms_consent_at?: string | null
+          sms_consent_source?: string | null
+          sms_consent_text?: string | null
+          terms_accepted_at?: string | null
+          terms_consent_text?: string | null
           updated_at?: string
           user_id?: string
           welcome_video_viewed_at?: string | null

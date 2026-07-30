@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Seo from "@/components/shared/Seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AccountConsentFields from "@/components/shared/AccountConsentFields";
+import { readContactIdentity } from "@/lib/contactIdentityStore";
+import { SMS_CONSENT_TEXT, TERMS_CONSENT_TEXT } from "@/lib/messagingConsent";
 
 interface LocationState {
   firstName?: string;
@@ -48,6 +51,9 @@ const MockLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<"signin" | "signup">("signin");
+  const [phone, setPhone] = useState(() => readContactIdentity().phone ?? "");
+  const [smsConsent, setSmsConsent] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -101,13 +107,35 @@ const MockLoginPage = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreed) {
+      toast.error("Please agree to the Terms of Use and Privacy Policy.");
+      return;
+    }
+    if (phone && phone.length !== 10) {
+      toast.error("Enter a valid 10-digit mobile number.");
+      return;
+    }
     try {
       const v = schema.parse({ email, password });
       setLoading(true);
+      const identity = readContactIdentity();
+      const smsOptedIn = smsConsent && phone.length === 10;
       const { data, error } = await supabase.auth.signUp({
         email: v.email,
         password: v.password,
-        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            first_name: identity.firstName ?? "",
+            last_name: identity.lastName ?? "",
+            phone,
+            terms_accepted: "true",
+            terms_consent_text: TERMS_CONSENT_TEXT,
+            sms_consent: smsOptedIn ? "true" : "false",
+            sms_consent_text: smsOptedIn ? SMS_CONSENT_TEXT : "",
+            sms_consent_source: smsOptedIn ? "MockLoginSignUp" : "",
+          },
+        },
       });
       if (error) {
         toast.error(
@@ -209,7 +237,24 @@ const MockLoginPage = () => {
                         </button>
                       </div>
                     </div>
-                    <Button type="submit" size="lg" className="w-full rounded-full" disabled={loading}>
+                    {mode === "signup" && (
+                      <AccountConsentFields
+                        idPrefix="signup"
+                        phone={phone}
+                        onPhoneChange={setPhone}
+                        smsConsent={smsConsent}
+                        onSmsConsentChange={setSmsConsent}
+                        agreed={agreed}
+                        onAgreedChange={setAgreed}
+                        disabled={loading}
+                      />
+                    )}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full rounded-full"
+                      disabled={loading || (mode === "signup" && !agreed)}
+                    >
                       {loading
                         ? mode === "signin"
                           ? "Signing in…"
