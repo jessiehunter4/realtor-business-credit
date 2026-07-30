@@ -1,26 +1,20 @@
 ## Goal
-Every visible "log in" entry point on the site sends users to `/mock-login`, never `/auth`.
+Every login entry point visitors can see or be redirected to lands on `/mock-login`. The `/auth` route stays in place (unlinked admin bootstrap path).
 
-## Why this works
-`/mock-login` already handles both audiences: after sign-in it checks the user's role and routes admins to `/admin` and everyone else to `/dashboard`, and it honors a `?next=` param. No new login logic needed — only the redirect targets change.
+## Current state (verified)
+All visible login paths already point to `/mock-login`:
+- Header sign-in links (desktop + mobile menu)
+- Route guards: `RoleGuards.tsx`, `ProtectedRoute.tsx`
+- Redirects from `AdminDashboard`, `MLSImport`, `OAuthConsentPage`, `startCheckout`
+- `/auth` still registered in `App.tsx` and, after a successful admin bootstrap, forwards to `/mock-login`
 
-## Changes
+The only remaining `/auth` references are the route definition itself, a comment, and an unrelated Supabase issuer URL in `src/lib/mcp/index.ts`.
 
-1. **`src/components/shared/SiteHeader.tsx`** — desktop "Log in" link `/auth` → `/mock-login` (mobile already correct).
-
-2. **`src/components/auth/RoleGuards.tsx`** — `RequireRole` and `RequireAdmin` send unauthenticated users to `/mock-login?next=…` instead of `/auth?next=…`.
-
-3. **`src/components/ProtectedRoute.tsx`** — `<Navigate to="/auth">` → `/mock-login`.
-
-4. **`src/pages/AdminDashboard.tsx`** (2 spots) and **`src/pages/MLSImport.tsx`** (1 spot) — `navigate("/auth")` on missing session → `/mock-login?next=<current admin path>`.
-
-5. **`src/lib/startCheckout.ts`** — `/auth?redirect=…` → `/mock-login?next=…` so the return path is honored by the login page.
-
-6. **`src/pages/OAuthConsentPage.tsx`** — `"/auth?next=…"` → `"/mock-login?next=…"`.
-
-7. **`src/pages/AuthPage.tsx`** — leave the `/auth` route in place but unlinked. It is the admin bootstrap path (calls the `setup-admin` function to grant the first admin role), so it stays reachable by direct URL only.
+## Work to do
+1. Sweep for any leftover login/sign-in affordances that bypass `/mock-login` (buttons, `window.location` assignments, email-link `redirectTo` targets, edge-function redirect URLs) and repoint them.
+2. Keep `/auth` registered and functional; no removal, no link added to it from any nav or CTA.
+3. Verify by loading the site and clicking the sign-in entry points, plus hitting a protected route while signed out, to confirm each lands on `/mock-login` with the `next` param preserved.
 
 ## Technical notes
-- Frontend-only; no backend, database, or auth-provider changes.
-- Signed-in users are unaffected; only unauthenticated redirects change.
-- If you want `/auth` to fully disappear (auto-redirect to `/mock-login`), tell me and I'll add that — the admin bootstrap call would then move into `/mock-login`.
+- `/mock-login` is the real Supabase auth page; the name is kept only for URL stability.
+- Redirect targets use `?next=<encoded path>` so post-login return behavior is unchanged.
