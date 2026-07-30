@@ -38,7 +38,7 @@ export default function MLSImport() {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      navigate("/auth");
+      navigate("/mock-login?next=%2Fadmin%2Fmls-import");
       return;
     }
 

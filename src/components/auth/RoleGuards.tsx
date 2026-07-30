@@ -20,8 +20,7 @@ export function RequireRole({
   const location = useLocation();
   if (loading) return <Spinner />;
   if (!session) {
-    const login = roles.includes("admin") ? "/auth" : "/mock-login";
-    return <Navigate to={`${login}?next=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
   }
   if (!role || !roles.includes(role)) return <Navigate to="/unauthorized" replace />;
   return <>{children}</>;
@@ -39,7 +38,7 @@ export function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { session, role, loading } = useAuthRole();
   const location = useLocation();
   if (loading) return <Spinner />;
-  if (!session) return <Navigate to={`/auth?next=${encodeURIComponent(location.pathname)}`} replace />;
+  if (!session) return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
   if (role !== "admin") return <Navigate to="/unauthorized" replace />;
   return <>{children}</>;
 }

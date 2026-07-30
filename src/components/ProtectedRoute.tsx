@@ -38,7 +38,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!session) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/mock-login" replace />;
   }
 
   return <>{children}</>;
