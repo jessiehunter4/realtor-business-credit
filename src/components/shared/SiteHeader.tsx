@@ -9,11 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 const navLinks = [
   { to: "/guide", label: "Guide" },
+  { to: "/how-it-works", label: "How It Works" },
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
-  { to: "/one-on-one", label: "1:1 Session" },
-  { to: "/business-credit-cards-for-realtors", label: "Cards" },
 ];
 
 const SiteHeader = () => {
