@@ -5,6 +5,9 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import AccountConsentFields from "@/components/shared/AccountConsentFields";
+import { SMS_CONSENT_TEXT, TERMS_CONSENT_TEXT } from "@/lib/messagingConsent";
+import { extractPhoneDigits } from "@/components/shared/PhoneInput";
 
 interface Props {
   intakeId: string;
@@ -36,6 +39,9 @@ export default function PostPlanAuthCard({
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneDigits, setPhoneDigits] = useState(extractPhoneDigits(phone ?? ""));
+  const [smsConsent, setSmsConsent] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const passwordTooShort = password.length > 0 && password.length < 8;
   const passwordMismatch = mode === "signup" && confirm.length > 0 && confirm !== password;
@@ -43,6 +49,7 @@ export default function PostPlanAuthCard({
     !!email &&
     password.length >= 8 &&
     (mode === "signin" || confirm === password) &&
+    (mode === "signin" || agreed) &&
     !submitting;
 
   const linkIntake = async () => {
@@ -71,6 +78,7 @@ export default function PostPlanAuthCard({
     setError(null);
     try {
       if (mode === "signup") {
+        const smsOptedIn = smsConsent && phoneDigits.length === 10;
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -79,7 +87,12 @@ export default function PostPlanAuthCard({
             data: {
               first_name: firstName ?? "",
               last_name: lastName ?? "",
-              phone: phone ?? "",
+              phone: phoneDigits,
+              terms_accepted: "true",
+              terms_consent_text: TERMS_CONSENT_TEXT,
+              sms_consent: smsOptedIn ? "true" : "false",
+              sms_consent_text: smsOptedIn ? SMS_CONSENT_TEXT : "",
+              sms_consent_source: smsOptedIn ? "PostPlanSignUp" : "",
             },
           },
         });
@@ -195,6 +208,19 @@ export default function PostPlanAuthCard({
             <p className="text-xs text-destructive mt-1">Passwords don't match.</p>
           )}
         </div>
+      )}
+
+      {mode === "signup" && (
+        <AccountConsentFields
+          idPrefix="pp"
+          phone={phoneDigits}
+          onPhoneChange={setPhoneDigits}
+          smsConsent={smsConsent}
+          onSmsConsentChange={setSmsConsent}
+          agreed={agreed}
+          onAgreedChange={setAgreed}
+          disabled={submitting}
+        />
       )}
 
       {error && (

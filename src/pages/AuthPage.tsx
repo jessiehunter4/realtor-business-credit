@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { z } from "zod";
+import AccountConsentFields from "@/components/shared/AccountConsentFields";
+import { TERMS_CONSENT_TEXT } from "@/lib/messagingConsent";
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -23,6 +25,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const adminCheckInFlight = useRef(false);
 
   const checkAdminAndRoute = async (userId: string) => {
@@ -104,7 +107,12 @@ export default function AuthPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!agreed) {
+      toast.error("Please agree to the Terms of Use and Privacy Policy.");
+      return;
+    }
+
     try {
       const validated = authSchema.parse({ email, password });
       setLoading(true);
@@ -113,7 +121,11 @@ export default function AuthPage() {
         email: validated.email,
         password: validated.password,
         options: {
-          emailRedirectTo: `${window.location.origin}${next ?? "/admin"}`
+          emailRedirectTo: `${window.location.origin}${next ?? "/admin"}`,
+          data: {
+            terms_accepted: "true",
+            terms_consent_text: TERMS_CONSENT_TEXT,
+          }
         }
       });
 
@@ -211,7 +223,14 @@ export default function AuthPage() {
                     placeholder="Minimum 6 characters"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <AccountConsentFields
+                  idPrefix="auth-signup"
+                  showPhone={false}
+                  agreed={agreed}
+                  onAgreedChange={setAgreed}
+                  disabled={loading}
+                />
+                <Button type="submit" className="w-full" disabled={loading || !agreed}>
                   {loading ? "Creating account..." : "Sign Up"}
                 </Button>
               </form>
