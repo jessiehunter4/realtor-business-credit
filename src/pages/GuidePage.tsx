@@ -48,7 +48,7 @@ const guideNavLinks = [
 ];
 
 const guideMobileOnlyLinks = [
-  { to: "/business-credit-cards-for-realtors", label: "Cards" },
+  { to: "/business-credit-cards-for-realtors", label: "Business Credit Cards" },
 ];
 
 const GUIDE_TAG_MAP: Record<number, { add: string; remove?: string }> = {
