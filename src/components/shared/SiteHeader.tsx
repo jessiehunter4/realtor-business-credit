@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/logo.png.asset.json";
+import logoAsset from "@/assets/rbc-logo-transparent.png.asset.json";
 import { useAuthRole } from "@/hooks/useAuthRole";
 import { supabase } from "@/integrations/supabase/client";
 
