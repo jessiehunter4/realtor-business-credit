@@ -14,7 +14,6 @@ const navLinks = [
 ];
 
 const secondaryLinks = [
-  { to: "/one-on-one", label: "1:1 Session" },
   { to: "/business-credit-cards-for-realtors", label: "Business Credit Cards" },
 ];
 
