@@ -14,6 +14,11 @@ const navLinks = [
   { to: "/about", label: "About" },
 ];
 
+const secondaryLinks = [
+  { to: "/one-on-one", label: "1:1 Session" },
+  { to: "/business-credit-cards-for-realtors", label: "Business Credit Cards" },
+];
+
 const SiteHeader = () => {
   const [open, setOpen] = useState(false);
   const { session, role } = useAuthRole();
@@ -103,6 +108,16 @@ const SiteHeader = () => {
             </Link>
             <nav className="flex flex-col gap-1">
               {navLinks.map((l) => (
+                <SheetClose asChild key={l.to}>
+                  <Link
+                    to={l.to}
+                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:bg-secondary/5"
+                  >
+                    {l.label}
+                  </Link>
+                </SheetClose>
+              ))}
+              {secondaryLinks.map((l) => (
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}
