@@ -288,8 +288,8 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Error in submit-lead:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Unknown error',
+    return new Response(JSON.stringify({
+      error: 'We could not process your submission. Please try again.',
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
