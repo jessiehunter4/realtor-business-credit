@@ -64,7 +64,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     id: "one-on-one",
-    name: "1:1 Private Coaching",
+    name: "Cohort Plus +",
     price: "$4,997",
     cadence: "per quarter",
     cadenceNote: "Quarterly engagement, renewable",
