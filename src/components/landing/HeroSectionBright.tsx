@@ -20,7 +20,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
   const trustBullets = [
     { icon: BookOpen, label: "Free guide" },
-    { icon: Calendar, label: "Free 1:1 session" },
     { icon: FileText, label: "Custom plan from your Needs Analysis" },
     { icon: GraduationCap, label: "Educational — not legal/tax advice" },
   ];
