@@ -58,14 +58,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
           <div className="mt-4 sm:mt-5 flex flex-col sm:flex-row gap-2.5 justify-center">
               <Link
-                to="/one-on-one"
-                data-analytics-id="cta-book-hero"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm sm:text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-              >
-                <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-                Book Free 1:1 Session
-              </Link>
-              <Link
                 to={guideLink}
                 data-analytics-id="cta-guide-hero"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm sm:text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
