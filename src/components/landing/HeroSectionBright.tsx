@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, ShieldCheck, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, Calendar, ShieldCheck, FileText, GraduationCap } from "lucide-react";
 import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
