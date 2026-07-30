@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Download, FileText, ListChecks, ArrowLeft } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
@@ -13,6 +13,8 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 export default function PortalPlanView() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { contactId } = useContactIdentity();
   const [planData, setPlanData] = useState<PlanData | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
@@ -25,6 +27,11 @@ export default function PortalPlanView() {
   useEffect(() => {
     async function fetchPlan() {
       if (!id) return;
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        navigate(`/mock-login?next=${encodeURIComponent(location.pathname)}`, { replace: true });
+        return;
+      }
       const { data, error: fetchError } = await supabase
         .from("custom_plans")
         .select("plan_data, status, created_at, updated_at, readiness_selection")
@@ -64,7 +71,7 @@ export default function PortalPlanView() {
       setLoading(false);
     }
     fetchPlan();
-  }, [id]);
+  }, [id, navigate, location.pathname]);
 
   const handleDownload = useCallback(async () => {
     if (!planData) return;
