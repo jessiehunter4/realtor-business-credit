@@ -190,9 +190,8 @@ const SmsOptInProofPage = () => (
         <ul className="list-disc pl-6 space-y-2">
           <li>Consent is never a condition of purchase or of receiving the free guide.</li>
           <li>
-            Contacts sourced from public MLS closed-transaction records are treated as email-only
-            and are explicitly flagged as not SMS-consented until they opt in through a web form on
-            this site.
+            Contacts are treated as email-only and are explicitly flagged as not SMS-consented until
+            they opt in through a web form on this site.
           </li>
           <li>
             We store a complete consent record for each subscriber: phone number, exact consent
