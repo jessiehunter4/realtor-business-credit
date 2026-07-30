@@ -45,6 +45,9 @@ const guideNavLinks = [
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
+];
+
+const guideMobileOnlyLinks = [
   { to: "/business-credit-cards-for-realtors", label: "Cards" },
 ];
 
@@ -334,6 +337,21 @@ const GuidePage = () => {
         >
           <div className="container mx-auto px-3 sm:px-4 py-3 flex flex-col gap-1 bg-secondary/95">
             {guideNavLinks.map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    isActive && "text-secondary-foreground bg-white/10"
+                  )
+                }
+              >
+                {l.label}
+              </NavLink>
+            ))}
+            {guideMobileOnlyLinks.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
