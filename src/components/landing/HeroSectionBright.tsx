@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar, ShieldCheck, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, ShieldCheck, FileText, GraduationCap } from "lucide-react";
 import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
@@ -20,7 +20,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
   const trustBullets = [
     { icon: BookOpen, label: "Free guide" },
-    { icon: Calendar, label: "Free 1:1 session" },
     { icon: FileText, label: "Custom plan from your Needs Analysis" },
     { icon: GraduationCap, label: "Educational — not legal/tax advice" },
   ];
