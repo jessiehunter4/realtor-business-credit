@@ -44,7 +44,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     id: "cohort",
-    name: "Realtor Credit Cohort",
+    name: "Pro Cohort",
     price: "$1,997",
     cadence: "90 days",
     cadenceNote: "One-time enrollment for the 90-day program",
