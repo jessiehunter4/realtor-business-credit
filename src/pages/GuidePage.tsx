@@ -44,7 +44,6 @@ const guideNavLinks = [
   { to: "/guide", label: "Guide" },
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/about", label: "About" },
 ];
 
 const guideMobileOnlyLinks = [
