@@ -158,13 +158,15 @@ export const ChapterTakeaway = ({ children }: { children: React.ReactNode }) => 
 export const PlanCTAButton = ({
   label = "Create My Free Customized Plan",
   className = "",
+  href: overrideHref,
 }: {
   label?: string;
   className?: string;
+  href?: string;
 }) => {
   const { buildForwardParams } = useContactIdentity();
   const params = buildForwardParams();
-  const href = `/intake${params ? `?${params}` : ""}`;
+  const href = overrideHref ?? `/intake${params ? `?${params}` : ""}`;
   return (
     <Link
       to={href}

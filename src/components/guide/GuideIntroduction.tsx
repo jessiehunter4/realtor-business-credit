@@ -69,7 +69,7 @@ const GuideIntroduction = () => (
       <Paragraph>This is <strong>education and coaching guidance</strong>. It is not legal, tax, accounting, or investment advice. Entity selection, commission handling, and asset-protection strategy should always be confirmed with your broker, CPA, attorney, and state licensing board for your specific situation.</Paragraph>
 
       <div className="mt-8 flex flex-col items-center gap-2">
-        <PlanCTAButton label="Skip Ahead: Create My Plan" />
+        <PlanCTAButton label="Skip Ahead: Read the Guide" href="/guide" />
         <p className="text-xs text-muted-foreground italic">Or keep reading — each chapter is a 2–3 minute read.</p>
       </div>
     </div>
