@@ -31,23 +31,28 @@ const tiers = PRICING_TIERS;
 
 type ComparisonRow = {
   feature: string;
-  values: [boolean | string, boolean | string, boolean | string];
+  values: [boolean | string, boolean | string, boolean | string, boolean | string];
 };
 
 const comparison: ComparisonRow[] = [
-  { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true] },
-  { feature: "Free Fundability Scan", values: [true, true, true] },
-  { feature: "Credit Suite vendor & tradeline directory", values: [true, true, true] },
-  { feature: "Guide + 7-step action checklist", values: [true, true, true] },
-  { feature: "Weekly live coaching calls", values: [false, true, true] },
-  { feature: "Small-group cohort community", values: [false, true, true] },
-  { feature: "Credit Suite client portal + coach", values: [false, true, true] },
-  { feature: "Private 1:1 coaching with Jessie", values: [false, false, true] },
-  { feature: "Priority response + funding strategy", values: [false, false, true] },
-  { feature: "Quarterly plan reviews", values: [false, false, true] },
+  { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true, true] },
+  { feature: "Task checklist + progress tracking", values: [true, true, true, true] },
+  { feature: "Guide + 7-step action checklist", values: [true, true, true, true] },
+  { feature: "Free Fundability Scan", values: [false, true, true, true] },
+  { feature: "Credit Suite vendor & tradeline directory", values: [false, true, true, true] },
+  { feature: "Weekly live coaching calls", values: [false, false, true, true] },
+  { feature: "Small-group cohort community", values: [false, false, true, true] },
+  { feature: "Credit Suite client portal + coach", values: [false, false, true, true] },
+  { feature: "Private 1:1 coaching with Jessie", values: [false, false, false, true] },
+  { feature: "Priority response + funding strategy", values: [false, false, false, true] },
+  { feature: "Quarterly plan reviews", values: [false, false, false, true] },
 ];
 
 const faqs = [
+  {
+    q: "Is there a free option?",
+    a: "Yes. The Free tier costs nothing and gives you the full guide, your customized plan from the intake survey, and the task checklist with progress tracking in your portal. No card required.",
+  },
   {
     q: "Do I have to pay upfront? Is there a payment plan?",
     a: "You can enroll directly, or start with the free guide and custom plan first. If a payment plan makes sense for the Cohort or Cohort Plus + tier, we can walk through options together — no pressure, no surprise charges.",
