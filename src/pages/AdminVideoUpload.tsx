@@ -6,12 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Upload, ArrowLeft, Trash2, Video } from "lucide-react";
 
-const STORAGE_PATH = "public/hero-jessie.mp4";
-const CAPTIONS_PATH = "public/hero-jessie.vtt";
+const STORAGE_PATH = "hero-jessie.mp4";
+const CAPTIONS_PATH = "hero-jessie.vtt";
 const BUCKET = "site-videos";
-const PUBLIC_FOLDER = "public";
-const VIDEO_FILE = "hero-jessie.mp4";
-const CAPTIONS_FILE = "hero-jessie.vtt";
 
 // Convert SRT subtitle text to WebVTT format
 const srtToVtt = (srt: string): string => {
@@ -37,8 +34,8 @@ const AdminVideoUpload = () => {
   const refresh = async () => {
     const { data: files } = await supabase.storage
       .from(BUCKET)
-      .list(PUBLIC_FOLDER, { search: VIDEO_FILE });
-    const found = files?.some((f) => f.name === VIDEO_FILE) ?? false;
+      .list("", { search: STORAGE_PATH });
+    const found = files?.some((f) => f.name === STORAGE_PATH) ?? false;
     setExists(found);
     if (found) {
       const { data } = await supabase.storage
@@ -51,8 +48,8 @@ const AdminVideoUpload = () => {
 
     const { data: capFiles } = await supabase.storage
       .from(BUCKET)
-      .list(PUBLIC_FOLDER, { search: CAPTIONS_FILE });
-    const capFound = capFiles?.some((f) => f.name === CAPTIONS_FILE) ?? false;
+      .list("", { search: CAPTIONS_PATH });
+    const capFound = capFiles?.some((f) => f.name === CAPTIONS_PATH) ?? false;
     setCaptionsExists(capFound);
     if (capFound) {
       const { data } = await supabase.storage

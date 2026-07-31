@@ -46,8 +46,8 @@ export default function WelcomeDialog({ open, onOpenChange, userId, firstName, m
         </DialogHeader>
         <div className="rounded-xl overflow-hidden bg-secondary/5 aspect-video">
           <HeroVideo
-            storagePath="public/welcome-dashboard.mp4"
-            captionsPath="public/welcome-dashboard.vtt"
+            storagePath="welcome-dashboard.mp4"
+            captionsPath="welcome-dashboard.vtt"
             alt="Welcome video from Jessie Hunter"
             className="rounded-xl"
           />
