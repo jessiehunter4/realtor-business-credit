@@ -43,7 +43,7 @@ const comparison: ComparisonRow[] = [
   { feature: "Weekly live coaching calls", values: [false, false, true, true] },
   { feature: "Small-group cohort community", values: [false, false, true, true] },
   { feature: "Credit Suite client portal + coach", values: [false, false, true, true] },
-  { feature: "Private 1:1 coaching with Jessie", values: [false, false, false, true] },
+  { feature: "Private 1:1 coaching with RE Pro Coach", values: [false, false, false, true] },
   { feature: "Priority response + funding strategy", values: [false, false, false, true] },
   { feature: "Quarterly plan reviews", values: [false, false, false, true] },
 ];
