@@ -78,7 +78,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Private cohort community",
       "Credit Suite client portal + coach",
     ],
-    notIncluded: ["Private 1:1 coaching with Jessie"],
+    notIncluded: ["RE Pro coach"],
     highlighted: true,
     ctaLabel: "Enroll in Cohort",
     ctaHref: STRIPE_LINKS.cohort,
@@ -94,7 +94,7 @@ export const PRICING_TIERS: PricingTier[] = [
     who: "For Realtors and brokers who want private, high-touch guidance.",
     features: [
       "Everything in Cohort",
-      "Private 1:1 coaching with Jessie",
+      "RE Pro coach",
       "Dedicated Credit Suite specialist",
       "Priority response + funding strategy sessions",
       "Quarterly plan reviews",
