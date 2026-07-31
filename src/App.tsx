@@ -28,6 +28,8 @@ import TermsPage from "./pages/TermsPage";
 import SmsOptInProofPage from "./pages/SmsOptInProofPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
+import SignupPage from "./pages/SignupPage";
+import AdminSignupPage from "./pages/AdminSignupPage";
 import DashboardPage from "./pages/DashboardPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelledPage from "./pages/PaymentCancelledPage";
@@ -56,6 +58,8 @@ const App = () => (
           <Route path="/one-on-one" element={<OneOnOnePage />} />
           <Route path="/intake" element={<IntakeSurveyPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/admin-signup" element={<AdminSignupPage />} />
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/mls-import" element={<MLSImport />} />
