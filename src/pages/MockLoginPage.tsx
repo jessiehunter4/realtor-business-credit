@@ -167,10 +167,6 @@ const MockLoginPage = () => {
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Visitor sign-in
-            </span>
             <h1
               className="mt-4 font-semibold text-secondary"
               style={{ fontSize: "clamp(1.75rem, 3vw, 2.25rem)", lineHeight: 1.15 }}
