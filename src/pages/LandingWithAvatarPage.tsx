@@ -29,8 +29,8 @@ const LandingWithAvatarPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Seo
-        title={visitorName ? `Welcome, ${visitorName} — RE Pro Business Credit` : "Your Personal Welcome — RE Pro Business Credit"}
-        description="A personal welcome and Jessie's 3-Step Rule: Read the Guide, Create Your Customized Plan, and Implementation."
+        title="Money When Your Business Needs It — RE Pro Business Credit"
+        description="A simple three-step path for real estate pros: read the free guide, get a custom 90-day plan, then choose how you implement it."
         path={`/landing-page/${slug || ""}`}
       />
       <SiteHeader />
