@@ -87,9 +87,10 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: "one-on-one",
     name: "Cohort Plus +",
-    price: "$4,997",
+    price: "$3,497",
+    originalPrice: "$3,997",
     cadence: "per quarter",
-    cadenceNote: "Quarterly engagement, renewable",
+    cadenceNote: "Limited-time $500 discount applied at checkout",
     who: "For Realtors and brokers who want private, high-touch guidance.",
     features: [
       "Everything in Cohort",
