@@ -120,10 +120,10 @@ export default function DashboardPage() {
             <Card className="col-span-2 lg:col-span-1">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                  <Calendar className="h-4 w-4" /> Next 1:1
+                  <Calendar className="h-4 w-4" /> Your Plan
                 </div>
-                <div className="mt-2 text-lg font-semibold text-secondary">Book your session</div>
-                <Link to="/one-on-one" className="text-xs text-primary hover:underline">Schedule now →</Link>
+                <div className="mt-2 text-lg font-semibold text-secondary">Keep making progress</div>
+                <Link to="/guide" className="text-xs text-primary hover:underline">Read the guide →</Link>
               </CardContent>
             </Card>
           </div>
