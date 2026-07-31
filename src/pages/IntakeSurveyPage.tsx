@@ -679,7 +679,7 @@ export default function IntakeSurveyPage() {
       <SiteHeader />
       <Seo
         title="RE Pro Business Financial Needs Analysis"
-        description="A short intake to prepare for your one-on-one business credit session."
+        description="A short intake that generates your custom RE Pro business structure, finance & credit plan."
         path="/intake"
         noindex
       />
