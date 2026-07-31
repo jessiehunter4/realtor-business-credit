@@ -11,7 +11,6 @@ import AboutPage from "./pages/AboutPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import MLSImport from "./pages/MLSImport";
-import OneOnOnePage from "./pages/OneOnOnePage";
 import IntakeSurveyPage from "./pages/IntakeSurveyPage";
 import AdminIntakeList from "./pages/AdminIntakeList";
 import AdminIntakeCoachView from "./pages/AdminIntakeCoachView";
@@ -55,7 +54,6 @@ const App = () => (
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/one-on-one" element={<OneOnOnePage />} />
           <Route path="/intake" element={<IntakeSurveyPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/signup" element={<SignupPage />} />
