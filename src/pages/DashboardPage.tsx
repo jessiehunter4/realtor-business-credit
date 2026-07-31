@@ -1,29 +1,50 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { LogOut, PlayCircle, Loader2, CheckCircle2, Circle, TrendingUp, Calendar } from "lucide-react";
+import { LogOut, PlayCircle, Loader2, TrendingUp, BookOpen } from "lucide-react";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import Seo from "@/components/shared/Seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useRoadmap } from "@/hooks/useRoadmap";
+import { logRoadmapEvent } from "@/lib/roadmap";
 import PlanHeroCard from "@/components/dashboard/PlanHeroCard";
 import WelcomeDialog from "@/components/dashboard/WelcomeDialog";
 import MessagePreferencesCard from "@/components/dashboard/MessagePreferencesCard";
+import ProgressSummary from "@/components/dashboard/ProgressSummary";
+import PriorityTaskCard from "@/components/dashboard/PriorityTaskCard";
+import RoadmapChecklist from "@/components/dashboard/RoadmapChecklist";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { session, profile, plan, tasks, loading } = useDashboardData();
+  const { session, profile, plan, tasks: progressRows, survey, loading } = useDashboardData();
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [markFirst, setMarkFirst] = useState(false);
+  const viewLogged = useRef(false);
 
   const firstName = profile?.first_name || session?.user.user_metadata?.first_name || "";
-  const doneCount = tasks.filter((t) => t.completed).length;
-  const pct = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
-  const nextTask = useMemo(() => tasks.find((t) => !t.completed) ?? null, [tasks]);
+
+  const { tasks, metrics, priorityTask, setTaskStatus, savingKey } = useRoadmap({
+    planId: plan?.id,
+    planData: plan?.plan_data,
+    survey,
+    progress: progressRows,
+    ready: !loading,
+  });
+
+  // Log a single dashboard view per session so workflows know they're engaged.
+  useEffect(() => {
+    if (loading || !plan?.id || viewLogged.current) return;
+    viewLogged.current = true;
+    logRoadmapEvent("dashboard_viewed", {
+      planId: plan.id,
+      nextTask: priorityTask,
+      completionPct: metrics.overallPct,
+    });
+  }, [loading, plan?.id, priorityTask, metrics.overallPct]);
 
   // First-login: open welcome dialog once (DB flag is authoritative).
   useEffect(() => {
@@ -90,61 +111,50 @@ export default function DashboardPage() {
         <PlanHeroCard
           plan={plan}
           firstName={firstName}
-          taskCount={tasks.length}
-          taskDoneCount={doneCount}
+          taskCount={metrics.total}
+          taskDoneCount={metrics.completed}
         />
 
-        {/* KPI strip */}
         {plan && (
-          <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4" /> 90-Day Plan
-                </div>
-                <div className="mt-2 text-2xl font-bold text-secondary">{doneCount}/{tasks.length || "—"}</div>
-                <Progress value={pct} className="h-1.5 mt-2" />
-                <div className="text-xs text-muted-foreground mt-1">{pct}% complete</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                  <TrendingUp className="h-4 w-4" /> Recommended Program
-                </div>
-                <div className="mt-2 text-lg font-semibold text-secondary capitalize">
-                  {plan.recommended_program_slug?.replace(/-/g, " ") || "Review with coach"}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="col-span-2 lg:col-span-1">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                  <Calendar className="h-4 w-4" /> Your Plan
-                </div>
-                <div className="mt-2 text-lg font-semibold text-secondary">Keep making progress</div>
-                <Link to="/guide" className="text-xs text-primary hover:underline">Read the guide →</Link>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+          <>
+            {/* Highest-priority incomplete task */}
+            <PriorityTaskCard
+              task={priorityTask}
+              saving={savingKey === priorityTask?.key}
+              onStatusChange={setTaskStatus}
+            />
 
-        {/* Next action */}
-        {plan && nextTask && (
-          <Card>
-            <CardContent className="p-5 sm:p-6">
-              <div className="text-xs uppercase tracking-wide font-semibold text-primary mb-1">Next action</div>
-              <div className="flex items-start gap-3">
-                <Circle className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                <div className="flex-1">
-                  <p className="text-secondary font-medium">{nextTask.task_label || nextTask.task_key}</p>
-                </div>
-                <Link to={`/portal/plan/${plan.id}?tab=checklist`}>
-                  <Button variant="outline" size="sm" className="rounded-full">Open checklist</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+            <ProgressSummary metrics={metrics} />
+
+            <RoadmapChecklist tasks={tasks} savingKey={savingKey} onStatusChange={setTaskStatus} />
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+                    <TrendingUp className="h-4 w-4" /> Recommended program
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-secondary capitalize">
+                    {plan.recommended_program_slug?.replace(/-/g, " ") || "Review with coach"}
+                  </div>
+                  <Link to="/pricing" className="text-xs text-primary hover:underline">
+                    Compare options →
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+                    <BookOpen className="h-4 w-4" /> Learn the why
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-secondary">The full guide</div>
+                  <Link to="/guide" className="text-xs text-primary hover:underline">
+                    Read the guide →
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </>
         )}
 
         <MessagePreferencesCard />
