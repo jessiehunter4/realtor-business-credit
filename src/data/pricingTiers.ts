@@ -5,6 +5,7 @@ export type PricingTier = {
   id: "free" | "self-paced" | "cohort" | "one-on-one";
   name: string;
   price: string;
+  originalPrice?: string;
   cadence: string;
   cadenceNote?: string;
   who: string;
@@ -65,9 +66,10 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: "cohort",
     name: "Pro Cohort",
-    price: "$1,997",
+    price: "$3,497",
+    originalPrice: "$3,997",
     cadence: "90 days",
-    cadenceNote: "One-time enrollment for the 90-day program",
+    cadenceNote: "Limited-time $500 discount applied at checkout",
     who: "For Realtors who want structure, accountability, and a small group.",
     features: [
       "Everything in Self-Paced",
