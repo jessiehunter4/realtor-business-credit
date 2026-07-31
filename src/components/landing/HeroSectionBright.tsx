@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, ShieldCheck, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, Clock, Compass, ClipboardList, Rocket } from "lucide-react";
 import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
@@ -16,12 +16,12 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
   const tagline = "— between closings, before your next client, and when opportunity knocks.";
 
   const subhead =
-    "Build the business structure, financial foundation, and separate business credit that funds your real estate practice the way commission income actually flows.";
+    "Commission income arrives in lumps. Your bills don't. Build the business structure and separate business credit that covers your overhead between closings — without leaning on your personal cards.";
 
   const trustBullets = [
-    { icon: BookOpen, label: "Free guide" },
-    { icon: FileText, label: "Custom plan from your Needs Analysis" },
-    { icon: GraduationCap, label: "Educational — not legal/tax advice" },
+    { icon: Compass, label: "Know where you stand" },
+    { icon: ClipboardList, label: "Get a 90-day plan" },
+    { icon: Rocket, label: "Choose how to implement" },
   ];
 
   return (
@@ -79,8 +79,8 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
           </ul>
 
           <p className="mt-3 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-            16 years brokering · Licensed CA &amp; GA · Certified Credit Suite Partner
+            <Clock className="h-3.5 w-3.5 text-primary" />
+            Free to read · about 5–10 minutes · no signup required
           </p>
         </div>
       </div>

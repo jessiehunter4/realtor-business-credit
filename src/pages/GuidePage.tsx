@@ -30,6 +30,7 @@ import Ch12 from "@/components/guide/chapters/Ch12";
 import Ch13 from "@/components/guide/chapters/Ch13";
 import GuideConclusion from "@/components/guide/GuideConclusion";
 import GuideResources from "@/components/guide/GuideResources";
+import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
@@ -431,6 +432,7 @@ const GuidePage = () => {
         <StateEntityWidget />
       </section>
       <GuideConclusion />
+      <CashFlowCalculator />
       <GuideResources />
       {/* Spacer so floating buttons don't cover final content on small screens */}
       <div className="h-20 sm:h-24" aria-hidden="true" />

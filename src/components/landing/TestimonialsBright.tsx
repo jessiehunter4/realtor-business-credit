@@ -59,6 +59,9 @@ const TestimonialsBright = () => (
         </figure>
       ))}
     </div>
+    <p className="mt-8 text-center text-sm text-muted-foreground">
+      Built by Jessie Hunter — 16 years brokering, licensed in CA &amp; GA, Certified Credit Suite Partner.
+    </p>
   </section>
 );
 

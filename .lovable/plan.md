@@ -1,51 +1,160 @@
-## Goal
+# Homepage Rewrite: The 3-Step Customer Journey
 
-Add a **Free** tier as the first pricing option, without touching the three existing paid tiers (DIY / Pro Cohort / Cohort Plus +).
+## Current state (verified)
 
-## What the Free tier says
+`src/pages/LandingPage.tsx` renders 13 sections in this order:
 
-- Name: **Free**, price **$0**, cadence "no card required"
-- Who: "For Realtors who want to learn the system and see their own plan before investing."
-- Includes:
-  - Full Business Structure, Finance & Credit Guide
-  - Your customized plan generated from the intake survey
-  - Task checklist from your plan, with progress tracking in the portal
-- Not included: coaching calls, cohort, Credit Suite portal/coach
-- CTA: **Read the Free Guide** → `/guide` (plain link, no Stripe)
+```text
+HeroSectionBright → GuideIntroduction → ProgramCurriculum → CustomPlanPreview →
+IsThisForMe → MoneyWhenYouNeedItStrip → ThreePillarsDiagram → ComparisonBright →
+CashFlowCalculator → GuideContentsBright → SamplePlanPreview → TestimonialsBright →
+FinalCTABright  (+ SiteHeader, SiteFooter, StickyMobileCTABar)
+```
 
-## Data model
+That is ~1,000 lines of section code and a lot of overlap: three separate "why business credit matters" arguments (MoneyWhenYouNeedItStrip, ThreePillarsDiagram, ComparisonBright), two plan previews (CustomPlanPreview, SamplePlanPreview), and two guide-contents blocks (ProgramCurriculum, GuideContentsBright). The hero also currently opens with credentials ("16 years brokering · Licensed CA & GA · Certified Credit Suite Partner"), which reads as About Us.
 
-`src/data/pricingTiers.ts`
-- Extend `PricingTier.id` union with `"free"`, and add an optional `isFree?: boolean` flag so components can branch on link-vs-checkout.
-- Prepend the Free tier object to `PRICING_TIERS` (icon: `BookOpen`), `ctaHref: "/guide"`.
-- Leave the three existing tier objects and `STRIPE_LINKS` byte-for-byte unchanged.
+CTA audit result: the CTAs that exist already point at `/guide` (`FinalCTABright`, `GuideContentsBright`, `ProgramCurriculum`, `CashFlowCalculator`, `StickyMobileCTABar`), except `SamplePlanPreview` → `/sample-plan`. No homepage CTA currently sends visitors to `/intake`, so the flow change is mostly about reinforcement and removing the `/sample-plan` detour as a *primary* action.
 
-`src/lib/startCheckout.ts`
-- `CheckoutTierId` stays `"self-paced" | "cohort" | "one-on-one"` — Free never goes to Stripe. Components will narrow before calling `startCheckout`.
+---
 
-## Component updates
+## 1. New information architecture
 
-**`src/pages/PricingPage.tsx`**
-- Card grid: `md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4` so 4 cards read cleanly (1 col mobile → 2 cols tablet/laptop → 4 cols wide desktop). Cards stay `items-stretch` with equal-height footers.
-- Card renderer: if `tier.isFree`, render a `<Link to={tier.ctaHref}>` styled like the outline CTA instead of the checkout button; otherwise keep the exact existing checkout button, loading state, and error handling.
-- Comparison table (`grid-cols-2 md:grid-cols-4` at ~line 303) and the feature/columns grid at ~line 446: add a Free column so the table has 4 tiers + label column; on mobile it keeps its existing stacked/scroll behavior. Free row values: guide ✓, custom plan ✓, task checklist ✓, everything else —.
-- FAQ copy: add one short line noting the Free tier exists and what it covers.
+Nine blocks, down from thirteen:
 
-**`src/pages/CheckoutPage.tsx`**
-- Filter Free out of the selectable list (`PRICING_TIERS.filter(t => !t.isFree)`) — checkout is for paid tiers only; `?tier=free` falls back to the existing default (`cohort`). No other change.
+```text
+1. Hero — visitor pain + outcome + one CTA (Read the Free Guide)
+2. Outcome strip — 3 short proof points ("money when you need it")
+3. How It Works — 3-step overview (Educate / Plan / Implement) as a compact rail
+4. Step 1: Educate    — image LEFT, text RIGHT
+5. Step 2: Plan       — text LEFT, image RIGHT
+6. Step 3: Implement  — image LEFT, text RIGHT
+7. What This Program Is (and is not)
+8. Proof — condensed testimonials + founder one-liner
+9. Final CTA — Start with the Free Guide
+```
 
-**`src/components/plan/InlinePricingAccordion.tsx`**
-- Free renders as an accordion item like the others, but its action is a `Link` to `/guide` rather than a checkout button. Paid items unchanged.
+---
 
-**`src/components/intake/IntakePricingAndReadiness.tsx`**
-- No change needed; the "just exploring" / "need clarity" responses already point to `/guide`.
+## 2. Hero section strategy
 
-## Testing checklist
+Rewrite `src/components/landing/HeroSectionBright.tsx` copy only (keep the video, gradient, and responsive scaffolding — those were tuned in earlier passes).
 
-- `/pricing` at 375px, 768px, 1024px, 1440px: 4 cards, no overflow, equal heights, "Most popular" badge still on Pro Cohort.
-- Free card CTA navigates to `/guide`; no Stripe call fires.
-- Each paid card still opens Stripe checkout and still shows its error text on failure.
-- `/checkout` shows only the 3 paid options; `?tier=cohort|self-paced|one-on-one` preselects correctly; `?tier=free` falls back to Cohort.
-- Plan-page inline accordion: Free expands with a guide link, paid tiers still check out.
-- Comparison table renders 4 tier columns on desktop and stays readable on mobile.
-- Typecheck passes with the widened `PricingTier["id"]` union.
+- **H1:** `Money when you need it.` (unchanged — it already tests as the visitor's own language)
+- **Sub-head:** replace the current structural sentence with a pain-first line: *"Commission income arrives in lumps. Your bills don't. Build the business structure and separate business credit that covers overhead between closings — without leaning on your personal cards."*
+- **Benefit line (3 chips, replacing the trust bullets):** "Know where you stand" · "Get a 90-day plan" · "Choose how to implement" — these preview the three steps rather than describing the company.
+- **Credentials line** ("16 years brokering · Licensed CA & GA…") moves out of the hero into the Proof section (block 8) and the About page.
+- **One primary CTA:** `Read the Free Guide → /guide`. Secondary text link: "Takes about 5–10 minutes."
+- Keep `firstName` / `closingContext` personalization logic intact.
+
+## 3. Three-step program layout
+
+New component `src/components/landing/HowItWorksRail.tsx` — three numbered pills with icon + one-line label, anchor-linking to `#step-educate`, `#step-plan`, `#step-implement`. Purely orientation; no CTAs.
+
+New shared component `src/components/landing/JourneyStep.tsx` with props `{ step, eyebrow, title, whatYouDo, whyItMatters, deliverable, bullets, image, imageAlt, cta, reverse }`. Renders a two-column grid (`lg:grid-cols-2`) with `lg:order-*` flipping when `reverse` is true. Each step answers the three required questions with explicit labels:
+
+- **What you'll do**
+- **Why it matters**
+- **What you get** (rendered as a highlighted "deliverable" chip)
+
+**Step 1 — Educate** (`image left`)
+What you'll do: read a concise, Realtor-specific guide, ~5–10 minutes. Why: you can't fix a structure you can't see; the guide shows where your business actually stands on entity, banking, and credit. What you get: a clear picture of your current position and the vocabulary lenders use.
+Include a compact guide preview: 5–6 chapter titles pulled from the existing `GuideContentsBright` data plus "13 chapters · 5–10 min skim". CTA: **Read the Free Guide → /guide**.
+
+**Step 2 — Plan** (`image right`)
+What you'll do: answer questions about your business, your goals, and your current situation. Why: generic checklists don't work — your gaps are specific. What you get: a personalized 90-day business structure, finance & credit plan with prioritized actions.
+Reuse the visual language of `CustomPlanPreview`. CTA is **not** `/intake` — it is a soft "See a sample plan → /sample-plan" text link, with the primary action still "Start with the guide".
+
+**Step 3 — Implement** (`image left`)
+What you'll do: choose the support level that fits. Why: a plan only pays off when it's executed. What you get: accountability and guidance through the 90 days.
+Three short cards — **Self-Paced** (work the plan on your own schedule), **Small Cohort** (a group of 5–10 Realtors moving through the plan together), **One-on-One Coaching** (direct, personalized guidance). No prices, no feature tables. Quiet text link: "See program details → /pricing".
+
+## 4. "What This Program Is" section
+
+New `src/components/landing/WhatThisIs.tsx` — two-column contrast card.
+
+- **This program is:** Educational · Planning-focused · Coaching-supported (green check treatment)
+- **This program is not:** Legal advice · Tax advice · Investment advice (muted, neutral treatment — informative, not alarming)
+- Footer line: "Always consult your broker, attorney, and tax professional for your specific situation."
+
+Placed after Step 3 so it reads as scope-setting rather than a warning gate.
+
+## 5. CTA strategy
+
+Every primary button on the homepage resolves to `guideLink` (`/guide` plus forwarded contact params from `useContactIdentity`). Rules:
+
+| Placement | Label | Target |
+|---|---|---|
+| Hero | Read the Free Guide | `/guide` |
+| Step 1 | Read the Free Guide | `/guide` |
+| Step 2 | (text link) See a sample plan | `/sample-plan` |
+| Step 3 | (text link) See program details | `/pricing` |
+| Final CTA | Start with the Free Guide | `/guide` |
+| Sticky mobile bar | Read the Free Guide | `/guide` |
+
+No homepage element links to `/intake` or triggers plan generation. `SamplePlanPreview`'s standalone `/sample-plan` section is retired; that link survives only as the Step 2 text link.
+
+## 6. Content consolidation
+
+| Current section | Action |
+|---|---|
+| `GuideIntroduction` (guide component reused on homepage) | Remove from homepage — its content is absorbed into Step 1 |
+| `ProgramCurriculum` | Remove — chapter list folds into Step 1's guide preview |
+| `CustomPlanPreview` | Absorb into Step 2 |
+| `IsThisForMe` | Remove — audience fit is carried by the new hero copy |
+| `MoneyWhenYouNeedItStrip` | Keep, trimmed to 3 items, as the outcome strip (block 2) |
+| `ThreePillarsDiagram` | Remove from homepage — structure/finance/credit is now explained through the steps |
+| `ComparisonBright` | Remove — redundant with the guide's own comparison |
+| `CashFlowCalculator` | Remove from homepage; move to `/guide` where an engaged reader will use it |
+| `GuideContentsBright` | Absorb into Step 1 preview |
+| `SamplePlanPreview` | Absorb into Step 2 |
+| `TestimonialsBright` | Keep, condensed to 3 quotes, plus the founder credential line |
+| `FinalCTABright` | Keep, copy refresh |
+
+No component files are deleted — they're unmounted from `LandingPage.tsx` so they remain available for `/guide` and other pages.
+
+## 7. Imagery
+
+Three AI-generated images at `src/assets/journey-step-1.jpg`, `-2.jpg`, `-3.jpg` (4:3, ~1200×900), imported as ES6 modules with descriptive alt text:
+
+1. Educate — a Realtor at a desk reading a printed guide, warm daylight, navy/green accents
+2. Plan — a clean document/dashboard showing a 90-day roadmap with checkmarks
+3. Implement — a small group of real estate professionals in a working session
+
+Style constraints: professional, warm, matches the navy `#0d1b2a` / green `#3eaf7c` / amber palette; no stock-photo cliché handshakes, no purple gradients.
+
+## 8. Responsive considerations
+
+- Alternation applies at `lg` and up only; below `lg` every step stacks image-then-text in reading order (`order` classes reset).
+- `HowItWorksRail` becomes a horizontal 3-up on `sm`+, vertical stack on mobile.
+- Anchor targets need `scroll-mt-24` to clear the sticky `SiteHeader`.
+- Images use `loading="lazy"` (hero video excluded) and fixed `aspect-[4/3]` containers to prevent layout shift.
+- Sticky mobile CTA bar retained; body keeps `pb-20 md:pb-0`.
+- All colors via existing semantic tokens (`primary`, `secondary`, `sky`, `accent`, `muted-foreground`) — no hardcoded color utilities.
+
+## 9. Technical details
+
+Files created:
+- `src/components/landing/JourneyStep.tsx`
+- `src/components/landing/HowItWorksRail.tsx`
+- `src/components/landing/WhatThisIs.tsx`
+- `src/data/homepageJourney.ts` (step content as data, so copy edits don't touch JSX)
+- three image assets
+
+Files edited:
+- `src/pages/LandingPage.tsx` — new section order, imports
+- `src/components/landing/HeroSectionBright.tsx` — copy + chips
+- `src/components/landing/MoneyWhenYouNeedItStrip.tsx` — trim to 3
+- `src/components/landing/TestimonialsBright.tsx` — condense, add credential line
+- `src/components/landing/FinalCTABright.tsx` — copy refresh
+
+Unchanged: analytics (`postFunnelEvent` `site_visit`, `tag-ghl-contact`), `useContactIdentity` param forwarding, SEO/JSON-LD block in `LandingPage.tsx` (description copy gets a light refresh only), all routes, all backend.
+
+Analytics: keep existing `data-analytics-id` conventions — `cta-guide-hero`, plus new `cta-guide-step1`, `cta-sample-plan-step2`, `cta-pricing-step3`, `cta-guide-final`.
+
+## 10. Phases
+
+1. **Content layer** — `src/data/homepageJourney.ts` with all step copy, plus hero copy revision.
+2. **Components** — `JourneyStep`, `HowItWorksRail`, `WhatThisIs` (renders with placeholder images).
+3. **Assembly** — rewire `LandingPage.tsx` to the new nine-block order; trim the retained sections.
+4. **Imagery** — generate and wire the three step images (depends on phase 2).
+5. **Verification** — typecheck, screenshot at 390px / 768px / 1440px, confirm no homepage link resolves to `/intake`.
