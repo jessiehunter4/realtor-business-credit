@@ -219,4 +219,3 @@ export function computeMetrics(tasks: RoadmapTask[]): RoadmapMetrics {
   };
 }
 
-export { TASK_BY_KEY };
