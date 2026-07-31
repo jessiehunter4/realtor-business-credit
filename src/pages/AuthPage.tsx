@@ -50,10 +50,9 @@ export default function AuthPage() {
         return;
       }
 
-      // Not an admin: admin elevation only happens through the code-verified
-      // sign-up path below, never automatically at sign-in.
-      toast.error("This account isn't an admin. Taking you to your dashboard.");
-      navigate("/dashboard", { replace: true });
+      // Not an admin: reject the sign-in outright rather than routing them here.
+      await supabase.auth.signOut();
+      toast.error("Invalid email or password");
     } finally {
       adminCheckInFlight.current = false;
     }
