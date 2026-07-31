@@ -92,7 +92,7 @@ const SiteHeader = () => {
                 Log in
               </Link>
               <Link
-                to="/one-on-one"
+                to="/guide"
                 data-analytics-id="cta-start-here-header"
                 className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
               >
@@ -167,7 +167,7 @@ const SiteHeader = () => {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link
-                      to="/one-on-one"
+                      to="/guide"
                       className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
                     >
                       Start Here
