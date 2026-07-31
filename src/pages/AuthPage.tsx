@@ -45,6 +45,7 @@ export default function AuthPage() {
         .eq("role", "admin")
         .maybeSingle();
       if (data) {
+        toast.success("Signed in successfully!");
         if (next) window.location.replace(next);
         else navigate("/admin");
         return;
@@ -92,7 +93,8 @@ export default function AuthPage() {
         return;
       }
 
-      toast.success("Signed in successfully!");
+      // Success is only confirmed once the account is verified as an admin
+      // (handled by checkAdminAndRoute via the auth state listener).
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
