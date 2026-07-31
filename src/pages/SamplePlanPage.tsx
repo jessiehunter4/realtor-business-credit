@@ -91,17 +91,16 @@ const SamplePlanPage = () => {
             Ready for <em>your</em> plan?
           </h2>
           <p className="mt-3 text-muted-foreground text-lg">
-            Book your free 1:1 and walk away with one just like this — built from your
+            Complete the free Needs Analysis and walk away with one just like this — built from your
             RE Pro Business Financial Needs Analysis.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              to="/one-on-one"
-              data-analytics-id="cta-book-sample-plan-bottom"
+              to="/intake"
+              data-analytics-id="cta-plan-sample-plan-bottom"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
             >
-              <Calendar className="h-5 w-5" />
-              Book My Free 1:1
+              Build My Custom Plan
             </Link>
           </div>
           <p className="mt-4 text-xs text-muted-foreground italic">
