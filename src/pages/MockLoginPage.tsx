@@ -52,6 +52,11 @@ const MockLoginPage = () => {
   // role are known, route by role (never by "authentication succeeded" alone).
   useEffect(() => {
     if (roleLoading || !activeSession) return;
+    if (role === "admin") {
+      // Admin accounts must use the admin sign-in page.
+      supabase.auth.signOut().then(() => toast.error("Invalid email or password"));
+      return;
+    }
     navigate(resolvePostAuthTarget(next, role), { replace: true });
   }, [roleLoading, activeSession, role, next, navigate]);
 
