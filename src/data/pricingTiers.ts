@@ -66,8 +66,8 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: "cohort",
     name: "Pro Cohort",
-    price: "$3,497",
-    originalPrice: "$3,997",
+    price: "$2,997",
+    originalPrice: "$3,497",
     cadence: "90 days",
     cadenceNote: "Limited-time $500 discount applied at checkout",
     who: "For Realtors who want structure, accountability, and a small group.",
