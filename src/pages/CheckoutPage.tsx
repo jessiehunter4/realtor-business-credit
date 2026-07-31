@@ -148,6 +148,9 @@ const CheckoutPage = () => {
                       <span className="flex-1">
                         <span className="block text-sm font-semibold text-secondary">
                           {tier.name} · {tier.price}
+                          {tier.originalPrice && (
+                            <span className="ml-1.5 text-secondary/40 line-through font-normal">{tier.originalPrice}</span>
+                          )}
                         </span>
                         <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
                           {tier.who}

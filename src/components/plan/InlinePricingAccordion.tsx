@@ -68,7 +68,11 @@ export default function InlinePricingAccordion({
                       )}
                     </div>
                     <p className="text-xs text-secondary/60 mt-0.5">
-                      <span className="font-semibold text-secondary/85">{tier.price}</span> · {tier.cadence}
+                      <span className="font-semibold text-secondary/85">{tier.price}</span>
+                      {tier.originalPrice && (
+                        <span className="ml-1.5 text-secondary/40 line-through">{tier.originalPrice}</span>
+                      )}
+                      <span className="ml-1.5">· {tier.cadence}</span>
                     </p>
                   </div>
                 </div>
