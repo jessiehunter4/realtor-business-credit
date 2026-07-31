@@ -26,6 +26,8 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [adminCode, setAdminCode] = useState("");
+  const pendingAdminCode = useRef<string>("");
   const adminCheckInFlight = useRef(false);
 
   const checkAdminAndRoute = async (userId: string) => {
@@ -45,12 +47,16 @@ export default function AuthPage() {
         return;
       }
 
-      // Not an admin. The only automatic grant allowed is first-admin
-      // bootstrap, which the server rejects once any admin exists.
+      // Not an admin yet. The server grants admin only for the first-admin
+      // bootstrap or when the correct admin access code is supplied.
+      const code = pendingAdminCode.current;
       const { data: bootstrap, error: bootstrapError } =
-        await supabase.functions.invoke("setup-admin");
+        await supabase.functions.invoke("setup-admin", {
+          body: code ? { code } : {},
+        });
+      pendingAdminCode.current = "";
       if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
-        toast.success("Admin access granted (first administrator).");
+        toast.success("Admin access granted.");
         if (next) window.location.replace(next);
         else navigate("/admin");
         return;
@@ -116,9 +122,15 @@ export default function AuthPage() {
       return;
     }
 
+    if (!adminCode.trim()) {
+      toast.error("Please enter the admin access code.");
+      return;
+    }
+
     try {
       const validated = authSchema.parse({ email, password });
       setLoading(true);
+      pendingAdminCode.current = adminCode.trim();
 
       const { error } = await supabase.auth.signUp({
         email: validated.email,
@@ -233,6 +245,21 @@ export default function AuthPage() {
                   onAgreedChange={setAgreed}
                   disabled={loading}
                 />
+                <div className="space-y-2">
+                  <Label htmlFor="signup-admin-code">Admin access code</Label>
+                  <Input
+                    id="signup-admin-code"
+                    type="password"
+                    value={adminCode}
+                    onChange={(e) => setAdminCode(e.target.value)}
+                    required
+                    disabled={loading}
+                    placeholder="Required for admin accounts"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Accounts created here become administrators. Visitors should sign up at /mock-login.
+                  </p>
+                </div>
                 <Button type="submit" className="w-full" disabled={loading || !agreed}>
                   {loading ? "Creating account..." : "Sign Up"}
                 </Button>

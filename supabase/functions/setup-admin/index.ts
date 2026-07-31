@@ -58,9 +58,21 @@ serve(async (req) => {
       );
     }
 
-    // BOOTSTRAP ONLY: an admin role may be self-granted exclusively when the
-    // system has no administrator yet. Once one exists, new admins must be
-    // granted by an existing admin.
+    // An admin role may be self-granted in two cases:
+    //   1. The caller supplies the correct ADMIN_SIGNUP_CODE, or
+    //   2. BOOTSTRAP: the system has no administrator yet.
+    let codeAccepted = false;
+    const adminSignupCode = Deno.env.get('ADMIN_SIGNUP_CODE') ?? '';
+    if (adminSignupCode) {
+      try {
+        const body = await req.json().catch(() => ({}));
+        const supplied = typeof body?.code === 'string' ? body.code.trim() : '';
+        codeAccepted = supplied.length > 0 && supplied === adminSignupCode;
+      } catch (_) {
+        codeAccepted = false;
+      }
+    }
+
     const { count: adminCount, error: countError } = await supabaseClient
       .from('user_roles')
       .select('id', { count: 'exact', head: true })
@@ -74,7 +86,7 @@ serve(async (req) => {
       );
     }
 
-    if ((adminCount ?? 0) > 0) {
+    if (!codeAccepted && (adminCount ?? 0) > 0) {
       console.warn(`Rejected admin self-grant for ${user.email}: admins already exist`);
       return new Response(
         JSON.stringify({ error: 'Forbidden' }),
