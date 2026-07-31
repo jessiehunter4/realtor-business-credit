@@ -13,7 +13,7 @@ const CustomPlanPreview = () => (
           Custom Business &amp; Finance Plan
         </h2>
         <p className="mt-3 text-muted-foreground text-lg">
-          Every Realtor's situation is different. After your free 1:1 session, you receive a written plan built from your Needs Analysis — not a generic template.
+          Every Realtor's situation is different. After your free Needs Analysis, you receive a written plan built from your answers — not a generic template.
         </p>
 
         <ul className="mt-6 space-y-3">
