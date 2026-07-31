@@ -199,9 +199,9 @@ const PricingPage = () => {
             <span className="text-primary">Money when you need it.</span>
           </h1>
           <p className="mt-5 text-lg md:text-xl text-secondary/70 max-w-2xl mx-auto leading-relaxed">
-            Three ways to build separate business credit for your real estate
-            business. Enroll directly below, or start with your free custom plan
-            first — your call.
+            Four ways to build separate business credit for your real estate
+            business — including a free option. Enroll directly below, or start
+            with your free guide and custom plan first.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
