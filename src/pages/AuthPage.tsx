@@ -35,6 +35,9 @@ export default function AuthPage() {
   const [code, setCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const adminCheckInFlight = useRef(false);
+  // While an admin sign-up is in progress the SIGNED_IN event must not route
+  // the user away before the access code has been verified server-side.
+  const signingUp = useRef(false);
 
   const checkAdminAndRoute = async (userId: string) => {
     if (adminCheckInFlight.current) return;
@@ -68,6 +71,7 @@ export default function AuthPage() {
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
+        if (signingUp.current) return;
         setTimeout(() => checkAdminAndRoute(session.user.id), 0);
       }
     });
@@ -118,6 +122,7 @@ export default function AuthPage() {
     try {
       const validated = adminSignupSchema.parse({ email, password, code });
       setLoading(true);
+      signingUp.current = true;
 
       const { data, error } = await supabase.auth.signUp({
         email: validated.email,
@@ -168,6 +173,7 @@ export default function AuthPage() {
       }
     } finally {
       setLoading(false);
+      signingUp.current = false;
     }
   };
 
