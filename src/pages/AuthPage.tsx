@@ -46,14 +46,19 @@ export default function AuthPage() {
       }
 
       // Not an admin. The only automatic grant allowed is first-admin
-      // bootstrap, which the server rejects once any admin exists.
-      const { data: bootstrap, error: bootstrapError } =
-        await supabase.functions.invoke("setup-admin");
-      if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
-        toast.success("Admin access granted (first administrator).");
-        if (next) window.location.replace(next);
-        else navigate("/admin");
-        return;
+      // bootstrap, which the server rejects (403) once any admin exists.
+      // Swallow that expected rejection instead of surfacing it as an error.
+      try {
+        const { data: bootstrap, error: bootstrapError } =
+          await supabase.functions.invoke("setup-admin");
+        if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
+          toast.success("Admin access granted (first administrator).");
+          if (next) window.location.replace(next);
+          else navigate("/admin");
+          return;
+        }
+      } catch {
+        // expected when an admin already exists
       }
 
       toast.error("This account isn't an admin. Taking you to your dashboard.");
