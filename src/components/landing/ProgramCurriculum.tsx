@@ -16,9 +16,9 @@ const modules = [
   },
   {
     n: "02",
-    title: "Book Free 1:1",
-    desc: "Grab a no-pressure strategy session with your coach.",
-    chip: "Live · 30 min",
+    title: "Read the Free Guide",
+    desc: "Learn the structure, finance, and credit foundation you need.",
+    chip: "Guide · 30 min",
     icon: CalendarCheck,
     accent: "sky" as const,
   },
@@ -116,11 +116,11 @@ const ProgramCurriculum = ({ guideLink = "/guide" }: Props) => {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Implementation</h3>
             <p className="text-sm text-white/70 leading-relaxed flex-grow">
-              Execute your plan with 1:1 coaching or inside the Realtor Credit Cohort.
+              Execute your plan self-paced or inside the Realtor Credit Cohort.
             </p>
             <div className="mt-5">
               <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-primary text-primary-foreground">
-                Cohort or 1:1
+                DIY or Cohort
               </span>
             </div>
           </div>
