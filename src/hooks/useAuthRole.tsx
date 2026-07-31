@@ -38,6 +38,9 @@ export function AuthRoleProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
+    // Keep consumers in a loading state until the role for THIS session is
+    // resolved, otherwise they route on a stale role.
+    setLoading(true);
     const r = await fetchRole(s.user.id);
     setRole(r);
     setLoading(false);

@@ -77,6 +77,20 @@ const MockLoginPage = () => {
         );
         return;
       }
+      if (data.user) {
+        // Admin accounts are not allowed to sign in here.
+        const { data: adminRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        if (adminRow) {
+          await supabase.auth.signOut();
+          toast.error("Invalid email or password");
+          return;
+        }
+      }
       // AuthRoleProvider picks up the new session and the effect above
       // performs the role-based redirect.
       if (!data.user) toast.error("Sign-in failed");
