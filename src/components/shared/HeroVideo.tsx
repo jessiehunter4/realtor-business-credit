@@ -14,8 +14,8 @@ interface Props {
 }
 
 const HeroVideo = ({
-  storagePath = "hero-jessie.mp4",
-  captionsPath = "hero-jessie.vtt",
+  storagePath = "public/hero-jessie.mp4",
+  captionsPath = "public/hero-jessie.vtt",
   poster,
   alt,
   className = "",

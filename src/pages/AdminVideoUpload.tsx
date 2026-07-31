@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Upload, ArrowLeft, Trash2, Video } from "lucide-react";
 
-const STORAGE_PATH = "hero-jessie.mp4";
-const CAPTIONS_PATH = "hero-jessie.vtt";
+const STORAGE_PATH = "public/hero-jessie.mp4";
+const CAPTIONS_PATH = "public/hero-jessie.vtt";
 const BUCKET = "site-videos";
 
 // Convert SRT subtitle text to WebVTT format
