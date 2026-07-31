@@ -716,7 +716,12 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          phase: string | null
           plan_id: string
+          priority: number | null
+          snoozed_until: string | null
+          source: string | null
+          status: string
           task_key: string
           task_label: string | null
           updated_at: string
@@ -726,7 +731,12 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          phase?: string | null
           plan_id: string
+          priority?: number | null
+          snoozed_until?: string | null
+          source?: string | null
+          status?: string
           task_key: string
           task_label?: string | null
           updated_at?: string
@@ -736,7 +746,12 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          phase?: string | null
           plan_id?: string
+          priority?: number | null
+          snoozed_until?: string | null
+          source?: string | null
+          status?: string
           task_key?: string
           task_label?: string | null
           updated_at?: string
