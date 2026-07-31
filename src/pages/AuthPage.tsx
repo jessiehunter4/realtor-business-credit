@@ -42,19 +42,22 @@ export default function AuthPage() {
       if (data) {
         if (next) window.location.replace(next);
         else navigate("/admin");
-      } else {
-        // Attempt to grant admin access for users signing in through /auth.
-        const { data: bootstrap, error: bootstrapError } = await supabase.functions.invoke("setup-admin");
-        if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
-          toast.success("Admin access granted!");
-          if (next) window.location.replace(next);
-          else navigate("/admin");
-          return;
-        }
-        toast.error("This account isn't an admin. Ask an existing admin to grant access.");
-        await supabase.auth.signOut();
-        setTimeout(() => navigate("/mock-login"), 1500);
+        return;
       }
+
+      // Not an admin. The only automatic grant allowed is first-admin
+      // bootstrap, which the server rejects once any admin exists.
+      const { data: bootstrap, error: bootstrapError } =
+        await supabase.functions.invoke("setup-admin");
+      if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
+        toast.success("Admin access granted (first administrator).");
+        if (next) window.location.replace(next);
+        else navigate("/admin");
+        return;
+      }
+
+      toast.error("This account isn't an admin. Taking you to your dashboard.");
+      navigate("/dashboard", { replace: true });
     } finally {
       adminCheckInFlight.current = false;
     }

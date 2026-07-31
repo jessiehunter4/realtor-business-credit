@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AccountConsentFields from "@/components/shared/AccountConsentFields";
 import { readContactIdentity } from "@/lib/contactIdentityStore";
 import { SMS_CONSENT_TEXT, TERMS_CONSENT_TEXT } from "@/lib/messagingConsent";
+import { useAuthRole } from "@/hooks/useAuthRole";
+import { resolvePostAuthTarget } from "@/lib/roles";
 
 interface LocationState {
   firstName?: string;
@@ -27,20 +29,11 @@ const schema = z.object({
   password: z.string().min(6, "Minimum 6 characters").max(100),
 });
 
-async function resolveHome(userId: string): Promise<"/admin" | "/dashboard"> {
-  const { data } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
-  return data ? "/admin" : "/dashboard";
-}
-
 const MockLoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { session: activeSession, role, loading: roleLoading } = useAuthRole();
   const rawNext = searchParams.get("next");
   const next =
     rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : null;
@@ -55,29 +48,12 @@ const MockLoginPage = () => {
   const [smsConsent, setSmsConsent] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
+  // Role resolution is centralised in AuthRoleProvider; once a session and its
+  // role are known, route by role (never by "authentication succeeded" alone).
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-      const home = await resolveHome(session.user.id);
-      const target =
-        next && ((next.startsWith("/admin") && home === "/admin") || (!next.startsWith("/admin") && home === "/dashboard"))
-          ? next
-          : home;
-      navigate(target, { replace: true });
-    });
-  }, [navigate, next]);
-
-  const routePostAuth = async (userId: string) => {
-    const home = await resolveHome(userId);
-    if (next) {
-      const isAdminPath = next.startsWith("/admin");
-      if ((isAdminPath && home === "/admin") || (!isAdminPath && home === "/dashboard")) {
-        window.location.replace(next);
-        return;
-      }
-    }
-    navigate(home, { replace: true });
-  };
+    if (roleLoading || !activeSession) return;
+    navigate(resolvePostAuthTarget(next, role), { replace: true });
+  }, [roleLoading, activeSession, role, next, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +72,9 @@ const MockLoginPage = () => {
         );
         return;
       }
-      if (data.user) await routePostAuth(data.user.id);
+      // AuthRoleProvider picks up the new session and the effect above
+      // performs the role-based redirect.
+      if (!data.user) toast.error("Sign-in failed");
     } catch (err) {
       if (err instanceof z.ZodError) toast.error(err.errors[0].message);
       else toast.error("Sign-in failed");
@@ -147,7 +125,8 @@ const MockLoginPage = () => {
       }
       if (data.session && data.user) {
         toast.success("Account created!");
-        await routePostAuth(data.user.id);
+        // Redirect is handled by the role-based effect once the provider
+        // resolves the new session's role.
       } else {
         toast.success("Check your email to confirm your account.");
       }

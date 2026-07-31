@@ -1,45 +1,87 @@
-## Goal
+## RBAC Implementation Plan
 
-Give you everything the toll-free verification form asks for: a publicly accessible opt-in proof URL, plus approved use-case and message-content copy.
+### Current state (verified)
 
-## 1. Public opt-in proof page (`/sms-opt-in`)
+- `user_roles` table + `app_role` enum (`admin`, `user`) + `has_role()` security-definer function already exist; RLS lets users read their own roles and admins read all.
+- `AuthRoleProvider` (`src/hooks/useAuthRole.tsx`) already resolves session + role; `RoleGuards.tsx` provides `RequireAuth`, `RequireRole`, `RequireAdmin`, `RequireVisitor`.
+- `/admin/*` routes and `/dashboard` are already guarded; `SiteHeader` already branches on `role === "admin"`.
+- Edge functions `process-mls-import`, `sync-to-ghl`, `tag-ghl-contact`, `test-ghl-connection`, `list-ghl-appointments` use the shared `requireAdmin` helper.
 
-A no-index, publicly reachable page at `https://reprobusinesscredit.com/sms-opt-in` that documents the full opt-in workflow. Carriers accept this as the "Opt-In Workflow Image URL."
+**Three real gaps found:**
 
-Contents:
-- Brand header (RE Pro Business Credit), business name, address, support email/phone.
-- Step-by-step opt-in flow: (1) visitor submits the guide/lead form, (2) creates an account, (3) checks the separate, unchecked-by-default SMS box, (4) confirmation.
-- Screenshots of each real opt-in surface, captured from the live app and stored in `public/opt-in/`:
-  - `/mock-login` → Create account tab (phone + SMS checkbox + Terms checkbox)
-  - `/intake` post-plan account card
-  - Landing page lead form
-  - Dashboard message preferences (opt-out control)
-- Verbatim consent language displayed as text (so carriers can read it without zooming):
-  > "Yes, text me at this number. I agree to receive recurring marketing and service text messages from RE Pro Business Credit. Msg & data rates may apply. Msg frequency varies. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase."
-- Links to `/terms` and `/privacy`.
-- Note that consent is never a condition of purchase, is stored with timestamp + exact text, and MLS-imported contacts are email-only until they opt in.
+1. **Privilege escalation:** `/auth` calls the `setup-admin` edge function, which grants the **admin** role to *any* authenticated user who signs in there. This is exactly the "any valid credentials get in" symptom.
+2. **Unguarded authenticated routes:** `/portal/plan/:id` and `/checkout` render with no guard (data is protected by RLS, but the pages are reachable and can render broken/empty states).
+3. **Role resolution is duplicated** — `MockLoginPage` queries `user_roles` directly instead of using the shared provider, and role defaults to `"user"` when no row exists (implicit, undocumented).
 
-Also add each screenshot as its own direct image URL (e.g. `https://reprobusinesscredit.com/opt-in/create-account.png`) so you can paste an image link if the form rejects a page URL.
+---
 
-## 2. Form field copy (paste-ready)
+### 1. Role model
 
-**Opt-In Type:** Web Form
+Keep `user_roles` as the single source of truth (never on `profiles`). Roles stay in the `app_role` enum so adding `coach`, `staff`, `manager` later is one enum value + one route-map entry.
 
-**Use Case Categories:** Account Notifications, Customer Care, Delivery Notifications (drop "Events" / "Security Alert" — they don't match this business).
+- No row for a user = implicit `user` (visitor). Document this; optionally backfill an explicit `user` row on signup via the existing `handle_new_user` trigger so every account has a row.
+- Add a **role → home route** map in one file (`src/lib/roles.ts`): `admin → /admin`, `user → /dashboard`, future roles append here. Every redirect decision reads this map — no scattered `role === "admin"` ternaries.
+- Optional schema additions (only if the user wants them): `user_roles.created_by uuid`, `user_roles.is_active boolean default true`. `is_active` would need to be honored by `has_role()` and `fetchRole()`.
 
-**Use Case Description (under 500 chars):**
-> This number is used to send appointment confirmations, reminders, and coaching program updates to real estate agents and brokers who requested our business credit guide, created an account, or booked a one-on-one session on reprobusinesscredit.com and checked a separate, unchecked-by-default SMS opt-in box. Messages include session reminders, plan-ready notifications, and program follow-ups. Consent is not a condition of purchase. Reply STOP to opt out, HELP for help.
+### 2. Authentication flow
 
-**Message Content (under 1000 chars) — 3 samples:**
-> Hi John! This is Jessie from RE Pro Business Credit. Your one-on-one business credit session on July 20 at 11:00 AM is confirmed. Reply STOP to unsubscribe, HELP for help.
->
-> Hi John, Jessie from RE Pro Business Credit. Your custom 90-day business structure and credit plan is ready in your portal: https://reprobusinesscredit.com/dashboard Reply STOP to unsubscribe.
->
-> Hi John, this is Jessie with RE Pro Business Credit following up on your session. Want to grab a time this week? https://reprobusinesscredit.com/one-on-one Reply STOP to cancel, HELP for help.
+1. Credentials submitted → Supabase auth.
+2. `AuthRoleProvider` `onAuthStateChange` fires and resolves the role (already implemented).
+3. Login page waits for `loading === false`, then redirects to `homeForRole(role)`.
+4. A `?next=` param is honored **only if** the target is permitted for that role; otherwise fall back to the role home.
 
-## 3. Technical notes
+`MockLoginPage` drops its local `resolveHome()` query and uses `useAuthRole()` — one code path for role resolution.
 
-- New route `src/pages/SmsOptInProofPage.tsx` registered in `App.tsx`; `noindex` via the existing `Seo` component.
-- Screenshots captured headlessly against the running app at desktop width and written to `public/opt-in/`.
-- Copy pulled from `src/lib/messagingConsent.ts` so the page never drifts from the live checkbox text.
-- Page must be published before submitting the form so the URL resolves for carrier review.
+### 3. Privilege-escalation fix (highest priority)
+
+- Stop the auto-grant: `/auth` no longer calls `setup-admin` on every sign-in. A non-admin signing in at `/auth` is redirected to `/dashboard` with a message.
+- `setup-admin` becomes a **bootstrap-only** function: it grants admin only when the `user_roles` table has zero admins (first-admin bootstrap), otherwise returns 403. All subsequent admins are granted by an existing admin.
+- Add an admin-only "Users & Roles" panel in the admin portal to grant/revoke roles (list users from `profiles`, insert/delete `user_roles` rows via an admin-guarded edge function using the service role).
+
+### 4. Route protection matrix
+
+| Access | Routes |
+|---|---|
+| Public | `/`, `/landing-page/:slug`, `/guide`, `/about`, `/pricing`, `/one-on-one`, `/intake`, `/sample-plan`, `/business-credit-cards-for-realtors`, `/privacy`, `/terms`, `/sms-opt-in`, `/booking-confirmed`, `/mock-login`, `/auth`, `/unauthorized`, `/payment-success`, `/payment-cancelled` |
+| Authenticated (any role) | `/portal/plan/:id`, `/checkout` — wrap in `RequireAuth` (**new**) |
+| Visitor only | `/dashboard` (already), plus future `/dashboard/*` progress/tasks pages |
+| Admin only | `/admin`, `/admin/mls-import`, `/admin/video-upload`, `/admin/intake`, `/admin/intake/:id`, `/admin/plan/:id` (already) |
+
+Guards are declared in `App.tsx` only. To reduce drift, group admin routes under a single parent `<Route element={<RequireAdmin/>}>` with `<Outlet/>` rather than wrapping each child.
+
+### 5. Unauthorized-access behavior
+
+- **Unauthenticated → protected route:** redirect to `/mock-login?next=<path>` (current behavior, keep).
+- **Visitor → `/admin/*`:** redirect to `/unauthorized`, which shows a friendly "You don't have permission" message and a button back to their role home. (Change from current: `/unauthorized` should read the role and label the button "Go to your dashboard" / "Go to admin".)
+- **Admin → `/dashboard`:** silent redirect to `/admin` (already in `RequireVisitor`).
+- **Role still loading:** render the spinner, never a redirect — prevents flicker-logouts on refresh.
+
+### 6. Navigation visibility
+
+- `SiteHeader` renders items from a single declarative array with an optional `roles` field, filtered by current role — so a visitor can never render an admin link.
+- Admin pages use the admin nav only; the visitor dashboard nav has no admin entries.
+- Any admin-only action buttons inside shared components are wrapped in a small `<ShowForRole roles={["admin"]}>` helper.
+
+### 7. Backend authorization (defense in depth)
+
+- RLS remains the enforcement layer; guards are UX only. Every admin-readable table already uses `has_role(auth.uid(),'admin')`.
+- Audit each edge function and classify: public (`submit-lead`, `log-funnel-event`, `intake-survey`, `heygen-token`), authenticated-user (`generate-plan`, `link-intake-to-user`, `create-checkout-session` — must verify the JWT and scope to `auth.uid()`), admin-only (must call `requireAdmin`). Add the missing guards found in that audit.
+- New role-management function is admin-guarded and rejects self-demotion of the last admin.
+
+### 8. Future scalability
+
+Adding a role = (1) new enum value, (2) entry in the role→home map, (3) `roles={[...]}` on routes/nav items, (4) RLS policies using `has_role`. No changes to the provider, guards, or login flow.
+
+### Implementation phases
+
+1. **Phase 1 — Security fix:** remove auto-admin-grant from `/auth`, make `setup-admin` bootstrap-only. *(no dependencies)*
+2. **Phase 2 — Central role config:** `src/lib/roles.ts` (role list, home map, route permissions); refactor `useAuthRole` and `MockLoginPage` to use it.
+3. **Phase 3 — Route coverage:** add `RequireAuth` to `/portal/plan/:id` and `/checkout`; consolidate admin routes under one guard. *(depends on 2)*
+4. **Phase 4 — Nav + unauthorized page:** role-filtered nav config, `ShowForRole`, role-aware `/unauthorized`. *(depends on 2)*
+5. **Phase 5 — Edge function audit + admin Users & Roles panel.** *(depends on 1)*
+6. **Phase 6 — Verification:** manual matrix test (visitor→/admin, admin→/dashboard, signed-out→both, deep-link `?next=` round-trip) plus a security scan.
+
+### Open questions
+
+- Do you want the `is_active` / `created_by` columns on `user_roles` now, or keep the schema as-is?
+- Should the admin "Users & Roles" panel be part of this work, or a follow-up?

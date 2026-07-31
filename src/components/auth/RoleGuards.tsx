@@ -1,5 +1,6 @@
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuthRole, type AppRole } from "@/hooks/useAuthRole";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuthRole } from "@/hooks/useAuthRole";
+import { homeForRole, type AppRole } from "@/lib/roles";
 
 function Spinner() {
   return (
@@ -14,7 +15,7 @@ export function RequireRole({
   children,
 }: {
   roles: AppRole[];
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   const { session, role, loading } = useAuthRole();
   const location = useLocation();
@@ -23,31 +24,28 @@ export function RequireRole({
     return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
   }
   if (!role || !roles.includes(role)) return <Navigate to="/unauthorized" replace />;
-  return <>{children}</>;
+  return <>{children ?? <Outlet />}</>;
 }
 
-export function RequireAuth({ children }: { children: React.ReactNode }) {
+export function RequireAuth({ children }: { children?: React.ReactNode }) {
   const { session, loading } = useAuthRole();
   const location = useLocation();
   if (loading) return <Spinner />;
   if (!session) return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
-  return <>{children}</>;
+  return <>{children ?? <Outlet />}</>;
 }
 
-export function RequireAdmin({ children }: { children: React.ReactNode }) {
+export function RequireAdmin({ children }: { children?: React.ReactNode }) {
+  return <RequireRole roles={["admin"]}>{children}</RequireRole>;
+}
+
+export function RequireVisitor({ children }: { children?: React.ReactNode }) {
   const { session, role, loading } = useAuthRole();
   const location = useLocation();
   if (loading) return <Spinner />;
   if (!session) return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
-  if (role !== "admin") return <Navigate to="/unauthorized" replace />;
-  return <>{children}</>;
-}
-
-export function RequireVisitor({ children }: { children: React.ReactNode }) {
-  const { session, role, loading } = useAuthRole();
-  const location = useLocation();
-  if (loading) return <Spinner />;
-  if (!session) return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
-  if (role === "admin") return <Navigate to="/admin" replace />;
-  return <>{children}</>;
+  // Roles with their own home (e.g. admin) are sent there instead of the
+  // visitor dashboard.
+  if (role && role !== "user") return <Navigate to={homeForRole(role)} replace />;
+  return <>{children ?? <Outlet />}</>;
 }

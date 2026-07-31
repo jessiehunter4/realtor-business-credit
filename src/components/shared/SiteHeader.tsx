@@ -6,23 +6,34 @@ import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/rbc-logo-transparent.png.asset.json";
 import { useAuthRole } from "@/hooks/useAuthRole";
 import { supabase } from "@/integrations/supabase/client";
+import { homeForRole, type AppRole } from "@/lib/roles";
 
-const navLinks = [
+type NavItem = { to: string; label: string; roles?: AppRole[] };
+
+// `roles` omitted = visible to everyone. Role-scoped items are filtered out
+// entirely, so a visitor can never render an admin link.
+const navLinks: NavItem[] = [
   { to: "/guide", label: "Guide" },
   { to: "/sample-plan", label: "Sample Plan" },
   { to: "/pricing", label: "Pricing" },
 ];
 
-const secondaryLinks = [
+const secondaryLinks: NavItem[] = [
   { to: "/business-credit-cards-for-realtors", label: "Business Credit Cards" },
 ];
+
+function visibleFor(items: NavItem[], role: AppRole | null) {
+  return items.filter((i) => !i.roles || (role !== null && i.roles.includes(role)));
+}
 
 const SiteHeader = () => {
   const [open, setOpen] = useState(false);
   const { session, role } = useAuthRole();
   const isAdmin = role === "admin";
-  const authedHome = isAdmin ? "/admin" : "/dashboard";
+  const authedHome = homeForRole(role);
   const authedLabel = isAdmin ? "Admin" : "Dashboard";
+  const primaryNav = visibleFor(navLinks, role);
+  const mobileSecondaryNav = visibleFor(secondaryLinks, role);
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = "/";
@@ -40,7 +51,7 @@ const SiteHeader = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((l) => (
+          {primaryNav.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
@@ -105,7 +116,7 @@ const SiteHeader = () => {
               <img src={logoAsset.url} alt="RE Pro Business Credit" className="h-12 w-auto" />
             </Link>
             <nav className="flex flex-col gap-1">
-              {navLinks.map((l) => (
+              {primaryNav.map((l) => (
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}
@@ -115,7 +126,7 @@ const SiteHeader = () => {
                   </Link>
                 </SheetClose>
               ))}
-              {secondaryLinks.map((l) => (
+              {mobileSecondaryNav.map((l) => (
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}

@@ -32,7 +32,7 @@ import DashboardPage from "./pages/DashboardPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelledPage from "./pages/PaymentCancelledPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
-import { RequireAdmin, RequireVisitor } from "./components/auth/RoleGuards";
+import { RequireAdmin, RequireAuth, RequireVisitor } from "./components/auth/RoleGuards";
 import { AuthRoleProvider } from "./hooks/useAuthRole";
 import NotFound from "./pages/NotFound";
 import ScrollMemory from "./components/ScrollMemory";
@@ -56,15 +56,19 @@ const App = () => (
           <Route path="/one-on-one" element={<OneOnOnePage />} />
           <Route path="/intake" element={<IntakeSurveyPage />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
-          <Route path="/admin/mls-import" element={<RequireAdmin><MLSImport /></RequireAdmin>} />
-          <Route path="/admin/video-upload" element={<RequireAdmin><AdminVideoUpload /></RequireAdmin>} />
-          <Route path="/admin/intake" element={<RequireAdmin><AdminIntakeList /></RequireAdmin>} />
-          <Route path="/admin/intake/:id" element={<RequireAdmin><AdminIntakeCoachView /></RequireAdmin>} />
-          <Route path="/admin/plan/:id" element={<RequireAdmin><AdminPlanView /></RequireAdmin>} />
+          <Route element={<RequireAdmin />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/mls-import" element={<MLSImport />} />
+            <Route path="/admin/video-upload" element={<AdminVideoUpload />} />
+            <Route path="/admin/intake" element={<AdminIntakeList />} />
+            <Route path="/admin/intake/:id" element={<AdminIntakeCoachView />} />
+            <Route path="/admin/plan/:id" element={<AdminPlanView />} />
+          </Route>
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          <Route path="/portal/plan/:id" element={<PortalPlanView />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route element={<RequireAuth />}>
+            <Route path="/portal/plan/:id" element={<PortalPlanView />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+          </Route>
           <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
           <Route path="/sample-plan" element={<SamplePlanPage />} />
           <Route

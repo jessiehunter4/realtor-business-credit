@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
+import { DEFAULT_ROLE, type AppRole } from "@/lib/roles";
 
-export type AppRole = "admin" | "user";
+export type { AppRole };
 
 interface AuthRoleContextValue {
   session: Session | null;
@@ -20,9 +21,9 @@ async function fetchRole(userId: string): Promise<AppRole | null> {
     .eq("user_id", userId);
   if (error || !data) return null;
   if (data.some((r) => r.role === "admin")) return "admin";
-  if (data.length > 0) return "user";
+  if (data.some((r) => r.role === "user")) return "user";
   // No row = implicit visitor
-  return "user";
+  return DEFAULT_ROLE;
 }
 
 export function AuthRoleProvider({ children }: { children: ReactNode }) {
