@@ -125,7 +125,8 @@ const MockLoginPage = () => {
       }
       if (data.session && data.user) {
         toast.success("Account created!");
-        await routePostAuth(data.user.id);
+        // Redirect is handled by the role-based effect once the provider
+        // resolves the new session's role.
       } else {
         toast.success("Check your email to confirm your account.");
       }
