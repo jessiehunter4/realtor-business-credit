@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthRole } from "@/hooks/useAuthRole";
+import { homeForRole } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
 
 export default function UnauthorizedPage() {
   const { role } = useAuthRole();
-  const home = role === "admin" ? "/admin" : "/dashboard";
+  const home = homeForRole(role);
   const homeLabel = role === "admin" ? "Go to admin" : "Go to my dashboard";
 
   return (
