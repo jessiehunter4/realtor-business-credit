@@ -74,7 +74,7 @@ const faqs = [
   },
   {
     q: "Will applying for a business credit card hurt my personal credit?",
-    a: "The application itself usually triggers a hard inquiry on your personal credit. After that, whether the ongoing balance reports to your personal credit depends on the issuer. Some report only to business bureaus, some report only when you're delinquent, and some report everything. We cover this issuer-by-issuer in the one-on-one session.",
+    a: "The application itself usually triggers a hard inquiry on your personal credit. After that, whether the ongoing balance reports to your personal credit depends on the issuer. Some report only to business bureaus, some report only when you're delinquent, and some report everything. We cover this issuer-by-issuer in the free guide.",
   },
   {
     q: "How many business credit cards should a Realtor have?",
