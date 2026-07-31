@@ -43,11 +43,11 @@ export default function PostPlanAuthCard({
   const [smsConsent, setSmsConsent] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-  const passwordTooShort = password.length > 0 && password.length < 8;
+  const passwordTooShort = password.length > 0 && password.length < 6;
   const passwordMismatch = mode === "signup" && confirm.length > 0 && confirm !== password;
   const canSubmit =
     !!email &&
-    password.length >= 8 &&
+    password.length >= 6 &&
     (mode === "signin" || confirm === password) &&
     (mode === "signin" || agreed) &&
     !submitting;
@@ -176,7 +176,7 @@ export default function PostPlanAuthCard({
             aria-invalid={passwordTooShort}
             aria-describedby="pp-password-hint"
             required
-            minLength={8}
+            minLength={6}
           />
           <button
             type="button"
@@ -188,7 +188,7 @@ export default function PostPlanAuthCard({
           </button>
         </div>
         <p id="pp-password-hint" className="text-xs text-muted-foreground mt-1">
-          At least 8 characters.
+          At least 6 characters.
         </p>
       </div>
 
