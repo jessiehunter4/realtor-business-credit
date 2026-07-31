@@ -15,7 +15,7 @@ const FinalCTABright = ({ guideLink = "/guide" }: Props) => (
           Money when you need it isn't luck — it's a plan.
         </h2>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-          Read the free guide, then book your free 1:1. Walk away with your Custom RE Pro Business Structure, Finance &amp; Credit Plan in one sitting.
+          Read the free guide, then complete your Needs Analysis. Walk away with your Custom RE Pro Business Structure, Finance &amp; Credit Plan in one sitting.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link

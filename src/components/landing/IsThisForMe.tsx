@@ -62,7 +62,7 @@ const IsThisForMe = () => (
             ))}
           </ul>
           <Link
-            to="/one-on-one"
+            to="/guide"
             className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary/80"
           >
             Start Here <ArrowRight className="h-4 w-4" />

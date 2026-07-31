@@ -10,10 +10,10 @@ const SamplePlanPreview = () => (
           📄 See a real example
         </span>
         <h2 className="mt-3 text-3xl md:text-4xl font-bold text-secondary">
-          See what your custom plan looks like — before you book.
+          See what your custom plan looks like — before you start.
         </h2>
         <p className="mt-3 text-muted-foreground text-lg">
-          Every free 1:1 ends with a personalized RE Pro Business Structure, Finance
+          Every Needs Analysis ends with a personalized RE Pro Business Structure, Finance
           &amp; Credit Plan. Here's a full sample for a fictional Sacramento broker so you
           know exactly what you're getting.
         </p>

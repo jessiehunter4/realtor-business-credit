@@ -13,7 +13,7 @@ const items = [
   { icon: Clock, bold: "Fundability signals checklist", rest: " — Strong / Watch / Missing across every signal lenders check." },
   { icon: BookOpen, bold: "The Realtor Credit Ladder (5 stages)", rest: " — from vendor tradelines to LOCs and high-limit business cards." },
   { icon: CheckCircle2, bold: "30 / 60 / 90-day action plan", rest: " — exactly what to do, in what order, this quarter." },
-  { icon: Users, bold: "Your Custom Plan + Program path", rest: " — what your 1:1 produces and how implementation works after." },
+  { icon: Users, bold: "Your Custom Plan + Program path", rest: " — what your Needs Analysis produces and how implementation works after." },
 ];
 
 const GuideContentsBright = ({ guideLink = "/guide" }: Props) => (

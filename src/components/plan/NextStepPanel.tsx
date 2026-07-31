@@ -69,7 +69,7 @@ const READINESS_OPTIONS: Option[] = [
       "Skim the guide chapters that match your top gap",
     ],
     cta: { label: "See pricing while I prepare", href: "#inline-pricing", icon: Sparkles },
-    secondary: { label: "Book a free 1:1 to talk it through", href: "/one-on-one" },
+    secondary: { label: "Read the free guide", href: "/guide" },
   },
   {
     id: "need_clarity",
@@ -77,12 +77,12 @@ const READINESS_OPTIONS: Option[] = [
     short: "Need clarity",
     headline: "Let's talk it through.",
     body:
-      "Book a free 1:1 with a coach. We'll walk your plan together, answer questions, and help you decide which tier — if any — actually fits your business right now.",
+      "Take another pass through your plan and the guide. They cover the questions most Realtors have at this stage, so you can decide which tier — if any — actually fits your business right now.",
     icon: Compass,
     tag: "f-readiness-clarity",
     accent: "border-sky-300 bg-sky-50",
     showPricing: true,
-    cta: { label: "Book a free 1-on-1", href: "/one-on-one", icon: Calendar },
+    cta: { label: "Read the free guide", href: "/guide", icon: ArrowRight },
   },
   {
     id: "exploring",

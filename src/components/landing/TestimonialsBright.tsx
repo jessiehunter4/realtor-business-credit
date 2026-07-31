@@ -19,7 +19,7 @@ const quotes = [
     avatar: t2,
   },
   {
-    text: "Walked out of the 1:1 with a written plan. Not a pitch — a plan. I knew exactly what to do Monday morning.",
+    text: "Walked away with a written plan. Not a pitch — a plan. I knew exactly what to do Monday morning.",
     name: "New Broker",
     where: "Texas",
     tone: "bg-accent/20 text-accent-foreground",

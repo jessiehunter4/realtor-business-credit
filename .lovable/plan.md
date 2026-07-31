@@ -1,32 +1,30 @@
 ## Goal
+Remove the free 1:1 / booking session from the public site: delete the `/one-on-one` page and strip every CTA, link, and mention of booking a 1:1 session. The paid "Cohort Plus +" pricing tier stays untouched (per your answer).
 
-Remove the admin access code from `/auth` sign-up so creating an account there makes an admin directly.
+## What gets removed
 
-## Why the code exists (context, then removing it)
+**Page & route**
+- Delete `src/pages/OneOnOnePage.tsx` and its route + import in `src/App.tsx`.
+- Delete `src/components/landing/OneOnOneStepsBlock.tsx` (whole "Book your free 1:1" 3-step block) and remove its usage from the landing page.
+- Keep `/booking-confirmed` route but remove its "book another session" link (it's a GHL redirect target; removing the route could break inbound links).
 
-The code was the server-side proof that the person signing up is authorized to be an admin. Without it, `/auth` is a public URL, so anyone who guesses it can create a full admin account with access to all leads, intake surveys, and plans. `/auth` is unlinked from navigation, but that is obscurity, not protection.
+**Navigation & global CTAs**
+- `SiteHeader.tsx` — remove the "Book Free 1:1" desktop and mobile-menu links.
+- `SiteFooter.tsx` — remove the "Book a Session" footer link.
+- `StickyMobileCTABar.tsx` — remove the "Book Free 1:1" button; the "Read Guide" button expands to full width.
 
-Removing it as requested, with an optional safety net below.
+**Page-level CTAs** (remove the button; keep surrounding copy, re-balance layout so the remaining CTA is centered/full-width)
+- `landing/CTASection.tsx`, `landing/HeroSection.tsx`, `landing/IsThisForMe.tsx`
+- `pages/AboutPage.tsx` (2 CTAs), `pages/BusinessCreditCardsForRealtorsPage.tsx` (2), `pages/PricingPage.tsx` (2), `pages/SamplePlanPage.tsx`, `pages/DashboardPage.tsx` ("Schedule now →"), `pages/BookingConfirmedPage.tsx`
+- `components/plan/NextStepPanel.tsx` and `components/intake/IntakePricingAndReadiness.tsx` — drop the "Book a free 1-on-1" next-step option, leaving the remaining options.
 
-## Changes
+**Copy mentions**
+- Scrub 1:1-session wording from `landing/FinalCTABright.tsx`, `landing/GuideContentsBright.tsx`, `landing/CustomPlanPreview.tsx`, `landing/SamplePlanPreview.tsx`, `landing/TestimonialsBright.tsx`, `landing/ProgramCurriculum.tsx`, `landing/LeadForm.tsx`, `landing-avatar/ThreeStepSection.tsx`, `guide/GuideMedia.tsx`, `guide/chapters/Ch13.tsx`, `components/GuidePDF.tsx`, `data/samplePlan.ts`, `pages/IntakeSurveyPage.tsx`, `pages/LandingPage.tsx`, `pages/PaymentSuccessPage.tsx`. Where a section's entire purpose was "book a session," it's replaced with the guide/plan CTA rather than left empty.
+- `pages/SmsOptInProofPage.tsx` — update the sample SMS that links to `/one-on-one`.
 
-1. **`src/pages/AuthPage.tsx`**
-   - Delete the "Admin access code" input, its state, the `KeyRound` icon, and the `adminSignupSchema` extension — back to validating just email and password.
-   - Keep the post-signup call that elevates the account, but send it without a code.
-
-2. **`supabase/functions/assign-admin-role/index.ts`**
-   - Drop the `ADMIN_SIGNUP_CODE` check. The function still requires a valid signed-in session (it verifies the bearer token), then upserts the `admin` role for that user.
-   - Keep the constant-time helper removal tidy and keep all logging.
-   - Redeploy the function.
-
-3. **`src/pages/AdminSignupPage.tsx`**
-   - This page exists only as the code-gated admin signup. With the code gone it's a duplicate of `/auth`, so remove the code field there too (or leave the page as-is if you'd rather keep it — say the word). Plan assumes: strip the code field so both pages behave the same.
-
-## Optional safety net (recommended, easy to add later)
-
-Instead of a typed code, the edge function can compare the signing-up email against a small allowlist stored in a secret (e.g. `ADMIN_EMAILS=jessie@...,you@...`). No code to type, but a random visitor still can't mint an admin. Tell me if you want this and I'll fold it in.
+## Left alone
+- Pricing tier "Cohort Plus +" (`data/pricingTiers.ts`), `startCheckout.ts`, `create-checkout-session` — these are paid 1:1 coaching, not the free session.
+- Admin `BookingsTab.tsx` / `AdminIntakeList.tsx` and legal pages (`Privacy`, `Terms`) — internal/legal references, no user-facing booking CTA.
 
 ## Technical notes
-
-- The database trigger still inserts the `user` role for every new account; the `admin` row is added on top, and role resolution prefers `admin`, so routing lands on `/admin`.
-- The `ADMIN_SIGNUP_CODE` secret becomes unused; it can stay stored harmlessly or be deleted.
+- After edits I'll grep for any remaining `/one-on-one` link to guarantee no dead routes, and run a typecheck.

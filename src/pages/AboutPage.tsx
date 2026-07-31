@@ -87,8 +87,8 @@ const helpSteps = [
   },
   {
     icon: Calendar,
-    title: "Book a free 1:1",
-    body: "A no-pressure conversation to clarify your goals, gaps, and top priorities.",
+    title: "Complete the Needs Analysis",
+    body: "A short, no-pressure intake that clarifies your goals, gaps, and top priorities.",
   },
   {
     icon: Target,
@@ -98,7 +98,7 @@ const helpSteps = [
   {
     icon: Users,
     title: "Custom plan & program",
-    body: "You get a personalized 90-day plan and a path — 1:1 coaching, cohort, or self-paced with check-ins.",
+    body: "You get a personalized 90-day plan and a path — self-paced, cohort, or Cohort Plus +.",
   },
 ];
 
@@ -183,12 +183,6 @@ const AboutPage = () => {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button asChild size="lg" className="w-full sm:w-auto rounded-full">
-                <Link to="/one-on-one">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Book a Free 1:1 Session
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto rounded-full">
                 <Link to="/guide">
                   <BookOpen className="mr-2 h-5 w-5" />
                   Read the Free Guide
@@ -418,17 +412,11 @@ const AboutPage = () => {
               Ready to turn your closings into capacity?
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Book a free one-on-one session. We'll review your goals, gaps, and
-              the first steps of your custom plan — no pressure, no obligation.
+              Start with the free guide, then build your custom plan — no pressure,
+              no obligation.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button asChild size="lg" className="w-full sm:w-auto rounded-full">
-                <Link to="/one-on-one">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Book a Free 1:1 Session
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto rounded-full">
                 <Link to="/guide">
                   <BookOpen className="mr-2 h-5 w-5" />
                   Read the Free Guide

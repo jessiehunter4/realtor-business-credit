@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, CreditCard, BookOpen, CheckCircle } from "lucide-react";
+import { ArrowRight, CreditCard, BookOpen, CheckCircle } from "lucide-react";
 
 interface Props {
   readiness?: string;
@@ -30,9 +30,9 @@ const RESPONSES: Record<string, Response> = {
   "I need more clarity first": {
     headline: "Okay — let's talk it through.",
     body:
-      "Schedule a free 1-on-1 with a coach. We'll walk your situation together and help you decide what fits.",
+      "Take another pass through the free guide. It walks your situation step by step and helps you decide what fits.",
     accent: "border-sky-300 bg-sky-50",
-    cta: { label: "Book a free 1-on-1", href: "/one-on-one", icon: Calendar },
+    cta: { label: "Read the free guide", href: "/guide", icon: BookOpen },
   },
   "I'm just exploring": {
     headline: "No problem — take your time.",

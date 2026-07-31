@@ -238,8 +238,7 @@ export default function AdminIntakeList() {
           <DialogHeader>
             <DialogTitle>Create New Intake Survey</DialogTitle>
             <DialogDescription>
-              Send a personalized intake form link to a Realtor before their
-              one-on-one session.
+              Send a personalized intake form link to a Realtor.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">

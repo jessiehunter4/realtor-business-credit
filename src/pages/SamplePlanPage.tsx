@@ -29,7 +29,7 @@ const SamplePlanPage = () => {
       <SiteHeader />
       <Seo
         title="Sample RE Pro Business Credit Plan — See What You'll Receive"
-        description="A full sample of the personalized RE Pro Business Structure, Finance & Credit Plan you receive after your free 1:1 session. Built for a fictional Sacramento broker so you know exactly what to expect."
+        description="A full sample of the personalized RE Pro Business Structure, Finance & Credit Plan you receive after your free Needs Analysis. Built for a fictional Sacramento broker so you know exactly what to expect."
         path="/sample-plan"
       />
 
@@ -46,10 +46,10 @@ const SamplePlanPage = () => {
               See exactly what your custom plan will look like.
             </h1>
             <p className="mt-4 text-muted-foreground text-lg">
-              This is the same format every Realtor walks away with after a free 1:1.
+              This is the same format every Realtor walks away with after the free Needs Analysis.
               We built this sample for <strong>Sarah Mitchell</strong>, a fictional
               Sacramento, CA residential broker, so you can read a full one before you
-              decide to book.
+              decide to enroll.
             </p>
           </div>
         </div>
@@ -91,17 +91,16 @@ const SamplePlanPage = () => {
             Ready for <em>your</em> plan?
           </h2>
           <p className="mt-3 text-muted-foreground text-lg">
-            Book your free 1:1 and walk away with one just like this — built from your
+            Complete the free Needs Analysis and walk away with one just like this — built from your
             RE Pro Business Financial Needs Analysis.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              to="/one-on-one"
-              data-analytics-id="cta-book-sample-plan-bottom"
+              to="/intake"
+              data-analytics-id="cta-plan-sample-plan-bottom"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
             >
-              <Calendar className="h-5 w-5" />
-              Book My Free 1:1
+              Build My Custom Plan
             </Link>
           </div>
           <p className="mt-4 text-xs text-muted-foreground italic">
