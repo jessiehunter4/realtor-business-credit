@@ -15,15 +15,16 @@ const FinalCTABright = ({ guideLink = "/guide" }: Props) => (
           Money when you need it isn't luck — it's a plan.
         </h2>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-          Read the free guide, then complete your Needs Analysis. Walk away with your Custom RE Pro Business Structure, Finance &amp; Credit Plan in one sitting.
+          Start with the free guide. It takes about 5–10 minutes, and it's the first step toward your own 90-day plan.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             to={guideLink}
+            data-analytics-id="cta-guide-final"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-8 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
           >
             <BookOpen className="h-5 w-5" />
-            Read the Free Guide
+            Start with the Free Guide
           </Link>
         </div>
         <p className="mt-6 text-sm text-secondary italic font-semibold">

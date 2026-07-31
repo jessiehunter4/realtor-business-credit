@@ -4,16 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import HeroSectionBright from "@/components/landing/HeroSectionBright";
-import GuideIntroduction from "@/components/guide/GuideIntroduction";
-import CustomPlanPreview from "@/components/landing/CustomPlanPreview";
-import IsThisForMe from "@/components/landing/IsThisForMe";
 import MoneyWhenYouNeedItStrip from "@/components/landing/MoneyWhenYouNeedItStrip";
-import ThreePillarsDiagram from "@/components/landing/ThreePillarsDiagram";
-import ComparisonBright from "@/components/landing/ComparisonBright";
-import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
-import GuideContentsBright from "@/components/landing/GuideContentsBright";
-import SamplePlanPreview from "@/components/landing/SamplePlanPreview";
-import ProgramCurriculum from "@/components/landing/ProgramCurriculum";
+import HowItWorksRail from "@/components/landing/HowItWorksRail";
+import JourneyStep from "@/components/landing/JourneyStep";
+import WhatThisIs from "@/components/landing/WhatThisIs";
+import { JOURNEY_STEPS } from "@/data/homepageJourney";
 import TestimonialsBright from "@/components/landing/TestimonialsBright";
 import FinalCTABright from "@/components/landing/FinalCTABright";
 import StickyMobileCTABar from "@/components/shared/StickyMobileCTABar";
@@ -48,6 +43,22 @@ const LandingPage = () => {
     }
   }, [contactId]);
 
+  const stepCtas: Record<string, { label: string; to: string; analyticsId?: string; variant?: "primary" | "link" }> = {
+    "step-educate": { label: "Read the Free Guide", to: guideLink, analyticsId: "cta-guide-step1" },
+    "step-plan": {
+      label: "See a sample plan",
+      to: "/sample-plan",
+      analyticsId: "cta-sample-plan-step2",
+      variant: "link",
+    },
+    "step-implement": {
+      label: "See program details",
+      to: "/pricing",
+      analyticsId: "cta-pricing-step3",
+      variant: "link",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Seo
@@ -65,16 +76,12 @@ const LandingPage = () => {
       />
       <SiteHeader />
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
-      <GuideIntroduction />
-      <ProgramCurriculum guideLink={guideLink} />
-      <CustomPlanPreview />
-      <IsThisForMe />
       <MoneyWhenYouNeedItStrip />
-      <ThreePillarsDiagram />
-      <ComparisonBright />
-      <CashFlowCalculator guideLink={guideLink} />
-      <GuideContentsBright guideLink={guideLink} />
-      <SamplePlanPreview />
+      <HowItWorksRail />
+      {JOURNEY_STEPS.map((s) => (
+        <JourneyStep key={s.id} {...s} cta={stepCtas[s.id]} />
+      ))}
+      <WhatThisIs />
       <TestimonialsBright />
       <FinalCTABright guideLink={guideLink} />
       <SiteFooter />
