@@ -26,14 +26,22 @@ const HeroVideo = ({
 
   useEffect(() => {
     let cancelled = false;
+    const splitPath = (p: string) => {
+      const idx = p.lastIndexOf("/");
+      return idx === -1
+        ? { folder: "", file: p }
+        : { folder: p.slice(0, idx), file: p.slice(idx + 1) };
+    };
     (async () => {
       try {
+        const video = splitPath(storagePath);
+        const captions = splitPath(captionsPath);
         // List the bucket to see if the file exists (avoids 404 console noise)
         const { data: files } = await supabase.storage
           .from("site-videos")
-          .list("", { search: storagePath });
+          .list(video.folder, { search: video.file });
 
-        const exists = files?.some((f) => f.name === storagePath);
+        const exists = files?.some((f) => f.name === video.file);
         if (!exists) {
           if (!cancelled) setChecked(true);
           return;
@@ -50,8 +58,8 @@ const HeroVideo = ({
         // Check for captions (optional)
         const { data: capFiles } = await supabase.storage
           .from("site-videos")
-          .list("", { search: captionsPath });
-        const capExists = capFiles?.some((f) => f.name === captionsPath);
+          .list(captions.folder, { search: captions.file });
+        const capExists = capFiles?.some((f) => f.name === captions.file);
         if (capExists) {
           const { data: capData } = await supabase.storage
             .from("site-videos")
