@@ -1,5 +1,5 @@
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
-import { getStoredContactIdentity } from "@/lib/contactIdentityStore";
+import { readContactIdentity } from "@/lib/contactIdentityStore";
 import type { RoadmapTask } from "./types";
 
 export type RoadmapEventType =
@@ -22,7 +22,7 @@ interface RoadmapEventMeta {
 export function logRoadmapEvent(eventType: RoadmapEventType, meta: RoadmapEventMeta = {}) {
   let contactId: string | undefined;
   try {
-    contactId = getStoredContactIdentity()?.contactId ?? undefined;
+    contactId = readContactIdentity()?.contactId ?? undefined;
   } catch {
     contactId = undefined;
   }
