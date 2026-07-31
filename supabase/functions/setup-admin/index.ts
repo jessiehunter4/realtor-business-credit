@@ -58,6 +58,30 @@ serve(async (req) => {
       );
     }
 
+    // BOOTSTRAP ONLY: an admin role may be self-granted exclusively when the
+    // system has no administrator yet. Once one exists, new admins must be
+    // granted by an existing admin.
+    const { count: adminCount, error: countError } = await supabaseClient
+      .from('user_roles')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'admin');
+
+    if (countError) {
+      console.error('Error counting admins:', countError);
+      return new Response(
+        JSON.stringify({ error: 'Internal server error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if ((adminCount ?? 0) > 0) {
+      console.warn(`Rejected admin self-grant for ${user.email}: admins already exist`);
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Assign admin role. This function may be invoked more than once during
     // auth state hydration, so duplicate-key conflicts are a successful,
     // idempotent outcome rather than a runtime failure.
