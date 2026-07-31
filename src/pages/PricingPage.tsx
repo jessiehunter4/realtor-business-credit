@@ -288,17 +288,11 @@ const PricingPage = () => {
                     {errorByTier[tier.id]}
                   </p>
                 )}
-                <Link
-                  to="/one-on-one"
-                  className="mt-3 text-center text-xs font-medium text-primary hover:underline"
-                >
-                  Prefer to talk first? Book a free 1:1
-                </Link>
               </div>
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-secondary/60">
-            Pricing shown in USD. Payment plans may be available — ask on your free 1:1.
+            Pricing shown in USD. Payment plans may be available — just ask.
           </p>
         </section>
 
@@ -486,14 +480,14 @@ const PricingPage = () => {
               Still have questions before you buy?
             </h2>
             <p className="mt-3 text-lg text-primary-foreground/90 max-w-2xl mx-auto">
-              Book a free 1:1 session. We'll build your custom plan together, then you can decide which enrollment path fits — with zero pressure.
+              Build your custom plan first — it's free. Then decide which enrollment path fits, with zero pressure.
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
-                to="/one-on-one"
+                to="/intake"
                 className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm md:text-base font-semibold text-primary hover:bg-white/90 transition-colors"
               >
-                Book Free 1:1 Session
+                Build My Custom Plan
               </Link>
               <Link
                 to="/guide"
