@@ -87,8 +87,8 @@ const helpSteps = [
   },
   {
     icon: Calendar,
-    title: "Book a free 1:1",
-    body: "A no-pressure conversation to clarify your goals, gaps, and top priorities.",
+    title: "Complete the Needs Analysis",
+    body: "A short, no-pressure intake that clarifies your goals, gaps, and top priorities.",
   },
   {
     icon: Target,
@@ -98,7 +98,7 @@ const helpSteps = [
   {
     icon: Users,
     title: "Custom plan & program",
-    body: "You get a personalized 90-day plan and a path — 1:1 coaching, cohort, or self-paced with check-ins.",
+    body: "You get a personalized 90-day plan and a path — self-paced, cohort, or Cohort Plus +.",
   },
 ];
 
