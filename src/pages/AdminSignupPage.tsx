@@ -1,8 +1,8 @@
 // Admin signup. The account is created as a normal user, then elevated to
-// admin only if the server validates the access code. Not linked in nav.
+// admin server-side. Not linked in nav.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +18,6 @@ import { useAuthRole } from "@/hooks/useAuthRole";
 const schema = z.object({
   email: z.string().email("Enter a valid email").max(255),
   password: z.string().min(6, "Minimum 6 characters").max(100),
-  code: z.string().min(1, "Admin access code is required").max(200),
 });
 
 export default function AdminSignupPage() {
@@ -26,7 +25,6 @@ export default function AdminSignupPage() {
   const { refresh } = useAuthRole();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,7 @@ export default function AdminSignupPage() {
       return;
     }
     try {
-      const v = schema.parse({ email, password, code });
+      const v = schema.parse({ email, password });
       setLoading(true);
 
       const { data, error } = await supabase.auth.signUp({
