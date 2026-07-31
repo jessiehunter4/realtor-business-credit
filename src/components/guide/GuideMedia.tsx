@@ -248,7 +248,7 @@ export const Guide306090Timeline = () => {
         "Confirm entity pathway with CPA / attorney",
         "Open the 3-account banking foundation",
         "Clean up address, phone, email, website consistency",
-        "Complete your Needs Analysis (in the free 1:1)",
+        "Complete your free Needs Analysis",
       ],
     },
     {
