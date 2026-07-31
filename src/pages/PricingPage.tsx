@@ -256,36 +256,46 @@ const PricingPage = () => {
                     </li>
                   ))}
                 </ul>
-                <button
-                  type="button"
-                  onClick={() => handleCheckout(tier.id)}
-                  disabled={loadingTier !== null}
-                  className={
-                    "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
-                    (tier.highlighted
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
-                      : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
-                    " disabled:opacity-60 disabled:cursor-not-allowed"
-                  }
-                >
-                  {loadingTier === tier.id ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Redirecting to Stripe…
-                    </>
-                  ) : (
-                    <>
-                      {tier.ctaLabel}
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-                {errorByTier[tier.id] && (
+                {tier.isFree ? (
+                  <Link
+                    to={tier.ctaHref}
+                    className="mt-7 inline-flex items-center justify-center gap-2 rounded-full border border-secondary/20 bg-white px-5 py-3 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                  >
+                    {tier.ctaLabel}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleCheckout(tier.id as CheckoutTierId)}
+                    disabled={loadingTier !== null}
+                    className={
+                      "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
+                      (tier.highlighted
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
+                        : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                      " disabled:opacity-60 disabled:cursor-not-allowed"
+                    }
+                  >
+                    {loadingTier === tier.id ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Redirecting to Stripe…
+                      </>
+                    ) : (
+                      <>
+                        {tier.ctaLabel}
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                )}
+                {!tier.isFree && errorByTier[tier.id as CheckoutTierId] && (
                   <p
                     role="alert"
                     className="mt-2 text-center text-xs font-medium text-destructive"
                   >
-                    {errorByTier[tier.id]}
+                    {errorByTier[tier.id as CheckoutTierId]}
                   </p>
                 )}
               </div>
