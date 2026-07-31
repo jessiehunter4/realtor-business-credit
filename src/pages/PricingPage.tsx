@@ -240,8 +240,11 @@ const PricingPage = () => {
                 )}
                 <h3 className="text-xl font-bold text-secondary">{tier.name}</h3>
                 <p className="mt-2 text-sm text-secondary/70 min-h-[3rem]">{tier.who}</p>
-                <div className="mt-5 flex items-baseline gap-2">
+                <div className="mt-5 flex items-baseline gap-2 flex-wrap">
                   <span className="text-4xl font-bold text-secondary">{tier.price}</span>
+                  {tier.originalPrice && (
+                    <span className="text-lg text-secondary/40 line-through">{tier.originalPrice}</span>
+                  )}
                   <span className="text-sm text-secondary/60">{tier.cadence}</span>
                 </div>
                 {tier.cadenceNote && (
