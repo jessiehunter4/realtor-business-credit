@@ -67,11 +67,11 @@ export default function AdminSignupPage() {
 
       const { data: result, error: fnError } = await supabase.functions.invoke(
         "assign-admin-role",
-        { body: { code: v.code } },
+        { body: {} },
       );
 
       if (fnError || !result || (result as { error?: string }).error) {
-        toast.error("Account created, but the admin access code was not accepted.");
+        toast.error("Account created, but admin access could not be granted.");
         await refresh();
         navigate("/dashboard", { replace: true });
         return;
@@ -138,22 +138,6 @@ export default function AdminSignupPage() {
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="admin-code">Admin access code</Label>
-              <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="admin-code"
-                  type="password"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="Provided by an existing administrator"
-                  required
-                  disabled={loading}
-                  className="pl-9"
-                />
               </div>
             </div>
             <AccountConsentFields
