@@ -52,7 +52,7 @@ const LandingPage = () => {
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Seo
         title="RE Pro Business Credit: Turn Your Closings Into Business Credit Capacity"
-        description="Free guide and free one-on-one for real estate agents and brokers. Build a fundable business structure, financial foundation, and separate business credit — without relying on personal credit."
+        description="Free guide and custom plan for real estate agents and brokers. Build a fundable business structure, financial foundation, and separate business credit — without relying on personal credit."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
