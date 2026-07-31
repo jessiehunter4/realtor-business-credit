@@ -183,12 +183,6 @@ const AboutPage = () => {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button asChild size="lg" className="w-full sm:w-auto rounded-full">
-                <Link to="/one-on-one">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Book a Free 1:1 Session
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto rounded-full">
                 <Link to="/guide">
                   <BookOpen className="mr-2 h-5 w-5" />
                   Read the Free Guide
@@ -418,17 +412,11 @@ const AboutPage = () => {
               Ready to turn your closings into capacity?
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Book a free one-on-one session. We'll review your goals, gaps, and
-              the first steps of your custom plan — no pressure, no obligation.
+              Start with the free guide, then build your custom plan — no pressure,
+              no obligation.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button asChild size="lg" className="w-full sm:w-auto rounded-full">
-                <Link to="/one-on-one">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Book a Free 1:1 Session
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="w-full sm:w-auto rounded-full">
                 <Link to="/guide">
                   <BookOpen className="mr-2 h-5 w-5" />
                   Read the Free Guide
