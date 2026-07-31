@@ -45,6 +45,7 @@ export default function AuthPage() {
         .eq("role", "admin")
         .maybeSingle();
       if (data) {
+        toast.success("Signed in successfully!");
         if (next) window.location.replace(next);
         else navigate("/admin");
         return;
