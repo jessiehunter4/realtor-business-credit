@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,10 +17,6 @@ const authSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters").max(100)
 });
 
-const adminSignupSchema = authSchema.extend({
-  code: z.string().min(1, "Admin access code is required").max(200),
-});
-
 export default function AuthPage() {
   const navigate = useNavigate();
   const { refresh } = useAuthRole();
@@ -32,11 +27,10 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const adminCheckInFlight = useRef(false);
   // While an admin sign-up is in progress the SIGNED_IN event must not route
-  // the user away before the access code has been verified server-side.
+  // the user away before the admin role has been granted server-side.
   const signingUp = useRef(false);
 
   const checkAdminAndRoute = async (userId: string) => {
@@ -120,7 +114,7 @@ export default function AuthPage() {
     }
 
     try {
-      const validated = adminSignupSchema.parse({ email, password, code });
+      const validated = authSchema.parse({ email, password });
       setLoading(true);
       signingUp.current = true;
 
@@ -152,11 +146,11 @@ export default function AuthPage() {
 
       const { data: result, error: fnError } = await supabase.functions.invoke(
         "assign-admin-role",
-        { body: { code: validated.code } },
+        { body: {} },
       );
 
       if (fnError || !result || (result as { error?: string }).error) {
-        toast.error("Account created, but the admin access code was not accepted.");
+        toast.error("Account created, but admin access could not be granted.");
         await refresh();
         navigate("/dashboard", { replace: true });
         return;
@@ -249,22 +243,6 @@ export default function AuthPage() {
                     disabled={loading}
                     placeholder="Minimum 6 characters"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-code">Admin access code</Label>
-                  <div className="relative">
-                    <KeyRound className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="signup-code"
-                      type="password"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      placeholder="Provided by an existing administrator"
-                      required
-                      disabled={loading}
-                      className="pl-9"
-                    />
-                  </div>
                 </div>
                 <AccountConsentFields
                   idPrefix="auth-signup"

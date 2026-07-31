@@ -1,8 +1,8 @@
 // Admin signup. The account is created as a normal user, then elevated to
-// admin only if the server validates the access code. Not linked in nav.
+// admin server-side. Not linked in nav.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +18,6 @@ import { useAuthRole } from "@/hooks/useAuthRole";
 const schema = z.object({
   email: z.string().email("Enter a valid email").max(255),
   password: z.string().min(6, "Minimum 6 characters").max(100),
-  code: z.string().min(1, "Admin access code is required").max(200),
 });
 
 export default function AdminSignupPage() {
@@ -26,7 +25,6 @@ export default function AdminSignupPage() {
   const { refresh } = useAuthRole();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,7 @@ export default function AdminSignupPage() {
       return;
     }
     try {
-      const v = schema.parse({ email, password, code });
+      const v = schema.parse({ email, password });
       setLoading(true);
 
       const { data, error } = await supabase.auth.signUp({
@@ -69,11 +67,11 @@ export default function AdminSignupPage() {
 
       const { data: result, error: fnError } = await supabase.functions.invoke(
         "assign-admin-role",
-        { body: { code: v.code } },
+        { body: {} },
       );
 
       if (fnError || !result || (result as { error?: string }).error) {
-        toast.error("Account created, but the admin access code was not accepted.");
+        toast.error("Account created, but admin access could not be granted.");
         await refresh();
         navigate("/dashboard", { replace: true });
         return;
@@ -97,7 +95,7 @@ export default function AdminSignupPage() {
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl font-bold text-center">Create an admin account</CardTitle>
           <CardDescription className="text-center">
-            Requires an admin access code. Without a valid code the account is created as a standard user.
+            Accounts created here are granted administrator access.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -140,22 +138,6 @@ export default function AdminSignupPage() {
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="admin-code">Admin access code</Label>
-              <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="admin-code"
-                  type="password"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="Provided by an existing administrator"
-                  required
-                  disabled={loading}
-                  className="pl-9"
-                />
               </div>
             </div>
             <AccountConsentFields
