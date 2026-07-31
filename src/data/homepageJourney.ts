@@ -1,6 +1,6 @@
 import { BookOpen, ClipboardList, Rocket, type LucideIcon } from "lucide-react";
 import step1Image from "@/assets/journey-step-1.jpg";
-import step2Image from "@/assets/journey-step-2.jpg";
+import samplePlanAsset from "@/assets/journey-step-2-plan.png.asset.json";
 import step3Image from "@/assets/journey-step-3.jpg";
 
 export interface JourneyStepContent {
@@ -69,8 +69,8 @@ export const JOURNEY_STEPS: JourneyStepContent[] = [
       "A prioritized 90-day action list — what to do, in what order",
       "A 6–12 month roadmap tied to your production",
     ],
-    image: step2Image,
-    imageAlt: "A printed 90-day action plan with a checklist and timeline",
+    image: samplePlanAsset.url,
+    imageAlt: "Sample RE Pro Business Credit Plan showing goals snapshot and fundability flags",
     reverse: true,
   },
   {
