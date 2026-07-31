@@ -1,6 +1,7 @@
 import { BookOpen, ClipboardList, Rocket, type LucideIcon } from "lucide-react";
 import step1Image from "@/assets/journey-step-1.jpg";
 import step2Image from "@/assets/journey-step-2.jpg";
+import samplePlanAsset from "@/assets/journey-step-2-plan.png.asset.json";
 import step3Image from "@/assets/journey-step-3.jpg";
 
 export interface JourneyStepContent {
