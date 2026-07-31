@@ -50,11 +50,11 @@ const comparison: ComparisonRow[] = [
 const faqs = [
   {
     q: "Do I have to pay upfront? Is there a payment plan?",
-    a: "You can enroll directly, or start with a free 1:1 session first. If a payment plan makes sense for the Cohort or 1:1 tier, we can walk through options together — no pressure, no surprise charges.",
+    a: "You can enroll directly, or start with the free guide and custom plan first. If a payment plan makes sense for the Cohort or Cohort Plus + tier, we can walk through options together — no pressure, no surprise charges.",
   },
   {
-    q: "What's included in the free 1:1 session?",
-    a: "A 45–60 minute working call to review your intake, your Fundability Scan, and your goals. You leave with a prioritized action plan you can implement on your own or with our help.",
+    q: "What's included in the free custom plan?",
+    a: "Your Needs Analysis and Fundability Scan are turned into a prioritized 90-day action plan you can implement on your own or with our help.",
   },
   {
     q: "How is this different from generic business credit programs?",
@@ -96,7 +96,7 @@ const trustItems = [
 const reassurance = [
   { icon: Lock, label: "Secure Stripe checkout" },
   { icon: BadgeCheck, label: "30-day satisfaction guarantee" },
-  { icon: CalendarClock, label: "Free 1:1 available first" },
+  { icon: CalendarClock, label: "Free custom plan first" },
   { icon: ShieldCheck, label: "No hidden fees" },
 ];
 
@@ -179,7 +179,7 @@ const PricingPage = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-primary/5 to-white">
       <Seo
         title="Pricing — RE Pro Business Credit Coaching"
-        description="Transparent pricing for RE Pro Business Credit coaching. Self-paced blueprint, 90-day cohort, and 1:1 private coaching — enroll directly or book a free 1:1 first."
+        description="Transparent pricing for RE Pro Business Credit coaching. Self-paced blueprint, 90-day cohort, and private coaching — enroll directly or start with your free custom plan."
         path="/pricing"
         jsonLd={jsonLd}
       />
@@ -195,7 +195,7 @@ const PricingPage = () => {
           </h1>
           <p className="mt-5 text-lg md:text-xl text-secondary/70 max-w-2xl mx-auto leading-relaxed">
             Three ways to build separate business credit for your real estate
-            business. Enroll directly below, or start with a free 1:1 session
+            business. Enroll directly below, or start with your free custom plan
             first — your call.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
