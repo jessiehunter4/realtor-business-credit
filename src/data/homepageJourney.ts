@@ -70,8 +70,8 @@ export const JOURNEY_STEPS: JourneyStepContent[] = [
       "A prioritized 90-day action list — what to do, in what order",
       "A 6–12 month roadmap tied to your production",
     ],
-    image: step2Image,
-    imageAlt: "A printed 90-day action plan with a checklist and timeline",
+    image: samplePlanAsset.url,
+    imageAlt: "Sample RE Pro Business Credit Plan showing goals snapshot and fundability flags",
     reverse: true,
   },
   {
