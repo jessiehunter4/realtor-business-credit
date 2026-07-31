@@ -31,23 +31,28 @@ const tiers = PRICING_TIERS;
 
 type ComparisonRow = {
   feature: string;
-  values: [boolean | string, boolean | string, boolean | string];
+  values: [boolean | string, boolean | string, boolean | string, boolean | string];
 };
 
 const comparison: ComparisonRow[] = [
-  { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true] },
-  { feature: "Free Fundability Scan", values: [true, true, true] },
-  { feature: "Credit Suite vendor & tradeline directory", values: [true, true, true] },
-  { feature: "Guide + 7-step action checklist", values: [true, true, true] },
-  { feature: "Weekly live coaching calls", values: [false, true, true] },
-  { feature: "Small-group cohort community", values: [false, true, true] },
-  { feature: "Credit Suite client portal + coach", values: [false, true, true] },
-  { feature: "Private 1:1 coaching with Jessie", values: [false, false, true] },
-  { feature: "Priority response + funding strategy", values: [false, false, true] },
-  { feature: "Quarterly plan reviews", values: [false, false, true] },
+  { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true, true] },
+  { feature: "Task checklist + progress tracking", values: [true, true, true, true] },
+  { feature: "Guide + 7-step action checklist", values: [true, true, true, true] },
+  { feature: "Free Fundability Scan", values: [false, true, true, true] },
+  { feature: "Credit Suite vendor & tradeline directory", values: [false, true, true, true] },
+  { feature: "Weekly live coaching calls", values: [false, false, true, true] },
+  { feature: "Small-group cohort community", values: [false, false, true, true] },
+  { feature: "Credit Suite client portal + coach", values: [false, false, true, true] },
+  { feature: "Private 1:1 coaching with Jessie", values: [false, false, false, true] },
+  { feature: "Priority response + funding strategy", values: [false, false, false, true] },
+  { feature: "Quarterly plan reviews", values: [false, false, false, true] },
 ];
 
 const faqs = [
+  {
+    q: "Is there a free option?",
+    a: "Yes. The Free tier costs nothing and gives you the full guide, your customized plan from the intake survey, and the task checklist with progress tracking in your portal. No card required.",
+  },
   {
     q: "Do I have to pay upfront? Is there a payment plan?",
     a: "You can enroll directly, or start with the free guide and custom plan first. If a payment plan makes sense for the Cohort or Cohort Plus + tier, we can walk through options together — no pressure, no surprise charges.",
@@ -194,9 +199,9 @@ const PricingPage = () => {
             <span className="text-primary">Money when you need it.</span>
           </h1>
           <p className="mt-5 text-lg md:text-xl text-secondary/70 max-w-2xl mx-auto leading-relaxed">
-            Three ways to build separate business credit for your real estate
-            business. Enroll directly below, or start with your free custom plan
-            first — your call.
+            Four ways to build separate business credit for your real estate
+            business — including a free option. Enroll directly below, or start
+            with your free guide and custom plan first.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
@@ -217,7 +222,7 @@ const PricingPage = () => {
         {/* Pricing cards */}
         <section className="container mx-auto px-4 pb-10 max-w-6xl" aria-labelledby="pricing-tiers">
           <h2 id="pricing-tiers" className="sr-only">Pricing tiers</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 items-stretch">
             {tiers.map((tier) => (
               <div
                 key={tier.id}
@@ -256,36 +261,46 @@ const PricingPage = () => {
                     </li>
                   ))}
                 </ul>
-                <button
-                  type="button"
-                  onClick={() => handleCheckout(tier.id)}
-                  disabled={loadingTier !== null}
-                  className={
-                    "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
-                    (tier.highlighted
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
-                      : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
-                    " disabled:opacity-60 disabled:cursor-not-allowed"
-                  }
-                >
-                  {loadingTier === tier.id ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Redirecting to Stripe…
-                    </>
-                  ) : (
-                    <>
-                      {tier.ctaLabel}
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-                {errorByTier[tier.id] && (
+                {tier.isFree ? (
+                  <Link
+                    to={tier.ctaHref}
+                    className="mt-7 inline-flex items-center justify-center gap-2 rounded-full border border-secondary/20 bg-white px-5 py-3 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                  >
+                    {tier.ctaLabel}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleCheckout(tier.id as CheckoutTierId)}
+                    disabled={loadingTier !== null}
+                    className={
+                      "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
+                      (tier.highlighted
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
+                        : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                      " disabled:opacity-60 disabled:cursor-not-allowed"
+                    }
+                  >
+                    {loadingTier === tier.id ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Redirecting to Stripe…
+                      </>
+                    ) : (
+                      <>
+                        {tier.ctaLabel}
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                )}
+                {!tier.isFree && errorByTier[tier.id as CheckoutTierId] && (
                   <p
                     role="alert"
                     className="mt-2 text-center text-xs font-medium text-destructive"
                   >
-                    {errorByTier[tier.id]}
+                    {errorByTier[tier.id as CheckoutTierId]}
                   </p>
                 )}
               </div>
@@ -326,6 +341,7 @@ const PricingPage = () => {
               <thead>
                 <tr className="border-b border-border bg-secondary/5">
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary">Feature</th>
+                  <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Free</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Self-Paced</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-primary text-center">Cohort</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">1:1 Coaching</th>
@@ -350,12 +366,21 @@ const PricingPage = () => {
                   </th>
                   {(
                     [
+                      { id: "free" as const, label: "Read the Guide" },
                       { id: "self-paced" as const, label: "Get Started" },
                       { id: "cohort" as const, label: "Enroll" },
                       { id: "one-on-one" as const, label: "Start 1:1" },
                     ]
                   ).map(({ id, label }) => (
                     <td key={id} className="p-4 text-center border-t border-border align-top">
+                      {id === "free" ? (
+                        <Link
+                          to="/guide"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                        >
+                          {label} →
+                        </Link>
+                      ) : (
                       <button
                         type="button"
                         onClick={() => handleCheckout(id)}
@@ -371,7 +396,8 @@ const PricingPage = () => {
                           <>{label} →</>
                         )}
                       </button>
-                      {errorByTier[id] && (
+                      )}
+                      {id !== "free" && errorByTier[id] && (
                         <p role="alert" className="mt-1 text-[11px] text-destructive">
                           {errorByTier[id]}
                         </p>

@@ -22,6 +22,8 @@ const validTierIds: CheckoutTierId[] = ["self-paced", "cohort", "one-on-one"];
 const isCheckoutTier = (value: string | null): value is CheckoutTierId =>
   !!value && validTierIds.includes(value as CheckoutTierId);
 
+const PAID_TIERS = PRICING_TIERS.filter((t) => !t.isFree);
+
 const CheckoutPage = () => {
   const [searchParams] = useSearchParams();
   const { contactId } = useContactIdentity();
@@ -123,11 +125,11 @@ const CheckoutPage = () => {
                 Choose Your Program
               </h2>
               <div className="space-y-3">
-                {PRICING_TIERS.map((tier) => (
+                {PAID_TIERS.map((tier) => (
                   <button
                     key={tier.id}
                     type="button"
-                    onClick={() => setSelectedTier(tier.id)}
+                    onClick={() => setSelectedTier(tier.id as CheckoutTierId)}
                     disabled={isLoading}
                     className={
                       "w-full rounded-xl border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-70 " +

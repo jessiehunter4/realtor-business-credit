@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
-import { Sparkles, Users, HeartHandshake } from "lucide-react";
+import { Sparkles, Users, HeartHandshake, BookOpen } from "lucide-react";
 
 export type PricingTier = {
-  id: "self-paced" | "cohort" | "one-on-one";
+  id: "free" | "self-paced" | "cohort" | "one-on-one";
   name: string;
   price: string;
   cadence: string;
@@ -11,6 +11,7 @@ export type PricingTier = {
   features: string[];
   notIncluded?: string[];
   highlighted?: boolean;
+  isFree?: boolean;
   ctaLabel: string;
   ctaHref: string;
   icon: LucideIcon;
@@ -23,6 +24,25 @@ export const STRIPE_LINKS = {
 } as const;
 
 export const PRICING_TIERS: PricingTier[] = [
+  {
+    id: "free",
+    name: "Free",
+    price: "$0",
+    cadence: "no card required",
+    cadenceNote: "Start reading in under a minute",
+    who: "For Realtors who want to learn the system and see their own plan before investing.",
+    features: [
+      "Full Business Structure, Finance & Credit Guide",
+      "Your customized plan from the intake survey",
+      "Task checklist generated from your plan",
+      "Progress tracking in your portal",
+    ],
+    notIncluded: ["Live coaching calls", "Cohort community", "Credit Suite portal + coach"],
+    isFree: true,
+    ctaLabel: "Read the Free Guide",
+    ctaHref: "/guide",
+    icon: BookOpen,
+  },
   {
     id: "self-paced",
     name: "DIY (Do it Yourself)",
