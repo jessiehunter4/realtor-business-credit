@@ -1,30 +1,51 @@
 ## Goal
-Remove the free 1:1 / booking session from the public site: delete the `/one-on-one` page and strip every CTA, link, and mention of booking a 1:1 session. The paid "Cohort Plus +" pricing tier stays untouched (per your answer).
 
-## What gets removed
+Add a **Free** tier as the first pricing option, without touching the three existing paid tiers (DIY / Pro Cohort / Cohort Plus +).
 
-**Page & route**
-- Delete `src/pages/OneOnOnePage.tsx` and its route + import in `src/App.tsx`.
-- Delete `src/components/landing/OneOnOneStepsBlock.tsx` (whole "Book your free 1:1" 3-step block) and remove its usage from the landing page.
-- Keep `/booking-confirmed` route but remove its "book another session" link (it's a GHL redirect target; removing the route could break inbound links).
+## What the Free tier says
 
-**Navigation & global CTAs**
-- `SiteHeader.tsx` — remove the "Book Free 1:1" desktop and mobile-menu links.
-- `SiteFooter.tsx` — remove the "Book a Session" footer link.
-- `StickyMobileCTABar.tsx` — remove the "Book Free 1:1" button; the "Read Guide" button expands to full width.
+- Name: **Free**, price **$0**, cadence "no card required"
+- Who: "For Realtors who want to learn the system and see their own plan before investing."
+- Includes:
+  - Full Business Structure, Finance & Credit Guide
+  - Your customized plan generated from the intake survey
+  - Task checklist from your plan, with progress tracking in the portal
+- Not included: coaching calls, cohort, Credit Suite portal/coach
+- CTA: **Read the Free Guide** → `/guide` (plain link, no Stripe)
 
-**Page-level CTAs** (remove the button; keep surrounding copy, re-balance layout so the remaining CTA is centered/full-width)
-- `landing/CTASection.tsx`, `landing/HeroSection.tsx`, `landing/IsThisForMe.tsx`
-- `pages/AboutPage.tsx` (2 CTAs), `pages/BusinessCreditCardsForRealtorsPage.tsx` (2), `pages/PricingPage.tsx` (2), `pages/SamplePlanPage.tsx`, `pages/DashboardPage.tsx` ("Schedule now →"), `pages/BookingConfirmedPage.tsx`
-- `components/plan/NextStepPanel.tsx` and `components/intake/IntakePricingAndReadiness.tsx` — drop the "Book a free 1-on-1" next-step option, leaving the remaining options.
+## Data model
 
-**Copy mentions**
-- Scrub 1:1-session wording from `landing/FinalCTABright.tsx`, `landing/GuideContentsBright.tsx`, `landing/CustomPlanPreview.tsx`, `landing/SamplePlanPreview.tsx`, `landing/TestimonialsBright.tsx`, `landing/ProgramCurriculum.tsx`, `landing/LeadForm.tsx`, `landing-avatar/ThreeStepSection.tsx`, `guide/GuideMedia.tsx`, `guide/chapters/Ch13.tsx`, `components/GuidePDF.tsx`, `data/samplePlan.ts`, `pages/IntakeSurveyPage.tsx`, `pages/LandingPage.tsx`, `pages/PaymentSuccessPage.tsx`. Where a section's entire purpose was "book a session," it's replaced with the guide/plan CTA rather than left empty.
-- `pages/SmsOptInProofPage.tsx` — update the sample SMS that links to `/one-on-one`.
+`src/data/pricingTiers.ts`
+- Extend `PricingTier.id` union with `"free"`, and add an optional `isFree?: boolean` flag so components can branch on link-vs-checkout.
+- Prepend the Free tier object to `PRICING_TIERS` (icon: `BookOpen`), `ctaHref: "/guide"`.
+- Leave the three existing tier objects and `STRIPE_LINKS` byte-for-byte unchanged.
 
-## Left alone
-- Pricing tier "Cohort Plus +" (`data/pricingTiers.ts`), `startCheckout.ts`, `create-checkout-session` — these are paid 1:1 coaching, not the free session.
-- Admin `BookingsTab.tsx` / `AdminIntakeList.tsx` and legal pages (`Privacy`, `Terms`) — internal/legal references, no user-facing booking CTA.
+`src/lib/startCheckout.ts`
+- `CheckoutTierId` stays `"self-paced" | "cohort" | "one-on-one"` — Free never goes to Stripe. Components will narrow before calling `startCheckout`.
 
-## Technical notes
-- After edits I'll grep for any remaining `/one-on-one` link to guarantee no dead routes, and run a typecheck.
+## Component updates
+
+**`src/pages/PricingPage.tsx`**
+- Card grid: `md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4` so 4 cards read cleanly (1 col mobile → 2 cols tablet/laptop → 4 cols wide desktop). Cards stay `items-stretch` with equal-height footers.
+- Card renderer: if `tier.isFree`, render a `<Link to={tier.ctaHref}>` styled like the outline CTA instead of the checkout button; otherwise keep the exact existing checkout button, loading state, and error handling.
+- Comparison table (`grid-cols-2 md:grid-cols-4` at ~line 303) and the feature/columns grid at ~line 446: add a Free column so the table has 4 tiers + label column; on mobile it keeps its existing stacked/scroll behavior. Free row values: guide ✓, custom plan ✓, task checklist ✓, everything else —.
+- FAQ copy: add one short line noting the Free tier exists and what it covers.
+
+**`src/pages/CheckoutPage.tsx`**
+- Filter Free out of the selectable list (`PRICING_TIERS.filter(t => !t.isFree)`) — checkout is for paid tiers only; `?tier=free` falls back to the existing default (`cohort`). No other change.
+
+**`src/components/plan/InlinePricingAccordion.tsx`**
+- Free renders as an accordion item like the others, but its action is a `Link` to `/guide` rather than a checkout button. Paid items unchanged.
+
+**`src/components/intake/IntakePricingAndReadiness.tsx`**
+- No change needed; the "just exploring" / "need clarity" responses already point to `/guide`.
+
+## Testing checklist
+
+- `/pricing` at 375px, 768px, 1024px, 1440px: 4 cards, no overflow, equal heights, "Most popular" badge still on Pro Cohort.
+- Free card CTA navigates to `/guide`; no Stripe call fires.
+- Each paid card still opens Stripe checkout and still shows its error text on failure.
+- `/checkout` shows only the 3 paid options; `?tier=cohort|self-paced|one-on-one` preselects correctly; `?tier=free` falls back to Cohort.
+- Plan-page inline accordion: Free expands with a guide link, paid tiers still check out.
+- Comparison table renders 4 tier columns on desktop and stays readable on mobile.
+- Typecheck passes with the widened `PricingTier["id"]` union.
