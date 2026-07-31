@@ -143,13 +143,6 @@ const BusinessCreditCardsForRealtorsPage = () => {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Link
-              to="/one-on-one"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-            >
-              <Calendar className="h-5 w-5" />
-              Book Free 1:1 Session
-            </Link>
-            <Link
               to="/guide"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
             >
@@ -217,7 +210,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
         <p className="text-xs text-muted-foreground italic mt-6 text-center max-w-2xl mx-auto">
           We intentionally don&apos;t list specific card names or affiliate links here.
           Card terms change quarterly, and the right answer depends on your structure.
-          Book a one-on-one if you want a recommendation for your situation.
+          The free guide walks through how to choose for your situation.
         </p>
       </section>
 
@@ -243,13 +236,6 @@ const BusinessCreditCardsForRealtorsPage = () => {
             cards afterward.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/one-on-one"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-            >
-              <Calendar className="h-5 w-5" />
-              Book a One-on-One review
-            </Link>
             <Link
               to="/guide"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
