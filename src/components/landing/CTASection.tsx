@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 
@@ -27,7 +27,7 @@ const CTASection = ({ guideLink = "/guide" }: CTASectionProps) => {
             Ready to Protect Your Personal Credit?
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Read the free guide — no sign-up required. Or, if you already know you need this, book a one-on-one session with Jessie to discuss your specific situation.
+            Read the free guide — no sign-up required. Then build your customized plan and start putting it into action.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -35,12 +35,6 @@ const CTASection = ({ guideLink = "/guide" }: CTASectionProps) => {
               <Link to={guideLink}>
                 <BookOpen className="mr-2 h-5 w-5" />
                 Read the Free Guide
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground">
-              <Link to="/one-on-one">
-                <Calendar className="mr-2 h-5 w-5" />
-                Free One-On-One Business Credit Session
               </Link>
             </Button>
           </div>
