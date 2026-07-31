@@ -13,9 +13,16 @@ interface Props {
   className?: string;
 }
 
+const splitPath = (p: string) => {
+  const idx = p.lastIndexOf("/");
+  return idx === -1
+    ? { prefix: "", name: p }
+    : { prefix: p.slice(0, idx), name: p.slice(idx + 1) };
+};
+
 const HeroVideo = ({
-  storagePath = "hero-jessie.mp4",
-  captionsPath = "hero-jessie.vtt",
+  storagePath = "public/hero-jessie.mp4",
+  captionsPath = "public/hero-jessie.vtt",
   poster,
   alt,
   className = "",
@@ -28,12 +35,15 @@ const HeroVideo = ({
     let cancelled = false;
     (async () => {
       try {
+        const video = splitPath(storagePath);
+        const caps = splitPath(captionsPath);
+
         // List the bucket to see if the file exists (avoids 404 console noise)
         const { data: files } = await supabase.storage
           .from("site-videos")
-          .list("", { search: storagePath });
+          .list(video.prefix, { search: video.name });
 
-        const exists = files?.some((f) => f.name === storagePath);
+        const exists = files?.some((f) => f.name === video.name);
         if (!exists) {
           if (!cancelled) setChecked(true);
           return;
@@ -50,8 +60,8 @@ const HeroVideo = ({
         // Check for captions (optional)
         const { data: capFiles } = await supabase.storage
           .from("site-videos")
-          .list("", { search: captionsPath });
-        const capExists = capFiles?.some((f) => f.name === captionsPath);
+          .list(caps.prefix, { search: caps.name });
+        const capExists = capFiles?.some((f) => f.name === caps.name);
         if (capExists) {
           const { data: capData } = await supabase.storage
             .from("site-videos")
