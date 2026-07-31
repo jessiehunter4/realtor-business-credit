@@ -95,7 +95,7 @@ export default function AdminSignupPage() {
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl font-bold text-center">Create an admin account</CardTitle>
           <CardDescription className="text-center">
-            Requires an admin access code. Without a valid code the account is created as a standard user.
+            Accounts created here are granted administrator access.
           </CardDescription>
         </CardHeader>
         <CardContent>

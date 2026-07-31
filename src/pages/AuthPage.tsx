@@ -30,7 +30,7 @@ export default function AuthPage() {
   const [agreed, setAgreed] = useState(false);
   const adminCheckInFlight = useRef(false);
   // While an admin sign-up is in progress the SIGNED_IN event must not route
-  // the user away before the access code has been verified server-side.
+  // the user away before the admin role has been granted server-side.
   const signingUp = useRef(false);
 
   const checkAdminAndRoute = async (userId: string) => {
