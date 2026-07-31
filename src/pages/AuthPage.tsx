@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,14 +11,20 @@ import { toast } from "sonner";
 import { z } from "zod";
 import AccountConsentFields from "@/components/shared/AccountConsentFields";
 import { TERMS_CONSENT_TEXT } from "@/lib/messagingConsent";
+import { useAuthRole } from "@/hooks/useAuthRole";
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(6, "Password must be at least 6 characters").max(100)
 });
 
+const adminSignupSchema = authSchema.extend({
+  code: z.string().min(1, "Admin access code is required").max(200),
+});
+
 export default function AuthPage() {
   const navigate = useNavigate();
+  const { refresh } = useAuthRole();
   const [searchParams] = useSearchParams();
   const rawNext = searchParams.get("next");
   const next =
@@ -25,6 +32,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const adminCheckInFlight = useRef(false);
 
@@ -45,22 +53,8 @@ export default function AuthPage() {
         return;
       }
 
-      // Not an admin. The only automatic grant allowed is first-admin
-      // bootstrap, which the server rejects (403) once any admin exists.
-      // Swallow that expected rejection instead of surfacing it as an error.
-      try {
-        const { data: bootstrap, error: bootstrapError } =
-          await supabase.functions.invoke("setup-admin");
-        if (!bootstrapError && bootstrap && !("error" in bootstrap)) {
-          toast.success("Admin access granted (first administrator).");
-          if (next) window.location.replace(next);
-          else navigate("/admin");
-          return;
-        }
-      } catch {
-        // expected when an admin already exists
-      }
-
+      // Not an admin: admin elevation only happens through the code-verified
+      // sign-up path below, never automatically at sign-in.
       toast.error("This account isn't an admin. Taking you to your dashboard.");
       navigate("/dashboard", { replace: true });
     } finally {
@@ -122,10 +116,10 @@ export default function AuthPage() {
     }
 
     try {
-      const validated = authSchema.parse({ email, password });
+      const validated = adminSignupSchema.parse({ email, password, code });
       setLoading(true);
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: validated.email,
         password: validated.password,
         options: {
@@ -146,7 +140,26 @@ export default function AuthPage() {
         return;
       }
 
-      toast.success("Account created successfully! You can now sign in.");
+      if (!data.session) {
+        toast.success("Account created. Confirm your email, then sign in to finish admin setup.");
+        return;
+      }
+
+      const { data: result, error: fnError } = await supabase.functions.invoke(
+        "assign-admin-role",
+        { body: { code: validated.code } },
+      );
+
+      if (fnError || !result || (result as { error?: string }).error) {
+        toast.error("Account created, but the admin access code was not accepted.");
+        await refresh();
+        navigate("/dashboard", { replace: true });
+        return;
+      }
+
+      toast.success("Admin account created.");
+      await refresh();
+      navigate("/admin", { replace: true });
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
@@ -230,6 +243,22 @@ export default function AuthPage() {
                     disabled={loading}
                     placeholder="Minimum 6 characters"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-code">Admin access code</Label>
+                  <div className="relative">
+                    <KeyRound className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-code"
+                      type="password"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      placeholder="Provided by an existing administrator"
+                      required
+                      disabled={loading}
+                      className="pl-9"
+                    />
+                  </div>
                 </div>
                 <AccountConsentFields
                   idPrefix="auth-signup"
