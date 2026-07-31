@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 interface Props {
   guideLink?: string;
@@ -13,15 +13,7 @@ const StickyMobileCTABar = ({ guideLink = "/guide" }: Props) => (
         className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-sky text-sky-foreground px-3 py-2.5 text-sm font-semibold shadow-card-hover"
       >
         <BookOpen className="h-4 w-4" />
-        Read Guide
-      </Link>
-      <Link
-        to="/one-on-one"
-        data-analytics-id="cta-book-sticky"
-        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground px-3 py-2.5 text-sm font-semibold shadow-card-hover"
-      >
-        <Calendar className="h-4 w-4" />
-        Book Free 1:1
+        Read the Free Guide
       </Link>
     </div>
   </div>
