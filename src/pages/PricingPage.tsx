@@ -222,7 +222,7 @@ const PricingPage = () => {
         {/* Pricing cards */}
         <section className="container mx-auto px-4 pb-10 max-w-6xl" aria-labelledby="pricing-tiers">
           <h2 id="pricing-tiers" className="sr-only">Pricing tiers</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 items-stretch">
             {tiers.map((tier) => (
               <div
                 key={tier.id}
@@ -341,6 +341,7 @@ const PricingPage = () => {
               <thead>
                 <tr className="border-b border-border bg-secondary/5">
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary">Feature</th>
+                  <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Free</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Self-Paced</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-primary text-center">Cohort</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">1:1 Coaching</th>
@@ -365,12 +366,21 @@ const PricingPage = () => {
                   </th>
                   {(
                     [
+                      { id: "free" as const, label: "Read the Guide" },
                       { id: "self-paced" as const, label: "Get Started" },
                       { id: "cohort" as const, label: "Enroll" },
                       { id: "one-on-one" as const, label: "Start 1:1" },
                     ]
                   ).map(({ id, label }) => (
                     <td key={id} className="p-4 text-center border-t border-border align-top">
+                      {id === "free" ? (
+                        <Link
+                          to="/guide"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                        >
+                          {label} →
+                        </Link>
+                      ) : (
                       <button
                         type="button"
                         onClick={() => handleCheckout(id)}
@@ -386,7 +396,8 @@ const PricingPage = () => {
                           <>{label} →</>
                         )}
                       </button>
-                      {errorByTier[id] && (
+                      )}
+                      {id !== "free" && errorByTier[id] && (
                         <p role="alert" className="mt-1 text-[11px] text-destructive">
                           {errorByTier[id]}
                         </p>
