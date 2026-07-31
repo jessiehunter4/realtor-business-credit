@@ -88,9 +88,18 @@ export default function InlinePricingAccordion({
                     ))}
                   </ul>
                   <div className="flex flex-wrap gap-3 pt-2">
+                    {tier.isFree ? (
+                      <Link
+                        to={tier.ctaHref}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-secondary/20 bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                      >
+                        {tier.ctaLabel}
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    ) : (
                     <button
                       type="button"
-                      onClick={() => handleCheckout(tier.id)}
+                      onClick={() => handleCheckout(tier.id as CheckoutTierId)}
                       disabled={loadingTier !== null}
                       className={
                         "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors " +
@@ -112,6 +121,7 @@ export default function InlinePricingAccordion({
                         </>
                       )}
                     </button>
+                    )}
                     <Link
                       to="/pricing"
                       className="inline-flex items-center text-sm font-medium text-primary hover:underline"
@@ -119,9 +129,9 @@ export default function InlinePricingAccordion({
                       Compare all plans →
                     </Link>
                   </div>
-                  {errorByTier[tier.id] && (
+                  {!tier.isFree && errorByTier[tier.id as CheckoutTierId] && (
                     <p role="alert" className="text-xs font-medium text-destructive">
-                      {errorByTier[tier.id]}
+                      {errorByTier[tier.id as CheckoutTierId]}
                     </p>
                   )}
                 </div>
