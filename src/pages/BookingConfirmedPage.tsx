@@ -130,12 +130,6 @@ const BookingConfirmedPage = () => {
             <BookOpen className="w-4 h-4" />
             Read the Free Guide
           </Link>
-          <Link
-            to="/one-on-one"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
-          >
-            Learn More About the 1:1 Session
-          </Link>
         </div>
       </section>
     </div>
