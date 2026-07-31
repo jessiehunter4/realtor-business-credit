@@ -1,74 +1,96 @@
-## Goal
+# Personalized Dashboard with Interactive Workflow Integration
 
-Rework the hero on `/landing-page/:slug` so a visitor instantly sees the personalized welcome video, a benefit-led headline, a short supporting line, and one clear CTA into the guide — with Jessie present only as a brief trust signal.
+## Current state (verified)
 
-Scope is limited to the hero. `ThreeStepSection` and `AvatarFinalCTA` stay as they are. The homepage (`/`) is untouched.
+- `src/pages/DashboardPage.tsx` (163 lines) renders: greeting, `PlanHeroCard`, a 3-card KPI strip, a single "Next action" card, and `MessagePreferencesCard`. It is mostly informational.
+- `src/hooks/useDashboardData.ts` loads `profiles`, the latest **published** `custom_plans` row for `user_id`, and all `plan_task_progress` rows for that plan. It does **not** load the `intake_surveys` row.
+- Tasks only exist in `plan_task_progress` **after** the user checks a box in `src/components/plan/PlanTaskChecklist.tsx` — rows are created lazily on toggle, keyed `action_{step}_{slug}`. So a brand-new user has `tasks = []` and the dashboard shows `0/—` and no next action. This is the core gap.
+- Plan content lives in `custom_plans.plan_data.sections`: `goals_snapshot`, `fundability.items[{label,status:strong|warning|missing,detail}]`, `action_plan_90day.items[{step,text,effort}]`, `roadmap.milestones`, `funding_opportunities`, `next_steps`.
+- `supabase/functions/generate-plan/index.ts` already contains a deterministic `computeFundabilityItems(survey)` rule function (entity, EIN, bank, address, phone, email, website, accounting, cards, tradelines, bureaus) that produces the strong/warning/missing statuses. The 90-day action items themselves are AI-generated, so their wording varies per user.
+- Task states today are boolean only (`completed`); there is no "in progress".
 
-## 1. Hero structure (top to bottom)
+## Architecture
 
 ```text
-┌──────────────────────────────────────────┐
-│  Headline (benefit-led, 1 line desktop)  │
-│  Subheadline (one sentence)              │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │   Personalized welcome video       │  │
-│  │   (placeholder card, 16:9)         │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-│  [ Read the Free Guide ]  See the 3 steps│
-│  Free · 5–10 min · no signup             │
-│  ▸ trust line: REALTOR® who's been there │
-└──────────────────────────────────────────┘
+intake_surveys ──┐
+                 ├─► rule engine (shared, deterministic) ─► Roadmap[]
+custom_plans ────┘        (canonical task catalog)          │
+plan_task_progress ───────────────────────────────────────► merged status
+                                                            │
+                                    ┌───────────────────────┴──────────────┐
+                                    ▼                                      ▼
+                            Dashboard UI                        funnel_events → GHL
+                        (progress, next action)               (email/SMS workflows)
 ```
 
-Key changes vs. today:
-- Video moves up: it sits directly under a tightened headline/subhead pair so it lands above the fold at common desktop and mobile heights. The long explanatory paragraph currently sitting between video and CTAs moves below the CTAs (or is cut to one short line) so the CTA is not pushed off screen.
-- Section vertical padding reduced (roughly `py-6 sm:py-8 md:py-10`) and the headline clamp tightened so headline + video + CTA fit in ~800px of viewport height.
-- Video container keeps the existing 16:9 `HeroVideoPlaceholder`, constrained to `max-w-[min(640px,100%)]` so it never dwarfs the type on wide screens.
+### 1. Canonical task catalog + rule engine
 
-## 2. Messaging
+New `src/lib/roadmap/` module (pure TS, no I/O, unit-testable):
 
-Replace the current "Congrats, {name} — money when you need it." greeting.
+- `taskCatalog.ts` — a fixed, ordered catalog of ~16 canonical tasks with stable `task_key`s that never change wording (e.g. `entity_formed`, `ein_obtained`, `business_bank_account`, `business_address`, `business_phone_listed`, `business_email_domain`, `business_website`, `accounting_software`, `duns_registered`, `experian_profile`, `equifax_profile`, `vendor_tradelines_3`, `starter_business_card`, `expenses_off_personal`, `utilization_under_30`, `higher_limit_card_or_loc`). Each entry carries: title, short explanation, phase (`foundation` → `credibility` → `bureaus` → `tradelines` → `funding`), base priority, `dependsOn: string[]`, estimated effort, and an optional action link/label (e.g. D&B registration, `/guide#chapter-x`, `/pricing`).
+- `rules.ts` — `deriveRoadmap(survey, planData, progressRows) => RoadmapTask[]`. Logic:
+  1. Seed every catalog task as `not_started`.
+  2. Apply **intake-derived auto-completion**, mirroring the existing `computeFundabilityItems` mapping so the dashboard and the plan never disagree: `strong` → `completed (source: intake)`, `warning` → `in_progress`, `missing` → `not_started`.
+  3. Apply **skip rules**: if the survey shows established business credit (EIN-only cards + 3+ reporting tradelines + a bureau profile), suppress introductory foundation tasks from the active list and file them under "Already in place".
+  4. Apply **user progress overlay**: any `plan_task_progress` row wins over the intake inference (explicit user action is authoritative).
+  5. Apply **dependency gating**: a task whose `dependsOn` are not all completed is marked `blocked` and cannot become the highlighted next action.
+  6. Compute effective priority = phase order → base priority → intake pain signals (`financial_pains`, `primary_goals` boost matching tasks, e.g. "money between closings" boosts LOC/tradeline tasks).
+  7. Dedupe: AI-generated `action_plan_90day` items are matched to catalog tasks via a keyword map; unmatched AI items are appended as `custom` tasks (`custom_{n}`) rather than duplicated.
+- Output type: `{ task_key, title, explanation, status, priority, phase, blocked, nextAction, actionHref?, source: 'intake'|'plan'|'user' }`.
 
-- Headline (no name, no congratulations): **"Money when your business needs it."**
-- Personalized name, if a slug exists, becomes a small eyebrow line above the headline instead of the headline itself: `Made for you, {FirstName}` — keeps personalization without a generic greeting.
-- Subheadline (visitor challenge → outcome → path): "Commissions arrive in lumps; your overhead doesn't. Here's the simple three-step path to a business structure and separate business credit that covers you between closings."
-- Explanatory paragraph below the CTAs, shortened to one sentence about what happens next.
-- Remove "Jessie's 3-Step Rule" phrasing from the hero; call it "the 3-step path."
+Because the rules are deterministic and shared, two users with different intake answers get materially different dashboards while the logic stays standardized.
 
-## 3. Personal branding
+### 2. Data layer changes
 
-- Cut the founder-forward line "A personal welcome and Jessie's 3-Step Rule…" from the hero.
-- Add one compact trust row under the CTAs: a small avatar/initial chip plus "Built by a REALTOR® who ran a decade of business expenses on personal credit — so you don't have to," with a text link "Read the story" → `/about`.
-- Video caption/alt copy stays neutral: "Your personalized welcome video."
+- Extend `useDashboardData` to also fetch the user's `intake_surveys` row (`user_id = uid`, latest by `created_at`), and expose `roadmap` from `deriveRoadmap(...)` plus derived metrics.
+- **Materialization**: on first dashboard load after a plan is published, upsert one `plan_task_progress` row per derived task (idempotent `onConflict: plan_id,task_key`) so tasks exist for workflow queries even before the user interacts. Rows carry `task_key`, `task_label`, and completion.
+- **Schema migration** (`plan_task_progress`): add `status text not null default 'not_started'` (`not_started|in_progress|completed`), `priority int`, `phase text`, `source text`, `snoozed_until timestamptz`. Keep the existing `completed` boolean in sync via a trigger so `PlanTaskChecklist.tsx` and `PortalPlanView` keep working unchanged. RLS: reuse the existing owner-scoped policies; add GRANTs only if new columns require none (they don't).
+- Migrate `PlanTaskChecklist.tsx`'s ad-hoc `action_{step}_{slug}` keys by having the roadmap matcher recognize legacy keys and re-map them once, so already-checked users don't lose progress.
 
-## 4. CTA flow
+### 3. Dashboard information architecture (top → bottom)
 
-- Primary CTA (only filled button): **Read the Free Guide** → `/guide`, `data-analytics-id="avatar-cta-guide-hero"` retained.
-- Secondary CTA demoted to a plain text link with a chevron: "See the 3-step path" → `#step-1` (no competing pill button).
-- No pricing, coaching, or booking CTA in the hero — those remain in `AvatarFinalCTA`.
-- Micro-reassurance under the buttons: "Free to read · about 5–10 minutes · no signup required."
+1. **Header row** — greeting, welcome video, log out (unchanged).
+2. **Priority card (hero)** — the single highest-priority unblocked incomplete task: title, why it matters (1–2 lines), effort, primary action button, "Mark in progress" / "Mark complete" controls. Replaces today's thin "Next action" card and moves to the top.
+3. **Progress strip** — overall completion %, completed vs. remaining, current phase (Foundation / Credibility / Bureaus / Tradelines / Funding), milestones achieved (from `roadmap.milestones` mapped to phase completion).
+4. **Roadmap checklist** — tasks grouped by phase, each row: status chip, title, priority badge, explanation, action link, status control. Collapsed groups for completed and blocked tasks ("Already in place — 6 items").
+5. **Plan card** — `PlanHeroCard` demoted below the roadmap; links to the full plan document and PDF.
+6. **Recommended program** — from `recommended_program_slug`, with a link to `/pricing`.
+7. **Message preferences** — unchanged.
+8. **Empty state** — if no published plan: a focused "Finish your Needs Analysis" card linking to `/intake`, with no fake zero metrics.
 
-## 5. Responsive behavior
+### 4. Progress metrics
 
-- Mobile (<640px): single column, eyebrow → headline (clamp min ~1.5rem) → one-line subhead → video → full-width primary CTA → text link. Padding tightened to `py-5`. Target: video top edge within the first screen, CTA reachable with one short scroll at 667px height.
-- Tablet: same order, video capped at ~560px wide, CTAs side by side.
-- Desktop: centered single column preserved; headline clamp reduced to `clamp(1.75rem, 5vw, 2.75rem)` so the type/video ratio stays balanced at 1500px+ (the current 3.25rem max overpowers the video).
-- Background blur orbs stay but are pulled in so they don't add layout height.
+Computed in the hook, never stored denormalized:
+- `overallPct` = completed / (total − skipped)
+- completed vs. remaining counts
+- phase completion (drives the "current implementation stage" label)
+- milestones achieved = phases fully complete
+All recompute on every status change; optimistic UI update then upsert, with rollback + toast on failure (same pattern already used in `PlanTaskChecklist`).
 
-## 6. Files touched
+### 5. Workflow integration (email/SMS)
 
-- `src/components/landing-avatar/AvatarHeroSection.tsx` — full restructure (order, copy, CTA hierarchy, trust row, spacing/clamps).
-- `src/components/landing-avatar/HeroVideoPlaceholder.tsx` — minor: neutral placeholder label ("Your personalized welcome video"), optional `maxWidth` pass-through.
-- `src/pages/LandingWithAvatarPage.tsx` — SEO title/description reworded away from "Jessie's 3-Step Rule"; pass `firstName` unchanged.
+- New shared helper `src/lib/roadmap/events.ts` calls the existing `log-funnel-event` function on: `dashboard_viewed`, `task_started`, `task_completed`, `phase_completed`, `roadmap_completed`, each with `{ task_key, phase, priority, next_task_key }`.
+- New edge function `sync-roadmap-state` (called after any status change, fire-and-forget): pushes the user's current `next_task_key`, `phase`, and `completion_pct` to GHL as contact custom fields, then applies tags via a **separate** API call (per the established upsert-then-tag rule) — e.g. `RBC_Task_business_website`, `RBC_Phase_Bureaus`. GHL workflows key off those tags/fields so reminder emails and SMS always reinforce exactly the task the dashboard is showing.
+- Because both surfaces read from the same derived `next_task_key`, completing a task on the dashboard automatically advances the workflow on the next sync — no parallel content model.
+- SMS sends remain gated on the existing `sms_eligible` / consent flags; email-only contacts get email reminders only.
 
-The personalized video stays the existing placeholder card — no HeyGen embed wiring in this phase; the `heygenEmbedUrl` prop remains so a URL can be dropped in later.
+### 6. Responsive design
 
-## 7. Phases
+- Mobile: single column; priority card full-width and sticky-adjacent to the top; phase groups as accordions; status control becomes a tap-through action sheet.
+- ≥`sm`: two-column metrics; ≥`lg`: three-column metrics with the roadmap full width below.
+- All colors via existing semantic tokens (navy/green/amber design system) — no hardcoded color utilities.
 
-1. Copy + structure rewrite in `AvatarHeroSection` (headline, eyebrow, subhead, order).
-2. CTA hierarchy and trust row.
-3. Placeholder label + width constraint.
-4. SEO metadata wording.
-5. Responsive pass — verify above-the-fold at 390×844, 768×1024, and 1500×855.
+## Implementation phases
+
+- **Phase 1 — Rules foundation:** `src/lib/roadmap/` catalog + `deriveRoadmap` + unit tests against several synthetic intake profiles (no-entity beginner, mid-stage, already-funded). No UI change.
+- **Phase 2 — Data:** migration for `plan_task_progress` status columns + sync trigger; extend `useDashboardData` with survey fetch, roadmap derivation, and idempotent materialization; legacy key remap.
+- **Phase 3 — Dashboard UI:** new components `PriorityTaskCard`, `ProgressSummary`, `RoadmapChecklist`, `RoadmapTaskRow`, `PhaseGroup`; restructure `DashboardPage.tsx`; empty state.
+- **Phase 4 — Status transitions:** in-progress/complete controls, optimistic updates, funnel event logging.
+- **Phase 5 — Workflow sync:** `sync-roadmap-state` edge function + GHL field/tag mapping; admin visibility of a user's roadmap state in the coach view.
+
+Dependencies: Phase 2 requires Phase 1's task keys to be final (they become database identifiers). Phase 5 requires Phase 4's events. Phases 3 and 4 can be built together.
+
+## Technical notes
+
+- The rule engine is duplicated conceptually with `computeFundabilityItems` in the edge function; Phase 1 should extract the shared mapping into `supabase/functions/_shared/` and have the client module import an identical copy, so plan generation and the dashboard can never drift.
+- No changes to `PlanDocument.tsx` / `PlanPDF.tsx` output; the plan stays the document, the dashboard becomes the workspace.

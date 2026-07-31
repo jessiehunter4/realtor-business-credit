@@ -30,6 +30,12 @@ const ALLOWED_EVENTS = [
   'plan_generation_succeeded',
   'plan_generation_failed',
   'plan_viewed',
+  'dashboard_viewed',
+  'task_started',
+  'task_completed',
+  'task_reopened',
+  'phase_completed',
+  'roadmap_completed',
 ];
 
 const parseRequestBody = async (req: Request) => {
