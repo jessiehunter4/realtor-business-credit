@@ -1,10 +1,20 @@
 import heroImg from "@/assets/guide/hero-agent.jpg";
 import { PlanCTAButton } from "./GuideComponents";
 
-const GuideCover = () => (
+interface GuideCoverProps {
+  visitorName?: string;
+}
+
+const GuideCover = ({ visitorName }: GuideCoverProps) => (
   <section className="bg-hero-grad pt-20 sm:pt-24 md:pt-28 pb-12 sm:pb-16 md:pb-20">
     <div className="container mx-auto px-4">
       <div className="max-w-4xl mx-auto text-center">
+        {visitorName && (
+          <p className="text-sm sm:text-base text-secondary/80 mb-3">
+            Welcome, <strong className="text-secondary">{visitorName}</strong> — this guide was put
+            together for real estate pros like you.
+          </p>
+        )}
         <p className="text-xs md:text-sm uppercase tracking-widest text-primary font-bold mb-3">
           RE Pro Business Credit · Free Guide
         </p>
