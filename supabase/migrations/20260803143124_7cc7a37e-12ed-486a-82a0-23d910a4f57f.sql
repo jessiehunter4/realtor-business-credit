@@ -1,0 +1,1 @@
+ALTER TABLE public.intake_surveys ADD COLUMN IF NOT EXISTS license_type_other text;

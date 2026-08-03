@@ -120,6 +120,7 @@ interface SurveyData {
   business_zip?: string;
   business_phone?: string;
   license_type?: string;
+  license_type_other?: string;
   years_in_real_estate?: string;
   gci_last_12_months?: string;
   sides_closed_last_12_months?: string;
@@ -831,6 +832,14 @@ export default function IntakeSurveyPage() {
                     </div>
                   ))}
                 </RadioGroup>
+                {form.license_type === "Other" && (
+                  <Input
+                    value={form.license_type_other || ""}
+                    onChange={e => updateField("license_type_other", e.target.value)}
+                    placeholder="Please describe your license type"
+                    maxLength={120}
+                  />
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
