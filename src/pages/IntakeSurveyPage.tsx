@@ -405,6 +405,9 @@ export default function IntakeSurveyPage() {
     if (!form.primary_goals || form.primary_goals.length < 1) {
       return { ok: false, step: 1, message: "Pick at least one primary goal." };
     }
+    if (form.primary_goals.includes("Other") && !form.primary_goals_other?.trim()) {
+      return { ok: false, step: 1, message: "Please describe your other primary goal." };
+    }
     return { ok: true };
   };
 
