@@ -78,6 +78,11 @@ export default function PostPlanAuthCard({
     setError(null);
     try {
       if (mode === "signup") {
+        if (phoneDigits.length !== 10) {
+          setError("Enter a valid 10-digit mobile number.");
+          setSubmitting(false);
+          return;
+        }
         const smsOptedIn = smsConsent && phoneDigits.length === 10;
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,

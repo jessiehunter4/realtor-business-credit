@@ -36,12 +36,13 @@ const AccountConsentFields = ({
     <div className="space-y-4">
       {showPhone && onPhoneChange && (
         <div className="space-y-2">
-          <Label htmlFor={`${idPrefix}-phone`}>Mobile Phone (optional)</Label>
+          <Label htmlFor={`${idPrefix}-phone`}>Mobile Phone</Label>
           <PhoneInput
             id={`${idPrefix}-phone`}
             value={phone}
             onChange={onPhoneChange}
             disabled={disabled}
+            required
           />
         </div>
       )}
