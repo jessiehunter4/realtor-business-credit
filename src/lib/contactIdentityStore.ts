@@ -11,6 +11,8 @@ interface StoredIdentity {
   email?: string;
   phone?: string;
   leadId?: string;
+  /** Personalized URL slug (e.g. /guide/:slug) the visitor arrived with. */
+  slug?: string;
 }
 
 export function readContactIdentity(): StoredIdentity {

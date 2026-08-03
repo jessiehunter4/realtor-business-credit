@@ -13,11 +13,14 @@ import { SMS_CONSENT_TEXT } from "@/lib/messagingConsent";
 
 interface GuideOptInGateProps {
   onAccessGranted: (contactId: string) => void;
+  /** Optional name derived from a personalized /guide/:slug URL. */
+  visitorName?: string;
 }
 
-const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) => {
+  const [firstName, setFirstName] = useState(() => (visitorName ? visitorName.split(" ")[0] : ""));
+  const visitorLastName = visitorName?.split(" ").slice(1).join(" ") ?? "";
+  const [lastName, setLastName] = useState(visitorLastName);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [smsConsent, setSmsConsent] = useState(false);
@@ -102,7 +105,7 @@ const GuideOptInGate = ({ onAccessGranted }: GuideOptInGateProps) => {
             <BookOpen className="h-7 w-7 text-primary" />
           </div>
           <CardTitle className="text-2xl text-secondary">
-            Read the Free Guide
+            {visitorName ? `${visitorName.split(" ")[0]}, Read the Free Guide` : "Read the Free Guide"}
           </CardTitle>
           <p className="text-muted-foreground text-sm mt-2">
             Enter your info below to get instant access to the complete RE Pro Business Credit Guide &amp; Action Plan.

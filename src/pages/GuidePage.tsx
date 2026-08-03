@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Download, Loader2, Menu, X } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
@@ -40,6 +40,8 @@ import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
 import { cn } from "@/lib/utils";
+import { parseVisitorSlug } from "@/lib/visitorSlug";
+import { mergeContactIdentity } from "@/lib/contactIdentityStore";
 
 const guideNavLinks = [
   { to: "/guide", label: "Guide" },
@@ -68,7 +70,17 @@ const GUIDE_EVENT_MAP: Record<number, string> = {
 const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
 
 const GuidePage = () => {
-  const { contactId, buildForwardParams } = useContactIdentity();
+  const { contactId, firstName, buildForwardParams } = useContactIdentity();
+  const { slug } = useParams<{ slug?: string }>();
+  const parsedSlug = useMemo(() => parseVisitorSlug(slug), [slug]);
+  const visitorName = firstName || parsedSlug.displayName || "";
+
+  // Persist the slug alongside identity so later funnel steps can reference it.
+  useEffect(() => {
+    if (parsedSlug.isValid) {
+      mergeContactIdentity({ slug: parsedSlug.raw });
+    }
+  }, [parsedSlug]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accessGranted, setAccessGranted] = useState(() => {
     if (contactId) return true;
@@ -180,7 +192,7 @@ const GuidePage = () => {
 
     console.log("[Guide] Logging guide_view, contactId:", contactId);
     // Log guide_view event
-    logEvent("guide_view");
+    logEvent("guide_view", parsedSlug.isValid ? { slug: parsedSlug.raw } : undefined);
 
     // Tag known visitors
     if (contactId) {
@@ -193,7 +205,7 @@ const GuidePage = () => {
         })
         .catch((e) => console.error("[Guide] Failed to tag guide visitor:", e));
     }
-  }, [contactId, logEvent]);
+  }, [contactId, logEvent, parsedSlug]);
 
   const handleAccessGranted = () => {
     setAccessGranted(true);
@@ -249,7 +261,7 @@ const GuidePage = () => {
   }, [contactId]);
 
   if (!accessGranted) {
-    return <GuideOptInGate onAccessGranted={handleAccessGranted} />;
+    return <GuideOptInGate onAccessGranted={handleAccessGranted} visitorName={visitorName || undefined} />;
   }
 
   return (
@@ -258,6 +270,7 @@ const GuidePage = () => {
         title="Real Estate Professional Business Finance & Credit Guide (Free)"
         description="A free Realtor-specific guide to business structure, finance, and credit — plus a 5-step interactive process to generate your own Customized Plan and a private RE Pro dashboard."
         path="/guide"
+        noindex={Boolean(slug)}
       />
       {/* Sticky CTA Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
@@ -398,7 +411,7 @@ const GuidePage = () => {
         <GuideProgressBar />
       </div>
 
-      <GuideCover />
+      <GuideCover visitorName={visitorName || undefined} />
       <GuideSkim />
       <GuideTOC />
       <GuideIntroduction />
