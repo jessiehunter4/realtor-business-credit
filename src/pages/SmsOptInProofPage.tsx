@@ -33,7 +33,7 @@ const steps = [
 const screenshots = [
   {
     src: "/opt-in/create-account.png",
-    label: "Account creation form (reprobusinesscredit.com/mock-login → Create account)",
+    label: "Account creation form (reprobusinesscredit.com/login → Create account)",
     note: "Mobile phone is optional. The SMS opt-in checkbox is separate and unchecked by default. The Terms of Use / Privacy Policy agreement is a distinct, separate checkbox.",
   },
   {

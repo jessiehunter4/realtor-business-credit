@@ -82,7 +82,7 @@ const App = () => (
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/sms-opt-in" element={<SmsOptInProofPage />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
-          <Route path="/mock-login" element={<MockLoginPage />} />
+          <Route path="/login" element={<MockLoginPage />} />
           <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />

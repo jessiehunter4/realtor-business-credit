@@ -29,7 +29,7 @@ export default function PortalPlanView() {
       if (!id) return;
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
-        navigate(`/mock-login?next=${encodeURIComponent(location.pathname)}`, { replace: true });
+        navigate(`/login?next=${encodeURIComponent(location.pathname)}`, { replace: true });
         return;
       }
       const { data, error: fetchError } = await supabase

@@ -171,7 +171,7 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/mock-login" className="text-primary underline underline-offset-4">
+            <Link to="/login" className="text-primary underline underline-offset-4">
               Log in
             </Link>
           </p>
