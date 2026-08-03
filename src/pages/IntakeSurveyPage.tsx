@@ -127,6 +127,8 @@ interface SurveyData {
   // B — Goals (multi-select, top 3 each)
   primary_goals?: string[];
   financial_pains?: string[];
+  primary_goals_other?: string;
+  financial_pains_other?: string;
   goals_notes?: string;
   // C
   has_business_entity?: string;
@@ -402,6 +404,9 @@ export default function IntakeSurveyPage() {
     }
     if (!form.primary_goals || form.primary_goals.length < 1) {
       return { ok: false, step: 1, message: "Pick at least one primary goal." };
+    }
+    if (form.primary_goals.includes("Other") && !form.primary_goals_other?.trim()) {
+      return { ok: false, step: 1, message: "Please describe your other primary goal." };
     }
     return { ok: true };
   };
@@ -899,6 +904,18 @@ export default function IntakeSurveyPage() {
                     );
                   })}
                 </div>
+                {(form.primary_goals || []).includes("Other") && (
+                  <div className="pt-2 space-y-1">
+                    <Label htmlFor="primary_goals_other" className="text-sm">Tell us about your other goal <span className="text-red-600">*</span></Label>
+                    <Textarea
+                      id="primary_goals_other"
+                      value={form.primary_goals_other || ""}
+                      onChange={e => updateField("primary_goals_other", e.target.value)}
+                      rows={2}
+                      placeholder="Describe the goal that matters most to you."
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -923,6 +940,18 @@ export default function IntakeSurveyPage() {
                     );
                   })}
                 </div>
+                {(form.financial_pains || []).includes("Other") && (
+                  <div className="pt-2 space-y-1">
+                    <Label htmlFor="financial_pains_other" className="text-sm">Tell us about your other pain point</Label>
+                    <Textarea
+                      id="financial_pains_other"
+                      value={form.financial_pains_other || ""}
+                      onChange={e => updateField("financial_pains_other", e.target.value)}
+                      rows={2}
+                      placeholder="Describe what's holding you back right now."
+                    />
+                  </div>
+                )}
               </div>
 
               <GoalStatement

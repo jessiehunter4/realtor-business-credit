@@ -420,6 +420,7 @@ export type Database = {
           entity_type: string | null
           filled_by: string
           financial_pains: string[]
+          financial_pains_other: string | null
           first_name: string | null
           full_name: string | null
           funding_gap_methods: string[] | null
@@ -445,6 +446,7 @@ export type Database = {
           preferred_cohort_time_2: string | null
           preferred_support_format: string | null
           primary_goals: string[]
+          primary_goals_other: string | null
           sides_closed_last_12_months: string | null
           state: string | null
           status: string
@@ -476,6 +478,7 @@ export type Database = {
           entity_type?: string | null
           filled_by?: string
           financial_pains?: string[]
+          financial_pains_other?: string | null
           first_name?: string | null
           full_name?: string | null
           funding_gap_methods?: string[] | null
@@ -501,6 +504,7 @@ export type Database = {
           preferred_cohort_time_2?: string | null
           preferred_support_format?: string | null
           primary_goals?: string[]
+          primary_goals_other?: string | null
           sides_closed_last_12_months?: string | null
           state?: string | null
           status?: string
@@ -532,6 +536,7 @@ export type Database = {
           entity_type?: string | null
           filled_by?: string
           financial_pains?: string[]
+          financial_pains_other?: string | null
           first_name?: string | null
           full_name?: string | null
           funding_gap_methods?: string[] | null
@@ -557,6 +562,7 @@ export type Database = {
           preferred_cohort_time_2?: string | null
           preferred_support_format?: string | null
           primary_goals?: string[]
+          primary_goals_other?: string | null
           sides_closed_last_12_months?: string | null
           state?: string | null
           status?: string
