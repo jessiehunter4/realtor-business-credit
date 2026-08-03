@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LandingWithAvatarPage from "./pages/LandingWithAvatarPage";
 import GuidePage from "./pages/GuidePage";
@@ -83,6 +83,7 @@ const App = () => (
           <Route path="/sms-opt-in" element={<SmsOptInProofPage />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/login" element={<MockLoginPage />} />
+          <Route path="/mock-login" element={<Navigate to="/login" replace />} />
           <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
