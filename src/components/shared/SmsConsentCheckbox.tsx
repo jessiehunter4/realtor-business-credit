@@ -11,13 +11,9 @@ interface SmsConsentCheckboxProps {
 }
 
 /**
- * Separate, specific, unchecked-by-default SMS consent. Rendered only after a
- * mobile number is present so the ask stays frictionless.
+ * Separate, specific, unchecked-by-default SMS consent. Always visible.
  */
 const SmsConsentCheckbox = ({ phone, checked, onCheckedChange, id = "smsConsent" }: SmsConsentCheckboxProps) => {
-  const digits = (phone || "").replace(/\D/g, "");
-  if (digits.length < 10) return null;
-
   return (
     <div className="flex items-start space-x-3">
       <Checkbox id={id} checked={checked} onCheckedChange={(c) => onCheckedChange(c === true)} />
