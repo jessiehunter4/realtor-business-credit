@@ -78,7 +78,7 @@ const GuidePage = () => {
   // Persist the slug alongside identity so later funnel steps can reference it.
   useEffect(() => {
     if (parsedSlug.isValid) {
-      mergeContactIdentity({ slug: parsedSlug.raw } as Record<string, string>);
+      mergeContactIdentity({ slug: parsedSlug.raw });
     }
   }, [parsedSlug]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
