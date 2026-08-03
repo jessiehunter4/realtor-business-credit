@@ -49,7 +49,7 @@ export default function SignupPage() {
       toast.error("Please agree to the Terms of Use and Privacy Policy.");
       return;
     }
-    if (phone && phone.length !== 10) {
+    if (phone.length !== 10) {
       toast.error("Enter a valid 10-digit mobile number.");
       return;
     }
