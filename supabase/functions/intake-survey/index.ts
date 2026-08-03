@@ -16,6 +16,7 @@ const EDITABLE_SURVEY_FIELDS = [
   "business_zip",
   "business_phone",
   "license_type",
+  "license_type_other",
   "years_in_real_estate",
   "gci_last_12_months",
   "sides_closed_last_12_months",
