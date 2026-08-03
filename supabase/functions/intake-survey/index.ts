@@ -22,6 +22,8 @@ const EDITABLE_SURVEY_FIELDS = [
   "sides_closed_last_12_months",
   "primary_goals",
   "financial_pains",
+  "primary_goals_other",
+  "financial_pains_other",
   "draft_email",
   "first_name",
   "last_name",
