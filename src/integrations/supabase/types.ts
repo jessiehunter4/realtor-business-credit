@@ -437,6 +437,7 @@ export type Database = {
           last_name: string | null
           lead_id: string | null
           license_type: string | null
+          license_type_other: string | null
           personal_credit_score_range: string | null
           personal_guarantee_comfort: string | null
           preferred_cohort_days: string | null
@@ -492,6 +493,7 @@ export type Database = {
           last_name?: string | null
           lead_id?: string | null
           license_type?: string | null
+          license_type_other?: string | null
           personal_credit_score_range?: string | null
           personal_guarantee_comfort?: string | null
           preferred_cohort_days?: string | null
@@ -547,6 +549,7 @@ export type Database = {
           last_name?: string | null
           lead_id?: string | null
           license_type?: string | null
+          license_type_other?: string | null
           personal_credit_score_range?: string | null
           personal_guarantee_comfort?: string | null
           preferred_cohort_days?: string | null
