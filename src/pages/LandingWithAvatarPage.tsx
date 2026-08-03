@@ -5,26 +5,11 @@ import AvatarHeroSection from "@/components/landing-avatar/AvatarHeroSection";
 import ThreeStepSection from "@/components/landing-avatar/ThreeStepSection";
 import AvatarFinalCTA from "@/components/landing-avatar/AvatarFinalCTA";
 import Seo from "@/components/shared/Seo";
-
-const cleanVisitorName = (slug?: string) => {
-  if (!slug) return "";
-
-  const decoded = decodeURIComponent(slug)
-    .replace(/[+_-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (!decoded) return "";
-
-  return decoded
-    .split(" ")
-    .map((part) => (part.length > 1 ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part.toUpperCase()))
-    .join(" ");
-};
+import { parseVisitorSlug } from "@/lib/visitorSlug";
 
 const LandingWithAvatarPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const visitorName = cleanVisitorName(slug);
+  const visitorName = parseVisitorSlug(slug).displayName;
 
   return (
     <div className="min-h-screen bg-background">
