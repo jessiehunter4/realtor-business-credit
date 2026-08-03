@@ -1,96 +1,63 @@
-# Personalized Dashboard with Interactive Workflow Integration
+# Personalized Guide URLs: `/guide/:slug`
 
-## Current state (verified)
+Give every visitor a personal entry point to the free guide, e.g. `reprobusinesscredit.com/guide/jp-eltanal`. The slug is the only personalization source for now — no database or CRM lookup. The existing `/guide` page keeps working exactly as it does today.
 
-- `src/pages/DashboardPage.tsx` (163 lines) renders: greeting, `PlanHeroCard`, a 3-card KPI strip, a single "Next action" card, and `MessagePreferencesCard`. It is mostly informational.
-- `src/hooks/useDashboardData.ts` loads `profiles`, the latest **published** `custom_plans` row for `user_id`, and all `plan_task_progress` rows for that plan. It does **not** load the `intake_surveys` row.
-- Tasks only exist in `plan_task_progress` **after** the user checks a box in `src/components/plan/PlanTaskChecklist.tsx` — rows are created lazily on toggle, keyed `action_{step}_{slug}`. So a brand-new user has `tasks = []` and the dashboard shows `0/—` and no next action. This is the core gap.
-- Plan content lives in `custom_plans.plan_data.sections`: `goals_snapshot`, `fundability.items[{label,status:strong|warning|missing,detail}]`, `action_plan_90day.items[{step,text,effort}]`, `roadmap.milestones`, `funding_opportunities`, `next_steps`.
-- `supabase/functions/generate-plan/index.ts` already contains a deterministic `computeFundabilityItems(survey)` rule function (entity, EIN, bank, address, phone, email, website, accounting, cards, tradelines, bureaus) that produces the strong/warning/missing statuses. The 90-day action items themselves are AI-generated, so their wording varies per user.
-- Task states today are boolean only (`completed`); there is no "in progress".
+## What the visitor experiences
 
-## Architecture
+- Landing on `/guide/john-paul` shows the same guide, with the name woven into the top of the page: a short greeting above the title ("Welcome, John Paul — this guide was put together for real estate pros like you") and a personalized line on the opt-in gate and the closing CTA.
+- If the slug looks like a real name, we use it. If it looks like junk (numbers, gibberish, too long, encoded tracking ids), the page silently falls back to the normal non-personalized guide — never an error page, never a broken greeting.
+- Everything downstream is unchanged: Guide -> Start Here -> Lead Form -> Intake -> Plan -> Account -> Dashboard. Existing `?contactId=` / `rbc_contact` identity handling continues to take priority over the slug when present.
 
-```text
-intake_surveys ──┐
-                 ├─► rule engine (shared, deterministic) ─► Roadmap[]
-custom_plans ────┘        (canonical task catalog)          │
-plan_task_progress ───────────────────────────────────────► merged status
-                                                            │
-                                    ┌───────────────────────┴──────────────┐
-                                    ▼                                      ▼
-                            Dashboard UI                        funnel_events → GHL
-                        (progress, next action)               (email/SMS workflows)
-```
+## Technical plan
 
-### 1. Canonical task catalog + rule engine
+### 1. Routing
 
-New `src/lib/roadmap/` module (pure TS, no I/O, unit-testable):
+- In `src/App.tsx`, add `<Route path="/guide/:slug" element={<GuidePage />} />` directly after the existing `/guide` route. React Router v6 ranks the static `/guide` above the dynamic child, so there is no conflict; `/guide` alone still renders the unpersonalized page.
+- No other route uses a `/guide/*` prefix, so there is no collision with `/sample-plan`, `/landing-page/:slug`, or the catch-all `*`.
 
-- `taskCatalog.ts` — a fixed, ordered catalog of ~16 canonical tasks with stable `task_key`s that never change wording (e.g. `entity_formed`, `ein_obtained`, `business_bank_account`, `business_address`, `business_phone_listed`, `business_email_domain`, `business_website`, `accounting_software`, `duns_registered`, `experian_profile`, `equifax_profile`, `vendor_tradelines_3`, `starter_business_card`, `expenses_off_personal`, `utilization_under_30`, `higher_limit_card_or_loc`). Each entry carries: title, short explanation, phase (`foundation` → `credibility` → `bureaus` → `tradelines` → `funding`), base priority, `dependsOn: string[]`, estimated effort, and an optional action link/label (e.g. D&B registration, `/guide#chapter-x`, `/pricing`).
-- `rules.ts` — `deriveRoadmap(survey, planData, progressRows) => RoadmapTask[]`. Logic:
-  1. Seed every catalog task as `not_started`.
-  2. Apply **intake-derived auto-completion**, mirroring the existing `computeFundabilityItems` mapping so the dashboard and the plan never disagree: `strong` → `completed (source: intake)`, `warning` → `in_progress`, `missing` → `not_started`.
-  3. Apply **skip rules**: if the survey shows established business credit (EIN-only cards + 3+ reporting tradelines + a bureau profile), suppress introductory foundation tasks from the active list and file them under "Already in place".
-  4. Apply **user progress overlay**: any `plan_task_progress` row wins over the intake inference (explicit user action is authoritative).
-  5. Apply **dependency gating**: a task whose `dependsOn` are not all completed is marked `blocked` and cannot become the highlighted next action.
-  6. Compute effective priority = phase order → base priority → intake pain signals (`financial_pains`, `primary_goals` boost matching tasks, e.g. "money between closings" boosts LOC/tradeline tasks).
-  7. Dedupe: AI-generated `action_plan_90day` items are matched to catalog tasks via a keyword map; unmatched AI items are appended as `custom` tasks (`custom_{n}`) rather than duplicated.
-- Output type: `{ task_key, title, explanation, status, priority, phase, blocked, nextAction, actionHref?, source: 'intake'|'plan'|'user' }`.
+### 2. Slug parsing helper
 
-Because the rules are deterministic and shared, two users with different intake answers get materially different dashboards while the logic stays standardized.
+- New `src/lib/visitorSlug.ts` exporting `parseVisitorSlug(slug?: string): { raw: string; displayName: string; isValid: boolean }`.
+- Validation: decode URI, trim; accept only letters, spaces, hyphens, underscores, plus signs and apostrophes; reject empty, length over 60, more than 4 words, or anything containing digits.
+- `displayName`: replace `-`/`_`/`+` with spaces, collapse whitespace, title-case each word.
+- This centralizes logic currently inlined in `LandingWithAvatarPage.tsx`; that page is refactored to import the same helper so both personalized entry points behave identically.
 
-### 2. Data layer changes
+### 3. Guide page personalization
 
-- Extend `useDashboardData` to also fetch the user's `intake_surveys` row (`user_id = uid`, latest by `created_at`), and expose `roadmap` from `deriveRoadmap(...)` plus derived metrics.
-- **Materialization**: on first dashboard load after a plan is published, upsert one `plan_task_progress` row per derived task (idempotent `onConflict: plan_id,task_key`) so tasks exist for workflow queries even before the user interacts. Rows carry `task_key`, `task_label`, and completion.
-- **Schema migration** (`plan_task_progress`): add `status text not null default 'not_started'` (`not_started|in_progress|completed`), `priority int`, `phase text`, `source text`, `snoozed_until timestamptz`. Keep the existing `completed` boolean in sync via a trigger so `PlanTaskChecklist.tsx` and `PortalPlanView` keep working unchanged. RLS: reuse the existing owner-scoped policies; add GRANTs only if new columns require none (they don't).
-- Migrate `PlanTaskChecklist.tsx`'s ad-hoc `action_{step}_{slug}` keys by having the roadmap matcher recognize legacy keys and re-map them once, so already-checked users don't lose progress.
+- `src/pages/GuidePage.tsx` reads `useParams<{ slug?: string }>()` and calls `parseVisitorSlug`.
+- Name precedence: `firstName` from `useContactIdentity()` (URL param or stored identity) first, then the slug's `displayName`, then nothing.
+- Pass the resulting `visitorName` into:
+  - `GuideCover` — optional greeting line above the H1, rendered only when a name exists so the default layout is untouched.
+  - `GuideOptInGate` — personalized heading, and the first-name field pre-filled from the slug (still editable, still required).
+  - `FloatingPlanCTA` / final CTA copy — optional name interpolation.
+  - Reserved for HeyGen: the same `visitorName` is what a future avatar greeting variable consumes, so no extra plumbing is needed later.
+- SEO: keep `Seo` `path` as `/guide`, emit a canonical to `/guide`, and add `noindex` on slug variants so personalized URLs do not fragment search indexing.
 
-### 3. Dashboard information architecture (top → bottom)
+### 4. Analytics and identity continuity
 
-1. **Header row** — greeting, welcome video, log out (unchanged).
-2. **Priority card (hero)** — the single highest-priority unblocked incomplete task: title, why it matters (1–2 lines), effort, primary action button, "Mark in progress" / "Mark complete" controls. Replaces today's thin "Next action" card and moves to the top.
-3. **Progress strip** — overall completion %, completed vs. remaining, current phase (Foundation / Credibility / Bureaus / Tradelines / Funding), milestones achieved (from `roadmap.milestones` mapped to phase completion).
-4. **Roadmap checklist** — tasks grouped by phase, each row: status chip, title, priority badge, explanation, action link, status control. Collapsed groups for completed and blocked tasks ("Already in place — 6 items").
-5. **Plan card** — `PlanHeroCard` demoted below the roadmap; links to the full plan document and PDF.
-6. **Recommended program** — from `recommended_program_slug`, with a link to `/pricing`.
-7. **Message preferences** — unchanged.
-8. **Empty state** — if no published plan: a focused "Finish your Needs Analysis" card linking to `/intake`, with no fake zero metrics.
+- When a valid slug is present, merge `{ slug }` into stored identity via `mergeContactIdentity` so later steps can reference where the visitor came from.
+- Include `slug` in the metadata of the existing `guide_view` funnel event. No new event types, no edge-function changes.
 
-### 4. Progress metrics
+### 5. Fallback behavior
 
-Computed in the hook, never stored denormalized:
-- `overallPct` = completed / (total − skipped)
-- completed vs. remaining counts
-- phase completion (drives the "current implementation stage" label)
-- milestones achieved = phases fully complete
-All recompute on every status change; optimistic UI update then upsert, with rollback + toast on failure (same pattern already used in `PlanTaskChecklist`).
+| Case | Behavior |
+| --- | --- |
+| `/guide` (no slug) | Current page, no greeting |
+| Malformed / numeric / overlong slug | Guide renders normally, greeting suppressed |
+| Unsupported characters | Same as malformed — suppressed, no error |
+| Slug present but visitor already identified | Stored `firstName` wins |
 
-### 5. Workflow integration (email/SMS)
+No redirects and no 404s — a bad slug degrades to the standard guide.
 
-- New shared helper `src/lib/roadmap/events.ts` calls the existing `log-funnel-event` function on: `dashboard_viewed`, `task_started`, `task_completed`, `phase_completed`, `roadmap_completed`, each with `{ task_key, phase, priority, next_task_key }`.
-- New edge function `sync-roadmap-state` (called after any status change, fire-and-forget): pushes the user's current `next_task_key`, `phase`, and `completion_pct` to GHL as contact custom fields, then applies tags via a **separate** API call (per the established upsert-then-tag rule) — e.g. `RBC_Task_business_website`, `RBC_Phase_Bureaus`. GHL workflows key off those tags/fields so reminder emails and SMS always reinforce exactly the task the dashboard is showing.
-- Because both surfaces read from the same derived `next_task_key`, completing a task on the dashboard automatically advances the workflow on the next sync — no parallel content model.
-- SMS sends remain gated on the existing `sms_eligible` / consent flags; email-only contacts get email reminders only.
+### 6. Future EveryCatch readiness
 
-### 6. Responsive design
+No URL change will be needed. When EveryCatch is wired up, a slug is generated per MLS lead, stored in a custom field, and sent via email/SMS as `/guide/{{contact.rbc_slug}}`. At that point the only addition is an optional lookup that resolves the slug to a contact record; the parsing helper, the `visitorName` prop chain, and the fallback path stay as-is. Links can also keep carrying `?contactId=` alongside the slug, which the existing identity hook already handles.
 
-- Mobile: single column; priority card full-width and sticky-adjacent to the top; phase groups as accordions; status control becomes a tap-through action sheet.
-- ≥`sm`: two-column metrics; ≥`lg`: three-column metrics with the roadmap full width below.
-- All colors via existing semantic tokens (navy/green/amber design system) — no hardcoded color utilities.
+## Phases
 
-## Implementation phases
-
-- **Phase 1 — Rules foundation:** `src/lib/roadmap/` catalog + `deriveRoadmap` + unit tests against several synthetic intake profiles (no-entity beginner, mid-stage, already-funded). No UI change.
-- **Phase 2 — Data:** migration for `plan_task_progress` status columns + sync trigger; extend `useDashboardData` with survey fetch, roadmap derivation, and idempotent materialization; legacy key remap.
-- **Phase 3 — Dashboard UI:** new components `PriorityTaskCard`, `ProgressSummary`, `RoadmapChecklist`, `RoadmapTaskRow`, `PhaseGroup`; restructure `DashboardPage.tsx`; empty state.
-- **Phase 4 — Status transitions:** in-progress/complete controls, optimistic updates, funnel event logging.
-- **Phase 5 — Workflow sync:** `sync-roadmap-state` edge function + GHL field/tag mapping; admin visibility of a user's roadmap state in the coach view.
-
-Dependencies: Phase 2 requires Phase 1's task keys to be final (they become database identifiers). Phase 5 requires Phase 4's events. Phases 3 and 4 can be built together.
-
-## Technical notes
-
-- The rule engine is duplicated conceptually with `computeFundabilityItems` in the edge function; Phase 1 should extract the shared mapping into `supabase/functions/_shared/` and have the client module import an identical copy, so plan generation and the dashboard can never drift.
-- No changes to `PlanDocument.tsx` / `PlanPDF.tsx` output; the plan stays the document, the dashboard becomes the workspace.
+1. Add `src/lib/visitorSlug.ts` with parser sanity checks.
+2. Add the route in `App.tsx`; verify `/guide` and `/guide/x` both render.
+3. Thread `visitorName` through `GuidePage`, `GuideCover`, and `GuideOptInGate`.
+4. Refactor `LandingWithAvatarPage` onto the shared helper.
+5. Add canonical/noindex handling and slug metadata on `guide_view`.
+6. Manual pass: valid slug, malformed slug, no slug, slug + existing `contactId`, and the full flow through to intake.
