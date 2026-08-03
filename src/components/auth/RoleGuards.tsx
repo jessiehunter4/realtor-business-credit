@@ -21,7 +21,7 @@ export function RequireRole({
   const location = useLocation();
   if (loading) return <Spinner />;
   if (!session) {
-    return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   }
   if (!role || !roles.includes(role)) return <Navigate to="/unauthorized" replace />;
   return <>{children ?? <Outlet />}</>;
@@ -31,7 +31,7 @@ export function RequireAuth({ children }: { children?: React.ReactNode }) {
   const { session, loading } = useAuthRole();
   const location = useLocation();
   if (loading) return <Spinner />;
-  if (!session) return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
+  if (!session) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   return <>{children ?? <Outlet />}</>;
 }
 
@@ -43,7 +43,7 @@ export function RequireVisitor({ children }: { children?: React.ReactNode }) {
   const { session, role, loading } = useAuthRole();
   const location = useLocation();
   if (loading) return <Spinner />;
-  if (!session) return <Navigate to={`/mock-login?next=${encodeURIComponent(location.pathname)}`} replace />;
+  if (!session) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   // Roles with their own home (e.g. admin) are sent there instead of the
   // visitor dashboard.
   if (role && role !== "user") return <Navigate to={homeForRole(role)} replace />;

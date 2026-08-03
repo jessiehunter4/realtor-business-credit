@@ -46,7 +46,7 @@ export default function OAuthConsentPage() {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
         const next = window.location.pathname + window.location.search;
-        window.location.href = "/mock-login?next=" + encodeURIComponent(next);
+        window.location.href = "/login?next=" + encodeURIComponent(next);
         return;
       }
       setUserEmail(sess.session.user.email ?? null);

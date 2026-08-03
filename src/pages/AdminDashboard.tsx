@@ -194,7 +194,7 @@ export default function AdminDashboard() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/mock-login?next=%2Fadmin");
+        navigate("/login?next=%2Fadmin");
         return;
       }
       setUser(user);
@@ -493,7 +493,7 @@ export default function AdminDashboard() {
     if (error) toast.error("Error signing out");
     else {
       toast.success("Signed out successfully");
-      navigate("/mock-login");
+      navigate("/login");
     }
   };
 

@@ -1,4 +1,4 @@
-// Visitor login page (real Supabase auth). Kept at /mock-login for URL stability.
+// Visitor login page (real Supabase auth).
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
