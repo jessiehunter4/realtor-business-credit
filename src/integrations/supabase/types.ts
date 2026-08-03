@@ -713,6 +713,57 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string | null
+          customer_id: string | null
+          email: string | null
+          id: string
+          metadata: Json | null
+          payment_intent: string | null
+          price_id: string | null
+          product: string | null
+          status: string
+          stripe_session_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_intent?: string | null
+          price_id?: string | null
+          product?: string | null
+          status?: string
+          stripe_session_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_intent?: string | null
+          price_id?: string | null
+          product?: string | null
+          status?: string
+          stripe_session_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       plan_task_progress: {
         Row: {
           completed: boolean
@@ -869,6 +920,48 @@ export type Database = {
           sort_order?: number
           tagline?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          payment_intent: string | null
+          price_id: string | null
+          product: string
+          purchased_at: string
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          payment_intent?: string | null
+          price_id?: string | null
+          product: string
+          purchased_at?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          payment_intent?: string | null
+          price_id?: string | null
+          product?: string
+          purchased_at?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
