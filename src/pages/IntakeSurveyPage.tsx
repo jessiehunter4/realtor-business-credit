@@ -120,6 +120,7 @@ interface SurveyData {
   business_zip?: string;
   business_phone?: string;
   license_type?: string;
+  license_type_other?: string;
   years_in_real_estate?: string;
   gci_last_12_months?: string;
   sides_closed_last_12_months?: string;
