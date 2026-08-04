@@ -999,7 +999,7 @@ export default function IntakeSurveyPage() {
               <div className="space-y-2">
                 <Label>Do you have a separate business address (non P.O. Box)?</Label>
                 <RadioGroup value={form.has_business_address || ""} onValueChange={v => updateField("has_business_address", v)}>
-                  {["Physical office", "Virtual office", "Home address", "No / Other"].map(opt => (
+                  {["Physical office", "Virtual office", "Home address", "No"].map(opt => (
                     <div key={opt} className="flex items-center space-x-2">
                       <RadioGroupItem value={opt} id={`ba-${opt}`} />
                       <Label htmlFor={`ba-${opt}`} className="font-normal">{opt}</Label>
