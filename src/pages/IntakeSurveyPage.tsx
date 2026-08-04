@@ -838,12 +838,18 @@ export default function IntakeSurveyPage() {
                   ))}
                 </RadioGroup>
                 {form.license_type === "Other" && (
-                  <Input
-                    value={form.license_type_other || ""}
-                    onChange={e => updateField("license_type_other", e.target.value)}
-                    placeholder="Please describe your license type"
-                    maxLength={120}
-                  />
+                  <div className="pl-6 space-y-1">
+                    <Label htmlFor="license_type_other" className="text-sm">
+                      Please specify your license type <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="license_type_other"
+                      value={form.license_type_other || ""}
+                      onChange={e => updateField("license_type_other", e.target.value)}
+                      placeholder="e.g. Associate Broker, Team Lead, Referral Agent"
+                      maxLength={120}
+                    />
+                  </div>
                 )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
