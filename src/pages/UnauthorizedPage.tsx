@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { signOutAndClear } from "@/lib/signOut";
 import { useAuthRole } from "@/hooks/useAuthRole";
 import { homeForRole } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
@@ -26,8 +26,7 @@ export default function UnauthorizedPage() {
             variant="outline"
             className="w-full rounded-full"
             onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/";
+              await signOutAndClear({ redirectTo: "/" });
             }}
           >
             Sign out
