@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { supabase } from "@/integrations/supabase/client";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
