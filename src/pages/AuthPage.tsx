@@ -125,6 +125,7 @@ export default function AuthPage() {
         options: {
           emailRedirectTo: `${window.location.origin}${next ?? "/admin"}`,
           data: {
+            requested_role: "admin",
             terms_accepted: "true",
             terms_consent_text: TERMS_CONSENT_TEXT,
           }
@@ -145,21 +146,22 @@ export default function AuthPage() {
         return;
       }
 
-      const { data: result, error: fnError } = await supabase.functions.invoke(
-        "assign-admin-role",
-        { body: {} },
-      );
-
-      if (fnError || !result || (result as { error?: string }).error) {
-        toast.error("Account created, but admin access could not be granted.");
-        await refresh();
-        navigate("/dashboard", { replace: true });
-        return;
-      }
-
-      toast.success("Admin account created.");
+      // The database assigns exactly one role at signup; route on the stored role.
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.session.user.id);
+      const isAdmin = !!roles?.some((r) => r.role === "admin");
       await refresh();
-      navigate("/admin", { replace: true });
+      if (isAdmin) {
+        toast.success("Admin account created.");
+        navigate("/admin", { replace: true });
+      } else {
+        toast.error(
+          "Account created as a standard user. An existing administrator must grant admin access.",
+        );
+        navigate("/dashboard", { replace: true });
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
