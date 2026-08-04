@@ -271,20 +271,7 @@ export default function PlanPDF({
       </Page>
 
       <Page size="LETTER" style={s.page}>
-        {/* Running header */}
-        <View style={s.runningHeader} fixed>
-          <Text style={s.runningHeaderBrand}>RE Pro Business Credit Plan</Text>
-          <Text>{planData.contact_name || "Agent"}</Text>
-        </View>
-
-        {/* Page footer with page numbers */}
-        <View style={s.pageFooter} fixed>
-          <Text style={s.footerText}>© 2026 RealtorBusinessCredit.com</Text>
-          <Text
-            style={s.pageNumber}
-            render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
-          />
-        </View>
+        <Chrome name={planData.contact_name || "Agent"} />
 
         {/* Header band */}
         <View style={s.header}>
@@ -312,28 +299,29 @@ export default function PlanPDF({
         <Text style={s.sectionEyebrow}>Section 01</Text>
         <Text style={s.sectionTitle}>Your Goals & Snapshot</Text>
         {goalsList.map((g, i) => {
-          const isPrimary = g.priority === "primary";
+          const isPrimary = i === 0;
           return (
             <View key={i} style={[s.goalCard, isPrimary ? s.goalCardPrimary : {}]} wrap={false}>
               <View style={s.goalHeader}>
                 <Text style={[s.goalBadge, isPrimary ? {} : s.goalBadgeSecondary]}>
                   {isPrimary ? "Primary Goal" : `Goal ${i + 1}`}
                 </Text>
-                <Text style={s.goalLabel}>{g.label}</Text>
+                <Text style={s.goalLabel}>{g.title}</Text>
               </View>
-              {(g.horizon || g.target_amount) ? (
-                <Text style={s.goalMeta}>
-                  {g.horizon ? `Horizon: ${g.horizon}` : ""}
-                  {g.horizon && g.target_amount ? " · " : ""}
-                  {g.target_amount ? `Target: ${g.target_amount}` : ""}
-                </Text>
-              ) : null}
-              {g.why_it_matters ? <Text style={s.goalWhy}>{g.why_it_matters}</Text> : null}
+              <Text style={s.goalMeta}>
+                {[g.meta, progressLabel(g.status), g.custom ? "Added by you" : null]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </Text>
+              {g.detail ? <Text style={s.goalWhy}>{g.detail}</Text> : null}
             </View>
           );
         })}
         <Text style={s.narrative}>{goalsNarrative}</Text>
+      </Page>
 
+      <Page size="LETTER" style={s.page}>
+        <Chrome name={planData.contact_name || "Agent"} />
         {/* Section 2 */}
         <Text style={s.sectionEyebrow}>Section 02</Text>
         <Text style={s.sectionTitle}>Business Structure & Fundability</Text>
@@ -347,7 +335,10 @@ export default function PlanPDF({
           </View>
         ))}
         <Text style={[s.narrative, { marginTop: 8 }]}>{fundabilityNarrative}</Text>
+      </Page>
 
+      <Page size="LETTER" style={s.page}>
+        <Chrome name={planData.contact_name || "Agent"} />
         {/* Section 3 */}
         <Text style={s.sectionEyebrow}>Section 03</Text>
         <Text style={s.sectionTitle}>90-Day Action Plan</Text>
@@ -358,24 +349,37 @@ export default function PlanPDF({
           <View key={i} style={s.actionRow} wrap={false}>
             <View style={s.actionCheckbox} />
             <View style={s.actionBadge}>
-              <Text style={s.actionNum}>{item.step}</Text>
+              <Text style={s.actionNum}>{i + 1}</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={s.actionText}>{item.text}</Text>
-              <Text style={s.actionEffort}>Est. effort: {item.effort}</Text>
+              <Text style={s.actionText}>{item.title}</Text>
+              <Text style={s.actionEffort}>
+                {[item.meta, progressLabel(item.status), item.custom ? "Added by you" : null]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </Text>
+              {item.detail ? <Text style={s.actionEffort}>{item.detail}</Text> : null}
             </View>
           </View>
         ))}
+      </Page>
 
+      <Page size="LETTER" style={s.page}>
+        <Chrome name={planData.contact_name || "Agent"} />
         {/* Section 4 */}
         <Text style={s.sectionEyebrow}>Section 04</Text>
         <Text style={s.sectionTitle}>6–12 Month Roadmap</Text>
         {milestones.map((m, i) => (
           <View key={i} style={s.milestoneRow} wrap={false}>
             <View style={s.milestoneBadge}>
-              <Text style={s.milestoneMonth}>{m.month}</Text>
+              <Text style={s.milestoneMonth}>{m.meta || `#${i + 1}`}</Text>
             </View>
-            <Text style={s.milestoneDesc}>{m.description}</Text>
+            <Text style={s.milestoneDesc}>
+              {m.title}
+              {"\n"}
+              {progressLabel(m.status)}
+              {m.custom ? " · Added by you" : ""}
+            </Text>
           </View>
         ))}
 
@@ -384,14 +388,17 @@ export default function PlanPDF({
         <Text style={s.sectionTitle}>Credit & Funding Opportunities</Text>
         {fundingItems.map((f, i) => (
           <View key={i} style={s.fundingItem} wrap={false}>
-            <Text style={s.fundingType}>{f.type}</Text>
-            <Text style={s.fundingDesc}>{f.description}</Text>
+            <Text style={s.fundingType}>{f.title}</Text>
+            <Text style={s.fundingDesc}>{f.detail}</Text>
           </View>
         ))}
         <Text style={s.disclaimer}>
           This is educational information, not a guarantee of approval or specific terms. Consult your attorney, CPA, and financial advisor.
         </Text>
+      </Page>
 
+      <Page size="LETTER" style={s.page}>
+        <Chrome name={planData.contact_name || "Agent"} />
         {/* Section 6 */}
         <Text style={s.sectionEyebrow}>Section 06</Text>
         <Text style={s.sectionTitle}>Program Options & Next Steps</Text>
