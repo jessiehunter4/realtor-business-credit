@@ -27,6 +27,7 @@ import TermsPage from "./pages/TermsPage";
 import SmsOptInProofPage from "./pages/SmsOptInProofPage";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SignupPage from "./pages/SignupPage";
 import AdminSignupPage from "./pages/AdminSignupPage";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
