@@ -182,7 +182,7 @@ export default function AdminIntakeCoachView() {
     setSaving(true);
     const editableKeys: (keyof IntakeSurvey)[] = [
       "contact_name", "contact_email", "brokerage_name", "city", "state",
-      "license_type", "years_in_real_estate", "gci_last_12_months",
+      "license_type", "license_type_other", "years_in_real_estate", "gci_last_12_months",
       "has_business_entity", "entity_type",
       "primary_goals", "financial_pains", "goals_notes",
       "has_business_address", "address_type", "has_business_phone",
