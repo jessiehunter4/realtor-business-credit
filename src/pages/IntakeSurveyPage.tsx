@@ -20,6 +20,8 @@ import PlanPreviewCard from "@/components/intake/PlanPreviewCard";
 import PlanGenerationLoader from "@/components/intake/PlanGenerationLoader";
 import PlanSuccessCelebration from "@/components/intake/PlanSuccessCelebration";
 import PostPlanAuthCard from "@/components/intake/PostPlanAuthCard";
+import AuthedPlanHandoff from "@/components/intake/AuthedPlanHandoff";
+import { useAuthRole } from "@/hooks/useAuthRole";
 import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
@@ -166,6 +168,7 @@ function IntakeSurveyForm() {
   const navigate = useNavigate();
   const { contactId, email: identityEmail, firstName, lastName, leadId } = useContactIdentity();
   const { toast } = useToast();
+  const { session, loading: authLoading } = useAuthRole();
   const mountLogged = useRef(false);
   const mountTime = useRef(Date.now());
 
@@ -604,6 +607,34 @@ function IntakeSurveyForm() {
       navigate(`/dashboard?firstLogin=1`);
     };
 
+    const hasIntakeRefs = Boolean(intakeId && intakeToken);
+    const guestAuthCard =
+      hasIntakeRefs && form.contact_email ? (
+        <PostPlanAuthCard
+          intakeId={intakeId!}
+          accessToken={intakeToken!}
+          defaultEmail={form.contact_email}
+          firstName={form.first_name}
+          lastName={form.last_name}
+          phone={form.business_phone}
+          onAuthenticated={goToPortal}
+        />
+      ) : null;
+
+    const isSignedIn = Boolean(session);
+    const successFooter = authLoading
+      ? null
+      : isSignedIn && hasIntakeRefs
+        ? (
+          <AuthedPlanHandoff
+            intakeId={intakeId!}
+            accessToken={intakeToken!}
+            onContinue={goToPortal}
+            fallback={guestAuthCard}
+          />
+        )
+        : guestAuthCard;
+
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <SiteHeader />
@@ -613,20 +644,12 @@ function IntakeSurveyForm() {
               planId={planState.planId}
               contactEmail={form.contact_email}
               hidePrimary
-              subheading="Create your account below to unlock and save your personalized plan."
-              footer={
-                intakeId && intakeToken && form.contact_email ? (
-                  <PostPlanAuthCard
-                    intakeId={intakeId}
-                    accessToken={intakeToken}
-                    defaultEmail={form.contact_email}
-                    firstName={form.first_name}
-                    lastName={form.last_name}
-                    phone={form.business_phone}
-                    onAuthenticated={goToPortal}
-                  />
-                ) : null
+              subheading={
+                isSignedIn
+                  ? "Your personalized plan has been saved to your account."
+                  : "Create your account below to unlock and save your personalized plan."
               }
+              footer={successFooter}
             />
           ) : planState.status === "generating" ? (
             <PlanGenerationLoader />
