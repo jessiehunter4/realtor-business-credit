@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useToast } from "@/hooks/use-toast";
 import { useRoadmap } from "@/hooks/useRoadmap";
 import { usePlanItems } from "@/hooks/usePlanItems";
 import { useEntitlements } from "@/hooks/useEntitlements";
