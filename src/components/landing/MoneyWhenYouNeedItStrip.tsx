@@ -23,7 +23,7 @@ const MoneyWhenYouNeedItStrip = () => (
     <div className="bg-accent-grad border border-accent/30 rounded-3xl p-6 md:p-10 shadow-card">
       <div className="max-w-3xl mx-auto text-center mb-8">
           <span className="inline-flex items-center gap-1.5 bg-secondary/5 rounded-full px-2 py-0.5 text-[10px] font-medium text-secondary/70 border border-secondary/10">
-            The #1 thing Realtors actually ask for
+            💵 The #1 thing Realtors actually ask for
           </span>
           <h2 className="mt-3 text-3xl md:text-4xl font-bold text-secondary">
             "Money when we need it."
