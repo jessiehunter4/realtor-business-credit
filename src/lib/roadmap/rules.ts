@@ -14,6 +14,8 @@ export interface ProgressRowLike {
   task_label?: string | null;
   completed?: boolean | null;
   status?: string | null;
+  completed_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface PlanDataLike {
@@ -130,6 +132,8 @@ export function deriveRoadmap({ survey, planData, progress }: DeriveRoadmapInput
       blocked: false,
       blockedBy: [],
       priority: 0,
+      completedAt: saved?.completed_at ?? null,
+      updatedAt: saved?.updated_at ?? null,
     };
   });
 
