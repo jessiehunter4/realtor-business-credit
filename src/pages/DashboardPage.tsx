@@ -122,11 +122,17 @@ export default function DashboardPage() {
               task={priorityTask}
               saving={savingKey === priorityTask?.key}
               onStatusChange={setTaskStatus}
+              planId={plan.id}
             />
 
-            <ProgressSummary metrics={metrics} />
+            <ProgressSummary metrics={metrics} planId={plan.id} />
 
-            <RoadmapChecklist tasks={tasks} savingKey={savingKey} onStatusChange={setTaskStatus} />
+            <RoadmapChecklist
+              tasks={tasks}
+              savingKey={savingKey}
+              onStatusChange={setTaskStatus}
+              planId={plan.id}
+            />
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Card>
