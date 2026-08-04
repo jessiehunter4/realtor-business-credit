@@ -66,7 +66,7 @@ export default function PlanActionsBar() {
   }, [plan, planItems]);
 
   const handleRegenerate = useCallback(async () => {
-    const surveyId = survey?.id ?? plan?.intake_survey_id;
+    const surveyId = (survey as { id?: string } | null)?.id ?? plan?.intake_survey_id;
     if (!surveyId) {
       toast.error("We couldn't find your needs analysis to rebuild from.");
       return;
@@ -83,7 +83,7 @@ export default function PlanActionsBar() {
     }
     toast.success("Your plan has been regenerated. Your edits and progress are kept.");
     await refresh();
-  }, [survey?.id, plan?.intake_survey_id, refresh]);
+  }, [survey, plan?.intake_survey_id, refresh]);
 
   if (!plan?.plan_data) return null;
 
