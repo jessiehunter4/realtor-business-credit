@@ -15,9 +15,20 @@ export function TaskHelpBubble({
   const help = task.help;
 
   const sections = [
-    { label: "What this means", body: help?.what ?? task.explanation },
+    {
+      label: "What this means",
+      body:
+        help?.what ??
+        (task.custom
+          ? "This step came from your personalized 90-day plan, based on the answers you gave in your Needs Analysis."
+          : task.explanation),
+    },
     ...(help?.why ? [{ label: "Why it matters", body: help.why }] : []),
-    { label: "What done looks like", body: help?.doneLooksLike ?? task.nextAction },
+    ...(help?.doneLooksLike
+      ? [{ label: "What done looks like", body: help.doneLooksLike }]
+      : task.custom
+        ? []
+        : [{ label: "What done looks like", body: task.nextAction }]),
     ...(help?.mistakes?.length
       ? [
           {
