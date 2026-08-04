@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useAuthProfilePrefill } from "@/hooks/useAuthProfilePrefill";
 import { supabase } from "@/integrations/supabase/client";
 import IntakePricingAndReadiness from "@/components/intake/IntakePricingAndReadiness";
 import InlinePricingAccordion from "@/components/plan/InlinePricingAccordion";
@@ -169,6 +170,7 @@ function IntakeSurveyForm() {
   const { contactId, email: identityEmail, firstName, lastName, leadId } = useContactIdentity();
   const { toast } = useToast();
   const { session, loading: authLoading } = useAuthRole();
+  const authPrefill = useAuthProfilePrefill();
   const mountLogged = useRef(false);
   const mountTime = useRef(Date.now());
 
@@ -186,6 +188,7 @@ function IntakeSurveyForm() {
   const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hydratedFromDraft = useRef(false);
+  const authPrefillApplied = useRef(false);
   const planEventLogged = useRef(false);
 
   // Log plan generation outcome funnel events once per outcome.
@@ -247,27 +250,43 @@ function IntakeSurveyForm() {
 
   useEffect(() => {
     if (isDirectMode) {
+      // Wait for the authenticated profile lookup so we never prefill twice.
+      if (authPrefill.loading) return;
       // Pre-populate from contact identity
-      const defaultName = [firstName, lastName].filter(Boolean).join(" ");
+      // Authenticated profile wins over URL/localStorage identity because the
+      // survey will be linked to that account.
+      const resolvedFirst = authPrefill.firstName || firstName || "";
+      const resolvedLast = authPrefill.lastName || lastName || "";
+      const resolvedEmail = authPrefill.email || identityEmail || "";
+      const defaultName = [resolvedFirst, resolvedLast].filter(Boolean).join(" ");
       // Restore any locally saved draft first (server-persisted id + form)
       const env = readDraft();
-      const localDraft: SurveyData = env?.form || {};
+      let localDraft: SurveyData = env?.form || {};
+      // A signed-in user with a server-side in-progress survey resumes it
+      // instead of starting a second one.
+      if (!env?.intake_id && authPrefill.existingDraft) {
+        localDraft = { ...(authPrefill.existingDraft.data as SurveyData), ...localDraft };
+        setIntakeId(authPrefill.existingDraft.id);
+        setIntakeToken(authPrefill.existingDraft.access_token);
+      }
       hydratedFromDraft.current = !!Object.keys(localDraft).length;
       if (env?.intake_id) setIntakeId(env.intake_id);
       if (env?.access_token) setIntakeToken(env.access_token);
+      if (authPrefillApplied.current) { setLoading(false); return; }
+      authPrefillApplied.current = true;
       setForm(prev => ({
         ...prev,
         ...localDraft,
         contact_name: localDraft.contact_name || prev.contact_name || defaultName || "",
-        contact_email: localDraft.contact_email || prev.contact_email || identityEmail || "",
-        first_name: localDraft.first_name || prev.first_name || firstName || "",
-        last_name: localDraft.last_name || prev.last_name || lastName || "",
+        contact_email: localDraft.contact_email || prev.contact_email || resolvedEmail,
+        first_name: localDraft.first_name || prev.first_name || resolvedFirst,
+        last_name: localDraft.last_name || prev.last_name || resolvedLast,
       }));
       setLoading(false);
       return;
     }
     fetchSurvey();
-  }, [token, isDirectMode, identityEmail, firstName, lastName]);
+  }, [token, isDirectMode, identityEmail, firstName, lastName, authPrefill]);
 
   const fetchSurvey = async () => {
     try {
