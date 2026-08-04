@@ -34,14 +34,14 @@ const MoneyWhenYouNeedItStrip = () => (
           </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-5 items-stretch">
+      <div className="grid md:grid-cols-3 gap-4">
         {items.map(({ icon: Icon, title, desc }) => (
-          <div key={title} className="bg-card border border-border rounded-2xl p-5 shadow-card h-full flex flex-col">
-            <div className="inline-flex w-10 h-10 rounded-xl items-center justify-center bg-accent/20 text-accent-foreground shrink-0">
+          <div key={title} className="bg-card border border-border rounded-2xl p-5 shadow-card">
+            <div className="inline-flex w-10 h-10 rounded-xl items-center justify-center bg-accent/20 text-accent-foreground">
               <Icon className="h-5 w-5" />
             </div>
             <h3 className="mt-3 font-bold text-secondary">{title}</h3>
-            <p className="mt-1 text-sm text-muted-foreground leading-relaxed flex-1">{desc}</p>
+            <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{desc}</p>
           </div>
         ))}
       </div>
