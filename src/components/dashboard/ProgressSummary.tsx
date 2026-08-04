@@ -2,8 +2,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Flag, ListTodo, Layers } from "lucide-react";
 import { PHASE_BLURBS, PHASE_LABELS, type RoadmapMetrics } from "@/lib/roadmap";
+import HelpBubble from "./HelpBubble";
+import { PhaseHelpBubble } from "./TaskHelpBubble";
 
-export default function ProgressSummary({ metrics }: { metrics: RoadmapMetrics }) {
+export default function ProgressSummary({
+  metrics,
+  planId,
+}: {
+  metrics: RoadmapMetrics;
+  planId?: string | null;
+}) {
   const phaseLabel = metrics.currentPhase ? PHASE_LABELS[metrics.currentPhase] : "Complete";
 
   return (
@@ -11,8 +19,24 @@ export default function ProgressSummary({ metrics }: { metrics: RoadmapMetrics }
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
               <ListTodo className="h-4 w-4" /> Overall
+              <HelpBubble
+                title="Overall progress"
+                className="ml-auto"
+                sections={[
+                  {
+                    label: "What this means",
+                    body:
+                      "The share of every step on your roadmap that you've marked complete — across all five stages.",
+                  },
+                  {
+                    label: "How to move it",
+                    body:
+                      "Work top down. The steps are ordered so earlier ones unlock the later ones; skipping ahead usually stalls.",
+                  },
+                ]}
+              />
             </div>
             <div className="mt-2 text-2xl font-bold text-secondary">{metrics.overallPct}%</div>
             <Progress value={metrics.overallPct} className="h-1.5 mt-2" />
@@ -20,8 +44,24 @@ export default function ProgressSummary({ metrics }: { metrics: RoadmapMetrics }
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
               <CheckCircle2 className="h-4 w-4" /> Completed
+              <HelpBubble
+                title="Completed steps"
+                className="ml-auto"
+                sections={[
+                  {
+                    label: "What this means",
+                    body:
+                      "How many roadmap steps you've marked done out of the total generated from your Needs Analysis answers.",
+                  },
+                  {
+                    label: "Note",
+                    body:
+                      "Some steps start out complete because your intake answers showed they were already handled. You can reopen any of them.",
+                  },
+                ]}
+              />
             </div>
             <div className="mt-2 text-2xl font-bold text-secondary">
               {metrics.completed}
@@ -32,8 +72,13 @@ export default function ProgressSummary({ metrics }: { metrics: RoadmapMetrics }
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
               <Layers className="h-4 w-4" /> Current stage
+              {metrics.currentPhase ? (
+                <span className="ml-auto">
+                  <PhaseHelpBubble phase={metrics.currentPhase} planId={planId} />
+                </span>
+              ) : null}
             </div>
             <div className="mt-2 text-lg font-semibold text-secondary">{phaseLabel}</div>
             <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -43,8 +88,24 @@ export default function ProgressSummary({ metrics }: { metrics: RoadmapMetrics }
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
               <Flag className="h-4 w-4" /> Milestones
+              <HelpBubble
+                title="Milestones"
+                className="ml-auto"
+                sections={[
+                  {
+                    label: "What this means",
+                    body:
+                      "A milestone is a full stage finished — Foundation, Credibility, Bureau Profiles, Tradelines, Funding.",
+                  },
+                  {
+                    label: "Why it matters",
+                    body:
+                      "Each completed stage unlocks the next set of options. Two or three milestones in is usually where funding starts to feel real.",
+                  },
+                ]}
+              />
             </div>
             <div className="mt-2 text-2xl font-bold text-secondary">
               {metrics.milestonesAchieved}
