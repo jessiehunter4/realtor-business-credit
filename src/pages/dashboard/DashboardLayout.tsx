@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useToast } from "@/hooks/use-toast";
 import { useRoadmap } from "@/hooks/useRoadmap";
 import { usePlanItems } from "@/hooks/usePlanItems";
 import { useEntitlements } from "@/hooks/useEntitlements";
@@ -71,6 +72,22 @@ export default function DashboardLayout() {
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [markFirst, setMarkFirst] = useState(false);
   const viewLogged = useRef(false);
+  const planExistsToasted = useRef(false);
+  const { toast } = useToast();
+
+  // Shown once when a returning user is redirected away from the intake flow.
+  useEffect(() => {
+    if (searchParams.get("planExists") !== "1" || planExistsToasted.current) return;
+    planExistsToasted.current = true;
+    toast({
+      title: "You already have a plan",
+      description:
+        "We've brought you to your dashboard where you can view your customized plan and continue your progress.",
+    });
+    const next = new URLSearchParams(searchParams);
+    next.delete("planExists");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, toast]);
 
   const firstName = profile?.first_name || session?.user.user_metadata?.first_name || "";
 

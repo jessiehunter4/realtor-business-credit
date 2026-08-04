@@ -9,6 +9,7 @@ import structureDiagram from "@/assets/guide-structure-diagram.png.asset.json";
 import structureHowItWorks from "@/assets/guide-structure-how-it-works.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import GuideCover from "@/components/guide/GuideCover";
@@ -71,6 +72,10 @@ const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
 
 const GuidePage = () => {
   const { contactId, firstName, buildForwardParams } = useContactIdentity();
+  const { hasPlan } = useOnboardingStatus();
+  const planHref = hasPlan
+    ? "/dashboard"
+    : `/intake${buildForwardParams() ? `?${buildForwardParams()}` : ""}`;
   const { slug } = useParams<{ slug?: string }>();
   const parsedSlug = useMemo(() => parseVisitorSlug(slug), [slug]);
   const visitorName = firstName || parsedSlug.displayName || "";
@@ -318,11 +323,9 @@ const GuidePage = () => {
             </Button>
             {/* Primary CTA stays visible on all breakpoints */}
             <Button asChild size="sm" className="text-xs sm:text-sm px-2.5 sm:px-3">
-              <Link
-                to={`/intake${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
-              >
+              <Link to={planHref}>
                 <Calendar className="sm:mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Create My Plan</span>
+                <span className="hidden sm:inline">{hasPlan ? "View My Plan" : "Create My Plan"}</span>
                 <span className="sm:hidden">My Plan</span>
               </Link>
             </Button>
@@ -399,11 +402,11 @@ const GuidePage = () => {
             </Button>
             <Button asChild size="sm" className="w-full justify-center">
               <Link
-                to={`/intake${buildForwardParams() ? `?${buildForwardParams()}` : ""}`}
+                to={planHref}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                Create My Customized Plan
+                {hasPlan ? "View My Customized Plan" : "Create My Customized Plan"}
               </Link>
             </Button>
           </div>
@@ -412,6 +415,16 @@ const GuidePage = () => {
       </div>
 
       <GuideCover visitorName={visitorName || undefined} />
+      {hasPlan && (
+        <div className="container mx-auto max-w-3xl px-4 pt-4">
+          <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground flex flex-wrap items-center justify-between gap-3">
+            <span>You've already created your customized plan — the guide stays here whenever you want to reread it.</span>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/dashboard">Go to My Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+      )}
       <GuideSkim />
       <GuideTOC />
       <GuideIntroduction />
