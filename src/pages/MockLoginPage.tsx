@@ -159,6 +159,28 @@ const MockLoginPage = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const v = z.string().email("Enter a valid email").max(255).parse(email);
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(v, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      setResetSent(true);
+      toast.success("Check your email for a password reset link.");
+    } catch (err) {
+      if (err instanceof z.ZodError) toast.error(err.errors[0].message);
+      else toast.error("Could not send reset email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-hero-grad">
       <Seo title="Log in — RE Pro Business Credit" description="Access your RE Pro Business Credit portal." />
