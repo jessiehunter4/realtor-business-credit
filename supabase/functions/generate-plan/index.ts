@@ -124,7 +124,7 @@ Profile:
 - Email: ${survey.contact_email || "N/A"}
 - Brokerage: ${survey.brokerage_name || "N/A"}
 - City/State: ${survey.city || "N/A"}, ${survey.state || "N/A"}
-- License Type: ${survey.license_type || "N/A"}
+- License Type: ${survey.license_type === "Other" && survey.license_type_other ? survey.license_type_other : (survey.license_type || "N/A")}
 - Years in Real Estate: ${survey.years_in_real_estate || "N/A"}
 - Gross Commission Income (Last 12 Months): ${survey.gci_last_12_months || "N/A"}
 - Sides Closed: ${survey.sides_closed_last_12_months || "N/A"}
