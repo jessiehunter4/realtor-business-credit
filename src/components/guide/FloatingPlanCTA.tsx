@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
 /**
  * Floating "Create My Plan" button fixed to the bottom-left of the viewport.
@@ -9,8 +10,9 @@ import { useContactIdentity } from "@/hooks/useContactIdentity";
  */
 const FloatingPlanCTA = () => {
   const { buildForwardParams } = useContactIdentity();
+  const { hasPlan } = useOnboardingStatus();
   const params = buildForwardParams();
-  const href = `/intake${params ? `?${params}` : ""}`;
+  const href = hasPlan ? "/dashboard" : `/intake${params ? `?${params}` : ""}`;
 
   return (
     <div
@@ -23,7 +25,7 @@ const FloatingPlanCTA = () => {
       >
         <Link to={href} data-analytics-id="cta-plan-guide-floating">
           <Sparkles className="h-5 w-5" />
-          <span className="text-sm font-semibold">Create My Plan</span>
+          <span className="text-sm font-semibold">{hasPlan ? "View My Plan" : "Create My Plan"}</span>
         </Link>
       </Button>
     </div>
