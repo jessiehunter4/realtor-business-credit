@@ -5,6 +5,7 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { signOutAndClear } from "@/lib/signOut";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,9 @@ const MockLoginPage = () => {
     if (roleLoading || !activeSession) return;
     if (role === "admin") {
       // Admin accounts must use the admin sign-in page.
-      supabase.auth.signOut().then(() => toast.error("Invalid email or password"));
+      signOutAndClear({ redirectTo: null }).then(() =>
+        toast.error("Invalid email or password"),
+      );
       return;
     }
     navigate(resolvePostAuthTarget(next, role), { replace: true });
@@ -88,7 +91,7 @@ const MockLoginPage = () => {
           .eq("role", "admin")
           .maybeSingle();
         if (adminRow) {
-          await supabase.auth.signOut();
+          await signOutAndClear({ redirectTo: null });
           toast.error("Invalid email or password");
           return;
         }

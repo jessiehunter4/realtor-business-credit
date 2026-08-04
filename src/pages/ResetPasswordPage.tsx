@@ -4,6 +4,7 @@ import { Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { signOutAndClear } from "@/lib/signOut";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,9 @@ export default function ResetPasswordPage() {
 
     if (role === "admin") {
       // Admin accounts must use the admin sign-in page.
-      supabase.auth.signOut().then(() => toast.error("Invalid email or password"));
+      signOutAndClear({ redirectTo: null }).then(() =>
+        toast.error("Invalid email or password"),
+      );
       return;
     }
 

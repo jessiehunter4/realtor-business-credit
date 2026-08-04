@@ -35,6 +35,7 @@ import { useRoadmap } from "@/hooks/useRoadmap";
 import { usePlanItems } from "@/hooks/usePlanItems";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { logRoadmapEvent } from "@/lib/roadmap";
+import { signOutAndClear } from "@/lib/signOut";
 import WelcomeDialog from "@/components/dashboard/WelcomeDialog";
 
 type Ctx = ReturnType<typeof useDashboardData> & {
@@ -133,8 +134,7 @@ export default function DashboardLayout() {
   }, [loading, profile, searchParams, setSearchParams]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    await signOutAndClear({ redirectTo: "/" });
   };
 
   if (loading) {
