@@ -8,7 +8,8 @@ export type RoadmapEventType =
   | "task_completed"
   | "task_reopened"
   | "phase_completed"
-  | "roadmap_completed";
+  | "roadmap_completed"
+  | "task_help_opened";
 
 interface RoadmapEventMeta {
   task?: RoadmapTask | null;

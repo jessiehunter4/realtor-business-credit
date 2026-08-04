@@ -1,4 +1,5 @@
 import type { CatalogTask } from "./types";
+import { TASK_HELP } from "./taskHelp";
 
 /**
  * Canonical, ordered task catalog for the RE Pro Business Credit roadmap.
@@ -6,7 +7,7 @@ import type { CatalogTask } from "./types";
  * `key` values are persisted as plan_task_progress.task_key — they are database
  * identifiers. Titles and copy can be edited freely; keys cannot.
  */
-export const TASK_CATALOG: CatalogTask[] = [
+const BASE_TASKS: CatalogTask[] = [
   // ---------------------------------------------------------------- foundation
   {
     key: "entity_formed",
@@ -213,6 +214,12 @@ export const TASK_CATALOG: CatalogTask[] = [
     keywords: ["line of credit", "loc", "higher-limit", "higher limit", "term loan", "funding"],
   },
 ];
+
+/** Catalog with plain-English help content attached for the dashboard bubbles. */
+export const TASK_CATALOG: CatalogTask[] = BASE_TASKS.map((task) => ({
+  ...task,
+  help: TASK_HELP[task.key],
+}));
 
 export const TASK_BY_KEY: Record<string, CatalogTask> = Object.fromEntries(
   TASK_CATALOG.map((t) => [t.key, t]),

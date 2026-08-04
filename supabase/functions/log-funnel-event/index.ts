@@ -36,6 +36,7 @@ const ALLOWED_EVENTS = [
   'task_reopened',
   'phase_completed',
   'roadmap_completed',
+  'task_help_opened',
 ];
 
 const parseRequestBody = async (req: Request) => {

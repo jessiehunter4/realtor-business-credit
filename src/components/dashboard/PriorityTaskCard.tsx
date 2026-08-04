@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PHASE_LABELS, type RoadmapTask, type TaskStatus } from "@/lib/roadmap";
+import { PhaseHelpBubble, TaskHelpBubble } from "./TaskHelpBubble";
 
 interface Props {
   task: RoadmapTask | null;
   saving: boolean;
   onStatusChange: (task: RoadmapTask, status: TaskStatus) => void;
+  planId?: string | null;
 }
 
-export default function PriorityTaskCard({ task, saving, onStatusChange }: Props) {
+export default function PriorityTaskCard({ task, saving, onStatusChange, planId }: Props) {
   if (!task) {
     return (
       <Card className="border-primary/30 bg-primary/5">
@@ -38,12 +40,18 @@ export default function PriorityTaskCard({ task, saving, onStatusChange }: Props
             Your next step
           </span>
           <Badge variant="secondary" className="text-[10px]">{PHASE_LABELS[task.phase]}</Badge>
+          <PhaseHelpBubble phase={task.phase} planId={planId} />
           {task.status === "in_progress" && (
             <Badge variant="outline" className="text-[10px]">In progress</Badge>
           )}
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-bold text-secondary leading-snug">{task.title}</h2>
+        <div className="flex items-start gap-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-secondary leading-snug">{task.title}</h2>
+          <div className="mt-1.5">
+            <TaskHelpBubble task={task} planId={planId} size="md" />
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{task.explanation}</p>
 
         <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2 text-sm text-secondary">
