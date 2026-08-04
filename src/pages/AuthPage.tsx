@@ -11,6 +11,7 @@ import { z } from "zod";
 import AccountConsentFields from "@/components/shared/AccountConsentFields";
 import { TERMS_CONSENT_TEXT } from "@/lib/messagingConsent";
 import { useAuthRole } from "@/hooks/useAuthRole";
+import { signOutAndClear } from "@/lib/signOut";
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
@@ -52,7 +53,7 @@ export default function AuthPage() {
       }
 
       // Not an admin: reject the sign-in outright rather than routing them here.
-      await supabase.auth.signOut();
+      await signOutAndClear({ redirectTo: null });
       toast.error("Invalid email or password");
     } finally {
       adminCheckInFlight.current = false;
