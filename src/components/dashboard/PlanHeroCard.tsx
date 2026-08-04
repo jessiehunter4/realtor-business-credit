@@ -25,7 +25,7 @@ export default function PlanHeroCard({ plan, firstName, taskCount = 0, taskDoneC
           <p className="text-muted-foreground text-sm">
             You're one step away. Complete the 5-minute Needs Analysis and we'll generate your personalized plan.
           </p>
-          <Link to="/intake">
+          <Link to="/intake" className="mt-6 inline-block">
             <Button size="lg" className="rounded-full">
               Complete My Intake <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
