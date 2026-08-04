@@ -37,7 +37,7 @@ const MoneyWhenYouNeedItStrip = () => (
       <div className="grid md:grid-cols-3 gap-5">
         {items.map(({ icon: Icon, title, desc }) => (
           <div key={title} className="flex flex-col h-full bg-card border border-border rounded-2xl p-5 shadow-card">
-            <div className="inline-flex w-10 h-10 rounded-xl items-center justify-center bg-accent/20 text-accent-foreground">
+            <div className="inline-flex w-10 h-10 rounded-xl items-center justify-center bg-primary/15 text-primary">
               <Icon className="h-5 w-5" />
             </div>
             <h3 className="mt-3 font-bold text-secondary">{title}</h3>
