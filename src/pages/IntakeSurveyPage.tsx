@@ -703,41 +703,42 @@ export default function IntakeSurveyPage() {
           </p>
         </div>
 
-        {/* Step indicator */}
-        <div className="flex gap-1 max-w-2xl mx-auto w-full">
-          {steps.map((s, i) => (
-            <button
-              key={s.key}
-              onClick={() => setStep(i)}
-              className={`flex-1 h-2 rounded-full transition-colors ${
-                i <= step ? "bg-primary" : "bg-border"
-              }`}
-              aria-label={s.title}
-            />
-          ))}
-        </div>
-        <div className="text-center space-y-1">
-          <p className="text-sm font-medium text-foreground">
-            Step {step + 1} of {steps.length}: {steps[step].title}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {isDirectMode
-              ? "About 3–5 minutes total. Your answers save automatically in this browser."
-              : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically as you type.`}
-          </p>
-          {autosaveStatus !== "idle" && (
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-              {autosaveStatus === "saving" ? "Saving…" : "Saved"}
-            </p>
-          )}
-        </div>
-
         <div className="space-y-6 max-w-3xl mx-auto">
           <StepVideoPlaceholder
             stepNumber={step + 1}
             title={activeVideo.title}
             description={activeVideo.description}
           />
+
+          {/* Step indicator */}
+          <div className="flex gap-1 max-w-2xl mx-auto w-full">
+            {steps.map((s, i) => (
+              <button
+                key={s.key}
+                onClick={() => setStep(i)}
+                className={`flex-1 h-2 rounded-full transition-colors ${
+                  i <= step ? "bg-primary" : "bg-border"
+                }`}
+                aria-label={s.title}
+              />
+            ))}
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm font-medium text-foreground">
+              Step {step + 1} of {steps.length}: {steps[step].title}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {isDirectMode
+                ? "About 3–5 minutes total. Your answers save automatically in this browser."
+                : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically as you type.`}
+            </p>
+            {autosaveStatus !== "idle" && (
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                {autosaveStatus === "saving" ? "Saving…" : "Saved"}
+              </p>
+            )}
+          </div>
+
           <div className="space-y-6 min-w-0">
         {/* Step A */}
         {step === 0 && (
