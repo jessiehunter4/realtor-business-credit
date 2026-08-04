@@ -1,6 +1,8 @@
 import { CheckCircle2, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import PlanItemRow from "@/components/dashboard/PlanItemRow";
+import AddPlanItemForm from "@/components/dashboard/AddPlanItemForm";
 import HelpBubble from "@/components/dashboard/HelpBubble";
 import EmptyPlanNotice from "./EmptyPlanNotice";
 import SectionHeader from "./SectionHeader";
@@ -9,7 +11,7 @@ import { useDashboardCtx } from "./DashboardLayout";
 
 export default function MilestonesSection() {
   const { plan, planItems } = useDashboardCtx();
-  const { milestones, setStatus, savingKey } = planItems;
+  const { milestones, setStatus, updateItem, addItem, removeItem, revertItem, savingKey } = planItems;
 
   if (!plan) return <EmptyPlanNotice />;
 
@@ -23,7 +25,9 @@ export default function MilestonesSection() {
       <Progress value={pct(milestones)} className="h-2" />
 
       {milestones.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No long-term milestones were generated for your plan yet.</p>
+        <p className="text-sm text-muted-foreground">
+          No long-term milestones were generated for your plan yet — add your own below.
+        </p>
       ) : (
         <ol className="relative border-l border-border ml-3 space-y-5 pt-2">
           {milestones.map((m) => {
@@ -39,6 +43,8 @@ export default function MilestonesSection() {
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-primary">{m.meta}</p>
+                  {m.custom && <span className="text-[10px] text-muted-foreground">added by you</span>}
+                  {m.edited && !m.custom && <span className="text-[10px] text-muted-foreground">edited</span>}
                   <HelpBubble
                     title="This milestone"
                     sections={[
@@ -47,23 +53,31 @@ export default function MilestonesSection() {
                     ]}
                   />
                 </div>
-                <p className={`mt-0.5 ${done ? "text-muted-foreground line-through" : "text-secondary font-medium"}`}>
-                  {m.title}
-                </p>
-                <Button
-                  variant={done ? "ghost" : "outline"}
-                  size="sm"
-                  className="rounded-full text-xs mt-2"
-                  disabled={savingKey === m.key}
-                  onClick={() => setStatus(m, done ? "not_started" : "completed")}
-                >
-                  {done ? "Undo" : "Mark reached"}
-                </Button>
+                <div className="mt-1">
+                  <PlanItemRow
+                    item={m}
+                    saving={savingKey === m.key}
+                    onStatusChange={setStatus}
+                    onUpdate={updateItem}
+                    onRemove={removeItem}
+                    onRevert={revertItem}
+                    metaLabel="Target month (e.g. Month 6)"
+                    labels={{ start: "Working on it", done: "Mark reached", undo: "Undo" }}
+                  />
+                </div>
               </li>
             );
           })}
         </ol>
       )}
+
+      <AddPlanItemForm
+        group="milestone"
+        addLabel="Add a milestone"
+        titlePlaceholder="What milestone do you want to hit?"
+        metaPlaceholder="Target month (e.g. Month 6)"
+        onAdd={addItem}
+      />
     </>
   );
 }
