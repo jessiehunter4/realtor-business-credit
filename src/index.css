@@ -65,6 +65,10 @@ All colors MUST be HSL.
     --amber: 36 100% 56%;
     --amber-dark: 36 100% 46%;
 
+    --hover-soft-bg: 167 50% 95%;
+    --hover-soft-text: 165 100% 33%;
+    --hover-soft-border: 163 49% 83%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;

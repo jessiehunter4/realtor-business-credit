@@ -59,6 +59,11 @@ export default {
           DEFAULT: "hsl(var(--amber))",
           dark: "hsl(var(--amber-dark))",
         },
+        "hover-soft": {
+          DEFAULT: "hsl(var(--hover-soft-bg))",
+          foreground: "hsl(var(--hover-soft-text))",
+          border: "hsl(var(--hover-soft-border))",
+        },
         sky: {
           DEFAULT: "hsl(var(--sky))",
           foreground: "#ffffff",
