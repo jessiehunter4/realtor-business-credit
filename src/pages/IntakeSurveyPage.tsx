@@ -159,7 +159,7 @@ interface SurveyData {
   additional_notes?: string;
 }
 
-export default function IntakeSurveyPage() {
+function IntakeSurveyForm() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
