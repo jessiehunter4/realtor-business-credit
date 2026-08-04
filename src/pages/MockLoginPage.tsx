@@ -44,9 +44,11 @@ const MockLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<"signin" | "signup">("signin");
+  const [view, setView] = useState<"tabs" | "forgot">("tabs");
   const [phone, setPhone] = useState(() => readContactIdentity().phone ?? "");
   const [smsConsent, setSmsConsent] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   // Role resolution is centralised in AuthRoleProvider; once a session and its
   // role are known, route by role (never by "authentication succeeded" alone).
