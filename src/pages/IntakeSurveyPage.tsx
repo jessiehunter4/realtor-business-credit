@@ -1300,3 +1300,34 @@ function IntakeSurveyForm() {
     </div>
   );
 }
+
+/**
+ * Guard: signed-in users who already have a published plan never re-enter the
+ * intake flow (which would create a duplicate survey + plan). They are sent to
+ * the dashboard instead. Token links (coach-sent) always open the form.
+ */
+export default function IntakeSurveyPage() {
+  const [searchParams] = useSearchParams();
+  const hasToken = Boolean(searchParams.get("token"));
+  const { loading, hasPlan } = useOnboardingStatus();
+  const navigate = useNavigate();
+  const redirected = useRef(false);
+
+  const blocked = !hasToken && hasPlan;
+
+  useEffect(() => {
+    if (loading || !blocked || redirected.current) return;
+    redirected.current = true;
+    navigate("/dashboard?planExists=1", { replace: true });
+  }, [loading, blocked, navigate]);
+
+  if (!hasToken && (loading || blocked)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return <IntakeSurveyForm />;
+}
