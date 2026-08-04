@@ -26,10 +26,11 @@ serve(async (req) => {
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
     const body = await req.json().catch(() => ({}));
-    const { intake_survey_id, intake_token, source } = body as {
+    const { intake_survey_id, intake_token, source, force } = body as {
       intake_survey_id?: string;
       intake_token?: string;
       source?: "user" | "admin";
+      force?: boolean;
     };
 
     // Authorize the request. Accept either:
@@ -37,6 +38,7 @@ serve(async (req) => {
     //   (b) a matching intake access_token (public user path).
     let userId: string | null = null;
     let isAdmin = false;
+    let isOwner = false;
     const authHeader = req.headers.get("Authorization");
     if (authHeader?.startsWith("Bearer ") && !intake_token) {
       const userClient = createClient(supabaseUrl, supabaseKey, {
@@ -55,8 +57,20 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "intake_survey_id required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // If not an admin, require a valid intake access token that matches this survey.
-    if (!isAdmin) {
+    // The signed-in owner of the survey may regenerate their own plan.
+    if (!isAdmin && userId) {
+      const { data: ownRow } = await adminClient
+        .from("intake_surveys")
+        .select("id, status, user_id")
+        .eq("id", intake_survey_id)
+        .maybeSingle();
+      if (ownRow?.user_id && ownRow.user_id === userId && ownRow.status === "submitted") {
+        isOwner = true;
+      }
+    }
+
+    // If neither admin nor owner, require a valid intake access token that matches this survey.
+    if (!isAdmin && !isOwner) {
       if (!intake_token) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
@@ -77,7 +91,8 @@ serve(async (req) => {
     const isUserGenerated = !isAdmin;
 
     // Idempotency: if a draft or published plan for this intake was created <60s ago, return it.
-    {
+    // A deliberate regeneration (force) skips this guard.
+    if (!force) {
       const { data: recent } = await adminClient
         .from("custom_plans")
         .select("id, created_at, status")
