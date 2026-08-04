@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { ArrowRight, Lightbulb, Compass, Sparkles } from "lucide-react";
 
 interface CalloutProps {
