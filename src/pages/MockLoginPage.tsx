@@ -203,24 +203,36 @@ const MockLoginPage = () => {
           </div>
 
           <div className="rounded-3xl bg-white shadow-card border border-border/60 p-6 sm:p-8">
-            <Tabs value={tab} onValueChange={(v) => setTab(v as "signin" | "signup")}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin">Sign in</TabsTrigger>
-                <TabsTrigger value="signup">Create account</TabsTrigger>
-              </TabsList>
-
-              {(["signin", "signup"] as const).map((mode) => (
-                <TabsContent key={mode} value={mode}>
-                  <form
-                    onSubmit={mode === "signin" ? handleSignIn : handleSignUp}
-                    className="space-y-5"
-                  >
+            {view === "forgot" ? (
+              <div className="space-y-5">
+                <div className="text-center">
+                  <h2 className="text-xl font-semibold text-secondary">Reset your password</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Enter your email and we'll send you a reset link.
+                  </p>
+                </div>
+                {resetSent ? (
+                  <div className="text-center space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      If an account exists for <span className="font-medium text-foreground">{email}</span>, you'll receive a reset link shortly.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full rounded-full"
+                      onClick={() => { setView("tabs"); setResetSent(false); }}
+                    >
+                      Back to sign in
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor={`${mode}-email`}>Email</Label>
+                      <Label htmlFor="forgot-email">Email</Label>
                       <div className="relative">
                         <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          id={`${mode}-email`}
+                          id="forgot-email"
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -231,60 +243,119 @@ const MockLoginPage = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`${mode}-password`}>Password</Label>
-                      <div className="relative">
-                        <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id={`${mode}-password`}
-                          type={showPassword ? "text" : "password"}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder={mode === "signup" ? "Minimum 6 characters" : "••••••••"}
-                          required
-                          disabled={loading}
-                          className="pl-9 pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((v) => !v)}
-                          aria-label={showPassword ? "Hide password" : "Show password"}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-muted-foreground hover:text-secondary"
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    {mode === "signup" && (
-                      <AccountConsentFields
-                        idPrefix="signup"
-                        phone={phone}
-                        onPhoneChange={setPhone}
-                        smsConsent={smsConsent}
-                        onSmsConsentChange={setSmsConsent}
-                        agreed={agreed}
-                        onAgreedChange={setAgreed}
-                        disabled={loading}
-                      />
-                    )}
                     <Button
                       type="submit"
                       size="lg"
                       className="w-full rounded-full"
-                      disabled={loading || (mode === "signup" && !agreed)}
+                      disabled={loading}
                     >
-                      {loading
-                        ? mode === "signin"
-                          ? "Signing in…"
-                          : "Creating account…"
-                        : mode === "signin"
-                          ? "Log in"
-                          : "Create account"}
+                      {loading ? "Sending…" : "Send reset link"}
                     </Button>
+                    <button
+                      type="button"
+                      onClick={() => setView("tabs")}
+                      className="w-full text-center text-sm text-muted-foreground hover:text-secondary"
+                    >
+                      Back to sign in
+                    </button>
                   </form>
-                </TabsContent>
-              ))}
-            </Tabs>
+                )}
+              </div>
+            ) : (
+              <Tabs value={tab} onValueChange={(v) => setTab(v as "signin" | "signup")}>
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="signin">Sign in</TabsTrigger>
+                  <TabsTrigger value="signup">Create account</TabsTrigger>
+                </TabsList>
+
+                {(["signin", "signup"] as const).map((mode) => (
+                  <TabsContent key={mode} value={mode}>
+                    <form
+                      onSubmit={mode === "signin" ? handleSignIn : handleSignUp}
+                      className="space-y-5"
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor={`${mode}-email`}>Email</Label>
+                        <div className="relative">
+                          <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id={`${mode}-email`}
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            required
+                            disabled={loading}
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`${mode}-password`}>Password</Label>
+                        <div className="relative">
+                          <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id={`${mode}-password`}
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder={mode === "signup" ? "Minimum 6 characters" : "••••••••"}
+                            required
+                            disabled={loading}
+                            className="pl-9 pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-muted-foreground hover:text-secondary"
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                      </div>
+                      {mode === "signup" && (
+                        <AccountConsentFields
+                          idPrefix="signup"
+                          phone={phone}
+                          onPhoneChange={setPhone}
+                          smsConsent={smsConsent}
+                          onSmsConsentChange={setSmsConsent}
+                          agreed={agreed}
+                          onAgreedChange={setAgreed}
+                          disabled={loading}
+                        />
+                      )}
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full rounded-full"
+                        disabled={loading || (mode === "signup" && !agreed)}
+                      >
+                        {loading
+                          ? mode === "signin"
+                            ? "Signing in…"
+                            : "Creating account…"
+                          : mode === "signin"
+                            ? "Log in"
+                            : "Create account"}
+                      </Button>
+                      {mode === "signin" && (
+                        <div className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => setView("forgot")}
+                            className="text-sm text-muted-foreground hover:text-secondary"
+                          >
+                            Forgot password?
+                          </button>
+                        </div>
+                      )}
+                    </form>
+                  </TabsContent>
+                ))}
+              </Tabs>
+            )}
           </div>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
