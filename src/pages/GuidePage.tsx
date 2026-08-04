@@ -415,6 +415,16 @@ const GuidePage = () => {
       </div>
 
       <GuideCover visitorName={visitorName || undefined} />
+      {hasPlan && (
+        <div className="container mx-auto max-w-3xl px-4 pt-4">
+          <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground flex flex-wrap items-center justify-between gap-3">
+            <span>You've already created your customized plan — the guide stays here whenever you want to reread it.</span>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/dashboard">Go to My Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+      )}
       <GuideSkim />
       <GuideTOC />
       <GuideIntroduction />
