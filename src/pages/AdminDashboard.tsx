@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Users, FileText, TrendingUp, Activity, RefreshCw, ExternalLink, Info, CalendarClock } from "lucide-react";
 import SeoFunnelTab from "@/components/admin/SeoFunnelTab";
 import BookingsTab from "@/components/admin/BookingsTab";
+import { signOutAndClear } from "@/lib/signOut";
 import {
   Dialog,
   DialogContent,
@@ -489,12 +490,8 @@ export default function AdminDashboard() {
   };
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) toast.error("Error signing out");
-    else {
-      toast.success("Signed out successfully");
-      navigate("/login");
-    }
+    toast.success("Signed out successfully");
+    await signOutAndClear({ redirectTo: "/login" });
   };
 
   /* ---------- Render ---------- */
