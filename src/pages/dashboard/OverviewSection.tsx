@@ -6,6 +6,7 @@ import PlanHeroCard from "@/components/dashboard/PlanHeroCard";
 import PriorityTaskCard from "@/components/dashboard/PriorityTaskCard";
 import ProgressSummary from "@/components/dashboard/ProgressSummary";
 import MessagePreferencesCard from "@/components/dashboard/MessagePreferencesCard";
+import PlanActionsBar from "@/components/dashboard/PlanActionsBar";
 import { pct } from "@/lib/planItems";
 import { useDashboardCtx } from "./DashboardLayout";
 
@@ -32,6 +33,8 @@ export default function OverviewSection() {
 
       {plan && (
         <>
+          <PlanActionsBar />
+
           <section aria-label="Plan sections" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {strips.map((s) => (
               <Link key={s.label} to={s.to}>

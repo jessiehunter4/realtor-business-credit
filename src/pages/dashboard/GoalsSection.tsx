@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import PlanItemRow from "@/components/dashboard/PlanItemRow";
+import AddPlanItemForm from "@/components/dashboard/AddPlanItemForm";
 import EmptyPlanNotice from "./EmptyPlanNotice";
 import SectionHeader from "./SectionHeader";
 import { countDone } from "@/lib/planItems";
@@ -7,7 +8,7 @@ import { useDashboardCtx } from "./DashboardLayout";
 
 export default function GoalsSection() {
   const { plan, planItems } = useDashboardCtx();
-  const { goals, setStatus, setNote, savingKey } = planItems;
+  const { goals, setStatus, setNote, updateItem, addItem, removeItem, revertItem, savingKey } = planItems;
 
   if (!plan) return <EmptyPlanNotice />;
 
@@ -29,19 +30,24 @@ export default function GoalsSection() {
         </Card>
       )}
 
-      {goals.length === 0 ? (
+      {goals.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          Your plan didn't capture individual goals. Your coach can add them on your next review.
+          Your plan didn't capture individual goals — add your own below, or your coach can add them on your next review.
         </p>
-      ) : (
-        <div className="space-y-2">
-          {goals.map((item) => (
+      )}
+
+      <div className="space-y-2">
+        {goals.map((item) => (
             <PlanItemRow
               key={item.key}
               item={item}
               saving={savingKey === item.key}
               onStatusChange={setStatus}
               onNoteSave={setNote}
+              onUpdate={updateItem}
+              onRemove={removeItem}
+              onRevert={revertItem}
+              metaLabel="Horizon or target amount"
               labels={{ start: "Working on it", done: "Achieved", undo: "Reopen" }}
               help={{
                 title: "Tracking a goal",
@@ -52,9 +58,16 @@ export default function GoalsSection() {
                 ],
               }}
             />
-          ))}
-        </div>
-      )}
+        ))}
+      </div>
+
+      <AddPlanItemForm
+        group="goal"
+        addLabel="Add a goal"
+        titlePlaceholder="What do you want to achieve?"
+        metaPlaceholder="Horizon or target amount (optional)"
+        onAdd={addItem}
+      />
     </>
   );
 }

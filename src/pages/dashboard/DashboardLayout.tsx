@@ -86,6 +86,7 @@ export default function DashboardLayout() {
     planId: plan?.id,
     planData: plan?.plan_data,
     progress: progressRows,
+    refresh: data.refresh,
   });
 
   const program = !entLoading && (hasProduct("cohort") || hasProduct("one-on-one"));

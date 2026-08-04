@@ -1,4 +1,5 @@
 import PlanItemRow from "@/components/dashboard/PlanItemRow";
+import AddPlanItemForm from "@/components/dashboard/AddPlanItemForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import EmptyPlanNotice from "./EmptyPlanNotice";
@@ -10,7 +11,7 @@ const WINDOWS = ["Days 1–30", "Days 31–60", "Days 61–90"];
 
 export default function ActionPlanSection() {
   const { plan, planItems } = useDashboardCtx();
-  const { actions, setStatus, savingKey } = planItems;
+  const { actions, setStatus, updateItem, addItem, removeItem, revertItem, savingKey } = planItems;
 
   if (!plan) return <EmptyPlanNotice />;
 
@@ -28,7 +29,9 @@ export default function ActionPlanSection() {
         <p className="text-sm text-muted-foreground">No 90-day items were generated for your plan yet.</p>
       ) : (
         WINDOWS.map((w) => {
-          const inWindow = actions.filter((a) => a.meta?.startsWith(w));
+          const inWindow = actions.filter((a) =>
+            a.meta?.startsWith(w) || (w === WINDOWS[0] && !WINDOWS.some((x) => a.meta?.startsWith(x))),
+          );
           if (inWindow.length === 0) return null;
           return (
             <Card key={w}>
@@ -45,6 +48,10 @@ export default function ActionPlanSection() {
                     item={item}
                     saving={savingKey === item.key}
                     onStatusChange={setStatus}
+                    onUpdate={updateItem}
+                    onRemove={removeItem}
+                    onRevert={revertItem}
+                    metaLabel="Window and effort (e.g. Days 1–30 · 1 hour)"
                     help={{
                       title: "This action step",
                       sections: [
@@ -60,6 +67,14 @@ export default function ActionPlanSection() {
           );
         })
       )}
+
+      <AddPlanItemForm
+        group="d90"
+        addLabel="Add a step"
+        titlePlaceholder="What step do you want to add?"
+        metaOptions={WINDOWS}
+        onAdd={addItem}
+      />
     </>
   );
 }

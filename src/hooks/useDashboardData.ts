@@ -21,6 +21,7 @@ export interface DashboardPlan {
   recommended_program_slug: string | null;
   plan_data: PlanData | null;
   contact_name: string | null;
+  intake_survey_id: string | null;
 }
 
 export interface TaskProgress {
@@ -74,7 +75,7 @@ export function useDashboardData(): DashboardData {
           .maybeSingle(),
         supabase
           .from("custom_plans")
-          .select("id, status, created_at, updated_at, recommended_program_slug, plan_data, contact_name")
+          .select("id, status, created_at, updated_at, recommended_program_slug, plan_data, contact_name, intake_survey_id")
           .eq("user_id", uid)
           .eq("status", "published")
           .order("created_at", { ascending: false })
