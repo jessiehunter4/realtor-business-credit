@@ -143,25 +143,88 @@ const statusLabel = (status: string) =>
 const statusSymbol = (status: string) =>
   status === "strong" ? "✓" : status === "warning" ? "⚠" : "✕";
 
+/** Printable progress markers for tracked plan items. */
+export interface PlanPrintItem {
+  title: string;
+  detail?: string;
+  meta?: string;
+  status: "not_started" | "in_progress" | "completed" | string;
+  custom?: boolean;
+}
+
+export interface PlanPrintProgress {
+  goals?: PlanPrintItem[];
+  actions?: PlanPrintItem[];
+  milestones?: PlanPrintItem[];
+  funding?: PlanPrintItem[];
+}
+
+const progressLabel = (status: string) =>
+  status === "completed" ? "Done" : status === "in_progress" ? "In progress" : "Not started";
+
+function Chrome({ name }: { name: string }) {
+  return (
+    <>
+      <View style={s.runningHeader} fixed>
+        <Text style={s.runningHeaderBrand}>RE Pro Business Credit Plan</Text>
+        <Text>{name}</Text>
+      </View>
+      <View style={s.pageFooter} fixed>
+        <Text style={s.footerText}>© 2026 RealtorBusinessCredit.com</Text>
+        <Text
+          style={s.pageNumber}
+          render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
+        />
+      </View>
+    </>
+  );
+}
+
 export default function PlanPDF({
   planData,
   createdAt,
   updatedAt,
+  progress,
 }: {
   planData: PlanData;
   createdAt?: string | null;
   updatedAt?: string | null;
+  /** Live dashboard items (edits, custom items, statuses) to print instead of the raw plan. */
+  progress?: PlanPrintProgress;
 }) {
   const sections = (planData?.sections ?? {}) as Partial<PlanData["sections"]>;
   const goalsNarrative = sections.goals_snapshot?.narrative ?? "";
-  const goalsList = sections.goals_snapshot?.goals ?? [];
   const fundabilityItems = sections.fundability?.items ?? [];
   const fundabilityNarrative = sections.fundability?.narrative ?? "";
-  const actionItems = sections.action_plan_90day?.items ?? [];
-  const milestones = sections.roadmap?.milestones ?? [];
-  const fundingItems = sections.funding_opportunities?.items ?? [];
   const nextStepsNarrative = sections.next_steps?.narrative ?? "";
   const programOptions = sections.next_steps?.program_options ?? [];
+
+  const goalsList: PlanPrintItem[] =
+    progress?.goals ??
+    (sections.goals_snapshot?.goals ?? []).map((g) => ({
+      title: g.label,
+      detail: g.why_it_matters,
+      meta: [g.priority ? `${g.priority} goal` : null, g.horizon, g.target_amount].filter(Boolean).join(" · "),
+      status: "not_started",
+    }));
+  const actionItems: PlanPrintItem[] =
+    progress?.actions ??
+    (sections.action_plan_90day?.items ?? []).map((a) => ({
+      title: a.text,
+      meta: a.effort ? `Est. effort: ${a.effort}` : undefined,
+      status: "not_started",
+    }));
+  const milestones: PlanPrintItem[] =
+    progress?.milestones ??
+    (sections.roadmap?.milestones ?? []).map((m) => ({ title: m.description, meta: m.month, status: "not_started" }));
+  const fundingItems: PlanPrintItem[] =
+    progress?.funding ??
+    (sections.funding_opportunities?.items ?? []).map((f) => ({
+      title: f.type,
+      detail: f.description,
+      status: "not_started",
+    }));
+
   const draftedLabel = formatPlanDate(createdAt);
   const updatedLabel = isMeaningfullyUpdated(createdAt, updatedAt) ? formatPlanDate(updatedAt) : null;
   const preparedFallback = new Date().toLocaleDateString("en-US", {
