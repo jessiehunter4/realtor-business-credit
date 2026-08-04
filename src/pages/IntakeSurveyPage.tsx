@@ -20,6 +20,8 @@ import PlanPreviewCard from "@/components/intake/PlanPreviewCard";
 import PlanGenerationLoader from "@/components/intake/PlanGenerationLoader";
 import PlanSuccessCelebration from "@/components/intake/PlanSuccessCelebration";
 import PostPlanAuthCard from "@/components/intake/PostPlanAuthCard";
+import AuthedPlanHandoff from "@/components/intake/AuthedPlanHandoff";
+import { useAuthRole } from "@/hooks/useAuthRole";
 import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
 import SiteHeader from "@/components/shared/SiteHeader";
@@ -166,6 +168,7 @@ function IntakeSurveyForm() {
   const navigate = useNavigate();
   const { contactId, email: identityEmail, firstName, lastName, leadId } = useContactIdentity();
   const { toast } = useToast();
+  const { session, loading: authLoading } = useAuthRole();
   const mountLogged = useRef(false);
   const mountTime = useRef(Date.now());
 
