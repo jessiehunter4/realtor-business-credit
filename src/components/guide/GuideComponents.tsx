@@ -165,14 +165,17 @@ export const PlanCTAButton = ({
   href?: string;
 }) => {
   const { buildForwardParams } = useContactIdentity();
+  const { hasPlan } = useOnboardingStatus();
   const params = buildForwardParams();
-  const href = overrideHref ?? `/intake${params ? `?${params}` : ""}`;
+  const planExists = hasPlan && !overrideHref;
+  const href = planExists ? "/dashboard" : overrideHref ?? `/intake${params ? `?${params}` : ""}`;
+  const text = planExists ? "View My Plan" : label;
   return (
     <Link
       to={href}
       className={`inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 ${className}`}
     >
-      {label}
+      {text}
       <ArrowRight className="h-4 w-4" />
     </Link>
   );
