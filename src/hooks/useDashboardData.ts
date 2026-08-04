@@ -30,6 +30,7 @@ export interface TaskProgress {
   completed: boolean;
   completed_at: string | null;
   status?: string | null;
+  updated_at?: string | null;
 }
 
 export interface DashboardData {
@@ -98,7 +99,7 @@ export function useDashboardData(): DashboardData {
       if (p?.id) {
         const { data: taskRows } = await supabase
           .from("plan_task_progress")
-          .select("id, task_key, task_label, completed, completed_at, status")
+          .select("id, task_key, task_label, completed, completed_at, status, updated_at")
           .eq("plan_id", p.id);
         setTasks((taskRows ?? []) as TaskProgress[]);
       } else {

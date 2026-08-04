@@ -1,17 +1,34 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, Circle, Clock, Loader2, Lock, PlayCircle } from "lucide-react";
+import { formatDistanceToNowStrict } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TASK_BY_KEY, type RoadmapTask, type TaskStatus } from "@/lib/roadmap";
+import { TaskHelpBubble } from "./TaskHelpBubble";
 
 interface Props {
   task: RoadmapTask;
   saving: boolean;
   onStatusChange: (task: RoadmapTask, status: TaskStatus) => void;
+  planId?: string | null;
 }
 
-export default function RoadmapTaskRow({ task, saving, onStatusChange }: Props) {
+function relative(iso?: string | null) {
+  if (!iso) return null;
+  try {
+    return `${formatDistanceToNowStrict(new Date(iso))} ago`;
+  } catch {
+    return null;
+  }
+}
+
+export default function RoadmapTaskRow({ task, saving, onStatusChange, planId }: Props) {
   const done = task.status === "completed";
+  const stamp = done
+    ? relative(task.completedAt ?? task.updatedAt)
+    : task.status === "in_progress"
+      ? relative(task.updatedAt)
+      : null;
   const blockedLabel = task.blockedBy
     .map((k) => TASK_BY_KEY[k]?.title ?? k)
     .join(", ");
@@ -40,6 +57,7 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange }: Props) 
             <p className={`font-medium ${done ? "text-muted-foreground line-through" : "text-secondary"}`}>
               {task.title}
             </p>
+            <TaskHelpBubble task={task} planId={planId} />
             {task.status === "in_progress" && (
               <Badge variant="outline" className="text-[10px]">In progress</Badge>
             )}
@@ -50,6 +68,11 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange }: Props) 
 
           {!done && <p className="text-sm text-muted-foreground mt-1">{task.explanation}</p>}
           {task.detail && done && <p className="text-xs text-muted-foreground mt-1">{task.detail}</p>}
+          {stamp && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {done ? "Completed" : "Started"} {stamp}
+            </p>
+          )}
 
           {!done && (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-muted-foreground">
