@@ -36,7 +36,13 @@ Everything checkable writes to the same task-progress store the roadmap already 
 
 Goal notes and user-edited text save back to the plan record so they persist and show up in the coach view and PDF export.
 
-Free and DIY tiers both get full access to viewing, editing, and tracking. Paid-only surfaces (cohort schedule, coach access) appear as locked cards with an upsell.
+## What each tier sees
+
+- **Free** — full access to viewing, editing, and tracking every plan section. No feature is held back on the tracking side.
+- **DIY ($497)** — everything in Free, plus a Resources area in the side menu: vetted providers and how-to walkthroughs for a business virtual office, a directory-listed business phone, EIN filing, and the other foundation items. Resource links appear inline on the matching roadmap tasks. Free users see these cards locked with a short upsell.
+- **Pro Cohort / Cohort Plus +** — everything in DIY, plus a "My Program" panel that hands off to the Credit Suite / Lendavo platforms with a direct launch link from the dashboard, alongside cohort schedule and coach access. Lower tiers see this as a locked card explaining what the transition includes.
+
+Tier gating reads from the existing entitlements hook, so the dashboard adjusts automatically after checkout.
 
 ## Technical notes
 
