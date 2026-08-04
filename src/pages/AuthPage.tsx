@@ -125,6 +125,7 @@ export default function AuthPage() {
         options: {
           emailRedirectTo: `${window.location.origin}${next ?? "/admin"}`,
           data: {
+            requested_role: "admin",
             terms_accepted: "true",
             terms_consent_text: TERMS_CONSENT_TEXT,
           }
