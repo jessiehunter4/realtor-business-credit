@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/rbc-logo-transparent.png.asset.json";
 import { useAuthRole } from "@/hooks/useAuthRole";
-import { supabase } from "@/integrations/supabase/client";
+import { signOutAndClear } from "@/lib/signOut";
 import { homeForRole, type AppRole } from "@/lib/roles";
 
 type NavItem = { to: string; label: string; roles?: AppRole[] };
@@ -35,8 +35,7 @@ const SiteHeader = () => {
   const primaryNav = visibleFor(navLinks, role);
   const mobileSecondaryNav = visibleFor(secondaryLinks, role);
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    await signOutAndClear({ redirectTo: "/" });
   };
 
   return (
