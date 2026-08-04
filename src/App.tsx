@@ -29,7 +29,15 @@ import OAuthConsentPage from "./pages/OAuthConsentPage";
 import MockLoginPage from "./pages/MockLoginPage";
 import SignupPage from "./pages/SignupPage";
 import AdminSignupPage from "./pages/AdminSignupPage";
-import DashboardPage from "./pages/DashboardPage";
+import DashboardLayout from "./pages/dashboard/DashboardLayout";
+import OverviewSection from "./pages/dashboard/OverviewSection";
+import GoalsSection from "./pages/dashboard/GoalsSection";
+import ActionPlanSection from "./pages/dashboard/ActionPlanSection";
+import RoadmapSection from "./pages/dashboard/RoadmapSection";
+import MilestonesSection from "./pages/dashboard/MilestonesSection";
+import FundingSection from "./pages/dashboard/FundingSection";
+import ResourcesSection from "./pages/dashboard/ResourcesSection";
+import ProgramSection from "./pages/dashboard/ProgramSection";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentCancelledPage from "./pages/PaymentCancelledPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
@@ -84,7 +92,16 @@ const App = () => (
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/login" element={<MockLoginPage />} />
           <Route path="/mock-login" element={<Navigate to="/login" replace />} />
-          <Route path="/dashboard" element={<RequireVisitor><DashboardPage /></RequireVisitor>} />
+          <Route path="/dashboard" element={<RequireVisitor><DashboardLayout /></RequireVisitor>}>
+            <Route index element={<OverviewSection />} />
+            <Route path="goals" element={<GoalsSection />} />
+            <Route path="90-day" element={<ActionPlanSection />} />
+            <Route path="roadmap" element={<RoadmapSection />} />
+            <Route path="milestones" element={<MilestonesSection />} />
+            <Route path="funding" element={<FundingSection />} />
+            <Route path="resources" element={<ResourcesSection />} />
+            <Route path="program" element={<ProgramSection />} />
+          </Route>
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
