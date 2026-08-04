@@ -133,8 +133,7 @@ export default function DashboardLayout() {
   }, [loading, profile, searchParams, setSearchParams]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    await signOutAndClear({ redirectTo: "/" });
   };
 
   if (loading) {
