@@ -92,6 +92,7 @@ const App = () => (
           <Route path="/sms-opt-in" element={<SmsOptInProofPage />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           <Route path="/login" element={<MockLoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/mock-login" element={<Navigate to="/login" replace />} />
           <Route path="/dashboard" element={<RequireVisitor><DashboardLayout /></RequireVisitor>}>
             <Route index element={<OverviewSection />} />
