@@ -92,6 +92,7 @@ export default {
       },
       boxShadow: {
         card: "0 8px 18px rgba(11,31,59,0.08)",
+        "card-soft": "0 4px 12px rgba(11,31,59,0.06)",
         "card-hover": "0 10px 30px rgba(11,31,59,0.10)",
       },
       backgroundImage: {

@@ -23,6 +23,7 @@ All colors MUST be HSL.
     --rbc-radius: 20px;
     --rbc-shadow: 0 10px 30px rgba(11,31,59,.10);
     --rbc-shadow-soft: 0 8px 18px rgba(11,31,59,.08);
+    --rbc-shadow-card-soft: 0 4px 12px rgba(11,31,59,.06);
 
     /* shadcn HSL tokens mirrored onto the brand palette */
     --background: 210 33% 98%;          /* #F7FAFC */
