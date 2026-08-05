@@ -19,6 +19,7 @@ import PortalPlanView from "./pages/PortalPlanView";
 import BookingConfirmedPage from "./pages/BookingConfirmedPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import SamplePlanPage from "./pages/SamplePlanPage";
+import MlsSimulatorPage from "./pages/MlsSimulatorPage";
 import AdminVideoUpload from "./pages/AdminVideoUpload";
 import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
 import PricingPage from "./pages/PricingPage";
@@ -83,6 +84,7 @@ const App = () => (
           </Route>
           <Route path="/booking-confirmed" element={<BookingConfirmedPage />} />
           <Route path="/sample-plan" element={<SamplePlanPage />} />
+          <Route path="/mls-simulator" element={<MlsSimulatorPage />} />
           <Route
             path="/business-credit-cards-for-realtors"
             element={<BusinessCreditCardsForRealtorsPage />}
