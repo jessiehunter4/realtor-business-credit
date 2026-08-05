@@ -247,7 +247,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
         <EditableText section="next_steps" value={nextStepsNarrative} rows={3} />
         <div className="grid sm:grid-cols-2 gap-3 mt-4">
           {programOptions.map((opt, i) => (
-            <div key={i} className="border border-gray-200 rounded-lg p-3">
+            <div key={i} className="border border-gray-200 rounded-lg p-3 text-center">
               <p className="font-semibold text-[#1e3a5f] text-sm">{opt.name}</p>
               <p className="text-gray-600 text-xs mt-1">{opt.description}</p>
             </div>
