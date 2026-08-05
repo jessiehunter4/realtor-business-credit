@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import { DEFAULT_ROLE, type AppRole } from "@/lib/roles";
-import { clearSessionStorage } from "@/lib/signOut";
+import { clearSessionStorage, clearVisitorLocalStorage } from "@/lib/signOut";
 
 export type { AppRole };
 
@@ -53,6 +53,9 @@ export function AuthRoleProvider({ children }: { children: ReactNode }) {
       // fresh sign-in both start from a clean sessionStorage so no scroll or
       // navigation state leaks between users on a shared browser.
       if (_e === "SIGNED_OUT" || _e === "SIGNED_IN") clearSessionStorage();
+      // Visitor identity / guide opt-in / intake drafts must not survive a
+      // sign-out, otherwise the gate is skipped for the next visitor.
+      if (_e === "SIGNED_OUT") clearVisitorLocalStorage();
       // Defer supabase call to avoid deadlock inside the listener
       setTimeout(() => { load(s); }, 0);
     });
