@@ -612,7 +612,10 @@ export default function AdminIntakeCoachView() {
                           <GoalStatement goals={goals} pains={pains} name={form.first_name || form.contact_name} />
 
                           <div className="space-y-2">
-                            <Label>Goals notes</Label>
+                            <Label>Additional goals or context</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Goal-shaped statements here are added to the plan as secondary goals. Background, numbers, and questions stay in the plan summary.
+                            </p>
                             <Textarea value={form.goals_notes || ""} onChange={(e) => updateField("goals_notes", e.target.value)} rows={3} />
                           </div>
                         </>
