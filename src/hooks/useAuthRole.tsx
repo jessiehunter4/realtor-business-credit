@@ -13,7 +13,15 @@ interface AuthRoleContextValue {
   refresh: () => Promise<void>;
 }
 
-const AuthRoleContext = createContext<AuthRoleContextValue | undefined>(undefined);
+// Keep a single context instance across HMR module re-evaluations. Without this,
+// a hot update to this file creates a new context while the mounted provider
+// still uses the old one, making consumers read `undefined` and throw.
+const g = globalThis as unknown as {
+  __authRoleContext?: React.Context<AuthRoleContextValue | undefined>;
+};
+const AuthRoleContext =
+  g.__authRoleContext ??
+  (g.__authRoleContext = createContext<AuthRoleContextValue | undefined>(undefined));
 
 async function fetchRole(userId: string): Promise<AppRole | null> {
   const { data, error } = await supabase
