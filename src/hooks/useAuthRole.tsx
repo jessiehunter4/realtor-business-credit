@@ -31,14 +31,20 @@ export function AuthRoleProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const loadedUserRef = useRef<string | null | undefined>(undefined);
 
   const load = useCallback(async (s: Session | null) => {
     setSession(s);
     if (!s) {
+      loadedUserRef.current = null;
       setRole(null);
       setLoading(false);
       return;
     }
+    // Already resolved for this user (e.g. token refresh on tab focus) —
+    // keep the current role instead of flipping back into a loading state.
+    if (loadedUserRef.current === s.user.id) return;
+    loadedUserRef.current = s.user.id;
     // Keep consumers in a loading state until the role for THIS session is
     // resolved, otherwise they route on a stale role.
     setLoading(true);
@@ -65,6 +71,7 @@ export function AuthRoleProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(async () => {
     const { data: { session: s } } = await supabase.auth.getSession();
+    loadedUserRef.current = undefined;
     await load(s);
   }, [load]);
 
