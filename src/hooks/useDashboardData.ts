@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import type { PlanData } from "@/components/plan/PlanDocument";
@@ -53,9 +53,11 @@ export function useDashboardData(): DashboardData {
   const [survey, setSurvey] = useState<IntakeSurveyLike | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const loadedUserRef = useRef<string | null | undefined>(undefined);
 
-  const load = useCallback(async (activeSession: Session | null) => {
+  const load = useCallback(async (activeSession: Session | null, force = false) => {
     if (!activeSession) {
+      loadedUserRef.current = null;
       setProfile(null);
       setPlan(null);
       setTasks([]);
@@ -63,7 +65,11 @@ export function useDashboardData(): DashboardData {
       setLoading(false);
       return;
     }
-    setLoading(true);
+    // Skip redundant reloads (e.g. token refresh when the tab regains focus).
+    if (!force && loadedUserRef.current === activeSession.user.id) return;
+    const isFirstLoad = loadedUserRef.current !== activeSession.user.id;
+    loadedUserRef.current = activeSession.user.id;
+    if (isFirstLoad) setLoading(true);
     setError(null);
     try {
       const uid = activeSession.user.id;
@@ -133,6 +139,6 @@ export function useDashboardData(): DashboardData {
     survey,
     loading,
     error,
-    refresh: async () => load(session),
+    refresh: async () => load(session, true),
   };
 }
