@@ -119,7 +119,7 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange, planId }:
                 className="rounded-full text-xs"
                 onClick={() => onStatusChange(task, "completed")}
               >
-                Done
+                Mark as Done?
               </Button>
             </>
           )}
