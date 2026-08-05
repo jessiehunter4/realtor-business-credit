@@ -1,13 +1,7 @@
-# Plan: Update Cost Comparison Chart Text Color
-
-## Goal
-Change the font color of the "High cost + FICO hit" label in the cash-flow calculator's SVG bar chart from white to black for better visibility.
+# Plan: Change SVG Label Text Color to Black
 
 ## Change
-In `src/components/landing/CashFlowCalculator.tsx`, update the SVG `<text>` element for the personal-credit bar label:
-- Current: `fill="white"`
-- New: `fill="black"` (or `hsl(var(--secondary))` if a themed dark color is preferred)
+In `src/components/landing/CashFlowCalculator.tsx`, line 174, change the `fill` attribute of the "High cost + FICO hit" SVG text from `white` to `black`.
 
 ## Verification
-- Load the homepage and scroll to the Cash-Flow Gap Calculator.
-- Confirm the "High cost + FICO hit" text is now black and readable against the red bar.
+Confirm the personal-credit bar label in the Cash-Flow Gap Calculator is now black and readable.
