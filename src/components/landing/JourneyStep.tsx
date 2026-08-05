@@ -23,7 +23,7 @@ const JourneyStep = ({
   cta,
 }: Props) => (
   <section id={id} className="container mx-auto px-4 py-12 md:py-16 scroll-mt-24">
-    <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto">
+    <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
       <div className={reverse ? "lg:order-2" : "lg:order-1"}>
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border shadow-card bg-muted">
           <img
