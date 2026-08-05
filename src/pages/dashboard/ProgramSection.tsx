@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PRICING_TIERS } from "@/data/pricingTiers";
+import { TIER_LABELS, isUpgrade, type PaidTierId } from "@/lib/entitlementTiers";
 import SectionHeader from "./SectionHeader";
 import { useDashboardCtx } from "./DashboardLayout";
 
@@ -24,12 +25,14 @@ export default function ProgramSection() {
   const { plan, tier } = useDashboardCtx();
   const recommended = plan?.recommended_program_slug ?? null;
   const nextSteps = plan?.plan_data?.sections?.next_steps;
+  const platformAccess = tier.capabilities.platformAccess;
+  const subtitle = tier.highest ? `${TIER_LABELS[tier.highest]} active` : "Free plan";
 
   return (
     <>
       <SectionHeader
         title="My Program"
-        subtitle={tier.program ? "Cohort access active" : tier.diy ? "DIY plan active" : "Free plan"}
+        subtitle={subtitle}
         blurb="Where you are today, and what the next level of support adds."
       />
 
@@ -41,13 +44,13 @@ export default function ProgramSection() {
         </Card>
       )}
 
-      <Card className={tier.program ? "border-primary/40 bg-primary/5" : "border-border"}>
+      <Card className={platformAccess ? "border-primary/40 bg-primary/5" : "border-border"}>
         <CardContent className="p-5 space-y-3">
           <div className="flex items-center gap-2 font-semibold text-secondary">
-            {tier.program ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
+            {platformAccess ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
             Credit Suite / Lendavo platforms
           </div>
-          {tier.program ? (
+          {platformAccess ? (
             <>
               <p className="text-sm text-muted-foreground">
                 Your cohort enrollment includes the implementation platforms. Launch them here — your RE Pro plan stays
@@ -72,8 +75,8 @@ export default function ProgramSection() {
           ) : (
             <>
               <p className="text-sm text-muted-foreground">
-                Pro Cohort and Cohort Plus + transition you onto the Credit Suite and Lendavo platforms, with a dedicated
-                specialist and the funding directory. You'll launch both from right here once you're enrolled.
+                Enrolling in Pro Cohort or Cohort Plus + transitions you onto the Credit Suite and Lendavo platforms,
+                with a specialist and the funding directory. You'll launch them from right here once you're enrolled.
               </p>
               <Link to="/pricing">
                 <Button className="rounded-full">
@@ -90,9 +93,11 @@ export default function ProgramSection() {
         <div className="grid gap-3 sm:grid-cols-2">
           {PRICING_TIERS.map((t) => {
             const active =
-              (t.id === "free" && !tier.diy) ||
-              (t.id === "self-paced" && tier.diy && !tier.program) ||
-              ((t.id === "cohort" || t.id === "one-on-one") && tier.program);
+              t.id === "free"
+                ? tier.owned.size === 0
+                : tier.owned.has(t.id as PaidTierId);
+            const upgrade =
+              t.id !== "free" && isUpgrade(t.id as PaidTierId, tier.highest);
             return (
               <Card key={t.id} className={active ? "border-primary/50" : ""}>
                 <CardContent className="p-4 space-y-2">
@@ -112,7 +117,7 @@ export default function ProgramSection() {
                   {!active && (
                     <Link to={t.ctaHref}>
                       <Button size="sm" variant="outline" className="rounded-full text-xs">
-                        {t.ctaLabel}
+                        {upgrade ? `Upgrade to ${t.name}` : t.ctaLabel}
                       </Button>
                     </Link>
                   )}
