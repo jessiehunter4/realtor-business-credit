@@ -55,7 +55,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             {subhead}
           </p>
 
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-2.5 justify-center">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-2.5 justify-center">
               <Link
                 to={guideLink}
                 data-analytics-id="cta-guide-hero"
