@@ -15,6 +15,9 @@ export interface ParsedVisitorSlug {
 
 const NAME_PATTERN = /^[a-zA-Z][a-zA-Z\s'’]*$/;
 
+/** e.g. "JP.Eltanal", "J.Hunter" — initials + "." + surname. */
+const INITIALS_PATTERN = /^([A-Z]{1,4})\.([a-zA-Z][a-zA-Z'’-]*)$/;
+
 const titleCase = (word: string) =>
   word.length > 1 ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word.toUpperCase();
 
@@ -30,6 +33,17 @@ export function parseVisitorSlug(slug?: string | null): ParsedVisitorSlug {
   }
   const raw = decoded.trim();
   if (!raw || raw.length > 60) return { ...empty, raw };
+
+  // Initials format keeps its capitalization verbatim ("JP.Eltanal" -> "JP Eltanal").
+  const initialsMatch = raw.match(INITIALS_PATTERN);
+  if (initialsMatch) {
+    const [, initials, surname] = initialsMatch;
+    return {
+      raw,
+      displayName: `${initials} ${titleCase(surname)}`,
+      isValid: true,
+    };
+  }
 
   const spaced = raw.replace(/[+_\-.]+/g, " ").replace(/\s+/g, " ").trim();
   if (!spaced || !NAME_PATTERN.test(spaced)) return { ...empty, raw };
