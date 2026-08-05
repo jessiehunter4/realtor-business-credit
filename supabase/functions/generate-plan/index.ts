@@ -314,6 +314,45 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       return new Response(JSON.stringify({ error: "AI returned malformed plan data. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // --- Deterministic goal reconciliation -------------------------------
+    // Guarantee every checked goal (and any "Other" goal text) exists as a
+    // discrete goal entry even if the model merged or dropped it.
+    const normalizeGoal = (s: string) =>
+      String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+    const aiGoals: any[] = Array.isArray(aiPlan.goals) ? [...aiPlan.goals] : [];
+    const goalMatches = (label: string) => {
+      const n = normalizeGoal(label);
+      if (!n) return true;
+      return aiGoals.some((g) => {
+        const gn = normalizeGoal(g?.label);
+        return gn === n || gn.includes(n) || n.includes(gn);
+      });
+    };
+
+    const checkedGoals: string[] = (survey.primary_goals || []).filter(
+      (g: string) => g && g !== "Other",
+    );
+    const otherGoalText: string = (survey.primary_goals_other || "").trim();
+    const expectedGoals: string[] = [...checkedGoals, ...(otherGoalText ? [otherGoalText] : [])];
+
+    for (const label of expectedGoals) {
+      if (goalMatches(label)) continue;
+      aiGoals.push({
+        label: label.length > 90 ? `${label.slice(0, 87)}…` : label,
+        priority: aiGoals.length === 0 ? "primary" : "secondary",
+        horizon: "",
+        target_amount: "",
+        why_it_matters: "You told us this matters in your Needs Analysis.",
+      });
+    }
+
+    // Exactly one primary: the first entry.
+    const reconciledGoals = aiGoals.map((g, i) => ({
+      ...g,
+      priority: i === 0 ? "primary" : "secondary",
+    }));
+
     // Build plan_data
     const planData = {
       contact_name: survey.contact_name,
@@ -322,7 +361,7 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       state: survey.state,
       license_type: survey.license_type,
       sections: {
-        goals_snapshot: { narrative: aiPlan.goals_snapshot_narrative, goals: aiPlan.goals || [] },
+        goals_snapshot: { narrative: aiPlan.goals_snapshot_narrative, goals: reconciledGoals },
         fundability: { items: fundabilityItems, narrative: aiPlan.fundability_narrative },
         action_plan_90day: { items: aiPlan.action_items },
         roadmap: { milestones: aiPlan.milestones },
