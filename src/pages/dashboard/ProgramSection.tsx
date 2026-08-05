@@ -45,8 +45,8 @@ export default function ProgramSection() {
       )}
 
       <Card className={platformAccess ? "border-primary/40 bg-primary/5" : "border-border"}>
-        <CardContent className="p-5 space-y-3">
-          <div className="flex items-center gap-2 font-semibold text-secondary">
+        <CardContent className="p-5 space-y-3 text-center">
+          <div className="flex items-center justify-center gap-2 font-semibold text-secondary">
             {platformAccess ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
             Credit Suite / Lendavo platforms
           </div>
