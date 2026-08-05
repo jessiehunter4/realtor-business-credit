@@ -124,13 +124,13 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
             {goalsList.map((g, i) => (
               <div
                 key={i}
-                className={`rounded-lg border p-3 ${
+                className={`rounded-lg border p-3 text-center ${
                   g.priority === "primary"
                     ? "border-[#3eaf7c] bg-[#3eaf7c]/5"
                     : "border-gray-200 bg-gray-50"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center justify-center gap-2 mb-1 flex-wrap">
                   <span
                     className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
                       g.priority === "primary"
