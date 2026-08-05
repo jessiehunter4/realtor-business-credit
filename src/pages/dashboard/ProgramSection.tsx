@@ -115,7 +115,7 @@ export default function ProgramSection() {
                     ))}
                   </ul>
                   {!active && (
-                    <Link to={t.ctaHref} className="inline-block mt-4">
+                    <Link to={t.ctaHref} className="inline-block mt-6">
                       <Button size="sm" variant="outline" className="rounded-full text-xs">
                         {upgrade ? `Upgrade to ${t.name}` : t.ctaLabel}
                       </Button>
