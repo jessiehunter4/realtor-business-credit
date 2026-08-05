@@ -55,7 +55,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             {subhead}
           </p>
 
-          <div className="mt-4 sm:mt-5 flex flex-col sm:flex-row gap-2.5 justify-center">
+          <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row gap-2.5 justify-center">
               <Link
                 to={guideLink}
                 data-analytics-id="cta-guide-hero"
@@ -66,7 +66,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               </Link>
           </div>
 
-          <ul className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
+          <ul className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
