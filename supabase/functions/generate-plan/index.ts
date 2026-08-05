@@ -146,8 +146,12 @@ Profile:
 
 Goals:
 - Primary Financial Goals (up to 3, in the order picked; treat the first as the top priority): ${(survey.primary_goals || []).join(" | ") || "N/A"}
+- Other Goal (free text the agent typed): ${survey.primary_goals_other || "N/A"}
 - Financial Pains (up to 3, in priority order): ${(survey.financial_pains || []).join(" | ") || "N/A"}
-- Goals Notes: ${survey.goals_notes || "N/A"}
+- Other Financial Pain (free text the agent typed): ${survey.financial_pains_other || "N/A"}
+- Additional Goals or Context (free text): ${survey.goals_notes || "N/A"}
+
+Goal extraction rule: every checked Primary Financial Goal must appear as its own goal entry. In addition, read the "Other Goal" text and the "Additional Goals or Context" text and turn any distinct goal-shaped statement (a financial outcome the agent wants) into its own secondary goal entry. Statements that are background, numbers, or questions for the coach are NOT goals — keep those in the narrative only. Never merge two goals into one entry.
 
 Business Structure:
 - Entity: ${survey.has_business_entity || "N/A"}
@@ -197,10 +201,10 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
               parameters: {
                 type: "object",
                 properties: {
-                  goals_snapshot_narrative: { type: "string", description: "2-3 paragraph narrative summarizing the agent's goals, production level, and why business credit matters for their situation." },
+                  goals_snapshot_narrative: { type: "string", description: "2-3 paragraph narrative summarizing the agent's goals, production level, and why business credit matters for their situation. Include context from the agent's free-text notes that is not itself a goal." },
                   goals: {
                     type: "array",
-                    description: "Each of the agent's goals as a distinct, structured entry. Include the primary goal first (priority='primary') followed by every additional goal (priority='secondary'). Do NOT merge goals together.",
+                    description: "Each of the agent's goals as a distinct, structured entry. Include the first checked primary goal first (priority='primary') followed by every additional goal (priority='secondary'), including goals extracted from the 'Other Goal' free text and the 'Additional Goals or Context' free text. Do NOT merge goals together and do NOT invent goals from background context.",
                     items: {
                       type: "object",
                       properties: {
