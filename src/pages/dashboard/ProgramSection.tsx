@@ -42,7 +42,7 @@ export default function ProgramSection() {
       )}
 
       <Card className={tier.program ? "border-primary/40 bg-primary/5" : "border-border"}>
-        <CardContent className="p-5 space-y-5">
+        <CardContent className="p-6 space-y-6">
           <div className="flex items-center gap-2 font-semibold text-secondary">
             {tier.program ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
             Credit Suite / Lendavo platforms
