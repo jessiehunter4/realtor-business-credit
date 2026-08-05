@@ -58,7 +58,7 @@ export default function ProgramSection() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {PLATFORMS.map((p) => (
-                  <div key={p.name} className="flex flex-col rounded-lg border border-border bg-card p-4">
+                  <div key={p.name} className="flex flex-col items-center text-center rounded-lg border border-border bg-card p-4">
                     <div className="flex-1">
                       <p className="font-medium text-secondary text-sm">{p.name}</p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.blurb}</p>
