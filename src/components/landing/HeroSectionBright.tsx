@@ -51,11 +51,11 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             </div>
           </div>
 
-          <p className="mt-4 sm:mt-5 text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-pretty max-w-2xl mx-auto">
+          <p className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-pretty max-w-2xl mx-auto">
             {subhead}
           </p>
 
-          <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row gap-2.5 justify-center">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-2.5 justify-center">
               <Link
                 to={guideLink}
                 data-analytics-id="cta-guide-hero"
@@ -66,7 +66,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               </Link>
           </div>
 
-          <ul className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
+          <ul className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -78,7 +78,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               ))}
           </ul>
 
-          <p className="mt-3 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
+          <p className="mt-4 sm:mt-5 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
             <Clock className="h-3.5 w-3.5 text-primary" />
             Free to read · about 5–10 minutes · no signup required
           </p>
