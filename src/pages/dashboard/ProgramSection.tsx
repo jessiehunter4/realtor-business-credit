@@ -78,7 +78,7 @@ export default function ProgramSection() {
                 Enrolling in Pro Cohort or Cohort Plus + transitions you onto the Credit Suite and Lendavo platforms,
                 with a specialist and the funding directory. You'll launch them from right here once you're enrolled.
               </p>
-              <Link to="/pricing">
+              <Link to="/pricing" className="inline-block mt-6">
                 <Button className="rounded-full">
                   See cohort options <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
