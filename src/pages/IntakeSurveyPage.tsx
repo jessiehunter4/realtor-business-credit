@@ -1017,8 +1017,16 @@ function IntakeSurveyForm() {
               />
 
               <div className="space-y-2">
-                <Label>Anything else about your goals? (optional)</Label>
-                <Textarea value={form.goals_notes || ""} onChange={e => updateField("goals_notes", e.target.value)} rows={3} placeholder="Context, numbers, or details you'd like your coach to know." />
+                <Label>Additional goals or context (optional)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Goals you describe here are added to your dashboard as secondary goals. Background, numbers, and questions for your coach stay in your plan summary.
+                </p>
+                <Textarea
+                  value={form.goals_notes || ""}
+                  onChange={e => updateField("goals_notes", e.target.value)}
+                  rows={3}
+                  placeholder="e.g. Build a 6-month operating reserve. Or share numbers and context you'd like your coach to know."
+                />
               </div>
             </CardContent>
           </Card>

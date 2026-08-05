@@ -146,8 +146,12 @@ Profile:
 
 Goals:
 - Primary Financial Goals (up to 3, in the order picked; treat the first as the top priority): ${(survey.primary_goals || []).join(" | ") || "N/A"}
+- Other Goal (free text the agent typed): ${survey.primary_goals_other || "N/A"}
 - Financial Pains (up to 3, in priority order): ${(survey.financial_pains || []).join(" | ") || "N/A"}
-- Goals Notes: ${survey.goals_notes || "N/A"}
+- Other Financial Pain (free text the agent typed): ${survey.financial_pains_other || "N/A"}
+- Additional Goals or Context (free text): ${survey.goals_notes || "N/A"}
+
+Goal extraction rule: every checked Primary Financial Goal must appear as its own goal entry. In addition, read the "Other Goal" text and the "Additional Goals or Context" text and turn any distinct goal-shaped statement (a financial outcome the agent wants) into its own secondary goal entry. Statements that are background, numbers, or questions for the coach are NOT goals — keep those in the narrative only. Never merge two goals into one entry.
 
 Business Structure:
 - Entity: ${survey.has_business_entity || "N/A"}
@@ -197,10 +201,10 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
               parameters: {
                 type: "object",
                 properties: {
-                  goals_snapshot_narrative: { type: "string", description: "2-3 paragraph narrative summarizing the agent's goals, production level, and why business credit matters for their situation." },
+                  goals_snapshot_narrative: { type: "string", description: "2-3 paragraph narrative summarizing the agent's goals, production level, and why business credit matters for their situation. Include context from the agent's free-text notes that is not itself a goal." },
                   goals: {
                     type: "array",
-                    description: "Each of the agent's goals as a distinct, structured entry. Include the primary goal first (priority='primary') followed by every additional goal (priority='secondary'). Do NOT merge goals together.",
+                    description: "Each of the agent's goals as a distinct, structured entry. Include the first checked primary goal first (priority='primary') followed by every additional goal (priority='secondary'), including goals extracted from the 'Other Goal' free text and the 'Additional Goals or Context' free text. Do NOT merge goals together and do NOT invent goals from background context.",
                     items: {
                       type: "object",
                       properties: {
@@ -310,6 +314,45 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       return new Response(JSON.stringify({ error: "AI returned malformed plan data. Please retry." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // --- Deterministic goal reconciliation -------------------------------
+    // Guarantee every checked goal (and any "Other" goal text) exists as a
+    // discrete goal entry even if the model merged or dropped it.
+    const normalizeGoal = (s: string) =>
+      String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+    const aiGoals: any[] = Array.isArray(aiPlan.goals) ? [...aiPlan.goals] : [];
+    const goalMatches = (label: string) => {
+      const n = normalizeGoal(label);
+      if (!n) return true;
+      return aiGoals.some((g) => {
+        const gn = normalizeGoal(g?.label);
+        return gn === n || gn.includes(n) || n.includes(gn);
+      });
+    };
+
+    const checkedGoals: string[] = (survey.primary_goals || []).filter(
+      (g: string) => g && g !== "Other",
+    );
+    const otherGoalText: string = (survey.primary_goals_other || "").trim();
+    const expectedGoals: string[] = [...checkedGoals, ...(otherGoalText ? [otherGoalText] : [])];
+
+    for (const label of expectedGoals) {
+      if (goalMatches(label)) continue;
+      aiGoals.push({
+        label: label.length > 90 ? `${label.slice(0, 87)}…` : label,
+        priority: aiGoals.length === 0 ? "primary" : "secondary",
+        horizon: "",
+        target_amount: "",
+        why_it_matters: "You told us this matters in your Needs Analysis.",
+      });
+    }
+
+    // Exactly one primary: the first entry.
+    const reconciledGoals = aiGoals.map((g, i) => ({
+      ...g,
+      priority: i === 0 ? "primary" : "secondary",
+    }));
+
     // Build plan_data
     const planData = {
       contact_name: survey.contact_name,
@@ -318,7 +361,7 @@ Generate a personalized plan using the generate_plan tool. Be specific, actionab
       state: survey.state,
       license_type: survey.license_type,
       sections: {
-        goals_snapshot: { narrative: aiPlan.goals_snapshot_narrative, goals: aiPlan.goals || [] },
+        goals_snapshot: { narrative: aiPlan.goals_snapshot_narrative, goals: reconciledGoals },
         fundability: { items: fundabilityItems, narrative: aiPlan.fundability_narrative },
         action_plan_90day: { items: aiPlan.action_items },
         roadmap: { milestones: aiPlan.milestones },

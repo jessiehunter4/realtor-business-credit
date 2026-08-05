@@ -14,12 +14,47 @@ export default function GoalsSection() {
 
   const narrative = plan.plan_data?.sections?.goals_snapshot?.narrative ?? "";
 
+  // The generator tags each goal's meta with "primary goal" / "secondary goal".
+  const isPrimary = (meta?: string) => !!meta && meta.toLowerCase().startsWith("primary goal");
+  const cleanMeta = (meta?: string) =>
+    meta
+      ? meta.replace(/^(primary|secondary) goal\s*(·\s*)?/i, "").trim() || undefined
+      : undefined;
+
+  const primaryGoals = goals.filter((g) => isPrimary(g.meta));
+  const secondaryGoals = goals.filter((g) => !isPrimary(g.meta));
+
+  const help = {
+    title: "Tracking a goal",
+    sections: [
+      { label: "What this means", body: "This is a financial outcome you told us matters — not a task. It's the reason the roadmap steps exist." },
+      { label: "How to use it", body: "Mark it 'Working on it' once you've started, and keep a short note about what's actually moving or blocking it." },
+      { label: "Done looks like", body: "The number or capability you described is real — money available, expenses off personal credit, or the limit you were after." },
+    ],
+  };
+
+  const renderGoal = (item: (typeof goals)[number]) => (
+    <PlanItemRow
+      key={item.key}
+      item={{ ...item, meta: cleanMeta(item.meta) }}
+      saving={savingKey === item.key}
+      onStatusChange={setStatus}
+      onNoteSave={setNote}
+      onUpdate={updateItem}
+      onRemove={removeItem}
+      onRevert={revertItem}
+      metaLabel="Horizon or target amount"
+      labels={{ start: "Working on it", done: "Achieved", undo: "Reopen" }}
+      help={help}
+    />
+  );
+
   return (
     <>
       <SectionHeader
         title="My Goals"
         subtitle={`${countDone(goals)} of ${goals.length} achieved`}
-        blurb="These came from your Needs Analysis. Track where each one stands and keep notes as things change."
+        blurb="These came from your Needs Analysis — including any goals you typed in yourself. Track where each one stands and add more any time."
       />
 
       {narrative && (
@@ -36,30 +71,23 @@ export default function GoalsSection() {
         </p>
       )}
 
-      <div className="space-y-2">
-        {goals.map((item) => (
-            <PlanItemRow
-              key={item.key}
-              item={item}
-              saving={savingKey === item.key}
-              onStatusChange={setStatus}
-              onNoteSave={setNote}
-              onUpdate={updateItem}
-              onRemove={removeItem}
-              onRevert={revertItem}
-              metaLabel="Horizon or target amount"
-              labels={{ start: "Working on it", done: "Achieved", undo: "Reopen" }}
-              help={{
-                title: "Tracking a goal",
-                sections: [
-                  { label: "What this means", body: "This is a financial outcome you told us matters — not a task. It's the reason the roadmap steps exist." },
-                  { label: "How to use it", body: "Mark it 'Working on it' once you've started, and keep a short note about what's actually moving or blocking it." },
-                  { label: "Done looks like", body: "The number or capability you described is real — money available, expenses off personal credit, or the limit you were after." },
-                ],
-              }}
-            />
-        ))}
-      </div>
+      {primaryGoals.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">Top priority</p>
+          {primaryGoals.map(renderGoal)}
+        </div>
+      )}
+
+      {secondaryGoals.length > 0 && (
+        <div className="space-y-2">
+          {primaryGoals.length > 0 && (
+            <p className="pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Also working toward
+            </p>
+          )}
+          {secondaryGoals.map(renderGoal)}
+        </div>
+      )}
 
       <AddPlanItemForm
         group="goal"
