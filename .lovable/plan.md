@@ -1,29 +1,22 @@
-# Reliable authenticated previews of `/dashboard/program`
+# Increase spacing inside the `/dashboard/program` card
 
-## Problem
+## Current state
 
-`/dashboard/program` sits behind the visitor guard: with no session, the guard redirects to `/login?next=...`. The screenshot run that failed did so because the browser started with an empty session, not because of anything in the app.
+`src/pages/dashboard/ProgramSection.tsx` wraps the card body with `CardContent className="p-5 space-y-5"` (line 45). Inside, the title row, description paragraph, and CTA button are separated by the `space-y-5` gap (20px). The user wants 16–24px of breathing room between these elements, so the current 20px is at the bottom of that range and still feels tight.
 
-A signed-in session for this project is already available in the sandbox (auth status is `injected`), so the fix is a repeatable screenshot helper that restores that session before navigating — no changes to app code or auth rules.
+## Plan
 
-## What I'll add
+1. Open `src/pages/dashboard/ProgramSection.tsx`.
+2. Change the `CardContent` on line 45 from `p-5 space-y-5` to `p-6 space-y-6`.
+   - This adds more internal padding and increases the gap between the title, description, and CTA to 24px, squarely in the requested 16–24px range.
+3. Run `tsgo` to confirm the change does not break types.
+4. Capture an authenticated screenshot of `/dashboard/program` using the session-injected helper so the change is visible without redirecting to `/login`.
 
-A reusable script at `/tmp/browser/auth-shot/shot.py` (sandbox tooling, outside the project checkout) that:
+## Files changed
 
-1. Restores the injected session — both the Supabase localStorage key and the SSR cookies — against `http://localhost:8080`.
-2. Navigates to any route passed as an argument, e.g. `/dashboard/program`.
-3. Waits for the route guard's loading spinner to clear and asserts the final URL is not `/login` (fails loudly with the reason if the session didn't take).
-4. Captures desktop (1280px) and mobile (390px) screenshots into `/tmp/browser/auth-shot/screenshots/`.
-5. Prints the final URL plus any console errors.
-
-Usage: `python3 /tmp/browser/auth-shot/shot.py /dashboard/program`
-
-## Verification
-
-Run it against `/dashboard/program` and show you the authenticated screenshot confirming the Program card spacing change (title / description / CTA at ~20px gaps).
+- `src/pages/dashboard/ProgramSection.tsx`
 
 ## Notes
 
-- No project source files change; no auth bypass or dev-only backdoor is added, so nothing can leak into production.
-- The session is read from environment variables at runtime and never printed or written into a screenshot-adjacent file.
-- If the session ever expires, the script reports it clearly and you sign in once in the Lovable preview to refresh it.
+- The change is purely presentational; no data or auth logic is affected.
+- The spacing will apply to both the enrolled (platform launch) and non-enrolled ("See cohort options") states because they share the same `CardContent` wrapper.
