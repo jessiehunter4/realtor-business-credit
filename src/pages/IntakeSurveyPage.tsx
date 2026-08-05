@@ -727,7 +727,7 @@ function IntakeSurveyForm() {
   const activeVideo = stepVideoMeta[step] ?? stepVideoMeta[0];
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-24 pt-8 px-4">
+    <div className="min-h-screen bg-muted/30 pb-24 pt-4 sm:pt-6 px-4">
       <SiteHeader />
       <Seo
         title="RE Pro Business Financial Needs Analysis"
@@ -735,18 +735,18 @@ function IntakeSurveyForm() {
         path="/intake"
         noindex
       />
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-5">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-secondary">
+        <div className="text-center space-y-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-secondary">
             RE Pro Business Financial Needs Analysis
           </h1>
-          <p className="text-muted-foreground">
+          <p className="hidden sm:block text-sm text-muted-foreground">
             {form.contact_name ? `Welcome, ${form.contact_name}!` : "Welcome!"} Please complete the sections below to help us prepare for your session.
           </p>
         </div>
 
-        <div className="space-y-6 max-w-3xl mx-auto">
+        <div className="space-y-4 sm:space-y-5 max-w-3xl mx-auto">
           <StepVideoPlaceholder
             stepNumber={step + 1}
             title={activeVideo.title}
@@ -754,35 +754,38 @@ function IntakeSurveyForm() {
           />
 
           {/* Step indicator */}
-          <div className="flex gap-1 max-w-2xl mx-auto w-full">
-            {steps.map((s, i) => (
-              <button
-                key={s.key}
-                onClick={() => setStep(i)}
-                className={`flex-1 h-2 rounded-full transition-colors ${
-                  i <= step ? "bg-primary" : "bg-border"
-                }`}
-                aria-label={s.title}
-              />
-            ))}
-          </div>
-          <div className="text-center space-y-1">
-            <p className="text-sm font-medium text-foreground">
-              Step {step + 1} of {steps.length}: {steps[step].title}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {isDirectMode
-                ? "About 3–5 minutes total. Your answers save automatically in this browser."
-                : `About ${Math.max(1, steps.length - step)} min left · Progress saves automatically as you type.`}
-            </p>
-            {autosaveStatus !== "idle" && (
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                {autosaveStatus === "saving" ? "Saving…" : "Saved"}
+          <div className="max-w-2xl mx-auto w-full space-y-2">
+            <div className="flex gap-1 w-full">
+              {steps.map((s, i) => (
+                <button
+                  key={s.key}
+                  onClick={() => setStep(i)}
+                  aria-current={i === step ? "step" : undefined}
+                  className={`flex-1 h-2 rounded-full transition-colors ${
+                    i <= step ? "bg-primary" : "bg-border"
+                  }`}
+                  aria-label={s.title}
+                />
+              ))}
+            </div>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+              <p className="text-sm font-medium text-foreground">
+                Step {step + 1} of {steps.length}: {steps[step].title}
               </p>
-            )}
+              <p className="text-xs text-muted-foreground sm:text-right">
+                {isDirectMode
+                  ? "About 3–5 min total · saves automatically"
+                  : `About ${Math.max(1, steps.length - step)} min left · saves automatically`}
+                {autosaveStatus !== "idle" && (
+                  <span className="ml-2 uppercase tracking-wide">
+                    {autosaveStatus === "saving" ? "Saving…" : "Saved"}
+                  </span>
+                )}
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-6 min-w-0">
+          <div className="space-y-5 min-w-0">
         {/* Step A */}
         {step === 0 && (
           <Card>
