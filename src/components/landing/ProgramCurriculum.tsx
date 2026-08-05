@@ -105,8 +105,8 @@ const ProgramCurriculum = ({ guideLink = "/guide" }: Props) => {
           })}
 
           {/* Module 5 — emphasis card */}
-          <div className="group flex flex-col bg-secondary p-6 rounded-3xl border border-secondary shadow-card-hover transition-all hover:-translate-y-1">
-            <div className="mb-5 flex items-center justify-between">
+          <div className="group flex flex-col items-center text-center bg-secondary p-6 rounded-3xl border border-secondary shadow-card-hover transition-all hover:-translate-y-1">
+            <div className="mb-5 flex items-center justify-between w-full">
               <span className="text-xs font-bold uppercase tracking-widest text-primary">
                 Module 05
               </span>
