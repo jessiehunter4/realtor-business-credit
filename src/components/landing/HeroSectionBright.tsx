@@ -55,18 +55,18 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             {subhead}
           </p>
 
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-2.5 justify-center">
-              <Link
-                to={guideLink}
-                data-analytics-id="cta-guide-hero"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm sm:text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
-              >
-                <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
-                Read the Free Guide
-              </Link>
+          <div className="mt-8 sm:mt-10 flex justify-center">
+            <Link
+              to={guideLink}
+              data-analytics-id="cta-guide-hero"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm sm:text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+            >
+              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+              Read the Free Guide
+            </Link>
           </div>
 
-          <ul className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
+          <ul className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
