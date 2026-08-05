@@ -55,11 +55,13 @@ export default function ProgramSection() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {PLATFORMS.map((p) => (
-                  <div key={p.name} className="rounded-lg border border-border bg-card p-3">
-                    <p className="font-medium text-secondary text-sm">{p.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{p.blurb}</p>
-                    <a href={p.href} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" className="rounded-full text-xs mt-2">
+                  <div key={p.name} className="flex flex-col rounded-lg border border-border bg-card p-4">
+                    <div className="flex-1">
+                      <p className="font-medium text-secondary text-sm">{p.name}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.blurb}</p>
+                    </div>
+                    <a href={p.href} target="_blank" rel="noopener noreferrer" className="mt-4">
+                      <Button size="sm" className="rounded-full text-xs">
                         Launch <ExternalLink className="h-3 w-3 ml-1" />
                       </Button>
                     </a>
