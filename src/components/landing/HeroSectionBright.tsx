@@ -70,7 +70,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="h-full flex flex-col items-center justify-center gap-2 bg-white/70 backdrop-blur border border-border rounded-2xl px-3 py-3 text-sm text-secondary shadow-card text-center"
+                  className="h-full flex items-center justify-center gap-3 bg-white/70 backdrop-blur border border-border rounded-2xl px-4 py-3 text-sm text-secondary shadow-card text-center"
                 >
                   <Icon className="h-5 w-5 text-primary flex-shrink-0" />
                   <span className="font-medium leading-tight">{label}</span>
