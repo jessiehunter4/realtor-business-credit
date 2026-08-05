@@ -59,7 +59,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               <Link
                 to={guideLink}
                 data-analytics-id="cta-guide-hero"
-                className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm sm:text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm sm:text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
               >
                 <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
                 Read the Free Guide
