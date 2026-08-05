@@ -8,16 +8,17 @@ import { useDashboardCtx } from "./DashboardLayout";
 
 export default function ResourcesSection() {
   const { tier } = useDashboardCtx();
+  const unlocked = tier.capabilities.resourceLibrary;
 
   return (
     <>
       <SectionHeader
         title="Foundation Resources"
-        subtitle={tier.diy ? "Included with DIY" : "DIY and above"}
+        subtitle={unlocked ? "Included with your plan" : "DIY and above"}
         blurb="Vetted providers and walkthroughs for the structural pieces: virtual office, directory-listed phone, EIN, entity, banking, and bureau registration."
       />
 
-      {!tier.diy && (
+      {!unlocked && (
         <Card className="border-primary/30 bg-primary/5">
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2 font-semibold text-secondary">
@@ -42,7 +43,7 @@ export default function ResourcesSection() {
               <h2 className="font-semibold text-secondary">{r.title}</h2>
               <p className="text-sm text-muted-foreground">{r.blurb}</p>
 
-              {tier.diy ? (
+              {unlocked ? (
                 <>
                   <p className="text-xs text-muted-foreground leading-relaxed">{r.what}</p>
                   <ul className="space-y-1.5 pt-1">

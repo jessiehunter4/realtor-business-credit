@@ -34,6 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRoadmap } from "@/hooks/useRoadmap";
 import { usePlanItems } from "@/hooks/usePlanItems";
 import { useEntitlements } from "@/hooks/useEntitlements";
+import { buildEntitlementState, type EntitlementState } from "@/lib/entitlementTiers";
 import { logRoadmapEvent } from "@/lib/roadmap";
 import { signOutAndClear } from "@/lib/signOut";
 import WelcomeDialog from "@/components/dashboard/WelcomeDialog";
@@ -41,7 +42,7 @@ import WelcomeDialog from "@/components/dashboard/WelcomeDialog";
 type Ctx = ReturnType<typeof useDashboardData> & {
   roadmap: ReturnType<typeof useRoadmap>;
   planItems: ReturnType<typeof usePlanItems>;
-  tier: { diy: boolean; program: boolean };
+  tier: EntitlementState;
   firstName: string;
 };
 
@@ -107,8 +108,7 @@ export default function DashboardLayout() {
     refresh: data.refresh,
   });
 
-  const program = !entLoading && (hasProduct("cohort") || hasProduct("one-on-one"));
-  const diy = program || (!entLoading && hasProduct("self-paced"));
+  const tier = buildEntitlementState(hasProduct, !entLoading);
 
   useEffect(() => {
     if (loading || !plan?.id || viewLogged.current) return;
@@ -145,7 +145,7 @@ export default function DashboardLayout() {
     );
   }
 
-  const ctx: Ctx = { ...data, roadmap, planItems, tier: { diy, program }, firstName };
+  const ctx: Ctx = { ...data, roadmap, planItems, tier, firstName };
 
   return (
     <DashboardCtx.Provider value={ctx}>
