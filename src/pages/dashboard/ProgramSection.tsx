@@ -42,7 +42,7 @@ export default function ProgramSection() {
       )}
 
       <Card className={tier.program ? "border-primary/40 bg-primary/5" : "border-border"}>
-        <CardContent className="p-6 space-y-8">
+        <CardContent className="p-5 space-y-3">
           <div className="flex items-center gap-2 font-semibold text-secondary">
             {tier.program ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
             Credit Suite / Lendavo platforms
@@ -53,13 +53,13 @@ export default function ProgramSection() {
                 Your cohort enrollment includes the implementation platforms. Launch them here — your RE Pro plan stays
                 your source of truth for goals and progress.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {PLATFORMS.map((p) => (
-                  <div key={p.name} className="rounded-lg border border-border bg-card p-4 space-y-3">
+                  <div key={p.name} className="rounded-lg border border-border bg-card p-3">
                     <p className="font-medium text-secondary text-sm">{p.name}</p>
-                    <p className="text-xs text-muted-foreground">{p.blurb}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{p.blurb}</p>
                     <a href={p.href} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" className="rounded-full text-xs">
+                      <Button size="sm" className="rounded-full text-xs mt-2">
                         Launch <ExternalLink className="h-3 w-3 ml-1" />
                       </Button>
                     </a>
