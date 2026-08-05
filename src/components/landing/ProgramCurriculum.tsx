@@ -83,9 +83,9 @@ const ProgramCurriculum = ({ guideLink = "/guide" }: Props) => {
             return (
               <div
                 key={n}
-                className={`group flex flex-col bg-card p-6 rounded-3xl border border-border shadow-card transition-all hover:shadow-card-hover hover:-translate-y-1 ${c.border}`}
+                className={`group flex flex-col items-center text-center bg-card p-6 rounded-3xl border border-border shadow-card transition-all hover:shadow-card-hover hover:-translate-y-1 ${c.border}`}
               >
-                <div className="mb-5 flex items-center justify-between">
+                <div className="mb-5 flex items-center justify-between w-full">
                   <span className={`text-xs font-bold uppercase tracking-widest ${c.text}`}>
                     Module {n}
                   </span>
@@ -105,8 +105,8 @@ const ProgramCurriculum = ({ guideLink = "/guide" }: Props) => {
           })}
 
           {/* Module 5 — emphasis card */}
-          <div className="group flex flex-col bg-secondary p-6 rounded-3xl border border-secondary shadow-card-hover transition-all hover:-translate-y-1">
-            <div className="mb-5 flex items-center justify-between">
+          <div className="group flex flex-col items-center text-center bg-secondary p-6 rounded-3xl border border-secondary shadow-card-hover transition-all hover:-translate-y-1">
+            <div className="mb-5 flex items-center justify-between w-full">
               <span className="text-xs font-bold uppercase tracking-widest text-primary">
                 Module 05
               </span>

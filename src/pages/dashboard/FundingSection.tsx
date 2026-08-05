@@ -32,9 +32,9 @@ export default function FundingSection() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {funding.map((f) => (
-            <Card key={f.key} className={f.status === "completed" ? "border-primary/40 bg-primary/5" : ""}>
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-start justify-between gap-2">
+          <Card key={f.key} className={f.status === "completed" ? "border-primary/40 bg-primary/5" : ""}>
+              <CardContent className="p-4 space-y-2 text-center">
+                <div className="flex items-start justify-center gap-2 flex-wrap">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <h2 className="font-semibold text-secondary">{f.title}</h2>
                     <HelpBubble
@@ -50,7 +50,7 @@ export default function FundingSection() {
                   </Badge>
                 </div>
                 {f.detail && <p className="text-sm text-muted-foreground">{f.detail}</p>}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="flex flex-wrap justify-center gap-1.5 pt-1">
                   {(["not_started", "in_progress", "completed"] as const).map((s) => (
                     <Button
                       key={s}

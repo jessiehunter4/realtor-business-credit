@@ -45,8 +45,8 @@ export default function ProgramSection() {
       )}
 
       <Card className={platformAccess ? "border-primary/40 bg-primary/5" : "border-border"}>
-        <CardContent className="p-5 space-y-3">
-          <div className="flex items-center gap-2 font-semibold text-secondary">
+        <CardContent className="p-5 space-y-3 text-center">
+          <div className="flex items-center justify-center gap-2 font-semibold text-secondary">
             {platformAccess ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
             Credit Suite / Lendavo platforms
           </div>
@@ -58,7 +58,7 @@ export default function ProgramSection() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {PLATFORMS.map((p) => (
-                  <div key={p.name} className="flex flex-col rounded-lg border border-border bg-card p-4">
+                  <div key={p.name} className="flex flex-col items-center text-center rounded-lg border border-border bg-card p-4">
                     <div className="flex-1">
                       <p className="font-medium text-secondary text-sm">{p.name}</p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.blurb}</p>
@@ -100,8 +100,8 @@ export default function ProgramSection() {
               t.id !== "free" && isUpgrade(t.id as PaidTierId, tier.highest);
             return (
               <Card key={t.id} className={active ? "border-primary/50" : ""}>
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2 flex-wrap">
+                <CardContent className="p-4 space-y-2 text-center">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
                     <t.icon className="h-4 w-4 text-primary" />
                     <h3 className="font-semibold text-secondary">{t.name}</h3>
                     <span className="text-sm text-muted-foreground">{t.price}</span>
