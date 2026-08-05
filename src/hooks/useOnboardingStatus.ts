@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface OnboardingStatus {
@@ -25,12 +25,17 @@ const EMPTY: Omit<OnboardingStatus, "loading"> = {
  */
 export function useOnboardingStatus(): OnboardingStatus {
   const [state, setState] = useState<OnboardingStatus>({ loading: true, ...EMPTY });
+  const resolvedUserRef = useRef<string | null | undefined>(undefined);
 
   const resolve = useCallback(async (userId: string | null) => {
     if (!userId) {
+      resolvedUserRef.current = null;
       setState({ loading: false, ...EMPTY });
       return;
     }
+    // Already resolved for this user — ignore token refreshes on tab focus.
+    if (resolvedUserRef.current === userId) return;
+    resolvedUserRef.current = userId;
     try {
       const [{ data: survey }, { data: plan }] = await Promise.all([
         supabase.from("intake_surveys").select("id").eq("user_id", userId).limit(1).maybeSingle(),
