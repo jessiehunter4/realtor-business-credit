@@ -171,7 +171,7 @@ const CashFlowCalculator = ({ guideLink = "/guide" }: Props) => {
                 <text x="10" y="22" fontSize="11" fill="hsl(var(--muted-foreground))">Personal credit</text>
                 <rect x="10" y="30" width="380" height="22" rx="4" fill="hsl(var(--muted))" />
                 <rect x="10" y="30" width="320" height="22" rx="4" fill="hsl(var(--destructive))" opacity="0.85" />
-                <text x="335" y="46" fontSize="11" fill="white" fontWeight="bold">High cost + FICO hit</text>
+                <text x="335" y="46" fontSize="11" fill="black" fontWeight="bold">High cost + FICO hit</text>
                 {/* Business credit bar */}
                 <text x="10" y="78" fontSize="11" fill="hsl(var(--muted-foreground))">Business credit</text>
                 <rect x="10" y="86" width="380" height="22" rx="4" fill="hsl(var(--muted))" />
