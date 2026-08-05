@@ -100,8 +100,8 @@ export default function ProgramSection() {
               t.id !== "free" && isUpgrade(t.id as PaidTierId, tier.highest);
             return (
               <Card key={t.id} className={active ? "border-primary/50" : ""}>
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2 flex-wrap">
+                <CardContent className="p-4 space-y-2 text-center">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
                     <t.icon className="h-4 w-4 text-primary" />
                     <h3 className="font-semibold text-secondary">{t.name}</h3>
                     <span className="text-sm text-muted-foreground">{t.price}</span>
