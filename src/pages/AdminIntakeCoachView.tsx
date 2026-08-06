@@ -808,6 +808,14 @@ export default function AdminIntakeCoachView() {
                         </SelectContent>
                       </Select>
                     </div>
+                    <div className="space-y-2">
+                      <Label>Credit utilization per credit card</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {form.credit_utilization_percent === null || form.credit_utilization_percent === undefined
+                          ? "Not provided"
+                          : `${form.credit_utilization_percent}%`}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
