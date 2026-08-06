@@ -153,6 +153,7 @@ interface SurveyData {
   desired_funding_types?: string[];
   personal_guarantee_comfort?: string;
   personal_credit_score_range?: string;
+  credit_utilization_percent?: number | null;
   // E
   preferred_support_format?: string;
   interest_in_cohort?: string;
