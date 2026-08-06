@@ -498,6 +498,16 @@ function IntakeSurveyForm() {
         contactId: contactId || undefined,
         eventType: "intake_submitted",
       }).catch(() => {});
+
+      // Fire-and-forget: routing logic lives inside the edge function.
+      void invokeCreditUtilizationWorkflow({
+        first_name: form.first_name,
+        last_name: form.last_name,
+        email: form.contact_email,
+        personal_credit_score_range: form.personal_credit_score_range,
+        credit_utilization_percent: form.credit_utilization_percent,
+        survey_id: finalId,
+      });
       if (contactId) {
         supabase.functions.invoke("tag-ghl-contact", { body: { contactId, tags: ["f-intake-submitted"] } }).catch(() => {});
       }
