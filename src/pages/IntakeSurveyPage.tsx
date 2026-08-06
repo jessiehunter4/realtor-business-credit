@@ -1230,6 +1230,7 @@ function IntakeSurveyForm() {
                     }
                     onValueChange={(v) => {
                       setUtilizationSource("select");
+                      setUtilizationTouched(true);
                       updateField("credit_utilization_percent", Number(v));
                     }}
                   >
@@ -1252,6 +1253,7 @@ function IntakeSurveyForm() {
                       value={form.credit_utilization_percent ?? ""}
                       onChange={(e) => {
                         setUtilizationSource("manual");
+                        setUtilizationTouched(true);
                         const raw = e.target.value;
                         updateField(
                           "credit_utilization_percent",
@@ -1264,7 +1266,7 @@ function IntakeSurveyForm() {
                     </span>
                   </div>
                 </div>
-                {utilizationError && (
+                {utilizationTouched && utilizationError && (
                   <p className="text-sm text-destructive">{utilizationError}</p>
                 )}
               </div>
