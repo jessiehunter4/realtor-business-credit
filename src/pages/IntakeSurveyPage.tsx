@@ -440,6 +440,10 @@ function IntakeSurveyForm() {
     if (form.primary_goals.includes("Other") && !form.primary_goals_other?.trim()) {
       return { ok: false, step: 1, message: "Please describe your other primary goal." };
     }
+    if (utilizationError !== null) {
+      setUtilizationTouched(true);
+      return { ok: false, step: 3, message: utilizationError };
+    }
     return { ok: true };
   };
 
