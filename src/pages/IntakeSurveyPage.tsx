@@ -1197,6 +1197,61 @@ function IntakeSurveyForm() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="credit-utilization-manual">
+                  What is your current credit utilization per credit card?
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  This is the percentage of your available credit currently being used. Example: If your
+                  credit limit is $10,000 and your balance is $2,500, your utilization is 25%.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Select
+                    value={
+                      utilizationSource === "select" && form.credit_utilization_percent != null
+                        ? String(form.credit_utilization_percent)
+                        : ""
+                    }
+                    onValueChange={(v) => {
+                      setUtilizationSource("select");
+                      updateField("credit_utilization_percent", Number(v));
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Select a percentage" /></SelectTrigger>
+                    <SelectContent>
+                      {UTILIZATION_OPTIONS.map((p) => (
+                        <SelectItem key={p} value={String(p)}>{p}%</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="relative">
+                    <Input
+                      id="credit-utilization-manual"
+                      type="number"
+                      min={0}
+                      max={100}
+                      inputMode="numeric"
+                      placeholder="Or type a percentage"
+                      className="pr-8"
+                      value={form.credit_utilization_percent ?? ""}
+                      onChange={(e) => {
+                        setUtilizationSource("manual");
+                        const raw = e.target.value;
+                        updateField(
+                          "credit_utilization_percent",
+                          raw === "" ? null : Number(raw),
+                        );
+                      }}
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                      %
+                    </span>
+                  </div>
+                </div>
+                {utilizationError && (
+                  <p className="text-sm text-destructive">{utilizationError}</p>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
