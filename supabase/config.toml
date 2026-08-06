@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.credit-card-utilization-workflow]
+verify_jwt = false
