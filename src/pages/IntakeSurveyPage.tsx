@@ -101,13 +101,15 @@ const writeDraft = (env: DraftEnvelope) => {
 
 export const COHORT_TIME_SLOTS = [
   "Monday 7:00 AM PT",
-  "Monday 7:00 AM PT",
   "Monday 5:00 PM PT",
   "Wednesday 7:00 AM PT",
   "Wednesday 5:00 PM PT",
   "Friday 7:00 AM PT",
   "Friday 5:00 PM PT",
 ];
+
+/** Credit utilization dropdown values: 0-100 in 5% increments. */
+const UTILIZATION_OPTIONS = Array.from({ length: 21 }, (_, i) => i * 5);
 
 interface SurveyData {
   id?: string;
