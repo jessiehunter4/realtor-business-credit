@@ -191,6 +191,13 @@ function IntakeSurveyForm() {
   const [step, setStep] = useState(0);
   const [utilizationSource, setUtilizationSource] = useState<"select" | "manual">("select");
   const [utilizationTouched, setUtilizationTouched] = useState(false);
+  const utilizationValue = form.credit_utilization_percent;
+  const utilizationError: string | null =
+    utilizationValue === null || utilizationValue === undefined || Number.isNaN(utilizationValue)
+      ? "Please enter your current credit utilization."
+      : utilizationValue < 0 || utilizationValue > 100
+        ? "Enter a number between 0 and 100."
+        : null;
   const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hydratedFromDraft = useRef(false);
