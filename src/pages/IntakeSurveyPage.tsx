@@ -189,6 +189,8 @@ function IntakeSurveyForm() {
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
+  const [utilizationSource, setUtilizationSource] = useState<"select" | "manual">("select");
+  const [utilizationTouched, setUtilizationTouched] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hydratedFromDraft = useRef(false);
