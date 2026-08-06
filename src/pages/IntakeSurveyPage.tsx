@@ -25,6 +25,7 @@ import AuthedPlanHandoff from "@/components/intake/AuthedPlanHandoff";
 import { useAuthRole } from "@/hooks/useAuthRole";
 import { usePlanGeneration } from "@/hooks/usePlanGeneration";
 import { beaconFunnelEvent, postFunnelEvent } from "@/lib/logFunnelEvent";
+import { invokeCreditUtilizationWorkflow } from "@/lib/creditUtilizationWorkflow";
 import SiteHeader from "@/components/shared/SiteHeader";
 import SiteFooter from "@/components/shared/SiteFooter";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
