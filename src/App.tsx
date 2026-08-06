@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import DevWorkflowTestPage from "./pages/DevWorkflowTestPage";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -108,6 +109,7 @@ const App = () => (
           </Route>
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
+          <Route path="/dev/workflow-test" element={<DevWorkflowTestPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
