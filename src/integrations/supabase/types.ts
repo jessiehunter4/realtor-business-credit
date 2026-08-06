@@ -415,6 +415,7 @@ export type Database = {
           contact_name: string | null
           created_at: string
           credit_reporting_bureaus: string[] | null
+          credit_utilization_percent: number | null
           desired_funding_types: string[] | null
           draft_email: string | null
           entity_type: string | null
@@ -473,6 +474,7 @@ export type Database = {
           contact_name?: string | null
           created_at?: string
           credit_reporting_bureaus?: string[] | null
+          credit_utilization_percent?: number | null
           desired_funding_types?: string[] | null
           draft_email?: string | null
           entity_type?: string | null
@@ -531,6 +533,7 @@ export type Database = {
           contact_name?: string | null
           created_at?: string
           credit_reporting_bureaus?: string[] | null
+          credit_utilization_percent?: number | null
           desired_funding_types?: string[] | null
           draft_email?: string | null
           entity_type?: string | null
