@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import DevWorkflowTestPage from "./pages/DevWorkflowTestPage";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
