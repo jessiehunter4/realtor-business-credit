@@ -46,6 +46,7 @@ const EDITABLE_SURVEY_FIELDS = [
   "desired_funding_types",
   "personal_guarantee_comfort",
   "personal_credit_score_range",
+  "credit_utilization_percent",
   "preferred_support_format",
   "interest_in_cohort",
   "preferred_cohort_days",
@@ -70,6 +71,15 @@ const pickEditableSurveyFields = (body: Record<string, unknown>) => {
 
   if (typeof picked.contact_name === "string") {
     picked.contact_name = picked.contact_name.trim() || null;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(picked, "credit_utilization_percent")) {
+    const raw = picked.credit_utilization_percent;
+    const num = typeof raw === "number" ? raw : Number(String(raw ?? "").trim());
+    picked.credit_utilization_percent =
+      raw === null || raw === "" || Number.isNaN(num)
+        ? null
+        : Math.min(100, Math.max(0, Math.round(num)));
   }
 
   return picked;
