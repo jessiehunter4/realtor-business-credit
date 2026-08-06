@@ -108,6 +108,9 @@ export const COHORT_TIME_SLOTS = [
   "Friday 5:00 PM PT",
 ];
 
+/** Credit utilization dropdown values: 0-100 in 5% increments. */
+const UTILIZATION_OPTIONS = Array.from({ length: 21 }, (_, i) => i * 5);
+
 interface SurveyData {
   id?: string;
   status?: string;
@@ -153,6 +156,7 @@ interface SurveyData {
   desired_funding_types?: string[];
   personal_guarantee_comfort?: string;
   personal_credit_score_range?: string;
+  credit_utilization_percent?: number | null;
   // E
   preferred_support_format?: string;
   interest_in_cohort?: string;
@@ -185,6 +189,15 @@ function IntakeSurveyForm() {
   const [notFound, setNotFound] = useState(false);
   const [form, setForm] = useState<SurveyData>({});
   const [step, setStep] = useState(0);
+  const [utilizationSource, setUtilizationSource] = useState<"select" | "manual">("select");
+  const [utilizationTouched, setUtilizationTouched] = useState(false);
+  const utilizationValue = form.credit_utilization_percent;
+  const utilizationError: string | null =
+    utilizationValue === null || utilizationValue === undefined || Number.isNaN(utilizationValue)
+      ? "Please enter your current credit utilization."
+      : utilizationValue < 0 || utilizationValue > 100
+        ? "Enter a number between 0 and 100."
+        : null;
   const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hydratedFromDraft = useRef(false);
@@ -433,6 +446,10 @@ function IntakeSurveyForm() {
     }
     if (form.primary_goals.includes("Other") && !form.primary_goals_other?.trim()) {
       return { ok: false, step: 1, message: "Please describe your other primary goal." };
+    }
+    if (utilizationError !== null) {
+      setUtilizationTouched(true);
+      return { ok: false, step: 3, message: utilizationError };
     }
     return { ok: true };
   };
@@ -1195,6 +1212,63 @@ function IntakeSurveyForm() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="credit-utilization-manual">
+                  What is your current credit utilization per credit card?
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  This is the percentage of your available credit currently being used. Example: If your
+                  credit limit is $10,000 and your balance is $2,500, your utilization is 25%.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Select
+                    value={
+                      utilizationSource === "select" && form.credit_utilization_percent != null
+                        ? String(form.credit_utilization_percent)
+                        : ""
+                    }
+                    onValueChange={(v) => {
+                      setUtilizationSource("select");
+                      setUtilizationTouched(true);
+                      updateField("credit_utilization_percent", Number(v));
+                    }}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Select a percentage" /></SelectTrigger>
+                    <SelectContent>
+                      {UTILIZATION_OPTIONS.map((p) => (
+                        <SelectItem key={p} value={String(p)}>{p}%</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="relative">
+                    <Input
+                      id="credit-utilization-manual"
+                      type="number"
+                      min={0}
+                      max={100}
+                      inputMode="numeric"
+                      placeholder="Or type a percentage"
+                      className="pr-8"
+                      value={form.credit_utilization_percent ?? ""}
+                      onChange={(e) => {
+                        setUtilizationSource("manual");
+                        setUtilizationTouched(true);
+                        const raw = e.target.value;
+                        updateField(
+                          "credit_utilization_percent",
+                          raw === "" ? null : Number(raw),
+                        );
+                      }}
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                      %
+                    </span>
+                  </div>
+                </div>
+                {utilizationTouched && utilizationError && (
+                  <p className="text-sm text-destructive">{utilizationError}</p>
+                )}
               </div>
             </CardContent>
           </Card>

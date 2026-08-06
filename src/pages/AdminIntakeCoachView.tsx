@@ -191,6 +191,7 @@ export default function AdminIntakeCoachView() {
       "business_credit_cards", "vendor_tradelines", "credit_reporting_bureaus",
       "funding_gap_methods", "desired_funding_types", "personal_guarantee_comfort",
       "personal_credit_score_range", "preferred_support_format",
+      "credit_utilization_percent",
       "interest_in_cohort", "preferred_cohort_days",
       "preferred_cohort_time_1", "preferred_cohort_time_2",
       "investment_readiness",
@@ -807,6 +808,14 @@ export default function AdminIntakeCoachView() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Credit utilization per credit card</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {form.credit_utilization_percent === null || form.credit_utilization_percent === undefined
+                          ? "Not provided"
+                          : `${form.credit_utilization_percent}%`}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
