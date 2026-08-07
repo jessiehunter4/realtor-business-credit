@@ -15,12 +15,12 @@ type NavItem = { to: string; label: string; roles?: AppRole[] };
 const navLinks: NavItem[] = [
   { to: "/guide", label: "Guide" },
   { to: "/sample-plan", label: "Sample Plan" },
+  { to: "/business-credit-cards-for-realtors", label: "Business Credit Cards" },
   { to: "/pricing", label: "Pricing" },
 ];
 
-const secondaryLinks: NavItem[] = [
-  { to: "/business-credit-cards-for-realtors", label: "Business Credit Cards" },
-];
+const secondaryLinks: NavItem[] = [];
+
 
 function visibleFor(items: NavItem[], role: AppRole | null) {
   return items.filter((i) => !i.roles || (role !== null && i.roles.includes(role)));
