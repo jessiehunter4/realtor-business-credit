@@ -66,15 +66,15 @@ const faqs = [
   },
   {
     q: "Do you guarantee approval amounts or credit limits?",
-    a: "No. Business credit outcomes depend on your entity, fundability, personal credit, income, and lender criteria. We share realistic expectations and typical timelines — never guarantees.",
+    a: "No. Business credit outcomes depend on your entity, funding readiness, personal credit, income, and lender criteria. We share realistic expectations and typical timelines — never guarantees.",
   },
   {
     q: "Can I switch or upgrade plans later?",
-    a: "Yes. Many Realtors start with the Self-Paced Blueprint or the Cohort and move to 1:1 later. Your custom plan carries over, so nothing is lost.",
+    a: "Yes. Many Realtors start with DIY (Do it Yourself) or the Pro Cohort and move up to Cohort Plus later. Your custom plan carries over, so nothing is lost.",
   },
   {
     q: "What if I'm newer and haven't closed many deals yet?",
-    a: "That's often the best time to start. Setting up your entity, banking, and fundability correctly early saves you from cleaning up messy personal-credit spending later.",
+    a: "That's often the best time to start. Setting up your entity, banking, and funding readiness correctly early saves you from cleaning up messy personal-credit spending later.",
   },
   {
     q: "Do you provide legal or tax advice?",
