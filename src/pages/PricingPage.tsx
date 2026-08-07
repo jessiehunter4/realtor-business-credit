@@ -35,9 +35,9 @@ type ComparisonRow = {
 };
 
 const comparison: ComparisonRow[] = [
+  { feature: "Guide + 7-step action checklist", values: [true, true, true, true] },
   { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true, true] },
   { feature: "Task checklist + progress tracking", values: [true, true, true, true] },
-  { feature: "Guide + 7-step action checklist", values: [true, true, true, true] },
   { feature: "Free Fundability Scan", values: [false, true, true, true] },
   { feature: "Credit Suite vendor & tradeline directory", values: [false, true, true, true] },
   { feature: "Weekly live coaching calls", values: [false, false, true, true] },
