@@ -1,31 +1,29 @@
-# Pricing FAQ — Recommended Changes
+# Stripe Checkout: enable Klarna/Affirm, remove Amazon Pay & Cash App Pay
 
-Review of the 10 FAQ items on `/pricing`. Three are inconsistent with current pricing/product naming, a few can be tightened, and two topics are missing.
+## What the audit found
 
-## Fixes (accuracy — these are wrong today)
+- There are **no Stripe Payment Links** in this project. Every "Enroll" button already funnels through one shared path:
+  - `src/data/pricingTiers.ts` → `STRIPE_LINKS` are internal app routes (`/checkout?tier=...`), not Stripe URLs.
+  - `/pricing`, `/checkout`, and the inline pricing accordion all call `startCheckout(tierId)` in `src/lib/startCheckout.ts`.
+  - That invokes the `create-checkout-session` edge function, which builds a **Stripe-hosted Checkout Session** from price IDs held in secrets (`STRIPE_PRICE_SELF_PACED`, `STRIPE_PRICE_COHORT`, `STRIPE_PRICE_ONE_ON_ONE`) and returns the hosted Stripe URL.
+- The existing tier → Stripe price mapping is intact and reusable. No new URLs are needed and none are missing.
+- The session currently sends no payment-method configuration, so Stripe falls back to whatever is toggled on in the account dashboard — which is why Amazon Pay and Cash App Pay show up.
 
-1. **"Can I switch or upgrade plans later?"** — still says "Self-Paced Blueprint" and "move to 1:1 later". Tiers are now **DIY (Do it Yourself)**, **Pro Cohort**, and **Cohort Plus**. Rewrite using current names.
-2. **"Do I have to pay upfront? Is there a payment plan?"** — mentions "Cohort or Cohort Plus tier" but omits DIY, and the payment-plan answer is vague ("we can walk through options"). Either state plainly that payment is one-time via Stripe and plans are handled case-by-case on a call, or drop the payment-plan half of the question.
-3. **"What's included in the free custom plan?"** — thinnest answer on the page and overlaps almost entirely with "Is there a free option?". Merge the two into one Free-tier answer, or expand this one to describe the plan's actual sections (goals snapshot, fundability status, 90-day actions, 6–12 month roadmap, funding options).
+## What changes (one file)
 
-## Additions (questions buyers actually ask before paying)
+`supabase/functions/create-checkout-session/index.ts`
 
-4. **"How much time per week does this take?"** — the biggest unspoken objection for busy agents. Answer with a realistic range plus the note that cohort calls are weekly and recorded.
-5. **"What happens right after I enroll?"** — removes checkout anxiety: instant receipt, portal access, plan and task checklist unlocked, cohort start date communicated.
-6. *(Optional)* **"Do I need an LLC or entity before I start?"** — very common Realtor blocker, and it reinforces the "check with your broker/attorney/CPA" disclaimer.
+- Explicitly request payment methods on the session instead of inheriting dashboard defaults:
+  - `payment_method_types[]` = `card`, `klarna`, `affirm`
+  - This excludes Amazon Pay and Cash App Pay from the hosted checkout page.
+- Klarna/Affirm render only when amount, USD currency, and buyer country are eligible; Stripe hides them otherwise, so card is always available.
+- Everything else untouched: auth check, tier allowlist, success/cancel URLs, `client_reference_id`, metadata, promo codes, webhook, and payment verification.
 
-## Removals / consolidation
+## What must happen in Stripe (not code)
 
-7. **"Is my payment secure?"** — already covered by the "Secure Stripe checkout" reassurance badge and the checkout page. Low value in an FAQ; safe to remove or fold into the enrollment answer.
-8. Keep **"Do you guarantee approval amounts…"** and **"Do you provide legal or tax advice?"** exactly as written — both are compliance-relevant and correctly conservative.
+- **Product name and description on the checkout page** come from the Stripe Product attached to each price. If a product's description is blank there, nothing will display — this has to be filled in on the three products in Stripe.
+- **Klarna and Affirm must be activated** on the Stripe account under payment method settings. If they are inactive, requesting them in the session errors out.
 
-## Ordering
+## Verification
 
-Reorder so pre-purchase objections come first, compliance last:
-Free option → What's in the free plan → How is this different → Time commitment → Newer agent → Switch/upgrade → Payment/enrollment → 30-day guarantee → No guarantees on limits → No legal/tax advice.
-
-## Technical notes
-
-- All content lives in the `faqs` array in `src/pages/PricingPage.tsx`; no component changes needed.
-- `src/pages/PricingPage.tsx` currently emits only `ItemList` JSON-LD. Adding a `FAQPage` schema block built from the same `faqs` array is a cheap SEO win and lets these questions surface in search results.
-- Tier names should be pulled from or kept in sync with `src/data/pricingTiers.ts` so renames don't drift again.
+- Click Enroll on each of the three paid tiers; confirm the Stripe page loads with the correct product and amount, shows Klarna and Affirm alongside card, and no longer lists Amazon Pay or Cash App Pay.
