@@ -164,10 +164,44 @@ export default function ResetPasswordPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
             ) : !validLink ? (
-              <div className="text-center space-y-4">
+              <form onSubmit={handleVerifyCode} className="space-y-5">
                 <p className="text-sm text-muted-foreground">
-                  This password reset link is invalid or has expired.
+                  Open the reset email we sent you. Click the link, or enter the 6-digit
+                  code from the email below.
                 </p>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-otp-email">Email</Label>
+                  <Input
+                    id="reset-otp-email"
+                    type="email"
+                    value={otpEmail}
+                    onChange={(e) => setOtpEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    disabled={verifying}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-otp-code">Reset code</Label>
+                  <Input
+                    id="reset-otp-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                    placeholder="123456"
+                    required
+                    disabled={verifying}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full rounded-full"
+                  disabled={verifying || otpCode.length < 6}
+                >
+                  {verifying ? "Verifying…" : "Verify code"}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
@@ -176,7 +210,7 @@ export default function ResetPasswordPage() {
                 >
                   Back to log in
                 </Button>
-              </div>
+              </form>
             ) : updated ? (
               <div className="text-center space-y-4">
                 <p className="text-sm text-muted-foreground">
