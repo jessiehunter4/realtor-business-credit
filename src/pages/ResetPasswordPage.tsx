@@ -37,15 +37,74 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [validLink, setValidLink] = useState<boolean | null>(null);
   const [updated, setUpdated] = useState(false);
+  const [otpEmail, setOtpEmail] = useState(searchParams.get("email") ?? "");
+  const [otpCode, setOtpCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
-    // Supabase recovery links put the tokens in the URL hash.
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.replace(/^#/, ""));
-    const type = params.get("type");
-    const accessToken = params.get("access_token");
-    setValidLink(type === "recovery" && !!accessToken);
+    // Recovery links can arrive in three shapes depending on the auth flow:
+    //   #access_token=...&type=recovery   (implicit)
+    //   ?code=...                          (PKCE)
+    //   ?token_hash=...&type=recovery      (verify redirect)
+    let cancelled = false;
+    const resolve = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const query = new URLSearchParams(window.location.search);
+
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (!cancelled) setValidLink(!error);
+        return;
+      }
+
+      const code = query.get("code");
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!cancelled) setValidLink(!error);
+        return;
+      }
+
+      const tokenHash = query.get("token_hash") ?? hashParams.get("token_hash");
+      if (tokenHash) {
+        const { error } = await supabase.auth.verifyOtp({ type: "recovery", token_hash: tokenHash });
+        if (!cancelled) setValidLink(!error);
+        return;
+      }
+
+      // Already-established recovery session (e.g. detectSessionInUrl ran first).
+      const { data } = await supabase.auth.getSession();
+      if (!cancelled) setValidLink(Boolean(data.session));
+    };
+    void resolve();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVerifying(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: otpEmail.trim(),
+        token: otpCode.trim(),
+        type: "recovery",
+      });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      setValidLink(true);
+      toast.success("Code verified — choose a new password.");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   useEffect(() => {
     if (!updated || roleLoading || !activeSession) return;
@@ -105,10 +164,44 @@ export default function ResetPasswordPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
             ) : !validLink ? (
-              <div className="text-center space-y-4">
+              <form onSubmit={handleVerifyCode} className="space-y-5">
                 <p className="text-sm text-muted-foreground">
-                  This password reset link is invalid or has expired.
+                  Open the reset email we sent you. Click the link, or enter the 6-digit
+                  code from the email below.
                 </p>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-otp-email">Email</Label>
+                  <Input
+                    id="reset-otp-email"
+                    type="email"
+                    value={otpEmail}
+                    onChange={(e) => setOtpEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    disabled={verifying}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-otp-code">Reset code</Label>
+                  <Input
+                    id="reset-otp-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                    placeholder="123456"
+                    required
+                    disabled={verifying}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full rounded-full"
+                  disabled={verifying || otpCode.length < 6}
+                >
+                  {verifying ? "Verifying…" : "Verify code"}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
@@ -117,7 +210,7 @@ export default function ResetPasswordPage() {
                 >
                   Back to log in
                 </Button>
-              </div>
+              </form>
             ) : updated ? (
               <div className="text-center space-y-4">
                 <p className="text-sm text-muted-foreground">
