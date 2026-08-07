@@ -211,14 +211,24 @@ const MockLoginPage = () => {
                 <div className="text-center">
                   <h2 className="text-xl font-semibold text-secondary">Reset your password</h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Enter your email and we'll send you a reset link.
+                    Enter your email and we'll send you a reset link and code.
                   </p>
                 </div>
                 {resetSent ? (
                   <div className="text-center space-y-4">
                     <p className="text-sm text-muted-foreground">
-                      If an account exists for <span className="font-medium text-foreground">{email}</span>, you'll receive a reset link shortly.
+                      If an account exists for <span className="font-medium text-foreground">{email}</span>, you'll receive a reset email shortly.
                     </p>
+                    <Button
+                      type="button"
+                      size="lg"
+                      className="w-full rounded-full"
+                      onClick={() =>
+                        navigate(`/reset-password?email=${encodeURIComponent(email)}`)
+                      }
+                    >
+                      I have a code
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
