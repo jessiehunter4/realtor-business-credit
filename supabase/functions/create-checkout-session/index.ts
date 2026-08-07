@@ -76,6 +76,11 @@ Deno.serve(async (req) => {
 
     const form = new URLSearchParams();
     form.append("mode", "payment");
+    // Explicit allowlist: card + BNPL (Klarna, Affirm).
+    // Omitting Amazon Pay / Cash App Pay disables them for this session.
+    form.append("payment_method_types[0]", "card");
+    form.append("payment_method_types[1]", "klarna");
+    form.append("payment_method_types[2]", "affirm");
     form.append("line_items[0][price]", priceId);
     form.append("line_items[0][quantity]", "1");
     const tierParam = body.tierId ? `&tier=${encodeURIComponent(body.tierId)}` : "";
