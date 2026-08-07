@@ -33,6 +33,7 @@ import GuideConclusion from "@/components/guide/GuideConclusion";
 import GuideResources from "@/components/guide/GuideResources";
 import CashFlowCalculator from "@/components/landing/CashFlowCalculator";
 import GuideFloatingTOC from "@/components/guide/GuideFloatingTOC";
+import GuideChapterRail from "@/components/guide/GuideChapterRail";
 import GuideProgressBar from "@/components/guide/GuideProgressBar";
 import GuideOptInGate from "@/components/guide/GuideOptInGate";
 import ChapterPlanCTA from "@/components/guide/ChapterPlanCTA";
@@ -464,6 +465,7 @@ const GuidePage = () => {
       <div className="h-20 sm:h-24" aria-hidden="true" />
 
       <GuideFloatingTOC />
+      <GuideChapterRail />
       <FloatingPlanCTA />
       <SiteFooter />
     </div>
