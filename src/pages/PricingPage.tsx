@@ -58,7 +58,7 @@ const faqs = [
   },
   {
     q: "What's included in the free custom plan?",
-    a: "Your Needs Analysis and Fundability Scan are turned into a prioritized 90-day action plan you can implement on your own or with our help.",
+    a: "Your Needs Analysis is turned into a prioritized 90-day action plan you can implement on your own or with our help.",
   },
   {
     q: "How is this different from generic business credit programs?",
