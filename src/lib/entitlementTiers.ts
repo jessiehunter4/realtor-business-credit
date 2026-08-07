@@ -6,7 +6,7 @@ export const TIER_ORDER: PaidTierId[] = ["self-paced", "cohort", "one-on-one"];
 export const TIER_LABELS: Record<PaidTierId, string> = {
   "self-paced": "DIY (Do it Yourself)",
   cohort: "Pro Cohort",
-  "one-on-one": "Cohort Plus +",
+  "one-on-one": "Cohort Plus",
 };
 
 export type TierCapabilities = {

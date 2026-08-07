@@ -54,7 +54,7 @@ const faqs = [
   },
   {
     q: "Do I have to pay upfront? Is there a payment plan?",
-    a: "You can enroll directly, or start with the free guide and custom plan first. If a payment plan makes sense for the Cohort or Cohort Plus + tier, we can walk through options together — no pressure, no surprise charges.",
+    a: "You can enroll directly, or start with the free guide and custom plan first. If a payment plan makes sense for the Cohort or Cohort Plus tier, we can walk through options together — no pressure, no surprise charges.",
   },
   {
     q: "What's included in the free custom plan?",
