@@ -98,7 +98,7 @@ const helpSteps = [
   {
     icon: Users,
     title: "Custom plan & program",
-    body: "You get a personalized 90-day plan and a path — self-paced, cohort, or Cohort Plus +.",
+    body: "You get a personalized 90-day plan and a path — self-paced, cohort, or Cohort Plus.",
   },
 ];
 

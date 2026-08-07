@@ -85,7 +85,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     id: "one-on-one",
-    name: "Cohort Plus +",
+    name: "Cohort Plus",
     price: "$3,497",
     originalPrice: "$3,997",
     cadence: "per quarter",
@@ -98,7 +98,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Priority response + funding strategy sessions",
       "Quarterly plan reviews",
     ],
-    ctaLabel: "Start 1:1 Coaching",
+    ctaLabel: "Start Cohort Plus",
     ctaHref: STRIPE_LINKS.oneOnOne,
     icon: HeartHandshake,
   },
