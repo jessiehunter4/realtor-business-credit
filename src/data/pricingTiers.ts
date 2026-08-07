@@ -93,13 +93,6 @@ export const PRICING_TIERS: PricingTier[] = [
     who: "For Realtors and brokers who want private, high-touch guidance.",
     features: [
       "Everything in Cohort",
-      "Custom Business, Finance & Credit Plan (PDF + portal)",
-      "Guide + 7-step action checklist",
-      "Credit Suite vendor & tradeline directory access",
-      "90-day cohort with 5–10 Realtors",
-      "Weekly live coaching calls",
-      "Private cohort community",
-      "Credit Suite client portal + coach",
       "Private 1:1 coaching with Jessie",
       "Dedicated Credit Suite specialist",
       "Priority response + funding strategy sessions",

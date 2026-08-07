@@ -371,7 +371,7 @@ const PricingPage = () => {
                       { id: "free" as const, label: "Read the Guide" },
                       { id: "self-paced" as const, label: "Get Started" },
                       { id: "cohort" as const, label: "Enroll" },
-                      { id: "one-on-one" as const, label: "Start Cohort Plus" },
+                      { id: "one-on-one" as const, label: "Start 1:1" },
                     ]
                   ).map(({ id, label }) => (
                     <td key={id} className="p-4 text-center border-t border-border align-top">
