@@ -38,7 +38,6 @@ const comparison: ComparisonRow[] = [
   { feature: "Guide + 7-step action checklist", values: [true, true, true, true] },
   { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true, true] },
   { feature: "Task checklist + progress tracking", values: [true, true, true, true] },
-  { feature: "Free Fundability Scan", values: [false, true, true, true] },
   { feature: "Credit Suite vendor & tradeline directory", values: [false, true, true, true] },
   { feature: "Weekly live coaching calls", values: [false, false, true, true] },
   { feature: "Small-group cohort community", values: [false, false, true, true] },
@@ -59,7 +58,7 @@ const faqs = [
   },
   {
     q: "What's included in the free custom plan?",
-    a: "Your Needs Analysis and Fundability Scan are turned into a prioritized 90-day action plan you can implement on your own or with our help.",
+    a: "Your Needs Analysis is turned into a prioritized 90-day action plan you can implement on your own or with our help.",
   },
   {
     q: "How is this different from generic business credit programs?",

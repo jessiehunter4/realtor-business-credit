@@ -54,7 +54,6 @@ export const PRICING_TIERS: PricingTier[] = [
     features: [
       "Custom Business, Finance & Credit Plan (PDF + portal)",
       "Guide + 7-step action checklist",
-      "Free Fundability Scan",
       "Credit Suite vendor & tradeline directory access",
       "Email support",
     ],
