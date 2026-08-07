@@ -86,7 +86,7 @@ const faqs = [
   },
   {
     q: "What does the 30-day guarantee cover?",
-    a: "If within 30 days of enrolling you feel the program isn't the right fit, email us and we'll refund your enrollment — no hard feelings. Applies to Cohort and 1:1 Coaching enrollments.",
+    a: "If within 30 days of enrolling you feel the program isn't the right fit, email us and we'll refund your enrollment — no hard feelings. Applies to Cohort and Cohort Plus enrollments.",
   },
 ];
 
@@ -346,7 +346,7 @@ const PricingPage = () => {
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Free</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Self-Paced</th>
                   <th scope="col" className="p-4 text-sm font-semibold text-primary text-center">Cohort</th>
-                  <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">1:1 Coaching</th>
+                  <th scope="col" className="p-4 text-sm font-semibold text-secondary text-center">Cohort Plus</th>
                 </tr>
               </thead>
               <tbody>
@@ -462,7 +462,7 @@ const PricingPage = () => {
                 If within 30 days of enrolling you feel the program isn't the
                 right fit for your real estate business, email us and we'll
                 refund your enrollment — no hard feelings. Applies to Cohort
-                and 1:1 Coaching enrollments.
+                and Cohort Plus enrollments.
               </p>
             </div>
           </div>
