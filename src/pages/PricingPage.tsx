@@ -39,10 +39,11 @@ const comparison: ComparisonRow[] = [
   { feature: "Custom Business, Finance & Credit Plan", values: [true, true, true, true] },
   { feature: "Task checklist + progress tracking", values: [true, true, true, true] },
   { feature: "Credit Suite vendor & tradeline directory", values: [false, true, true, true] },
-  { feature: "Weekly live coaching calls", values: [false, false, true, true] },
+  { feature: "Weekly live group coaching calls", values: [false, false, true, true] },
   { feature: "Small-group cohort community", values: [false, false, true, true] },
   { feature: "Credit Suite client portal + coach", values: [false, false, true, true] },
-  { feature: "Private 1:1 coaching with RE Pro Coach", values: [false, false, false, true] },
+  { feature: "Private 1:1 coaching sessions with RE Pro Coach", values: [false, false, false, "Included"] },
+  { feature: "Dedicated Credit Suite specialist", values: [false, false, false, true] },
   { feature: "Priority response + funding strategy", values: [false, false, false, true] },
   { feature: "Quarterly plan reviews", values: [false, false, false, true] },
 ];
@@ -51,6 +52,10 @@ const faqs = [
   {
     q: "Is there a free option?",
     a: "Yes. The Free tier costs nothing and gives you the full guide, your customized plan from the intake survey, and the task checklist with progress tracking in your portal. No card required.",
+  },
+  {
+    q: "What's the difference between Pro Cohort and Cohort Plus?",
+    a: "Pro Cohort is group coaching: the 90-day program, weekly live group calls, and the small-group community. Cohort Plus includes everything in Pro Cohort and adds private one-on-one coaching sessions — plus a dedicated Credit Suite specialist, priority response, and quarterly plan reviews. If you want personal, private guidance on your own situation, choose Cohort Plus.",
   },
   {
     q: "Do I have to pay upfront? Is there a payment plan?",
