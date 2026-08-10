@@ -98,6 +98,10 @@ const BusinessCreditCardsForRealtorsPage = () => {
   const { contactId } = useContactIdentity();
   const logged = useRef(false);
 
+  const [checklistEmail, setChecklistEmail] = useState("");
+  const [checklistStatus, setChecklistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [checklistMessage, setChecklistMessage] = useState("");
+
   useEffect(() => {
     if (logged.current) return;
     logged.current = true;
@@ -107,6 +111,39 @@ const BusinessCreditCardsForRealtorsPage = () => {
       eventType: "comparison_page_view",
     }).catch((e) => console.error("[Comparison] Failed to log comparison_page_view:", e));
   }, [contactId]);
+
+  const handleChecklistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checklistEmail || !/^\S+@\S+\.\S+$/.test(checklistEmail)) {
+      setChecklistStatus("error");
+      setChecklistMessage("Please enter a valid email address.");
+      return;
+    }
+    setChecklistStatus("loading");
+    try {
+      const { data, error } = await supabase.functions.invoke("submit-checklist-email", {
+        body: {
+          email: checklistEmail,
+          source: "business-credit-cards-checklist",
+          pagePath: window.location.pathname,
+          ghlContactId: contactId || undefined,
+        },
+      });
+      if (error) throw error;
+      setChecklistStatus("success");
+      setChecklistMessage((data?.message as string) || "Checklist coming to your inbox!");
+      void postFunnelEvent({
+        contactId: contactId || undefined,
+        eventType: "checklist_email_submitted",
+        metadata: { page: "business-credit-cards-for-realtors" },
+      }).catch((err) => console.error("[Comparison] Failed to log checklist_email_submitted:", err));
+    } catch (err) {
+      setChecklistStatus("error");
+      setChecklistMessage(
+        err instanceof Error ? err.message : "We could not process your request. Please try again."
+      );
+    }
+  };
 
   const jsonLd = {
     "@context": "https://schema.org",
