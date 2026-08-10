@@ -64,7 +64,7 @@ const SamplePlanPage = () => {
             <PDFDownloadLink
               document={pdfDoc}
               fileName="Sample-Realtor-Business-Credit-Plan.pdf"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#153865] text-white px-5 py-2.5 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-[#26928D] transition-all"
             >
               {({ loading }) => (
                 <>
