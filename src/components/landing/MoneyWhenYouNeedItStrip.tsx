@@ -36,7 +36,7 @@ const MoneyWhenYouNeedItStrip = () => (
 
       <div className="grid md:grid-cols-3 gap-5">
         {items.map(({ icon: Icon, title, desc }) => (
-          <div key={title} className="flex flex-col h-full bg-card border border-border rounded-2xl p-5 shadow-card">
+          <div key={title} className="flex flex-col h-full bg-card border border-border rounded-2xl p-5" style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
             <div className="inline-flex w-10 h-10 rounded-xl items-center justify-center bg-primary/15 text-primary">
               <Icon className="h-5 w-5" />
             </div>
