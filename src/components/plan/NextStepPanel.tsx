@@ -165,14 +165,14 @@ export default function NextStepPanel({ planId, contactId, initialSelection, dem
       aria-labelledby="next-step-heading"
       className="mt-8 rounded-2xl bg-white border border-border shadow-card overflow-hidden"
     >
-      <div className="bg-[#0d1b2a] px-6 sm:px-8 py-5">
-        <p className="text-[#3eaf7c] text-[10px] tracking-[0.2em] uppercase font-semibold">
+      <div className="bg-muted/50 px-6 sm:px-8 py-5 border-b border-border">
+        <p className="text-primary text-[10px] tracking-[0.2em] uppercase font-semibold">
           Your Next Step
         </p>
-        <h3 id="next-step-heading" className="text-white text-lg sm:text-xl font-bold mt-1">
+        <h3 id="next-step-heading" className="text-secondary text-xl sm:text-2xl font-bold mt-1">
           Where are you right now with starting the program?
         </h3>
-        <p className="text-white/70 text-sm mt-1">
+        <p className="text-secondary/70 text-sm mt-1">
           Pick the option that fits — we'll show you exactly what to do next.
         </p>
       </div>
@@ -191,10 +191,10 @@ export default function NextStepPanel({ planId, contactId, initialSelection, dem
                 key={opt.id}
                 htmlFor={`readiness-${opt.id}`}
                 className={
-                  "cursor-pointer flex items-start gap-3 rounded-xl border p-3 transition-all " +
+                  "cursor-pointer flex items-start gap-3 rounded-xl border p-3 transition-all duration-200 " +
                   (checked
                     ? "border-primary bg-primary/5 shadow-card"
-                    : "border-border hover:border-primary/40 hover:bg-primary/[0.02]")
+                    : "border-border bg-white hover:border-secondary/40 hover:bg-primary/[0.03] hover:shadow-sm")
                 }
               >
                 <RadioGroupItem
