@@ -112,7 +112,7 @@ const LandingPage = () => {
       <SiteHeader />
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
       <MoneyWhenYouNeedItStrip />
-      <HowItWorksRail />
+      <HowItWorksRail activeSection={activeSection} />
       {JOURNEY_STEPS.map((s) => (
         <JourneyStep key={s.id} {...s} cta={stepCtas[s.id]} />
       ))}
