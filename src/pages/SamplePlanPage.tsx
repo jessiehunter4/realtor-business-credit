@@ -42,7 +42,7 @@ const SamplePlanPage = () => {
             <ArrowLeft className="h-4 w-4" /> Back to home
           </Link>
           <div className="max-w-3xl">
-            <h1 className="text-3xl md:text-5xl font-bold text-secondary tracking-tight">
+            <h1 className="text-3xl md:text-5xl font-bold text-[#153865] tracking-tight">
               See exactly what your custom plan will look like.
             </h1>
             <p className="mt-4 text-muted-foreground text-lg">
