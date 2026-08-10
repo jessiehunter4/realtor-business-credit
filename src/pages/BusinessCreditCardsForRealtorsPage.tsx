@@ -11,6 +11,8 @@ import {
   ShieldCheck,
   BookOpen,
   Calendar,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
