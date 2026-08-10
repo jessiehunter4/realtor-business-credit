@@ -90,7 +90,7 @@ const SamplePlanPage = () => {
           <h2 className="text-2xl md:text-4xl font-bold text-secondary">
             Ready for <em>your</em> plan?
           </h2>
-          <p className="mt-3 text-muted-foreground text-lg">
+          <p className="mt-3 text-secondary text-lg">
             Complete the free Needs Analysis and walk away with one just like this — built from your
             RE Pro Business Financial Needs Analysis.
           </p>
@@ -98,7 +98,7 @@ const SamplePlanPage = () => {
             <Link
               to="/intake"
               data-analytics-id="cta-plan-sample-plan-bottom"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-success-green text-success-green-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-success-green-hover transition-all"
             >
               Build My Custom Plan
             </Link>

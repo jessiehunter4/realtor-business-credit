@@ -63,6 +63,7 @@ All colors MUST be HSL.
     --coral: 0 100% 71%;                /* #FF6B6B */
     --success-green: 161 82% 39%;
     --success-green-hover: 161 82% 33%;
+    --success-green-foreground: 0 0% 100%;
     --amber: 36 100% 56%;
     --amber-dark: 36 100% 46%;
 
