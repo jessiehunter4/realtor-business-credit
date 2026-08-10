@@ -243,39 +243,64 @@ const BusinessCreditCardsForRealtorsPage = () => {
 
       {/* Categories */}
       <section className="container mx-auto px-4 py-8 md:py-12 max-w-5xl">
-        <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-6 text-center">
           5 categories of business cards Realtors actually use
         </h2>
+
+        {/* Filter tabs */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {filterTabs.map((tab) => {
+            const isActive = tab.value === selectedFilter;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setSelectedFilter(tab.value)}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all border ${
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary shadow-md"
+                    : "bg-card text-secondary border-border hover:border-primary/50 hover:bg-primary/5"
+                }`}
+                aria-pressed={isActive}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {cardCategories.map(({ icon: Icon, tone, name, bestFor, watchOuts }, idx) => (
-            <Card
-              key={name}
-              className={`border-border rounded-2xl shadow-card hover:shadow-card-hover transition-shadow bg-card ${
-                idx === cardCategories.length - 1
-                  ? "md:col-span-2 md:justify-self-center md:max-w-2xl"
-                  : ""
-              }`}
-            >
-              <CardContent className="pt-6 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${tone}`}>
-                    <Icon className="w-6 h-6" />
+          {filteredCategories.map(({ icon: Icon, tone, name, bestFor, watchOuts }, idx) => {
+            const isLastAlone =
+              idx === filteredCategories.length - 1 && filteredCategories.length % 2 === 1;
+            return (
+              <Card
+                key={name}
+                className={`border-border rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 bg-card ${
+                  isLastAlone ? "md:col-span-2 md:justify-self-center md:max-w-2xl" : ""
+                }`}
+              >
+                <CardContent className="pt-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${tone}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-secondary">{name}</h3>
                   </div>
-                  <h3 className="text-lg font-bold text-secondary">{name}</h3>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">Best for</p>
-                  <p className="text-sm text-foreground/85 leading-relaxed">{bestFor}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-accent-foreground mb-1 flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" /> Watch-outs
-                  </p>
-                  <p className="text-sm text-foreground/75 leading-relaxed">{watchOuts}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">Best for</p>
+                    <p className="text-sm text-foreground/85 leading-relaxed">{bestFor}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-accent-foreground mb-1 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" /> Watch-outs
+                    </p>
+                    <p className="text-sm text-foreground/75 leading-relaxed">{watchOuts}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
         <p className="text-xs text-muted-foreground italic mt-6 text-center max-w-2xl mx-auto">
           We intentionally don&apos;t list specific card names or affiliate links here.
