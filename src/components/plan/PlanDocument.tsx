@@ -87,7 +87,7 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
   };
 
   return (
-    <div className="w-full bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden text-gray-800 text-sm print:shadow-none print:border-0">
+    <div className="w-full bg-white shadow-[0_4px_24px_-6px_rgba(13,27,42,0.10)] border border-gray-300 rounded-lg overflow-hidden text-gray-800 text-sm print:shadow-none print:border-0">
       {/* Header */}
       <div className="bg-[#0d1b2a] px-6 sm:px-8 py-5 sm:py-6 flex items-center justify-between">
         <div>
