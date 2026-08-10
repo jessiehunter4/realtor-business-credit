@@ -45,7 +45,7 @@ const SamplePlanPage = () => {
             <h1 className="text-3xl md:text-5xl font-bold text-[#153865] tracking-tight">
               See exactly what your custom plan will look like.
             </h1>
-            <p className="mt-4 text-muted-foreground text-lg">
+            <p className="mt-4 text-foreground text-lg">
               This is the same format every Realtor walks away with after the free Needs Analysis.
               We built this sample for <strong>Sarah Mitchell</strong>, a fictional
               Sacramento, CA residential broker, so you can read a full one before you
