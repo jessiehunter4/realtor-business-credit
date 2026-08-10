@@ -109,7 +109,7 @@ const SamplePlanPage = () => {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter darkNavy />
     </div>
   );
 };
