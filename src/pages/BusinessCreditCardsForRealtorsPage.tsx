@@ -250,6 +250,38 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
       </section>
 
+      {/* Dedicated callout banner */}
+      <section className="container mx-auto px-4 py-6 md:py-8 max-w-5xl">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card px-6 py-8 md:py-10">
+          <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-accent/15 blur-3xl pointer-events-none" />
+          <div className="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-6">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="h-7 w-7 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl md:text-2xl font-bold text-secondary mb-2 tracking-tight">
+                Want the right card for your specific situation?
+              </h3>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                The best card is the one you qualify for after your business
+                structure is set up correctly. Our free Needs Analysis builds a
+                90-day action plan that puts you in position for higher limits,
+                better terms, and less reliance on your personal credit.
+              </p>
+            </div>
+            <Link
+              to="/one-on-one"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all whitespace-nowrap"
+            >
+              <Calendar className="h-5 w-5" />
+              Book Free Needs Analysis
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FAQs */}
       <section className="container mx-auto px-4 py-14 md:py-20 max-w-3xl">
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
