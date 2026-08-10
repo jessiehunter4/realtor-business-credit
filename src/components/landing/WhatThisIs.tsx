@@ -14,7 +14,7 @@ const WhatThisIs = () => (
           <p className="text-sm font-bold uppercase tracking-wide text-success-green">This program is</p>
           <ul className="mt-3 space-y-2.5">
             {IS.map((item) => (
-              <li key={item} className="flex items-center gap-2.5 text-base font-medium text-secondary">
+              <li key={item} className="flex items-center gap-2.5 py-2.5 text-base font-medium text-secondary">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success-green text-white">
                   <Check className="h-4 w-4" aria-hidden="true" />
                 </span>
@@ -29,7 +29,7 @@ const WhatThisIs = () => (
           </p>
           <ul className="mt-3 space-y-2.5">
             {IS_NOT.map((item) => (
-              <li key={item} className="flex items-center gap-2.5 text-base font-medium text-secondary">
+              <li key={item} className="flex items-center gap-2.5 py-2.5 text-base font-medium text-secondary">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white">
                   <X className="h-4 w-4" aria-hidden="true" />
                 </span>
