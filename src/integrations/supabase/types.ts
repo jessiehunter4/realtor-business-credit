@@ -134,6 +134,36 @@ export type Database = {
         }
         Relationships: []
       }
+      checklist_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          ghl_contact_id: string | null
+          id: string
+          page_path: string | null
+          source: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          ghl_contact_id?: string | null
+          id?: string
+          page_path?: string | null
+          source?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          ghl_contact_id?: string | null
+          id?: string
+          page_path?: string | null
+          source?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       contact_syncs: {
         Row: {
           agent_id: string | null
