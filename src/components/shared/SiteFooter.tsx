@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { cn } from "@/lib/utils";
 
-const SiteFooter = () => {
+interface SiteFooterProps {
+  darkNavy?: boolean;
+}
+
+const SiteFooter = ({ darkNavy = false }: SiteFooterProps) => {
   const { contactId } = useContactIdentity();
 
   const handleComparisonClick = () => {
@@ -14,7 +19,14 @@ const SiteFooter = () => {
   };
 
   return (
-    <footer className="border-t border-border bg-secondary text-secondary-foreground/80 py-8 mt-0">
+    <footer
+      className={cn(
+        "text-secondary-foreground/80 py-8 mt-0",
+        darkNavy
+          ? "bg-[#153865] border-t-0"
+          : "border-t border-border bg-secondary"
+      )}
+    >
       <div className="container mx-auto px-4 max-w-5xl space-y-3 text-center md:text-left">
         <p className="text-xs md:text-sm leading-relaxed">
           <strong className="text-secondary-foreground">Educational content only.</strong>{" "}
