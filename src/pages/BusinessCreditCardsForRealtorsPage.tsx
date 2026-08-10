@@ -284,6 +284,14 @@ const BusinessCreditCardsForRealtorsPage = () => {
               Read the Free Guide
             </Link>
           </div>
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-secondary/80">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              Updated for 2026
+            </span>
+            <span className="text-secondary/50">•</span>
+            <span>5-Min Read</span>
+          </div>
         </div>
       </section>
 
