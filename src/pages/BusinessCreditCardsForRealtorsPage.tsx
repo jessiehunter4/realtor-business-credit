@@ -446,7 +446,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* FAQs */}
-      <section className="container mx-auto px-4 py-14 md:py-20 max-w-3xl">
+      <section id="faqs" className="container mx-auto px-4 py-14 md:py-20 max-w-3xl scroll-mt-28">
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
           Frequently asked questions
         </h2>
