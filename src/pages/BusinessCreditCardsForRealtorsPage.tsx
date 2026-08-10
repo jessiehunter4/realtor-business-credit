@@ -242,7 +242,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* Categories */}
-      <section className="container mx-auto px-4 py-8 md:py-12 max-w-5xl">
+      <section id="categories" className="container mx-auto px-4 py-8 md:py-12 max-w-5xl scroll-mt-28">
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-6 text-center">
           5 categories of business cards Realtors actually use
         </h2>
