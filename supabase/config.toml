@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.credit-card-utilization-workflow]
 verify_jwt = false
+
+[functions.submit-checklist-email]
+verify_jwt = false
