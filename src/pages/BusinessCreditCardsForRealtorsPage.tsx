@@ -325,6 +325,76 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
       </section>
 
+      {/* Checklist PDF CTA */}
+      <section className="container mx-auto px-4 py-14 md:py-20 max-w-4xl">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card px-6 py-10 md:py-14">
+          <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-sky/15 blur-3xl pointer-events-none" />
+          <div className="relative text-center max-w-2xl mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+              <Mail className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-3 tracking-tight">
+              Get the Realtor Business Credit Checklist (PDF)
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-8">
+              A one-page printable checklist with the 7 steps to set up your business
+              structure, bank account, and credit profile — so you qualify for the right
+              cards faster.
+            </p>
+
+            {checklistStatus === "success" ? (
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <CheckCircle2 className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-lg font-medium text-secondary">{checklistMessage}</p>
+                <p className="text-sm text-muted-foreground">
+                  Check your inbox (and spam folder) for the PDF.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleChecklistSubmit} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+                <div className="flex-1 space-y-2 text-left">
+                  <Label htmlFor="checklist-email" className="sr-only">
+                    Email address
+                  </Label>
+                  <Input
+                    id="checklist-email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    required
+                    value={checklistEmail}
+                    onChange={(e) => setChecklistEmail(e.target.value)}
+                    className="h-12 rounded-xl border-border bg-background px-4 text-base"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={checklistStatus === "loading"}
+                  className="h-12 px-6 rounded-xl text-base font-semibold"
+                >
+                  {checklistStatus === "loading" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send My Checklist"
+                  )}
+                </Button>
+              </form>
+            )}
+            {checklistStatus === "error" && (
+              <p className="mt-3 text-sm text-red-600">{checklistMessage}</p>
+            )}
+            <p className="mt-4 text-xs text-muted-foreground">
+              We respect your inbox. Unsubscribe anytime.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* FAQs */}
       <section className="container mx-auto px-4 py-14 md:py-20 max-w-3xl">
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
