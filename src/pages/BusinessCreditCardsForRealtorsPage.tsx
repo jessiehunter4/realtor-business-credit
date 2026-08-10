@@ -1,5 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   CheckCircle2,
@@ -13,9 +16,12 @@ import {
   Calendar,
   Sparkles,
   ArrowRight,
+  Mail,
+  Loader2,
 } from "lucide-react";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import { supabase } from "@/integrations/supabase/client";
 import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
