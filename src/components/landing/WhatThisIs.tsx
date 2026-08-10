@@ -1,4 +1,4 @@
-import { Check, Minus } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 const IS = ["Educational", "Planning-focused", "Coaching-supported"];
 const IS_NOT = ["Legal advice", "Tax advice", "Investment advice"];
@@ -10,12 +10,12 @@ const WhatThisIs = () => (
         What this program is — and what it isn't
       </h2>
       <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
-          <p className="text-sm font-bold uppercase tracking-wide text-primary">This program is</p>
+        <div className="rounded-2xl border border-success-green/30 bg-success-green/5 p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-success-green">This program is</p>
           <ul className="mt-3 space-y-2.5">
             {IS.map((item) => (
               <li key={item} className="flex items-center gap-2.5 text-base font-medium text-secondary">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success-green text-white">
                   <Check className="h-4 w-4" aria-hidden="true" />
                 </span>
                 {item}
@@ -23,15 +23,15 @@ const WhatThisIs = () => (
             ))}
           </ul>
         </div>
-        <div className="rounded-2xl border border-border bg-muted/50 p-5">
-          <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-destructive">
             This program is not
           </p>
           <ul className="mt-3 space-y-2.5">
             {IS_NOT.map((item) => (
-              <li key={item} className="flex items-center gap-2.5 text-base font-medium text-muted-foreground">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-border text-muted-foreground">
-                  <Minus className="h-4 w-4" aria-hidden="true" />
+              <li key={item} className="flex items-center gap-2.5 text-base font-medium text-secondary">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white">
+                  <X className="h-4 w-4" aria-hidden="true" />
                 </span>
                 {item}
               </li>
