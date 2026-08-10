@@ -54,6 +54,7 @@ export default {
         "success-green": {
           DEFAULT: "hsl(var(--success-green))",
           hover: "hsl(var(--success-green-hover))",
+          foreground: "hsl(var(--success-green-foreground))",
         },
         amber: {
           DEFAULT: "hsl(var(--amber))",
