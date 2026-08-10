@@ -221,6 +221,38 @@ const BusinessCreditCardsForRealtorsPage = () => {
         jsonLd={jsonLd}
       />
 
+      {/* Floating jump-link sidebar (desktop only) */}
+      <nav
+        className="hidden xl:block fixed top-28 right-6 z-40 w-56"
+        aria-label="Page sections"
+      >
+        <div className="bg-card/90 backdrop-blur-sm border border-border rounded-2xl shadow-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            Jump to
+          </p>
+          <ul className="space-y-2">
+            {jumpLinks.map((link) => {
+              const isActive = activeSection === link.id;
+              return (
+                <li key={link.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleJump(link.id)}
+                    className={`w-full text-left text-sm font-medium transition-colors px-2 py-1.5 rounded-lg ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-secondary hover:text-primary hover:bg-primary/5"
+                    }`}
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </nav>
+
       {/* Hero */}
       <section className="relative overflow-hidden bg-hero-grad">
         <div className="absolute inset-0 pointer-events-none">
