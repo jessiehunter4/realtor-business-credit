@@ -16,7 +16,7 @@ const HowItWorksRail = () => (
         <li key={id}>
           <a
             href={`#${id}`}
-            className="h-full flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-4 shadow-card hover:shadow-card-hover transition-all"
+            className="h-full flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-4 shadow-card hover:bg-hover-soft hover:border-hover-soft-border hover:shadow-card-hover transition-all"
           >
             <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-base font-bold">
               {step}
