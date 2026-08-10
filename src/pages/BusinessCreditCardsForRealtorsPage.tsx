@@ -217,7 +217,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* TL;DR */}
-      <section className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
+      <section id="tldr" className="container mx-auto px-4 py-12 md:py-16 max-w-4xl scroll-mt-28">
         <Card className="border-border rounded-2xl shadow-card bg-card">
           <CardContent className="pt-6 space-y-3">
             <h2 className="text-xl md:text-2xl font-bold text-secondary">
