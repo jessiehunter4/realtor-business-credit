@@ -228,9 +228,16 @@ const BusinessCreditCardsForRealtorsPage = () => {
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
           5 categories of business cards Realtors actually use
         </h2>
-        <div className="grid md:grid-cols-2 gap-5">
-          {cardCategories.map(({ icon: Icon, tone, name, bestFor, watchOuts }) => (
-            <Card key={name} className="border-border rounded-2xl shadow-card hover:shadow-card-hover transition-shadow bg-card">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {cardCategories.map(({ icon: Icon, tone, name, bestFor, watchOuts }, idx) => (
+            <Card
+              key={name}
+              className={`border-border rounded-2xl shadow-card hover:shadow-card-hover transition-shadow bg-card ${
+                idx === cardCategories.length - 1
+                  ? "md:col-span-2 md:justify-self-center md:max-w-2xl"
+                  : ""
+              }`}
+            >
               <CardContent className="pt-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${tone}`}>
