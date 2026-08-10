@@ -37,7 +37,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
           <h1 className="text-[clamp(1.75rem,6vw,3.25rem)] font-bold text-secondary leading-[1.08] tracking-tight text-balance">
             {headline}
           </h1>
-          <p className="mt-2 sm:mt-3 text-[clamp(1rem,2.8vw,1.5rem)] font-semibold text-secondary/90 leading-snug text-balance max-w-2xl mx-auto">
+          <p className="mt-2 sm:mt-3 text-[clamp(1rem,2.8vw,1.5rem)] font-bold text-secondary leading-snug text-balance max-w-2xl mx-auto">
             {tagline}
           </p>
 
