@@ -310,7 +310,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* The order matters */}
-      <section className="container mx-auto px-4 py-14 md:py-20 max-w-5xl">
+      <section id="order-matters" className="container mx-auto px-4 py-14 md:py-20 max-w-5xl scroll-mt-28">
         <div className="relative overflow-hidden bg-hero-grad border border-border rounded-3xl shadow-card px-6 py-12 md:py-16">
           <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-sky/15 blur-3xl pointer-events-none" />
