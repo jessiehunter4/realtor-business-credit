@@ -32,6 +32,7 @@ const cardCategories = [
     icon: Wallet,
     tone: "bg-primary/10 text-primary",
     name: "Cash-back business cards",
+    filterLabel: "Cash-Back",
     bestFor:
       "Realtors with steady marketing spend (Zillow, FB ads, photography) who want a flat 1.5–2% return on every dollar.",
     watchOuts:
@@ -41,6 +42,7 @@ const cardCategories = [
     icon: Plane,
     tone: "bg-sky/15 text-sky",
     name: "Travel & points business cards",
+    filterLabel: "Travel & Points",
     bestFor:
       "Agents who travel for showings, conferences (NAR, Inman, broker conventions), or relocation business. Sign-up bonuses can offset a year of conference travel.",
     watchOuts:
@@ -50,6 +52,7 @@ const cardCategories = [
     icon: Building2,
     tone: "bg-accent/20 text-accent-foreground",
     name: "Office supply / category bonus cards",
+    filterLabel: "Office Supply",
     bestFor:
       "Brokers and team leads with recurring spend on signs, lockboxes, printers, software subscriptions, and office supplies.",
     watchOuts:
@@ -59,6 +62,7 @@ const cardCategories = [
     icon: Wrench,
     tone: "bg-primary/10 text-primary",
     name: "EIN-only / no personal guarantee cards",
+    filterLabel: "No PG",
     bestFor:
       "Established businesses with strong fundability (D-U-N-S, business bank account, 6+ months of business credit history, vendor tradelines reporting).",
     watchOuts:
@@ -68,12 +72,19 @@ const cardCategories = [
     icon: ShieldCheck,
     tone: "bg-sky/15 text-sky",
     name: "Charge cards (pay in full each month)",
+    filterLabel: "Charge Cards",
     bestFor:
       "Agents who want higher purchasing power without a fixed credit limit, and who close consistently enough to pay balances in full.",
     watchOuts:
       "Missing a payment cycle hurts a lot more than on a revolving card. Not a fit if commission timing is unpredictable.",
   },
 ];
+
+const filterTabs = [
+  { label: "All", value: "All" },
+  ...cardCategories.map((c) => ({ label: c.filterLabel, value: c.filterLabel })),
+];
+
 
 const faqs = [
   {
