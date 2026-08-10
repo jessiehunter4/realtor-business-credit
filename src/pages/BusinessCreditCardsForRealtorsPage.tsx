@@ -120,6 +120,44 @@ const BusinessCreditCardsForRealtorsPage = () => {
   const [checklistStatus, setChecklistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [checklistMessage, setChecklistMessage] = useState("");
 
+  const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
+    const sections = ["tldr", "categories", "order-matters", "faqs"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const jumpLinks = [
+    { id: "tldr", label: "The 60-second version" },
+    { id: "categories", label: "5 categories" },
+    { id: "order-matters", label: "Why order matters" },
+    { id: "faqs", label: "FAQs" },
+  ];
+
+  const handleJump = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveSection(id);
+    }
+  };
+
   useEffect(() => {
     if (logged.current) return;
     logged.current = true;
