@@ -109,6 +109,13 @@ const BusinessCreditCardsForRealtorsPage = () => {
   const { contactId } = useContactIdentity();
   const logged = useRef(false);
 
+  const [selectedFilter, setSelectedFilter] = useState("All");
+
+  const filteredCategories =
+    selectedFilter === "All"
+      ? cardCategories
+      : cardCategories.filter((c) => c.filterLabel === selectedFilter);
+
   const [checklistEmail, setChecklistEmail] = useState("");
   const [checklistStatus, setChecklistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [checklistMessage, setChecklistMessage] = useState("");
