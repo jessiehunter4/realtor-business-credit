@@ -61,6 +61,39 @@ const LandingPage = () => {
     },
   };
 
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const sectionRefs = useRef<Record<string, IntersectionObserverEntry | null>>({});
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          sectionRefs.current[entry.target.id] = entry;
+        });
+
+        const visible = STEP_IDS.filter((id) => sectionRefs.current[id]?.isIntersecting);
+        if (visible.length === 1) {
+          setActiveSection(visible[0]);
+        } else if (visible.length > 1) {
+          const best = visible.reduce((prev, curr) => {
+            const prevEntry = sectionRefs.current[prev];
+            const currEntry = sectionRefs.current[curr];
+            return (currEntry?.intersectionRatio ?? 0) > (prevEntry?.intersectionRatio ?? 0) ? curr : prev;
+          });
+          setActiveSection(best);
+        }
+      },
+      { threshold: [0.25, 0.5, 0.75], rootMargin: "-80px 0px -40% 0px" }
+    );
+
+    STEP_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Seo
