@@ -120,6 +120,44 @@ const BusinessCreditCardsForRealtorsPage = () => {
   const [checklistStatus, setChecklistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [checklistMessage, setChecklistMessage] = useState("");
 
+  const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
+    const sections = ["tldr", "categories", "order-matters", "faqs"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const jumpLinks = [
+    { id: "tldr", label: "The 60-second version" },
+    { id: "categories", label: "5 categories" },
+    { id: "order-matters", label: "Why order matters" },
+    { id: "faqs", label: "FAQs" },
+  ];
+
+  const handleJump = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveSection(id);
+    }
+  };
+
   useEffect(() => {
     if (logged.current) return;
     logged.current = true;
@@ -183,6 +221,38 @@ const BusinessCreditCardsForRealtorsPage = () => {
         jsonLd={jsonLd}
       />
 
+      {/* Floating jump-link sidebar (desktop only) */}
+      <nav
+        className="hidden xl:block fixed top-28 right-6 z-40 w-56"
+        aria-label="Page sections"
+      >
+        <div className="bg-card/90 backdrop-blur-sm border border-border rounded-2xl shadow-card p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            Jump to
+          </p>
+          <ul className="space-y-2">
+            {jumpLinks.map((link) => {
+              const isActive = activeSection === link.id;
+              return (
+                <li key={link.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleJump(link.id)}
+                    className={`w-full text-left text-sm font-medium transition-colors px-2 py-1.5 rounded-lg ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-secondary hover:text-primary hover:bg-primary/5"
+                    }`}
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </nav>
+
       {/* Hero */}
       <section className="relative overflow-hidden bg-hero-grad">
         <div className="absolute inset-0 pointer-events-none">
@@ -217,7 +287,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* TL;DR */}
-      <section className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
+      <section id="tldr" className="container mx-auto px-4 py-12 md:py-16 max-w-4xl scroll-mt-28">
         <Card className="border-border rounded-2xl shadow-card bg-card">
           <CardContent className="pt-6 space-y-3">
             <h2 className="text-xl md:text-2xl font-bold text-secondary">
@@ -242,7 +312,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* Categories */}
-      <section className="container mx-auto px-4 py-8 md:py-12 max-w-5xl">
+      <section id="categories" className="container mx-auto px-4 py-8 md:py-12 max-w-5xl scroll-mt-28">
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-6 text-center">
           5 categories of business cards Realtors actually use
         </h2>
@@ -310,7 +380,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* The order matters */}
-      <section className="container mx-auto px-4 py-14 md:py-20 max-w-5xl">
+      <section id="order-matters" className="container mx-auto px-4 py-14 md:py-20 max-w-5xl scroll-mt-28">
         <div className="relative overflow-hidden bg-hero-grad border border-border rounded-3xl shadow-card px-6 py-12 md:py-16">
           <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-sky/15 blur-3xl pointer-events-none" />
@@ -446,7 +516,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {/* FAQs */}
-      <section className="container mx-auto px-4 py-14 md:py-20 max-w-3xl">
+      <section id="faqs" className="container mx-auto px-4 py-14 md:py-20 max-w-3xl scroll-mt-28">
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
           Frequently asked questions
         </h2>
