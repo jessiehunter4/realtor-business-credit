@@ -172,9 +172,9 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
               {item.status === "missing" && <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
               <span className="text-gray-700">{item.label}</span>
               <span className="text-gray-400 text-xs ml-1 hidden sm:inline">— {item.detail}</span>
-              <span className={`ml-auto font-sans font-semibold text-xs ${
-                item.status === "strong" ? "text-green-600" :
-                item.status === "warning" ? "text-amber-500" : "text-red-500"
+              <span className={`ml-auto font-sans font-semibold text-xs px-2.5 py-1 rounded-full border ${
+                item.status === "strong" ? "bg-green-100 text-green-700 border-green-200" :
+                item.status === "warning" ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-red-100 text-red-700 border-red-200"
               }`}>
                 {item.status === "strong" ? "Strong" : item.status === "warning" ? "Needs Attention" : "Missing"}
               </span>
