@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
@@ -15,6 +15,8 @@ import StickyMobileCTABar from "@/components/shared/StickyMobileCTABar";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
 import Seo from "@/components/shared/Seo";
+
+const STEP_IDS = JOURNEY_STEPS.map((s) => s.id);
 
 const LandingPage = () => {
   const { contactId, firstName, buildForwardParams } = useContactIdentity();
