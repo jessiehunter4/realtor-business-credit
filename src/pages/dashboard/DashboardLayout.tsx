@@ -7,7 +7,6 @@ import {
   Flag,
   LayoutDashboard,
   Loader2,
-  LogOut,
   PlayCircle,
   Target,
   Wallet,
@@ -133,10 +132,6 @@ export default function DashboardLayout() {
       setSearchParams(next, { replace: true });
     }
   }, [loading, profile, searchParams, setSearchParams]);
-
-  const handleLogout = async () => {
-    await signOutAndClear({ redirectTo: "/" });
-  };
 
   if (loading) {
     return (
