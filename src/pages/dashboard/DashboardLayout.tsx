@@ -158,22 +158,29 @@ export default function DashboardLayout() {
         <div className="min-h-screen flex w-full bg-background">
           <Sidebar collapsible="icon">
             <SidebarContent>
-              <SidebarGroup>
-                <SidebarGroupLabel>Your plan</SidebarGroupLabel>
+              <SidebarGroup className="mt-2">
+                <SidebarGroupLabel className="uppercase tracking-wider text-xs text-sidebar-foreground/60 mb-2">
+                  Your plan
+                </SidebarGroupLabel>
                 <SidebarGroupContent>
-                  <SidebarMenu>
+                  <SidebarMenu className="gap-1.5">
                     {NAV.map((item) => (
                       <SidebarMenuItem key={item.to}>
-                        <SidebarMenuButton asChild tooltip={item.label}>
+                        <SidebarMenuButton asChild tooltip={item.label} size="lg">
                           <NavLink
                             to={item.to}
                             end={item.end}
                             className={({ isActive }) =>
-                              `flex items-center gap-2 ${isActive ? "bg-muted font-medium text-primary" : "hover:bg-muted/50"}`
+                              cn(
+                                "flex items-center gap-3 rounded-md border-l-4 border-transparent transition-colors",
+                                isActive
+                                  ? "bg-primary/10 text-primary border-l-primary font-semibold"
+                                  : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                              )
                             }
                           >
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.label}</span>
+                            <item.icon className="h-5 w-5 shrink-0" />
+                            <span className="text-base">{item.label}</span>
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
