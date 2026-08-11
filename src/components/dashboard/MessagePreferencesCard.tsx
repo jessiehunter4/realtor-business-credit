@@ -35,7 +35,7 @@ const MessagePreferencesCard = () => {
   }, []);
 
   const update = async (field: "sms" | "email", value: boolean) => {
-    if (!lead) return;
+    if (!lead || saving) return;
     setSaving(field);
     const now = new Date().toISOString();
     const patch =
@@ -48,11 +48,21 @@ const MessagePreferencesCard = () => {
     const { error } = await supabase.from("leads").update(patch).eq("id", lead.id);
     setSaving(null);
     if (error) {
-      toast.error("Couldn't save your preference. Please try again.");
+      toast.error("Couldn't save your preference. Please try again.", {
+        id: `pref-${field}`,
+      });
       return;
     }
     setLead({ ...lead, [field === "sms" ? "sms_consent" : "email_consent"]: value });
-    toast.success("Preferences updated.");
+    const message =
+      field === "email"
+        ? value
+          ? "Email preferences saved"
+          : "Email updates turned off"
+        : value
+          ? "Text update preferences saved"
+          : "Text updates turned off";
+    toast.success(message, { id: `pref-${field}` });
   };
 
   if (loading || !lead) return null;
@@ -74,6 +84,7 @@ const MessagePreferencesCard = () => {
             id="emailPref"
             checked={lead.email_consent}
             disabled={saving === "email"}
+            aria-busy={saving === "email"}
             onCheckedChange={(v) => update("email", v)}
           />
         </div>
@@ -92,15 +103,18 @@ const MessagePreferencesCard = () => {
             id="smsPref"
             checked={lead.sms_consent}
             disabled={saving === "sms"}
+            aria-busy={saving === "sms"}
             onCheckedChange={(v) => update("sms", v)}
           />
         </div>
 
-        {saving && (
-          <p className="text-xs text-muted-foreground flex items-center gap-2">
-            <Loader2 className="h-3 w-3 animate-spin" /> Saving…
-          </p>
-        )}
+        <p aria-live="polite" className="text-xs text-muted-foreground flex items-center gap-2 min-h-4">
+          {saving && (
+            <>
+              <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+            </>
+          )}
+        </p>
       </CardContent>
     </Card>
   );
