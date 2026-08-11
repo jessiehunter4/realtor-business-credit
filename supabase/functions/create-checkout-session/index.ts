@@ -1,5 +1,9 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { TIER_COPY, buildIncludedText } from "../_shared/tierCopy.ts";
+import {
+  TIER_COPY,
+  buildIncludedText,
+  syncStripeProductCopy,
+} from "../_shared/tierCopy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -99,9 +103,12 @@ Deno.serve(async (req) => {
     if (body.leadId) form.append("metadata[lead_id]", body.leadId);
     if (userEmail) form.append("customer_email", userEmail);
     form.append("allow_promotion_codes", "true");
-    // Show the tier's "What's Included" bullets on the Stripe Checkout page.
+    // Show the tier's "What's Included" bullets on the Stripe Checkout page,
+    // and keep the Stripe Product copy in sync automatically (no admin step).
     if (body.tierId && TIER_COPY[body.tierId]) {
-      form.append("custom_text[submit][message]", buildIncludedText(TIER_COPY[body.tierId]));
+      const copy = TIER_COPY[body.tierId];
+      await syncStripeProductCopy(priceId, copy, body.tierId, stripeKey);
+      form.append("custom_text[submit][message]", buildIncludedText(copy));
     }
 
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
