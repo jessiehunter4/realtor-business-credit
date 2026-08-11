@@ -6,6 +6,7 @@ import {
   PHASE_BLURBS,
   PHASE_LABELS,
   PHASE_ORDER,
+  pickPriorityTask,
   type RoadmapTask,
   type TaskPhase,
   type TaskStatus,
@@ -22,6 +23,7 @@ interface Props {
 
 export default function RoadmapChecklist({ tasks, savingKey, onStatusChange, planId }: Props) {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const nextUpKey = pickPriorityTask(tasks)?.key ?? null;
 
   const phases = PHASE_ORDER.map((phase: TaskPhase) => {
     const inPhase = tasks.filter((t) => t.phase === phase);
@@ -75,6 +77,7 @@ export default function RoadmapChecklist({ tasks, savingKey, onStatusChange, pla
                   <RoadmapTaskRow
                     key={task.key}
                     task={task}
+                    isNextUp={task.key === nextUpKey}
                     saving={savingKey === task.key}
                     onStatusChange={onStatusChange}
                     planId={planId}
