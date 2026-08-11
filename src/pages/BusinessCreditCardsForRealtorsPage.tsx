@@ -457,7 +457,6 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       {SHOW_CHECKLIST_CTA && (
-        {/* Checklist PDF CTA */}
         <section className="container mx-auto px-4 py-14 md:py-20 max-w-4xl">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card px-6 py-10 md:py-14">
             <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
