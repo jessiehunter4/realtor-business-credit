@@ -309,6 +309,47 @@ export default function AdminDashboard() {
     }
   };
 
+  const [syncingStripe, setSyncingStripe] = useState(false);
+
+  const handleSyncStripeProducts = async () => {
+    setSyncingStripe(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-stripe-products");
+      if (error) {
+        toast.error("Failed to sync Stripe product descriptions");
+      } else {
+        const results = (data as { results?: { error?: string }[] })?.results ?? [];
+        const failed = results.filter((r) => r.error).length;
+        if (failed) {
+          toast.warning(`Synced with ${failed} error(s) — check function logs`);
+        } else {
+          toast.success(`Updated ${results.length} Stripe product description(s)`);
+        }
+      }
+    } catch {
+      toast.error("Request failed");
+    } finally {
+      setSyncingStripe(false);
+    }
+  };
+
+  const handleTestGHLConnectionLegacy = async () => {
+    setTestingConnection(true);
+    setConnectionResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("test-ghl-connection");
+      if (error) {
+        setConnectionResult({ connected: false, error: error.message });
+      } else {
+        setConnectionResult(data as { connected: boolean; location_name?: string; error?: string; details?: string });
+      }
+    } catch {
+      setConnectionResult({ connected: false, error: "Request failed" });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   /* ---------- Funnel Analytics ---------- */
 
   const fetchFunnelData = async (
