@@ -7,7 +7,6 @@ import {
   Flag,
   LayoutDashboard,
   Loader2,
-  LogOut,
   PlayCircle,
   Target,
   Wallet,
@@ -134,10 +133,6 @@ export default function DashboardLayout() {
     }
   }, [loading, profile, searchParams, setSearchParams]);
 
-  const handleLogout = async () => {
-    await signOutAndClear({ redirectTo: "/" });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -210,10 +205,6 @@ export default function DashboardLayout() {
                 >
                   <PlayCircle className="h-4 w-4 sm:mr-2" />
                   <span className="hidden sm:inline">Welcome video</span>
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Log out</span>
                 </Button>
               </div>
             </div>

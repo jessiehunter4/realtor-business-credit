@@ -16,6 +16,14 @@ export interface TaskHelp {
   mistakes?: string[];
 }
 
+/** A direct, contextual action a user can take for a task (usually an external tool). */
+export interface TaskQuickAction {
+  label: string;
+  href: string;
+  /** True when the link goes to an external site and should open in a new tab. */
+  external?: boolean;
+}
+
 export interface CatalogTask {
   /** Stable identifier — persisted in plan_task_progress.task_key. Never change. */
   key: string;
@@ -30,6 +38,8 @@ export interface CatalogTask {
   effort: string;
   actionHref?: string;
   actionLabel?: string;
+  /** Optional direct-action links shown inside the "Your next step" card. */
+  quickActions?: TaskQuickAction[];
   /** Keywords used to match AI-generated plan action items to this task. */
   keywords: string[];
   /** Long-form explanation surfaced by the help bubble. Optional. */
