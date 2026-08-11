@@ -26,12 +26,6 @@ import {
 } from "@/components/ui/accordion";
 import { PRICING_TIERS } from "@/data/pricingTiers";
 import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import PayLaterOptions from "@/components/pricing/PayLaterOptions";
 
 const tiers = PRICING_TIERS;
