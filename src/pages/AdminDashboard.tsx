@@ -333,23 +333,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleTestGHLConnectionLegacy = async () => {
-    setTestingConnection(true);
-    setConnectionResult(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("test-ghl-connection");
-      if (error) {
-        setConnectionResult({ connected: false, error: error.message });
-      } else {
-        setConnectionResult(data as { connected: boolean; location_name?: string; error?: string; details?: string });
-      }
-    } catch {
-      setConnectionResult({ connected: false, error: "Request failed" });
-    } finally {
-      setTestingConnection(false);
-    }
-  };
-
   /* ---------- Funnel Analytics ---------- */
 
   const fetchFunnelData = async (
