@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/accordion";
 import { PRICING_TIERS } from "@/data/pricingTiers";
 import { startCheckout, type CheckoutTierId } from "@/lib/startCheckout";
+import PayLaterOptions from "@/components/pricing/PayLaterOptions";
 
 const tiers = PRICING_TIERS;
 
@@ -308,8 +309,9 @@ const PricingPage = () => {
               </div>
             ))}
           </div>
-          <p className="mt-6 text-center text-xs text-secondary/60">
-            Pricing shown in USD. Payment plans may be available — just ask.
+          <PayLaterOptions />
+          <p className="mt-4 text-center text-xs text-secondary/60">
+            Pricing shown in USD.
           </p>
         </section>
 
