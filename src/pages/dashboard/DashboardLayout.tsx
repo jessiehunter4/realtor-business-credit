@@ -211,10 +211,6 @@ export default function DashboardLayout() {
                   <PlayCircle className="h-4 w-4 sm:mr-2" />
                   <span className="hidden sm:inline">Welcome video</span>
                 </Button>
-                <Button variant="outline" size="sm" className="rounded-full" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Log out</span>
-                </Button>
               </div>
             </div>
 
