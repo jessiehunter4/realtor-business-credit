@@ -11,6 +11,7 @@ interface Props {
   saving: boolean;
   onStatusChange: (task: RoadmapTask, status: TaskStatus) => void;
   planId?: string | null;
+  isNextUp?: boolean;
 }
 
 function relative(iso?: string | null) {
@@ -22,8 +23,10 @@ function relative(iso?: string | null) {
   }
 }
 
-export default function RoadmapTaskRow({ task, saving, onStatusChange, planId }: Props) {
+export default function RoadmapTaskRow({ task, saving, onStatusChange, planId, isNextUp }: Props) {
   const done = task.status === "completed";
+  const active = task.status === "in_progress";
+  const upcoming = !done && !active && !task.blocked;
   const stamp = done
     ? relative(task.completedAt ?? task.updatedAt)
     : task.status === "in_progress"
@@ -33,19 +36,36 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange, planId }:
     .map((k) => TASK_BY_KEY[k]?.title ?? k)
     .join(", ");
 
+  const stateLabel = done
+    ? "Completed"
+    : active
+      ? "In progress"
+      : task.blocked
+        ? "Locked"
+        : "Not started";
+
+  const shell = done
+    ? "border-border bg-muted/40"
+    : active
+      ? "border-primary bg-primary/5 ring-1 ring-primary/30 shadow-sm"
+      : task.blocked
+        ? "border-dashed border-border bg-muted/30"
+        : isNextUp
+          ? "border-primary/40 bg-card"
+          : "border-border bg-card";
+
   return (
     <div
-      className={`rounded-lg border p-3 sm:p-4 transition-colors ${
-        done ? "border-primary/30 bg-primary/5" : task.blocked ? "border-border bg-muted/30" : "border-border bg-card"
-      }`}
+      aria-label={`${task.title} — ${stateLabel}`}
+      className={`rounded-lg border p-3 sm:p-4 transition-colors ${shell}`}
     >
       <div className="flex items-start gap-3">
         <div className="mt-0.5 shrink-0">
           {done ? (
-            <CheckCircle2 className="h-5 w-5 text-primary" />
+            <CheckCircle2 className="h-5 w-5 text-primary/70" />
           ) : task.blocked ? (
-            <Lock className="h-5 w-5 text-muted-foreground" />
-          ) : task.status === "in_progress" ? (
+            <Lock className="h-5 w-5 text-muted-foreground/70" />
+          ) : active ? (
             <PlayCircle className="h-5 w-5 text-primary" />
           ) : (
             <Circle className="h-5 w-5 text-muted-foreground" />
@@ -54,19 +74,45 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange, planId }:
 
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className={`font-medium ${done ? "text-muted-foreground line-through" : "text-secondary"}`}>
+            <p
+              className={`font-medium ${
+                done
+                  ? "text-muted-foreground line-through"
+                  : task.blocked
+                    ? "text-muted-foreground"
+                    : active
+                      ? "text-secondary font-semibold"
+                      : "text-secondary"
+              }`}
+            >
               {task.title}
             </p>
             <TaskHelpBubble task={task} planId={planId} />
-            {task.status === "in_progress" && (
-              <Badge variant="outline" className="text-[10px]">In progress</Badge>
+            {active && (
+              <Badge className="text-[10px]">In progress</Badge>
+            )}
+            {isNextUp && !active && !done && !task.blocked && (
+              <Badge variant="outline" className="text-[10px] border-primary text-primary">Next up</Badge>
+            )}
+            {task.blocked && (
+              <Badge variant="outline" className="text-[10px] text-muted-foreground">Locked</Badge>
             )}
             {task.source === "intake" && done && (
               <Badge variant="secondary" className="text-[10px]">From your intake</Badge>
             )}
           </div>
 
-          {!done && <p className="text-sm text-muted-foreground mt-1">{task.explanation}</p>}
+          {!done && (
+            <p className={`text-sm mt-1 ${upcoming || task.blocked ? "text-muted-foreground" : "text-secondary/80"}`}>
+              {task.explanation}
+            </p>
+          )}
+          {active && (
+            <div className="mt-2 rounded-md bg-background/70 border border-primary/20 px-3 py-2 text-sm text-secondary">
+              <span className="font-semibold">Do this: </span>
+              {task.nextAction}
+            </div>
+          )}
           {task.detail && done && <p className="text-xs text-muted-foreground mt-1">{task.detail}</p>}
           {stamp && (
             <p className="text-xs text-muted-foreground mt-1">
@@ -96,30 +142,30 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange, planId }:
             <Button
               variant="ghost"
               size="sm"
-              className="rounded-full text-xs"
+              className="rounded-full text-xs min-h-10"
               onClick={() => onStatusChange(task, "not_started")}
             >
               Undo
             </Button>
           ) : (
             <>
-              {task.status !== "in_progress" && !task.blocked && (
+              {!active && !task.blocked && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="rounded-full text-xs"
+                  className="rounded-full text-xs min-h-10"
                   onClick={() => onStatusChange(task, "in_progress")}
                 >
                   Start
                 </Button>
               )}
               <Button
-                variant="outline"
+                variant={active ? "default" : "outline"}
                 size="sm"
-                className="rounded-full text-xs"
+                className="rounded-full text-xs min-h-10"
                 onClick={() => onStatusChange(task, "completed")}
               >
-                Mark as Done?
+                {active ? "Mark complete" : "Mark as Done?"}
               </Button>
             </>
           )}
