@@ -55,18 +55,22 @@ export const priceEnvByTier: Record<PaidTierId, string> = {
   "one-on-one": "STRIPE_PRICE_ONE_ON_ONE",
 };
 
-/** Stripe product descriptions are plain text and capped at 350 chars. */
+/**
+ * Stripe product description — renders in the LEFT order-summary column of
+ * Checkout. Plain text, capped at 350 chars. Bullets go on their own lines.
+ */
 export function buildProductDescription(tier: TierCopy): string {
-  const full = `${tier.description} What's Included: ${tier.features
-    .map((f) => `• ${f}`)
-    .join(" ")}`;
+  const header = tier.description;
+  const bullets = tier.features.map((f) => `• ${f}`);
+  let full = [header, ...bullets].join("\n");
+  while (full.length > 350 && bullets.length > 0) {
+    bullets.pop();
+    full = [header, ...bullets].join("\n");
+  }
   return full.length > 350 ? `${full.slice(0, 347).trimEnd()}...` : full;
 }
 
-/** Bullet block rendered on the Stripe Checkout page via custom_text. */
+/** Short reassurance line above the Pay button (inclusions live on the left). */
 export function buildIncludedText(tier: TierCopy): string {
-  const full = `What's Included with ${tier.name}:\n${tier.features
-    .map((f) => `• ${f}`)
-    .join("\n")}`;
-  return full.length > 1200 ? full.slice(0, 1200) : full;
+  return `${tier.name} — full inclusions are listed in your order summary.`;
 }
