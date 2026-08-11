@@ -18,10 +18,8 @@ export default function EffortChip({ effort, withLabel = false, className }: Pro
       )}
     >
       <Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
-      <span className="sr-only">Estimated effort:</span>
-      <span>
-        {withLabel ? `Est. effort: ${effort}` : effort}
-      </span>
+      {!withLabel && <span className="sr-only">Estimated effort:</span>}
+      <span>{withLabel ? `Est. effort: ${effort}` : effort}</span>
     </span>
   );
 }
