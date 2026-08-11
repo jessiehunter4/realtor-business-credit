@@ -28,6 +28,8 @@ import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
 import FinalCTABright from "@/components/landing/FinalCTABright";
 
+const SHOW_CHECKLIST_CTA = false;
+
 const cardCategories = [
   {
     icon: Wallet,
