@@ -72,5 +72,51 @@ export function buildProductDescription(tier: TierCopy): string {
 
 /** Short reassurance line above the Pay button (inclusions live on the left). */
 export function buildIncludedText(tier: TierCopy): string {
-  return `${tier.name} — full inclusions are listed in your order summary.`;
+  const bullets = tier.features.map((f) => `• ${f}`).join("\n");
+  return `What's included with ${tier.name}:\n${bullets}`;
+}
+
+/**
+ * Best-effort: push the current pricing-page copy onto the Stripe Product that
+ * is attached to `priceId`. Runs automatically before each Checkout session so
+ * no manual admin sync is ever needed. Never throws.
+ */
+export async function syncStripeProductCopy(
+  priceId: string,
+  tier: TierCopy,
+  tierId: string,
+  stripeKey: string,
+): Promise<void> {
+  try {
+    const priceRes = await fetch(`https://api.stripe.com/v1/prices/${priceId}`, {
+      headers: { Authorization: `Bearer ${stripeKey}` },
+    });
+    const price = await priceRes.json();
+    if (!priceRes.ok) throw new Error(price?.error?.message || "price lookup failed");
+
+    const productId =
+      typeof price.product === "string" ? price.product : price.product?.id;
+    if (!productId) return;
+
+    const description = buildProductDescription(tier);
+    const form = new URLSearchParams();
+    form.append("name", tier.name);
+    form.append("description", description);
+    form.append("metadata[tier_id]", tierId);
+
+    const res = await fetch(`https://api.stripe.com/v1/products/${productId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${stripeKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: form.toString(),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      console.error("syncStripeProductCopy failed:", err?.error?.message);
+    }
+  } catch (err) {
+    console.error("syncStripeProductCopy error:", (err as Error).message);
+  }
 }
