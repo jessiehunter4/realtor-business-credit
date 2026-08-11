@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import logoAsset from "@/assets/rbc-logo-transparent.png.asset.json";
 import { useAuthRole } from "@/hooks/useAuthRole";
@@ -38,6 +47,10 @@ const SiteHeader = () => {
     await signOutAndClear({ redirectTo: "/" });
   };
 
+  const email = session?.user?.email ?? "";
+  const initials =
+    (email.trim()[0] ?? "U").toUpperCase();
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-4">
@@ -69,18 +82,42 @@ const SiteHeader = () => {
         <div className="hidden md:flex items-center gap-2">
           {session ? (
             <>
-              <Link
-                to={authedHome}
-                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
-              >
-                {authedLabel}
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
-              >
-                Sign out
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Account menu"
+                    className="inline-flex items-center justify-center rounded-full border border-border bg-white p-1 text-secondary transition-colors hover:bg-secondary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-secondary/10 text-secondary text-sm font-semibold">
+                        {initials || <User className="h-4 w-4" aria-hidden="true" />}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-popover">
+                  {email && (
+                    <>
+                      <DropdownMenuLabel className="truncate font-normal text-xs text-muted-foreground">
+                        {email}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link to={authedHome} className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" aria-hidden="true" />
+                      {authedLabel}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <>
