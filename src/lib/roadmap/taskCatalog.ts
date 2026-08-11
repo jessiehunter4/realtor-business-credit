@@ -58,6 +58,11 @@ const BASE_TASKS: CatalogTask[] = [
     dependsOn: ["business_bank_account"],
     effort: "2 hours",
     keywords: ["quickbook", "xero", "bookkeep", "accounting software"],
+    quickActions: [
+      { label: "Connect QuickBooks", href: "https://quickbooks.intuit.com/", external: true },
+      { label: "Connect Xero", href: "https://www.xero.com/signup/", external: true },
+      { label: "Connect Wave", href: "https://www.waveapps.com/", external: true },
+    ],
   },
 
   // --------------------------------------------------------------- credibility
@@ -84,6 +89,9 @@ const BASE_TASKS: CatalogTask[] = [
     dependsOn: [],
     effort: "30 min",
     keywords: ["phone", "411", "directory", "google business"],
+    quickActions: [
+      { label: "Open Google Business Profile", href: "https://www.google.com/business/", external: true },
+    ],
   },
   {
     key: "business_email_domain",
@@ -122,6 +130,9 @@ const BASE_TASKS: CatalogTask[] = [
     dependsOn: ["ein_obtained"],
     effort: "20 min + 1–4 wk wait",
     keywords: ["d-u-n-s", "duns", "dun & bradstreet", "dun and bradstreet"],
+    quickActions: [
+      { label: "Start D-U-N-S registration", href: "https://www.dnb.com/duns-number/get-a-duns.html", external: true },
+    ],
   },
   {
     key: "experian_profile",
@@ -134,6 +145,9 @@ const BASE_TASKS: CatalogTask[] = [
     dependsOn: ["ein_obtained"],
     effort: "30 min",
     keywords: ["experian"],
+    quickActions: [
+      { label: "Open Experian Business", href: "https://www.experian.com/small-business/business-credit", external: true },
+    ],
   },
   {
     key: "equifax_profile",
@@ -146,6 +160,9 @@ const BASE_TASKS: CatalogTask[] = [
     dependsOn: ["ein_obtained"],
     effort: "30 min",
     keywords: ["equifax"],
+    quickActions: [
+      { label: "Open Equifax Small Business", href: "https://www.equifax.com/business/small-business/", external: true },
+    ],
   },
 
   // ---------------------------------------------------------------- tradelines
