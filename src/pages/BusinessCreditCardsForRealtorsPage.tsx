@@ -277,7 +277,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
             and brokers — the categories of cards that actually fit, and the
             order to set them up so you qualify for higher limits later.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <div className="mt-8 flex flex-col items-center gap-2">
             <Link
               to="/guide"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
@@ -285,14 +285,14 @@ const BusinessCreditCardsForRealtorsPage = () => {
               <BookOpen className="h-5 w-5" />
               Read the Free Guide
             </Link>
-          </div>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-secondary/80">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              Updated for 2026
-            </span>
-            <span className="text-secondary/50">•</span>
-            <span>5-Min Read</span>
+            <div className="flex items-center justify-center gap-2 text-sm font-medium text-secondary/80">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                Updated for 2026
+              </span>
+              <span className="text-secondary/50">•</span>
+              <span>5-Min Read</span>
+            </div>
           </div>
         </div>
       </section>
