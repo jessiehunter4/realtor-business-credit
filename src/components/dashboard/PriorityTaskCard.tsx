@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Clock, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, ExternalLink, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PHASE_LABELS, type RoadmapTask, type TaskStatus } from "@/lib/roadmap";
 import { PhaseHelpBubble, TaskHelpBubble } from "./TaskHelpBubble";
+import EffortChip from "./EffortChip";
 
 interface Props {
   task: RoadmapTask | null;
@@ -59,8 +60,34 @@ export default function PriorityTaskCard({ task, saving, onStatusChange, planId 
           {task.nextAction}
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2">
-          <Clock className="h-3.5 w-3.5" /> Est. effort: {task.effort}
+        {task.quickActions && task.quickActions.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {task.quickActions.map((action) =>
+              action.external ? (
+                <Button
+                  key={action.href}
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                >
+                  <a href={action.href} target="_blank" rel="noopener noreferrer">
+                    {action.label}
+                    <ExternalLink className="h-3.5 w-3.5 ml-1.5" aria-hidden="true" />
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </Button>
+              ) : (
+                <Button key={action.href} asChild variant="outline" size="sm" className="rounded-full">
+                  <Link to={action.href}>{action.label}</Link>
+                </Button>
+              )
+            )}
+          </div>
+        )}
+
+        <div className="mt-3">
+          <EffortChip effort={task.effort} withLabel />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 mt-4">
