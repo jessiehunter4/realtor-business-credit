@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { CheckCircle2, Circle, Clock, Loader2, Lock, PlayCircle } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, Lock, PlayCircle } from "lucide-react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TASK_BY_KEY, type RoadmapTask, type TaskStatus } from "@/lib/roadmap";
 import { TaskHelpBubble } from "./TaskHelpBubble";
+import EffortChip from "./EffortChip";
 
 interface Props {
   task: RoadmapTask;
@@ -122,9 +123,7 @@ export default function RoadmapTaskRow({ task, saving, onStatusChange, planId, i
 
           {!done && (
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" /> {task.effort}
-              </span>
+              <EffortChip effort={task.effort} />
               {task.blocked && <span>Unlocks after: {blockedLabel}</span>}
               {task.actionHref && (
                 <Link to={task.actionHref} className="text-primary hover:underline">
