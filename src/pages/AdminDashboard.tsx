@@ -643,6 +643,14 @@ export default function AdminDashboard() {
             <RefreshCw className={`h-4 w-4 ${refreshingDashboard ? "animate-spin" : ""}`} />
             {refreshingDashboard ? "Refreshing..." : "Refresh"}
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => void handleSyncStripeProducts()}
+            disabled={syncingStripe}
+          >
+            {syncingStripe ? "Syncing Stripe…" : "Sync Stripe Product Info"}
+          </Button>
           <p className="text-xs text-muted-foreground w-full sm:w-auto sm:self-center">
             Auto-refresh: {Math.floor(AUTO_REFRESH_MS / 1000)}s · Last: {lastRefreshLabel}
           </p>
