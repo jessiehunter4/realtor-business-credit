@@ -37,6 +37,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 import { buildEntitlementState, type EntitlementState } from "@/lib/entitlementTiers";
 import { logRoadmapEvent } from "@/lib/roadmap";
 import { signOutAndClear } from "@/lib/signOut";
+import { cn } from "@/lib/utils";
 import WelcomeDialog from "@/components/dashboard/WelcomeDialog";
 
 type Ctx = ReturnType<typeof useDashboardData> & {
