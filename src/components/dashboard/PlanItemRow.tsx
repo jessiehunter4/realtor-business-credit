@@ -231,7 +231,7 @@ export default function PlanItemRow({
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-xs"
+                className="rounded-full text-xs border border-border"
                 onClick={() => onStatusChange(item, "completed")}
               >
                 {l.done}
