@@ -1,5 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-
 export default function SectionHeader({
   title,
   subtitle,
@@ -11,9 +9,9 @@ export default function SectionHeader({
 }) {
   return (
     <header className="space-y-1">
-      <div className="flex flex-wrap items-baseline gap-x-4">
+      <div className="flex flex-wrap items-baseline gap-x-3">
         <h1 className="text-2xl font-bold text-secondary">{title}</h1>
-        {subtitle && <Badge variant="secondary" className="text-[10px]">{subtitle}</Badge>}
+        {subtitle && <span className="text-xs text-muted-foreground">{subtitle}</span>}
       </div>
       {blurb && <p className="text-sm text-muted-foreground">{blurb}</p>}
     </header>
