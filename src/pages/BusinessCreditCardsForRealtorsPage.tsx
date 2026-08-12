@@ -292,25 +292,34 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
         <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl relative z-10">
           <p className="text-primary text-sm md:text-base font-semibold uppercase tracking-wider mb-3">
-            Educational round-up · Updated 2026
+            Free guide · Updated 2026
           </p>
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
-            Business Credit Cards for Realtors:
-            <span className="block text-primary mt-2">A Plain-English Buyer&apos;s Guide</span>
+            Business Credit Cards for Real Estate Pros:
+            <span className="block text-primary mt-2">the How &amp; Why of Credit Card Stacking</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty max-w-3xl">
-            Most articles on this topic are written for "small businesses" in general.
-            This one is written for residential and commercial real estate agents
-            and brokers — the categories of cards that actually fit, and the
-            order to set them up so you qualify for higher limits later.
+          <div className="mt-6 mx-auto w-full max-w-[720px]">
+            <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
+              <HeroVideo
+                storagePath="public/card-guide-jessie.mp4"
+                captionsPath="public/card-guide-jessie.vtt"
+                alt="Jessie Hunter explains business credit card stacking for real estate professionals"
+                className="rounded-2xl sm:rounded-3xl"
+              />
+            </div>
+          </div>
+          <p className="mt-6 text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty max-w-3xl mx-auto text-center">
+            Written for residential and commercial agents, brokers, and investors — how a planned sequence of
+            business credit cards can give your business working capital, what it really costs, and the structure
+            you need in place first.
           </p>
           <div className="mt-8 flex flex-col items-center gap-2">
             <Link
-              to="/guide"
+              to="/card-guide"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
             >
               <BookOpen className="h-5 w-5" />
-              Read the Free Guide
+              Read the Free Card Guide
             </Link>
             <div className="flex items-center justify-center gap-2 text-sm font-medium text-secondary/80">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1.5">
@@ -321,6 +330,92 @@ const BusinessCreditCardsForRealtorsPage = () => {
               <span>5-Min Read</span>
             </div>
           </div>
+          <p className="mt-6 mx-auto max-w-2xl rounded-xl border border-border bg-card/80 px-4 py-3 text-xs text-foreground/75 leading-relaxed text-center">
+            {AFFILIATE_DISCLOSURE_SHORT}
+          </p>
+        </div>
+      </section>
+
+      {/* Sneak peek at what's inside */}
+      <section id="sneak-peek" className="container mx-auto px-4 py-12 md:py-16 max-w-5xl scroll-mt-28">
+        <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-3 text-center tracking-tight">
+          A sneak peek at what&apos;s coming your way
+        </h2>
+        <p className="text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-8">
+          The card guide is free, plain-English, and written for how real estate income actually works.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[
+            {
+              icon: Layers,
+              title: "How the strategy actually works",
+              body: "What credit card stacking is, why sequence and spacing drive outcomes, and how rounds are paced over months rather than days.",
+            },
+            {
+              icon: AlertTriangle,
+              title: "The pitfalls that trigger denials",
+              body: "Inconsistent business details, applying for everything at once, and being unreachable when an issuer calls to verify your business.",
+            },
+            {
+              icon: Wallet,
+              title: "Paying for things that don't take cards",
+              body: "How third-party balance transfer and bill-pay services work for contractors and vendors — and the fees you need to price in first.",
+            },
+            {
+              icon: ShieldCheck,
+              title: "What you get for free",
+              body: "The full card guide, the main structure and credit guide, your customized plan, and a private dashboard — no credit card required.",
+            },
+          ].map(({ icon: Icon, title, body }) => (
+            <Card key={title} className="border-border rounded-2xl shadow-card bg-card">
+              <CardContent className="pt-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary">{title}</h3>
+                </div>
+                <p className="text-sm text-foreground/85 leading-relaxed">{body}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <Link
+            to="/card-guide"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+          >
+            <BookOpen className="h-5 w-5" />
+            Read the Free Card Guide
+          </Link>
+          <p className="text-xs text-muted-foreground italic">{RESULTS_STATEMENT}</p>
+        </div>
+      </section>
+
+      {/* Who this is for */}
+      <section className="container mx-auto px-4 py-8 md:py-10 max-w-5xl">
+        <div className="rounded-3xl border border-border bg-card shadow-card px-6 py-8 md:py-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+              <Users className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-secondary tracking-tight">Who this is for</h2>
+          </div>
+          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+            {[
+              "Residential Realtors carrying marketing and overhead between closings",
+              "Commercial agents with long deal cycles and lumpy income",
+              "Brokers and team leads covering payroll, office, and lead spend",
+              "Investors funding rehabs, materials, and carrying costs",
+              "Transaction coordinators, property managers, and other real estate professionals",
+              "Anyone tired of putting business expenses on personal cards",
+            ].map((item) => (
+              <li key={item} className="flex gap-2 py-1 text-base text-foreground/85">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
