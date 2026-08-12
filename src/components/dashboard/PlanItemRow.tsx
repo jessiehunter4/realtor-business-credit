@@ -184,7 +184,7 @@ export default function PlanItemRow({
           )}
         </div>
 
-        <div className="shrink-0 flex flex-col sm:flex-row gap-1.5">
+        <div className="shrink-0 flex flex-col sm:flex-row items-center gap-1.5">
           {onUpdate && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
