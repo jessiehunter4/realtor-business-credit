@@ -45,7 +45,7 @@ export default function FundingSection() {
                       ]}
                     />
                   </div>
-                  <Badge variant={f.status === "completed" ? "default" : "secondary"} className="text-[10px] shrink-0">
+                  <Badge variant="default" className="text-[10px] shrink-0">
                     {STATUS_LABEL[f.status]}
                   </Badge>
                 </div>
