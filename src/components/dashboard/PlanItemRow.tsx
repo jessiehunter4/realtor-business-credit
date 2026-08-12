@@ -213,35 +213,48 @@ export default function PlanItemRow({
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mt-2" />
           ) : done ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-full text-xs"
-              onClick={() => onStatusChange(item, "not_started")}
-            >
-              {l.undo}
-            </Button>
-          ) : (
-            <>
-              {item.status !== "in_progress" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full text-xs"
-                  onClick={() => onStatusChange(item, "in_progress")}
-                >
-                  {l.start}
-                </Button>
-              )}
+            <div className="flex items-center gap-1.5">
+              <Button
+                size="sm"
+                className="rounded-full text-xs bg-success-green text-success-green-foreground hover:bg-success-green-hover"
+                onClick={() => onStatusChange(item, "not_started")}
+              >
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                {l.done}
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-xs border border-border"
+                className="rounded-full text-xs border-border text-muted-foreground hover:text-foreground"
+                onClick={() => onStatusChange(item, "not_started")}
+              >
+                {l.undo}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <Button
+                size="sm"
+                className={`rounded-full text-xs ${
+                  item.status === "in_progress"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-transparent text-muted-foreground border border-border hover:bg-muted hover:text-foreground"
+                }`}
+                variant={item.status === "in_progress" ? "default" : "outline"}
+                onClick={() => onStatusChange(item, "in_progress")}
+              >
+                <PlayCircle className="h-3.5 w-3.5 mr-1" />
+                {l.start}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full text-xs border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                 onClick={() => onStatusChange(item, "completed")}
               >
                 {l.done}
               </Button>
-            </>
+            </div>
           )}
         </div>
       </div>
