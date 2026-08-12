@@ -91,7 +91,7 @@ export default function ProgramSection() {
 
       <section className="space-y-3">
         <h2 className="text-lg font-bold text-secondary">Compare your options</h2>
-        <div className="grid gap-3 sm:grid-cols-2 items-stretch">
+        <div className="grid gap-3 sm:grid-cols-2 sm:grid-rows-2 items-stretch">
           {PRICING_TIERS.map((t) => {
             const active =
               t.id === "free"
@@ -101,7 +101,7 @@ export default function ProgramSection() {
               t.id !== "free" && isUpgrade(t.id as PaidTierId, tier.highest);
             return (
               <Card key={t.id} className={cn("h-full flex flex-col", active ? "border-primary/50" : "")}>
-                <CardContent className="p-5 space-y-3 text-center flex flex-col flex-1">
+                <CardContent className="p-5 h-full text-center flex flex-col">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <t.icon className="h-4 w-4 text-primary" />
                     <h3 className="font-semibold text-secondary">{t.name}</h3>
@@ -109,18 +109,20 @@ export default function ProgramSection() {
                     {active && <Badge className="text-[10px]">Your plan</Badge>}
                     {recommended === t.id && <Badge variant="secondary" className="text-[10px]">Recommended</Badge>}
                   </div>
-                  <p className="text-xs text-muted-foreground">{t.who}</p>
-                  <ul className="text-xs text-muted-foreground space-y-1.5 pb-1">
+                  <p className="text-xs text-muted-foreground mt-3">{t.who}</p>
+                  <ul className="text-xs text-muted-foreground space-y-1.5 pb-1 mt-3 flex-1">
                     {t.features.slice(0, 4).map((f) => (
                       <li key={f} className="leading-relaxed">· {f}</li>
                     ))}
                   </ul>
-                  {!active && (
-                    <Link to={t.ctaHref} className="inline-block mt-auto pt-3">
+                  {!active ? (
+                    <Link to={t.ctaHref} className="inline-block mt-auto pt-4">
                       <Button size="sm" variant="outline" className="rounded-full text-xs">
                         {upgrade ? `Upgrade to ${t.name}` : t.ctaLabel}
                       </Button>
                     </Link>
+                  ) : (
+                    <div className="mt-auto pt-4" aria-hidden="true" />
                   )}
                 </CardContent>
               </Card>
