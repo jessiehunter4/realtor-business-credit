@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Clock, Compass, ClipboardList, Rocket } from "lucide-react";
+import { BookOpen, Clock } from "lucide-react";
 import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
