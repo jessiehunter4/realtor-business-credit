@@ -15,9 +15,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
   const tagline = "— between closings, before your next client, and when opportunity knocks.";
 
-  const subhead =
-    "Commission income arrives in lumps. Your bills don't. Build the business structure and separate business credit that covers your overhead between closings — without leaning on your personal cards.";
-
   const trustBullets = [
     { icon: Compass, label: "Know where you stand" },
     { icon: ClipboardList, label: "Get a 90-day plan" },
@@ -32,16 +29,13 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
         <div className="absolute top-1/3 right-1/4 w-56 h-56 rounded-full bg-accent/15 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-5 sm:py-7 md:py-9 lg:py-10 relative z-10">
+      <div className="container mx-auto px-4 py-4 sm:py-5 md:py-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-[clamp(1.75rem,6vw,3.25rem)] font-bold text-secondary leading-[1.08] tracking-tight text-balance">
             {headline}
           </h1>
-          <p className="mt-2 sm:mt-3 text-[clamp(1rem,2.8vw,1.5rem)] font-bold text-secondary leading-snug text-balance max-w-2xl mx-auto">
-            {tagline}
-          </p>
 
-          <div className="relative mt-4 sm:mt-5 w-full max-w-[min(720px,100%)] mx-auto">
+          <div className="relative mt-3 sm:mt-4 w-full max-w-[min(600px,100%)] mx-auto">
             <div className="absolute -inset-3 sm:-inset-5 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
             <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
@@ -51,11 +45,11 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             </div>
           </div>
 
-          <p className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-pretty max-w-2xl mx-auto">
-            {subhead}
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base font-medium text-secondary/80 leading-snug text-balance max-w-2xl mx-auto">
+            {tagline}
           </p>
 
-          <div className="mt-8 sm:mt-10 flex justify-center">
+          <div className="mt-5 sm:mt-6 flex justify-center">
             <Link
               to={guideLink}
               data-analytics-id="cta-guide-hero"
@@ -66,7 +60,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
             </Link>
           </div>
 
-          <ul className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
+          <ul className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
               {trustBullets.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -78,7 +72,7 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               ))}
           </ul>
 
-          <p className="mt-4 sm:mt-5 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
+          <p className="mt-3 sm:mt-4 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
             <Clock className="h-3.5 w-3.5 text-primary" />
             Free to read · about 5–10 minutes · no signup required
           </p>
