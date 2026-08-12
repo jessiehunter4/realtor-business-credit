@@ -179,9 +179,10 @@ export default function PlanItemRow({
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="text-left text-xs text-secondary/80 hover:text-primary"
+                  className="inline-flex items-center gap-1.5 text-left text-xs font-medium text-secondary hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded min-h-[44px] px-1 -ml-1 transition-colors"
                 >
-                  {item.note ? `Note: ${item.note}` : "+ Add a note"}
+                  <StickyNote className="h-3.5 w-3.5" />
+                  {item.note ? `Note: ${item.note}` : "Add a note"}
                 </button>
               )}
             </div>
