@@ -119,7 +119,7 @@ export default function PlanItemRow({
 
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className={`font-semibold ${done ? "text-muted-foreground line-through" : "text-secondary"}`}>
+            <p className={`font-bold ${done ? "text-muted-foreground line-through" : "text-foreground"}`}>
               {item.title}
             </p>
             {help && <HelpBubble title={help.title} sections={help.sections} />}
@@ -133,8 +133,12 @@ export default function PlanItemRow({
               <span className="text-[10px] text-secondary/70">edited</span>
             )}
           </div>
-          {item.meta && <p className="text-xs text-secondary/80 mt-1">{item.meta}</p>}
-          {item.detail && <p className="text-sm text-secondary/80 mt-1">{item.detail}</p>}
+          {item.meta && (
+            <span className="inline-flex items-center mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary/10 text-secondary">
+              {item.meta}
+            </span>
+          )}
+          {item.detail && <p className="text-sm text-secondary/80 mt-1.5 leading-relaxed">{item.detail}</p>}
 
           {onNoteSave && (
             <div className="mt-2">
