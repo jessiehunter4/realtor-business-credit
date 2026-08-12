@@ -213,7 +213,7 @@ export default function PlanItemRow({
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mt-2" />
           ) : done ? (
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-col sm:flex-row items-center gap-1.5">
               <Button
                 size="sm"
                 className="rounded-full text-xs bg-success-green text-success-green-foreground hover:bg-success-green-hover"
@@ -232,7 +232,7 @@ export default function PlanItemRow({
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-col sm:flex-row items-center gap-1.5">
               <Button
                 size="sm"
                 className={`rounded-full text-xs ${
