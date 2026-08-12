@@ -213,29 +213,29 @@ export default function PlanItemRow({
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mt-2" />
           ) : done ? (
-            <div className="flex flex-col sm:flex-row items-center gap-1.5">
+            <div className="flex flex-col sm:flex-row items-center gap-2">
               <Button
                 size="sm"
-                className="rounded-full text-xs bg-success-green text-success-green-foreground hover:bg-success-green-hover"
+                className="rounded-full text-sm font-medium h-10 px-4 bg-success-green text-success-green-foreground hover:bg-success-green-hover"
                 onClick={() => onStatusChange(item, "not_started")}
               >
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 {l.done}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-xs border-border text-muted-foreground hover:text-foreground"
+                className="rounded-full text-sm font-medium h-10 px-4 border-border text-muted-foreground hover:text-foreground"
                 onClick={() => onStatusChange(item, "not_started")}
               >
                 {l.undo}
               </Button>
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row items-center gap-1.5">
+            <div className="flex flex-col sm:flex-row items-center gap-2">
               <Button
                 size="sm"
-                className={`rounded-full text-xs ${
+                className={`rounded-full text-sm font-medium h-10 px-4 ${
                   item.status === "in_progress"
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "bg-transparent text-muted-foreground border border-border hover:bg-muted hover:text-foreground"
@@ -243,15 +243,16 @@ export default function PlanItemRow({
                 variant={item.status === "in_progress" ? "default" : "outline"}
                 onClick={() => onStatusChange(item, "in_progress")}
               >
-                <PlayCircle className="h-3.5 w-3.5 mr-1" />
+                <PlayCircle className="h-4 w-4 mr-1.5" />
                 {l.start}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-xs border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-full text-sm font-medium h-10 px-4 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                 onClick={() => onStatusChange(item, "completed")}
               >
+                <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 {l.done}
               </Button>
             </div>

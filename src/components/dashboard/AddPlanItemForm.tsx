@@ -48,7 +48,7 @@ export default function AddPlanItemForm({
       <Button
         variant="outline"
         size="sm"
-        className="rounded-full text-xs border-primary/40 text-primary hover:bg-primary/10 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring min-h-11 min-w-[132px]"
+        className="rounded-full text-sm font-medium h-10 px-4 border-primary/40 text-primary hover:bg-primary/10 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => setOpen(true)}
       >
         <Plus className="h-4 w-4 mr-1.5" /> {addLabel}
