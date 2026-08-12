@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PRICING_TIERS } from "@/data/pricingTiers";
 import { TIER_LABELS, isUpgrade, type PaidTierId } from "@/lib/entitlementTiers";
+import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
 import { useDashboardCtx } from "./DashboardLayout";
 
