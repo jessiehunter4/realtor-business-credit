@@ -15,12 +15,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
   const tagline = "— between closings, before your next client, and when opportunity knocks.";
 
-  const trustBullets = [
-    { icon: Compass, label: "Know where you stand" },
-    { icon: ClipboardList, label: "Get a 90-day plan" },
-    { icon: Rocket, label: "Choose how to implement" },
-  ];
-
   return (
     <section className="relative overflow-hidden bg-hero-grad">
       <div className="absolute inset-0 pointer-events-none">
