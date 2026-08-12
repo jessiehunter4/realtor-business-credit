@@ -49,6 +49,12 @@ const GuideResources = () => (
                 Start Here →
               </Link>
             </Paragraph>
+            <Paragraph className="mb-0 mt-3">
+              <strong>Companion guide:</strong>{" "}
+              <Link to="/card-guide" className="text-primary hover:underline font-bold">
+                The RE Pro Business Credit Card Guide — How &amp; Why of Credit Card Stacking →
+              </Link>
+            </Paragraph>
           </Callout>
 
           <SectionHeading>About the Author</SectionHeading>

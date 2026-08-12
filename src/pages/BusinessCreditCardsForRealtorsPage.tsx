@@ -19,6 +19,11 @@ import {
   Mail,
   Loader2,
   Clock,
+  ShieldAlert,
+  Layers,
+  Users,
+  GraduationCap,
+  PhoneCall,
 } from "lucide-react";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
@@ -27,6 +32,9 @@ import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
 import FinalCTABright from "@/components/landing/FinalCTABright";
+import HeroVideo from "@/components/shared/HeroVideo";
+import PartnerCTA from "@/components/card-guide/PartnerCTA";
+import { AFFILIATE_DISCLOSURE_SHORT, FULL_DISCLOSURES, RESULTS_STATEMENT } from "@/config/partner";
 
 const SHOW_CHECKLIST_CTA = false;
 
@@ -106,6 +114,22 @@ const faqs = [
     q: "What's the difference between a business credit card and 'business credit'?",
     a: "A business credit card is one product. 'Business credit' is a separate credit profile (D-U-N-S, Experian Business, Equifax Small Business) tied to your EIN, built through vendor tradelines and on-time payments. The card is a downstream benefit of having real business credit.",
   },
+  {
+    q: "What is credit card stacking?",
+    a: "It is applying for several business credit cards in a planned sequence so the approved limits together give your business meaningful spending capacity that can be used much like a line of credit. It is not a loan, not a line of credit product, and not credit repair. Every credit decision is made by third-party issuers.",
+  },
+  {
+    q: "Will I have to sign a personal guarantee?",
+    a: "Almost always, early on. Most business credit cards available to a newer business require a personal guarantee and involve a credit inquiry. As the business builds revenue, banking history, and its own credit profile, some products reduce or remove that requirement.",
+  },
+  {
+    q: "How much can I expect to be approved for?",
+    a: "There is no promised amount. Well-qualified clients may access up to $300,000 in business credit across multiple rounds, but results vary and depend on your credit profile, business details, and issuer decisions.",
+  },
+  {
+    q: "What happens on a bank verification call?",
+    a: "An issuer may call to verify what the business does, how long it has operated, where it is located, and how to reach it. Consistent answers and a professionally answered business phone matter. Coaching through these calls is one of the most valuable parts of a good support program.",
+  },
 ];
 
 const BusinessCreditCardsForRealtorsPage = () => {
@@ -126,7 +150,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
   const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
-    const sections = ["tldr", "categories", "order-matters", "faqs"];
+    const sections = ["sneak-peek", "tldr", "categories", "order-matters", "how-it-works", "red-flags", "faqs"];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -147,9 +171,12 @@ const BusinessCreditCardsForRealtorsPage = () => {
   }, []);
 
   const jumpLinks = [
+    { id: "sneak-peek", label: "What's inside" },
     { id: "tldr", label: "The 60-second version" },
     { id: "categories", label: "5 categories" },
     { id: "order-matters", label: "Why order matters" },
+    { id: "how-it-works", label: "How the program works" },
+    { id: "red-flags", label: "Red flags" },
     { id: "faqs", label: "FAQs" },
   ];
 
@@ -218,8 +245,8 @@ const BusinessCreditCardsForRealtorsPage = () => {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <Seo
-        title="Business Credit Cards for Realtors: 2026 Buyer's Guide"
-        description="A Realtor-specific look at the categories of business credit cards that actually fit real estate agents and brokers — and what to set up first so you qualify."
+        title="Business Credit Cards for Realtors: Card Stacking Guide"
+        description="How real estate pros use a planned sequence of business credit cards as working capital — categories that fit, the order to set things up, the real costs, and the free RE Pro card guide."
         path="/business-credit-cards-for-realtors"
         jsonLd={jsonLd}
       />
@@ -265,25 +292,34 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
         <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl relative z-10">
           <p className="text-primary text-sm md:text-base font-semibold uppercase tracking-wider mb-3">
-            Educational round-up · Updated 2026
+            Free guide · Updated 2026
           </p>
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
-            Business Credit Cards for Realtors:
-            <span className="block text-primary mt-2">A Plain-English Buyer&apos;s Guide</span>
+            Business Credit Cards for Real Estate Pros:
+            <span className="block text-primary mt-2">the How &amp; Why of Credit Card Stacking</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty max-w-3xl">
-            Most articles on this topic are written for "small businesses" in general.
-            This one is written for residential and commercial real estate agents
-            and brokers — the categories of cards that actually fit, and the
-            order to set them up so you qualify for higher limits later.
+          <div className="mt-6 mx-auto w-full max-w-[720px]">
+            <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
+              <HeroVideo
+                storagePath="public/card-guide-jessie.mp4"
+                captionsPath="public/card-guide-jessie.vtt"
+                alt="Jessie Hunter explains business credit card stacking for real estate professionals"
+                className="rounded-2xl sm:rounded-3xl"
+              />
+            </div>
+          </div>
+          <p className="mt-6 text-lg md:text-xl text-muted-foreground leading-relaxed text-pretty max-w-3xl mx-auto text-center">
+            Written for residential and commercial agents, brokers, and investors — how a planned sequence of
+            business credit cards can give your business working capital, what it really costs, and the structure
+            you need in place first.
           </p>
           <div className="mt-8 flex flex-col items-center gap-2">
             <Link
-              to="/guide"
+              to="/card-guide"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
             >
               <BookOpen className="h-5 w-5" />
-              Read the Free Guide
+              Read the Free Card Guide
             </Link>
             <div className="flex items-center justify-center gap-2 text-sm font-medium text-secondary/80">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1.5">
@@ -294,6 +330,92 @@ const BusinessCreditCardsForRealtorsPage = () => {
               <span>5-Min Read</span>
             </div>
           </div>
+          <p className="mt-6 mx-auto max-w-2xl rounded-xl border border-border bg-card/80 px-4 py-3 text-xs text-foreground/75 leading-relaxed text-center">
+            {AFFILIATE_DISCLOSURE_SHORT}
+          </p>
+        </div>
+      </section>
+
+      {/* Sneak peek at what's inside */}
+      <section id="sneak-peek" className="container mx-auto px-4 py-12 md:py-16 max-w-5xl scroll-mt-28">
+        <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-3 text-center tracking-tight">
+          A sneak peek at what&apos;s coming your way
+        </h2>
+        <p className="text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-8">
+          The card guide is free, plain-English, and written for how real estate income actually works.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[
+            {
+              icon: Layers,
+              title: "How the strategy actually works",
+              body: "What credit card stacking is, why sequence and spacing drive outcomes, and how rounds are paced over months rather than days.",
+            },
+            {
+              icon: AlertTriangle,
+              title: "The pitfalls that trigger denials",
+              body: "Inconsistent business details, applying for everything at once, and being unreachable when an issuer calls to verify your business.",
+            },
+            {
+              icon: Wallet,
+              title: "Paying for things that don't take cards",
+              body: "How third-party balance transfer and bill-pay services work for contractors and vendors — and the fees you need to price in first.",
+            },
+            {
+              icon: ShieldCheck,
+              title: "What you get for free",
+              body: "The full card guide, the main structure and credit guide, your customized plan, and a private dashboard — no credit card required.",
+            },
+          ].map(({ icon: Icon, title, body }) => (
+            <Card key={title} className="border-border rounded-2xl shadow-card bg-card">
+              <CardContent className="pt-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary">{title}</h3>
+                </div>
+                <p className="text-sm text-foreground/85 leading-relaxed">{body}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <Link
+            to="/card-guide"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+          >
+            <BookOpen className="h-5 w-5" />
+            Read the Free Card Guide
+          </Link>
+          <p className="text-xs text-muted-foreground italic">{RESULTS_STATEMENT}</p>
+        </div>
+      </section>
+
+      {/* Who this is for */}
+      <section className="container mx-auto px-4 py-8 md:py-10 max-w-5xl">
+        <div className="rounded-3xl border border-border bg-card shadow-card px-6 py-8 md:py-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+              <Users className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-secondary tracking-tight">Who this is for</h2>
+          </div>
+          <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+            {[
+              "Residential Realtors carrying marketing and overhead between closings",
+              "Commercial agents with long deal cycles and lumpy income",
+              "Brokers and team leads covering payroll, office, and lead spend",
+              "Investors funding rehabs, materials, and carrying costs",
+              "Transaction coordinators, property managers, and other real estate professionals",
+              "Anyone tired of putting business expenses on personal cards",
+            ].map((item) => (
+              <li key={item} className="flex gap-2 py-1 text-base text-foreground/85">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -456,6 +578,86 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
       </section>
 
+      {/* How the funding partner program works */}
+      <section id="how-it-works" className="container mx-auto px-4 py-12 md:py-16 max-w-5xl scroll-mt-28">
+        <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-3 text-center tracking-tight">
+          If you want help implementing it
+        </h2>
+        <p className="text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-8">
+          We work with a funding partner that runs a 12-month coaching and support program for business credit card
+          strategy. Here is what that program covers.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[
+            {
+              icon: Building2,
+              title: "Entity and business setup support",
+              body: "Getting the business details right — entity, EIN, address, phone, and industry code — so applications are consistent and verifiable.",
+            },
+            {
+              icon: Layers,
+              title: "Strategic application sequencing",
+              body: "A planned order and pacing for applications across multiple rounds instead of a scattershot afternoon of submissions.",
+            },
+            {
+              icon: GraduationCap,
+              title: "Business credit profile building",
+              body: "Establishing and strengthening your profile with the business credit bureaus over time.",
+            },
+            {
+              icon: PhoneCall,
+              title: "Coaching through bank approvals",
+              body: "Hand-holding through the bank approval process, including the verification calls that decide real approvals.",
+            },
+          ].map(({ icon: Icon, title, body }) => (
+            <Card key={title} className="border-border rounded-2xl shadow-card bg-card">
+              <CardContent className="pt-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-sky/15 text-sky flex items-center justify-center">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary">{title}</h3>
+                </div>
+                <p className="text-sm text-foreground/85 leading-relaxed">{body}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <PartnerCTA className="mt-8" />
+      </section>
+
+      {/* Red flags */}
+      <section id="red-flags" className="container mx-auto px-4 py-12 md:py-16 max-w-4xl scroll-mt-28">
+        <div className="rounded-3xl border border-border bg-card shadow-card px-6 py-8 md:py-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-secondary tracking-tight">
+              How to spot a bad stacking company
+            </h2>
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              "Promises of guaranteed approval, guaranteed funding amounts, or guaranteed timelines",
+              "Claims of special or insider relationships with banks",
+              "Any suggestion of no credit check, or that this will not affect your personal credit at all",
+              "Encouraging you to misstate revenue, time in business, or the purpose of the funds",
+              "Large fees with no coaching, no support, and no one available when a bank calls you",
+              "Calling it a loan or a line of credit, or blurring it with credit repair",
+            ].map((item) => (
+              <li key={item} className="flex gap-2 py-1 text-base text-foreground/85">
+                <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-sm text-muted-foreground italic">
+            Nobody has a back door at the banks. Preparation, sequencing, and support are the real product.
+          </p>
+        </div>
+      </section>
+
       {SHOW_CHECKLIST_CTA && (
         <section className="container mx-auto px-4 py-14 md:py-20 max-w-4xl">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card px-6 py-10 md:py-14">
@@ -542,7 +744,23 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
       </section>
 
-      <FinalCTABright guideLink="/guide" />
+      {/* Full disclosures */}
+      <section className="bg-muted/40 border-t border-border">
+        <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
+          <h2 className="text-xl md:text-2xl font-bold text-secondary mb-3">Important disclosures</h2>
+          <p className="text-sm text-foreground/80 leading-relaxed mb-6">{AFFILIATE_DISCLOSURE_SHORT}</p>
+          <div className="space-y-4">
+            {FULL_DISCLOSURES.map((d) => (
+              <div key={d.title} className="rounded-2xl border border-border bg-card p-5">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-2">{d.title}</h3>
+                <p className="text-sm text-foreground/80 leading-relaxed m-0">{d.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <FinalCTABright guideLink="/card-guide" />
       <SiteFooter />
     </div>
   );
