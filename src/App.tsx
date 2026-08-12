@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LandingWithAvatarPage from "./pages/LandingWithAvatarPage";
 import GuidePage from "./pages/GuidePage";
+import CardGuidePage from "./pages/CardGuidePage";
 import AboutPage from "./pages/AboutPage";
 
 import AuthPage from "./pages/AuthPage";
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/" element={<LandingPage />} />
           <Route path="/landing-page/:slug" element={<LandingWithAvatarPage />} />
           <Route path="/guide" element={<GuidePage />} />
+          <Route path="/card-guide" element={<CardGuidePage />} />
           <Route path="/guide/:slug" element={<GuidePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
