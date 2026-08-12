@@ -29,31 +29,34 @@ export default function MilestonesSection() {
           No long-term milestones were generated for your plan yet — add your own below.
         </p>
       ) : (
-        <ol className="relative border-l border-border ml-3 space-y-5 pt-2">
+        <ol className="relative space-y-6 pt-2">
           {milestones.map((m) => {
             const done = m.status === "completed";
             return (
-              <li key={m.key} className="ml-6">
-                <span className="absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full bg-background">
-                  {done ? (
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                  ) : (
-                    <Circle className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">{m.meta}</p>
-                  {m.custom && <span className="text-[10px] text-muted-foreground">added by you</span>}
-                  {m.edited && !m.custom && <span className="text-[10px] text-muted-foreground">edited</span>}
-                  <HelpBubble
-                    title="This milestone"
-                    sections={[
-                      { label: "What this means", body: "A checkpoint your plan expects around this month, based on how business credit files actually mature." },
-                      { label: "If you're behind", body: "Timelines shift — usually because a tradeline isn't reporting yet. Go back to the roadmap and confirm the reporting steps are truly done." },
-                    ]}
-                  />
+              <li key={m.key} className="relative grid grid-cols-[24px_1fr] gap-3">
+                <div className="relative flex justify-center">
+                  <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border" />
+                  <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full bg-background self-start mt-0.5">
+                    {done ? (
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                    ) : (
+                      <Circle className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </span>
                 </div>
-                <div className="mt-1">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-primary">{m.meta}</p>
+                    {m.custom && <span className="text-[10px] text-muted-foreground">added by you</span>}
+                    {m.edited && !m.custom && <span className="text-[10px] text-muted-foreground">edited</span>}
+                    <HelpBubble
+                      title="This milestone"
+                      sections={[
+                        { label: "What this means", body: "A checkpoint your plan expects around this month, based on how business credit files actually mature." },
+                        { label: "If you're behind", body: "Timelines shift — usually because a tradeline isn't reporting yet. Go back to the roadmap and confirm the reporting steps are truly done." },
+                      ]}
+                    />
+                  </div>
                   <PlanItemRow
                     item={m}
                     saving={savingKey === m.key}
