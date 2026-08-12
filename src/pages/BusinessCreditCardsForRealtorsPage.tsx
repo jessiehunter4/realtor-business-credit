@@ -578,6 +578,86 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
       </section>
 
+      {/* How the funding partner program works */}
+      <section id="how-it-works" className="container mx-auto px-4 py-12 md:py-16 max-w-5xl scroll-mt-28">
+        <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-3 text-center tracking-tight">
+          If you want help implementing it
+        </h2>
+        <p className="text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-8">
+          We work with a funding partner that runs a 12-month coaching and support program for business credit card
+          strategy. Here is what that program covers.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[
+            {
+              icon: Building2,
+              title: "Entity and business setup support",
+              body: "Getting the business details right — entity, EIN, address, phone, and industry code — so applications are consistent and verifiable.",
+            },
+            {
+              icon: Layers,
+              title: "Strategic application sequencing",
+              body: "A planned order and pacing for applications across multiple rounds instead of a scattershot afternoon of submissions.",
+            },
+            {
+              icon: GraduationCap,
+              title: "Business credit profile building",
+              body: "Establishing and strengthening your profile with the business credit bureaus over time.",
+            },
+            {
+              icon: PhoneCall,
+              title: "Coaching through bank approvals",
+              body: "Hand-holding through the bank approval process, including the verification calls that decide real approvals.",
+            },
+          ].map(({ icon: Icon, title, body }) => (
+            <Card key={title} className="border-border rounded-2xl shadow-card bg-card">
+              <CardContent className="pt-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-sky/15 text-sky flex items-center justify-center">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary">{title}</h3>
+                </div>
+                <p className="text-sm text-foreground/85 leading-relaxed">{body}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <PartnerCTA className="mt-8" />
+      </section>
+
+      {/* Red flags */}
+      <section id="red-flags" className="container mx-auto px-4 py-12 md:py-16 max-w-4xl scroll-mt-28">
+        <div className="rounded-3xl border border-border bg-card shadow-card px-6 py-8 md:py-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-secondary tracking-tight">
+              How to spot a bad stacking company
+            </h2>
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              "Promises of guaranteed approval, guaranteed funding amounts, or guaranteed timelines",
+              "Claims of special or insider relationships with banks",
+              "Any suggestion of no credit check, or that this will not affect your personal credit at all",
+              "Encouraging you to misstate revenue, time in business, or the purpose of the funds",
+              "Large fees with no coaching, no support, and no one available when a bank calls you",
+              "Calling it a loan or a line of credit, or blurring it with credit repair",
+            ].map((item) => (
+              <li key={item} className="flex gap-2 py-1 text-base text-foreground/85">
+                <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-sm text-muted-foreground italic">
+            Nobody has a back door at the banks. Preparation, sequencing, and support are the real product.
+          </p>
+        </div>
+      </section>
+
       {SHOW_CHECKLIST_CTA && (
         <section className="container mx-auto px-4 py-14 md:py-20 max-w-4xl">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card px-6 py-10 md:py-14">
@@ -664,7 +744,23 @@ const BusinessCreditCardsForRealtorsPage = () => {
         </div>
       </section>
 
-      <FinalCTABright guideLink="/guide" />
+      {/* Full disclosures */}
+      <section className="bg-muted/40 border-t border-border">
+        <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
+          <h2 className="text-xl md:text-2xl font-bold text-secondary mb-3">Important disclosures</h2>
+          <p className="text-sm text-foreground/80 leading-relaxed mb-6">{AFFILIATE_DISCLOSURE_SHORT}</p>
+          <div className="space-y-4">
+            {FULL_DISCLOSURES.map((d) => (
+              <div key={d.title} className="rounded-2xl border border-border bg-card p-5">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-2">{d.title}</h3>
+                <p className="text-sm text-foreground/80 leading-relaxed m-0">{d.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <FinalCTABright guideLink="/card-guide" />
       <SiteFooter />
     </div>
   );
