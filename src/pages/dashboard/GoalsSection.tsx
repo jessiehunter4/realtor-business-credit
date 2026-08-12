@@ -58,9 +58,12 @@ export default function GoalsSection() {
       />
 
       {narrative && (
-        <Card>
+        <Card className="border-l-4 border-l-primary bg-muted/50 shadow-none">
           <CardContent className="p-4 sm:p-5">
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{narrative}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+              Your plan summary
+            </p>
+            <p className="text-sm text-secondary leading-relaxed whitespace-pre-wrap">{narrative}</p>
           </CardContent>
         </Card>
       )}
@@ -73,7 +76,7 @@ export default function GoalsSection() {
 
       {primaryGoals.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">Top priority</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary mb-1">Top priority</p>
           {primaryGoals.map(renderGoal)}
         </div>
       )}
@@ -81,7 +84,7 @@ export default function GoalsSection() {
       {secondaryGoals.length > 0 && (
         <div className="space-y-2">
           {primaryGoals.length > 0 && (
-            <p className="pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <p className="pt-6 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
               Also working toward
             </p>
           )}

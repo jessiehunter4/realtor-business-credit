@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Circle, Loader2, MoreVertical, PlayCircle } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, MoreVertical, PlayCircle, Plus, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -119,7 +119,7 @@ export default function PlanItemRow({
 
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className={`font-semibold ${done ? "text-muted-foreground line-through" : "text-secondary"}`}>
+            <p className={`font-bold ${done ? "text-muted-foreground line-through" : "text-foreground"}`}>
               {item.title}
             </p>
             {help && <HelpBubble title={help.title} sections={help.sections} />}
@@ -133,8 +133,12 @@ export default function PlanItemRow({
               <span className="text-[10px] text-secondary/70">edited</span>
             )}
           </div>
-          {item.meta && <p className="text-xs text-secondary/80 mt-1">{item.meta}</p>}
-          {item.detail && <p className="text-sm text-secondary/80 mt-1">{item.detail}</p>}
+          {item.meta && (
+            <span className="inline-flex items-center mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary/10 text-secondary whitespace-nowrap">
+              {item.meta}
+            </span>
+          )}
+          {item.detail && <p className="text-sm text-secondary/80 mt-1.5 leading-relaxed">{item.detail}</p>}
 
           {onNoteSave && (
             <div className="mt-2">
@@ -175,9 +179,10 @@ export default function PlanItemRow({
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="text-left text-xs text-secondary/80 hover:text-primary"
+                  className="inline-flex items-center gap-1.5 text-left text-xs font-medium text-secondary hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded min-h-[44px] px-1 -ml-1 transition-colors"
                 >
-                  {item.note ? `Note: ${item.note}` : "+ Add a note"}
+                  <StickyNote className="h-3.5 w-3.5" />
+                  {item.note ? `Note: ${item.note}` : "Add a note"}
                 </button>
               )}
             </div>
@@ -208,35 +213,48 @@ export default function PlanItemRow({
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mt-2" />
           ) : done ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-full text-xs"
-              onClick={() => onStatusChange(item, "not_started")}
-            >
-              {l.undo}
-            </Button>
-          ) : (
-            <>
-              {item.status !== "in_progress" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full text-xs"
-                  onClick={() => onStatusChange(item, "in_progress")}
-                >
-                  {l.start}
-                </Button>
-              )}
+            <div className="flex flex-col sm:flex-row items-center gap-1.5">
+              <Button
+                size="sm"
+                className="rounded-full text-xs bg-success-green text-success-green-foreground hover:bg-success-green-hover"
+                onClick={() => onStatusChange(item, "not_started")}
+              >
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                {l.done}
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-xs border border-border"
+                className="rounded-full text-xs border-border text-muted-foreground hover:text-foreground"
+                onClick={() => onStatusChange(item, "not_started")}
+              >
+                {l.undo}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-center gap-1.5">
+              <Button
+                size="sm"
+                className={`rounded-full text-xs ${
+                  item.status === "in_progress"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-transparent text-muted-foreground border border-border hover:bg-muted hover:text-foreground"
+                }`}
+                variant={item.status === "in_progress" ? "default" : "outline"}
+                onClick={() => onStatusChange(item, "in_progress")}
+              >
+                <PlayCircle className="h-3.5 w-3.5 mr-1" />
+                {l.start}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full text-xs border-border text-muted-foreground hover:text-foreground hover:bg-muted"
                 onClick={() => onStatusChange(item, "completed")}
               >
                 {l.done}
               </Button>
-            </>
+            </div>
           )}
         </div>
       </div>
