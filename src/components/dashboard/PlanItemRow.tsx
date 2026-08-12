@@ -175,7 +175,7 @@ export default function PlanItemRow({
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="text-left text-xs text-muted-foreground hover:text-primary"
+                  className="text-left text-xs text-secondary/80 hover:text-primary"
                 >
                   {item.note ? `Note: ${item.note}` : "+ Add a note"}
                 </button>
