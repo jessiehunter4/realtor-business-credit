@@ -40,7 +40,7 @@ export default function ProgramSection() {
       {nextSteps?.narrative && (
         <Card>
           <CardContent className="p-4 sm:p-5">
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{nextSteps.narrative}</p>
+            <p className="text-sm text-secondary/80 leading-relaxed whitespace-pre-wrap">{nextSteps.narrative}</p>
           </CardContent>
         </Card>
       )}
@@ -53,7 +53,7 @@ export default function ProgramSection() {
           </div>
           {platformAccess ? (
             <>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-secondary/80">
                 Your cohort enrollment includes the implementation platforms. Launch them here — your RE Pro plan stays
                 your source of truth for goals and progress.
               </p>
@@ -62,7 +62,7 @@ export default function ProgramSection() {
                   <div key={p.name} className="flex flex-col items-center text-center rounded-lg border border-border bg-card p-4">
                     <div className="flex-1">
                       <p className="font-medium text-secondary text-sm">{p.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.blurb}</p>
+                      <p className="text-xs text-secondary/80 mt-1 leading-relaxed">{p.blurb}</p>
                     </div>
                     <a href={p.href} target="_blank" rel="noopener noreferrer" className="mt-4">
                       <Button size="sm" className="rounded-full text-xs">
@@ -75,7 +75,7 @@ export default function ProgramSection() {
             </>
           ) : (
             <>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-secondary/80">
                 Enrolling in Pro Cohort or Cohort Plus transitions you onto the Credit Suite and Lendavo platforms,
                 with a specialist and the funding directory. You'll launch them from right here once you're enrolled.
               </p>
@@ -105,12 +105,12 @@ export default function ProgramSection() {
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <t.icon className="h-4 w-4 text-primary" />
                     <h3 className="font-semibold text-secondary">{t.name}</h3>
-                    <span className="text-sm text-muted-foreground">{t.price}</span>
+                    <span className="text-sm text-secondary/80">{t.price}</span>
                     {active && <Badge className="text-[10px]">Your plan</Badge>}
                     {recommended === t.id && <Badge variant="secondary" className="text-[10px]">Recommended</Badge>}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3">{t.who}</p>
-                  <ul className="text-xs text-muted-foreground space-y-1.5 pb-1 mt-3 flex-1">
+                  <p className="text-xs text-secondary/80 mt-3">{t.who}</p>
+                  <ul className="text-xs text-secondary/80 space-y-1.5 pb-1 mt-3 flex-1">
                     {t.features.slice(0, 4).map((f) => (
                       <li key={f} className="leading-relaxed">· {f}</li>
                     ))}
