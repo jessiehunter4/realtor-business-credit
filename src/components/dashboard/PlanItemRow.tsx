@@ -106,7 +106,7 @@ export default function PlanItemRow({
           </div>
         </div>
       ) : (
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <div className="mt-0.5 shrink-0">
           {done ? (
             <CheckCircle2 className="h-5 w-5 text-primary" />
