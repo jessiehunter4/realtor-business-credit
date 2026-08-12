@@ -19,6 +19,11 @@ import {
   Mail,
   Loader2,
   Clock,
+  ShieldAlert,
+  Layers,
+  Users,
+  GraduationCap,
+  PhoneCall,
 } from "lucide-react";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
@@ -27,6 +32,9 @@ import Seo from "@/components/shared/Seo";
 import SiteFooter from "@/components/shared/SiteFooter";
 import SiteHeader from "@/components/shared/SiteHeader";
 import FinalCTABright from "@/components/landing/FinalCTABright";
+import HeroVideo from "@/components/shared/HeroVideo";
+import PartnerCTA from "@/components/card-guide/PartnerCTA";
+import { AFFILIATE_DISCLOSURE_SHORT, FULL_DISCLOSURES, RESULTS_STATEMENT } from "@/config/partner";
 
 const SHOW_CHECKLIST_CTA = false;
 
@@ -106,6 +114,22 @@ const faqs = [
     q: "What's the difference between a business credit card and 'business credit'?",
     a: "A business credit card is one product. 'Business credit' is a separate credit profile (D-U-N-S, Experian Business, Equifax Small Business) tied to your EIN, built through vendor tradelines and on-time payments. The card is a downstream benefit of having real business credit.",
   },
+  {
+    q: "What is credit card stacking?",
+    a: "It is applying for several business credit cards in a planned sequence so the approved limits together give your business meaningful spending capacity that can be used much like a line of credit. It is not a loan, not a line of credit product, and not credit repair. Every credit decision is made by third-party issuers.",
+  },
+  {
+    q: "Will I have to sign a personal guarantee?",
+    a: "Almost always, early on. Most business credit cards available to a newer business require a personal guarantee and involve a credit inquiry. As the business builds revenue, banking history, and its own credit profile, some products reduce or remove that requirement.",
+  },
+  {
+    q: "How much can I expect to be approved for?",
+    a: "There is no promised amount. Well-qualified clients may access up to $300,000 in business credit across multiple rounds, but results vary and depend on your credit profile, business details, and issuer decisions.",
+  },
+  {
+    q: "What happens on a bank verification call?",
+    a: "An issuer may call to verify what the business does, how long it has operated, where it is located, and how to reach it. Consistent answers and a professionally answered business phone matter. Coaching through these calls is one of the most valuable parts of a good support program.",
+  },
 ];
 
 const BusinessCreditCardsForRealtorsPage = () => {
@@ -126,7 +150,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
   const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
-    const sections = ["tldr", "categories", "order-matters", "faqs"];
+    const sections = ["sneak-peek", "tldr", "categories", "order-matters", "how-it-works", "red-flags", "faqs"];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -147,9 +171,12 @@ const BusinessCreditCardsForRealtorsPage = () => {
   }, []);
 
   const jumpLinks = [
+    { id: "sneak-peek", label: "What's inside" },
     { id: "tldr", label: "The 60-second version" },
     { id: "categories", label: "5 categories" },
     { id: "order-matters", label: "Why order matters" },
+    { id: "how-it-works", label: "How the program works" },
+    { id: "red-flags", label: "Red flags" },
     { id: "faqs", label: "FAQs" },
   ];
 
