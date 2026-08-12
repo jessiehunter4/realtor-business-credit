@@ -134,7 +134,7 @@ export default function PlanItemRow({
             )}
           </div>
           {item.meta && (
-            <span className="inline-flex items-center mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary/10 text-secondary">
+            <span className="inline-flex items-center mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary/10 text-secondary whitespace-nowrap">
               {item.meta}
             </span>
           )}
