@@ -57,12 +57,12 @@ export default function ProgramSection() {
                 Your cohort enrollment includes the implementation platforms. Launch them here — your RE Pro plan stays
                 your source of truth for goals and progress.
               </p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 items-stretch">
                 {PLATFORMS.map((p) => (
-                  <div key={p.name} className="flex flex-col items-center text-center rounded-lg border border-border bg-card p-4">
-                    <div className="flex-1">
+                  <div key={p.name} className="flex flex-col items-center justify-between h-full text-center rounded-lg border border-border bg-card p-5">
+                    <div className="flex-1 flex flex-col items-center justify-center">
                       <p className="font-medium text-secondary text-sm">{p.name}</p>
-                      <p className="text-xs text-secondary/80 mt-1 leading-relaxed">{p.blurb}</p>
+                      <p className="text-xs text-secondary/80 mt-2 leading-relaxed">{p.blurb}</p>
                     </div>
                     <a href={p.href} target="_blank" rel="noopener noreferrer" className="mt-4">
                       <Button size="sm" className="rounded-full text-xs">
