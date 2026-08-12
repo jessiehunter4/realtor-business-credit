@@ -15,9 +15,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
   const tagline = "— between closings, before your next client, and when opportunity knocks.";
 
-  const subhead =
-    "Commission income arrives in lumps. Your bills don't. Build the business structure and separate business credit that covers your overhead between closings — without leaning on your personal cards.";
-
   const trustBullets = [
     { icon: Compass, label: "Know where you stand" },
     { icon: ClipboardList, label: "Get a 90-day plan" },
