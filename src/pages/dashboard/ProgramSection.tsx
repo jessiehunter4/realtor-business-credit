@@ -45,49 +45,51 @@ export default function ProgramSection() {
         </Card>
       )}
 
-      <Card className={platformAccess ? "border-primary/40 bg-primary/5" : "border-border"}>
-        <CardContent className="p-5 space-y-3 text-center">
-          <div className="flex items-center justify-center gap-2 font-semibold text-secondary">
-            {platformAccess ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
-            Credit Suite / Lendavo platforms
-          </div>
-          {platformAccess ? (
-            <>
-              <p className="text-sm text-secondary/80">
-                Your cohort enrollment includes the implementation platforms. Launch them here — your RE Pro plan stays
-                your source of truth for goals and progress.
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2 items-stretch">
-                {PLATFORMS.map((p) => (
-                  <div key={p.name} className="flex flex-col items-center justify-between h-full text-center rounded-lg border border-border bg-card p-5">
-                    <div className="flex-1 flex flex-col items-center justify-center">
-                      <p className="font-medium text-secondary text-sm">{p.name}</p>
-                      <p className="text-xs text-secondary/80 mt-2 leading-relaxed">{p.blurb}</p>
+      {false && (
+        <Card className={platformAccess ? "border-primary/40 bg-primary/5" : "border-border"}>
+          <CardContent className="p-5 space-y-3 text-center">
+            <div className="flex items-center justify-center gap-2 font-semibold text-secondary">
+              {platformAccess ? <Users className="h-4 w-4 text-primary" /> : <Lock className="h-4 w-4 text-muted-foreground" />}
+              Credit Suite / Lendavo platforms
+            </div>
+            {platformAccess ? (
+              <>
+                <p className="text-sm text-secondary/80">
+                  Your cohort enrollment includes the implementation platforms. Launch them here — your RE Pro plan stays
+                  your source of truth for goals and progress.
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2 items-stretch">
+                  {PLATFORMS.map((p) => (
+                    <div key={p.name} className="flex flex-col items-center justify-between h-full text-center rounded-lg border border-border bg-card p-5">
+                      <div className="flex-1 flex flex-col items-center justify-center">
+                        <p className="font-medium text-secondary text-sm">{p.name}</p>
+                        <p className="text-xs text-secondary/80 mt-2 leading-relaxed">{p.blurb}</p>
+                      </div>
+                      <a href={p.href} target="_blank" rel="noopener noreferrer" className="mt-4">
+                        <Button size="sm" className="rounded-full text-xs">
+                          Launch <ExternalLink className="h-3 w-3 ml-1" />
+                        </Button>
+                      </a>
                     </div>
-                    <a href={p.href} target="_blank" rel="noopener noreferrer" className="mt-4">
-                      <Button size="sm" className="rounded-full text-xs">
-                        Launch <ExternalLink className="h-3 w-3 ml-1" />
-                      </Button>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-secondary/80">
-                Enrolling in Pro Cohort or Cohort Plus transitions you onto the Credit Suite and Lendavo platforms,
-                with a specialist and the funding directory. You'll launch them from right here once you're enrolled.
-              </p>
-              <Link to="/pricing" className="inline-block mt-6">
-                <Button className="rounded-full">
-                  See cohort options <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
-            </>
-          )}
-        </CardContent>
-      </Card>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-secondary/80">
+                  Enrolling in Pro Cohort or Cohort Plus transitions you onto the Credit Suite and Lendavo platforms,
+                  with a specialist and the funding directory. You'll launch them from right here once you're enrolled.
+                </p>
+                <Link to="/pricing" className="inline-block mt-6">
+                  <Button className="rounded-full">
+                    See cohort options <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </Link>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <section className="space-y-3">
         <h2 className="text-lg font-bold text-secondary">Compare your options</h2>
