@@ -245,8 +245,8 @@ const BusinessCreditCardsForRealtorsPage = () => {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <Seo
-        title="Business Credit Cards for Realtors: 2026 Buyer's Guide"
-        description="A Realtor-specific look at the categories of business credit cards that actually fit real estate agents and brokers — and what to set up first so you qualify."
+        title="Business Credit Cards for Realtors: Card Stacking Guide"
+        description="How real estate pros use a planned sequence of business credit cards as working capital — categories that fit, the order to set things up, the real costs, and the free RE Pro card guide."
         path="/business-credit-cards-for-realtors"
         jsonLd={jsonLd}
       />
