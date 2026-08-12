@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Clock, Compass, ClipboardList, Rocket } from "lucide-react";
+import { BookOpen, Clock } from "lucide-react";
 import HeroVideo from "@/components/shared/HeroVideo";
 
 interface Props {
@@ -14,12 +14,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
     : "Money when you need it";
 
   const tagline = "— between closings, before your next client, and when opportunity knocks.";
-
-  const trustBullets = [
-    { icon: Compass, label: "Know where you stand" },
-    { icon: ClipboardList, label: "Get a 90-day plan" },
-    { icon: Rocket, label: "Choose how to implement" },
-  ];
 
   return (
     <section className="relative overflow-hidden bg-hero-grad">
@@ -59,18 +53,6 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
               Read the Free Guide
             </Link>
           </div>
-
-          <ul className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-3xl mx-auto items-stretch">
-              {trustBullets.map(({ icon: Icon, label }) => (
-                <li
-                  key={label}
-                  className="h-full flex items-center justify-center gap-3 bg-white/70 backdrop-blur border border-border rounded-2xl px-4 py-3 text-sm text-secondary shadow-card-soft hover:shadow-card-soft transition-all text-center"
-                >
-                  <Icon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span className="font-medium leading-tight">{label}</span>
-                </li>
-              ))}
-          </ul>
 
           <p className="mt-3 sm:mt-4 text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-1.5">
             <Clock className="h-3.5 w-3.5 text-primary" />
