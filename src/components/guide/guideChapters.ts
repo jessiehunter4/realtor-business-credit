@@ -23,6 +23,27 @@ export const tocItems: TOCItem[] = [
   { id: "resources", label: "Resources", isChapter: true },
 ];
 
+const chapterSubtitles: Record<string, string> = {
+  "chapter-1": "The hidden cost of mixing",
+  "chapter-2": "What separation really means",
+  "chapter-3": "Set up for success",
+  "chapter-4": "From personal to business",
+  "chapter-5": "The step-by-step system",
+  "chapter-6": "How lenders judge you",
+  "chapter-7": "Classify your business right",
+  "chapter-8": "Cash for the slow months",
+  "chapter-9": "Grow without overextending",
+  "chapter-10": "Run the numbers weekly",
+  "chapter-11": "Protect your progress",
+  "chapter-12": "Your personalized roadmap",
+  "chapter-13": "Put your plan into action",
+};
+
 export const chapterItems = tocItems
   .filter((i) => /^chapter-\d+$/.test(i.id))
-  .map((i) => ({ ...i, number: Number(i.id.replace("chapter-", "")) }));
+  .map((i) => ({
+    ...i,
+    number: Number(i.id.replace("chapter-", "")),
+    title: i.label.replace(/^\d+\.\s*/, ""),
+    subtitle: chapterSubtitles[i.id] ?? "",
+  }));
