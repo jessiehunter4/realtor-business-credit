@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Circle, Loader2, MoreVertical, PlayCircle } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, MoreVertical, PlayCircle, Plus, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
