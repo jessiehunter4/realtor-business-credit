@@ -28,7 +28,7 @@ const CardGuideCover = () => (
         <div className="mt-8 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(11,31,59,.15)] border border-border mx-auto w-full max-w-2xl">
           <img
             src={heroImg}
-            alt="Real estate professional reviewing business credit card options"
+            alt="Male real estate professional writing notes at a desk with a laptop"
             width={1536}
             height={1024}
             loading="eager"

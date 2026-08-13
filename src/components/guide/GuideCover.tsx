@@ -34,7 +34,7 @@ const GuideCover = ({ visitorName }: GuideCoverProps) => (
         </div>
 
         <div className="mt-8 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(11,31,59,.15)] border border-border mx-auto w-full max-w-2xl">
-          <img src={heroImg} alt="Real estate professional reviewing their business finance plan" width={1536} height={1024} loading="eager" className="w-full h-auto block" />
+          <img src={heroImg} alt="Male real estate professional writing notes at a desk with a laptop" width={1536} height={1024} loading="eager" className="w-full h-auto block" />
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-2">
