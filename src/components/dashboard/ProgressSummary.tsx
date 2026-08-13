@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Check, CheckCircle2, Flag, ListTodo, Layers } from "lucide-react";
+import { CheckCircle2, Flag, ListTodo, Layers } from "lucide-react";
 import { PHASE_BLURBS, PHASE_LABELS, type RoadmapMetrics } from "@/lib/roadmap";
 import HelpBubble from "./HelpBubble";
 import { PhaseHelpBubble } from "./TaskHelpBubble";
@@ -122,34 +122,23 @@ export default function ProgressSummary({
           const isActive = p.phase === metrics.currentPhase;
           const isUpcoming = !p.complete && !isActive;
           return (
-            <div key={p.phase} className="space-y-1">
-              <div className="flex justify-center h-5">
-                {p.complete ? (
-                  <span
-                    className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ${
-                      isActive
-                        ? "ring-2 ring-primary-foreground ring-offset-2 ring-offset-background"
-                        : ""
-                    }`}
-                  >
-                    <Check className="h-3 w-3" strokeWidth={3} />
-                  </span>
-                ) : (
-                  <span
-                    className={`h-5 w-5 rounded-full border-2 bg-background ${
-                      isActive
-                        ? "border-muted ring-2 ring-primary ring-offset-2 ring-offset-background"
-                        : "border-muted"
-                    }`}
-                  />
-                )}
-              </div>
+            <div key={p.phase} className="space-y-2">
               <div
                 className={`h-1.5 rounded-full ${
                   p.complete ? "bg-primary" : isActive ? "bg-primary" : "bg-muted"
                 }`}
               />
-              <div className={`text-[10px] sm:text-xs truncate ${isUpcoming ? "text-muted-foreground/70" : "text-muted-foreground"}`}>{p.label}</div>
+              <div
+                className={`text-[10px] sm:text-xs truncate ${
+                  isActive
+                    ? "text-foreground font-medium"
+                    : isUpcoming
+                      ? "text-muted-foreground/70"
+                      : "text-muted-foreground"
+                }`}
+              >
+                {p.label}
+              </div>
             </div>
           );
         })}
