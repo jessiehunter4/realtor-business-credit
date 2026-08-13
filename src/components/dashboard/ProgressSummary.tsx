@@ -120,6 +120,7 @@ export default function ProgressSummary({
       <div className="grid grid-cols-5 gap-1.5" aria-hidden>
         {metrics.phases.map((p) => {
           const isActive = p.phase === metrics.currentPhase;
+          const isUpcoming = !p.complete && !isActive;
           return (
             <div key={p.phase} className="space-y-1">
               <div className="flex justify-center h-5">
@@ -145,10 +146,10 @@ export default function ProgressSummary({
               </div>
               <div
                 className={`h-1.5 rounded-full ${
-                  p.complete ? "bg-primary" : p.completed > 0 ? "bg-primary/40" : "bg-muted"
+                  p.complete ? "bg-primary" : isActive ? "bg-primary" : "bg-muted"
                 }`}
               />
-              <div className="text-[10px] sm:text-xs text-muted-foreground truncate">{p.label}</div>
+              <div className={`text-[10px] sm:text-xs truncate ${isUpcoming ? "text-muted-foreground/70" : "text-muted-foreground"}`}>{p.label}</div>
             </div>
           );
         })}
