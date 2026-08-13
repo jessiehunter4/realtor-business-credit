@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Check, CheckCircle2, Flag, ListTodo, Layers } from "lucide-react";
+import { CheckCircle2, Flag, ListTodo, Layers } from "lucide-react";
 import { PHASE_BLURBS, PHASE_LABELS, type RoadmapMetrics } from "@/lib/roadmap";
 import HelpBubble from "./HelpBubble";
 import { PhaseHelpBubble } from "./TaskHelpBubble";
