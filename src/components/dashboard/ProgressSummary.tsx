@@ -117,7 +117,7 @@ export default function ProgressSummary({
       </div>
 
       {/* Stage rail */}
-      <div className="grid grid-cols-5 gap-1.5 mt-16" aria-hidden>
+      <div className="grid grid-cols-5 gap-1.5 mt-24" aria-hidden>
         {metrics.phases.map((p) => {
           const isActive = p.phase === metrics.currentPhase;
           const isUpcoming = !p.complete && !isActive;
