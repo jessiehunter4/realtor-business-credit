@@ -120,6 +120,15 @@ export default function ProgressSummary({
       <div className="grid grid-cols-5 gap-1.5" aria-hidden>
         {metrics.phases.map((p) => (
           <div key={p.phase} className="space-y-1">
+            <div className="flex justify-center h-5">
+              {p.complete ? (
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+                  <Check className="h-3 w-3" strokeWidth={3} />
+                </span>
+              ) : (
+                <span className="h-5 w-5 rounded-full border-2 border-muted bg-background" />
+              )}
+            </div>
             <div
               className={`h-1.5 rounded-full ${
                 p.complete ? "bg-primary" : p.completed > 0 ? "bg-primary/40" : "bg-muted"
