@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Download, FileText, ListChecks, ArrowLeft } from "lucide-react";
+import { Loader2, Download, FileText, ListChecks, ArrowLeft, Pencil, Save } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PlanDocument, { type PlanData } from "@/components/plan/PlanDocument";
@@ -10,11 +11,13 @@ import PlanPDF from "@/components/plan/PlanPDF";
 import PlanTaskChecklist from "@/components/plan/PlanTaskChecklist";
 import NextStepPanel, { type ReadinessId } from "@/components/plan/NextStepPanel";
 import { useContactIdentity } from "@/hooks/useContactIdentity";
+import type { Json } from "@/integrations/supabase/types";
 
 export default function PortalPlanView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { contactId } = useContactIdentity();
   const [planData, setPlanData] = useState<PlanData | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
@@ -23,6 +26,8 @@ export default function PortalPlanView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [editMode, setEditMode] = useState(searchParams.get("edit") === "1");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function fetchPlan() {
@@ -93,6 +98,45 @@ export default function PortalPlanView() {
     }
   }, [planData, createdAt, updatedAt]);
 
+  const handleEditSection = useCallback((section: string, value: string) => {
+    setPlanData((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, sections: { ...prev.sections } };
+      if (section === "goals_snapshot") {
+        updated.sections.goals_snapshot = { narrative: value };
+      } else if (section === "fundability") {
+        updated.sections.fundability = { ...updated.sections.fundability, narrative: value };
+      } else if (section === "next_steps") {
+        updated.sections.next_steps = { ...updated.sections.next_steps, narrative: value };
+      }
+      return updated;
+    });
+  }, []);
+
+  const exitEdit = useCallback(() => {
+    setEditMode(false);
+    const next = new URLSearchParams(searchParams);
+    next.delete("edit");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  const handleSave = useCallback(async () => {
+    if (!id || !planData) return;
+    setSaving(true);
+    const { error: saveError } = await supabase
+      .from("custom_plans")
+      .update({ plan_data: planData as unknown as Json })
+      .eq("id", id);
+    setSaving(false);
+    if (saveError) {
+      console.error(saveError);
+      toast.error("Could not save your changes. Please try again.");
+      return;
+    }
+    toast.success("Your plan has been updated.");
+    exitEdit();
+  }, [id, planData, exitEdit]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30">
@@ -134,17 +178,40 @@ export default function PortalPlanView() {
                 <ListChecks className="w-4 h-4" /> Checklist
               </TabsTrigger>
             </TabsList>
-            <Button onClick={handleDownload} disabled={generating} size="sm">
-              {generating ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <div className="flex gap-2">
+              {editMode ? (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" onClick={handleSave} disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                    Save changes
+                  </Button>
+                </>
               ) : (
-                <Download className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Plan
+                </Button>
               )}
-              {generating ? "Generating..." : "Download PDF"}
-            </Button>
+              <Button onClick={handleDownload} disabled={generating} size="sm">
+                {generating ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-2 h-4 w-4" />
+                )}
+                {generating ? "Generating..." : "Download PDF"}
+              </Button>
+            </div>
           </div>
           <TabsContent value="plan">
-            <PlanDocument planData={planData} createdAt={createdAt} updatedAt={updatedAt} />
+            <PlanDocument
+              planData={planData}
+              createdAt={createdAt}
+              updatedAt={updatedAt}
+              editMode={editMode}
+              onEditSection={handleEditSection}
+            />
             <NextStepPanel
               planId={id}
               contactId={contactId || undefined}
