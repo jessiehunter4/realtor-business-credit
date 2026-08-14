@@ -37,7 +37,7 @@ const SamplePlanPreview = () => (
           <Link
             to="/sample-plan"
             data-analytics-id="cta-view-sample-plan"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-7 py-3.5 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-success-green-hover active:bg-success-green-hover transition-all"
           >
             <FileText className="h-5 w-5" />
             View the Full Sample Plan
