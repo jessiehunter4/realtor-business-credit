@@ -15,7 +15,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const BADGE_CLASS: Record<string, string> = {
   not_started: "border border-border bg-muted text-muted-foreground",
-  in_progress: "bg-primary text-primary-foreground hover:bg-primary/90",
+  in_progress: "bg-primary text-primary-foreground hover:bg-success-green-hover",
   completed: "bg-success-green text-success-green-foreground hover:bg-success-green-hover",
 };
 
