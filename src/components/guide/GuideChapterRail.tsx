@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, ChevronRight, List, X } from "lucide-react";
+import { CalendarDays, Check, ChevronRight, List, X } from "lucide-react";
 import { chapterItems } from "./guideChapters";
 import ChapterCheckbox from "./ChapterCheckbox";
 import { useGuideProgress } from "@/hooks/useGuideProgress";
