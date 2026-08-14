@@ -740,14 +740,22 @@ const BusinessCreditCardsForRealtorsPage = () => {
         <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-8 text-center">
           Frequently asked questions
         </h2>
-        <div className="space-y-5">
+        <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((f) => (
-            <div key={f.q} className="border-l-2 border-primary pl-4">
-              <h3 className="text-lg font-semibold text-secondary mb-1">{f.q}</h3>
-              <p className="text-base text-muted-foreground leading-relaxed">{f.a}</p>
-            </div>
+            <AccordionItem
+              key={f.q}
+              value={f.q}
+              className="rounded-2xl border border-border bg-card px-5 shadow-card data-[state=open]:shadow-card-hover"
+            >
+              <AccordionTrigger className="text-left text-base font-semibold text-secondary hover:no-underline py-5">
+                {f.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-base text-muted-foreground leading-relaxed pb-5">
+                {f.a}
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </section>
 
       {/* Full disclosures */}
