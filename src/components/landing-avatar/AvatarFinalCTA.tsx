@@ -17,7 +17,7 @@ const AvatarFinalCTA = () => (
           <Link
             to="/guide"
             data-analytics-id="avatar-cta-guide-final"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-base font-semibold shadow-card hover:shadow-card-hover hover:bg-success-green-hover active:bg-success-green-hover transition-all"
           >
             <BookOpen className="h-5 w-5" />
             Read the Guide

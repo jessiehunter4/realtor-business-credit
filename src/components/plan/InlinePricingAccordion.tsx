@@ -95,7 +95,7 @@ export default function InlinePricingAccordion({
                     {tier.isFree ? (
                       <Link
                         to={tier.ctaHref}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-secondary/20 bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-secondary/20 bg-white px-4 py-2 text-sm font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
                       >
                         {tier.ctaLabel}
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -107,9 +107,9 @@ export default function InlinePricingAccordion({
                       disabled={loadingTier !== null}
                       className={
                         "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors " +
-                        (tier.highlighted
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                          : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                          (tier.highlighted
+                            ? "bg-primary text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover"
+                            : "border border-secondary/20 bg-white text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover") +
                         " disabled:cursor-not-allowed disabled:opacity-60"
                       }
                     >

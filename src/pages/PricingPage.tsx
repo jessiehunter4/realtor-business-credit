@@ -206,13 +206,13 @@ const PricingPage = () => {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/guide"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm md:text-base font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm md:text-base font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
             >
               Read the Free Guide
             </Link>
             <Link
               to="/sample-plan"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm md:text-base font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-white px-6 py-3 text-sm md:text-base font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
             >
               See a Sample Plan
             </Link>
@@ -267,7 +267,7 @@ const PricingPage = () => {
                 {tier.isFree ? (
                   <Link
                     to={tier.ctaHref}
-                    className="mt-7 inline-flex items-center justify-center gap-2 rounded-full border border-secondary/20 bg-white px-5 py-3 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                    className="mt-7 inline-flex items-center justify-center gap-2 rounded-full border border-secondary/20 bg-white px-5 py-3 text-sm font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
                   >
                     {tier.ctaLabel}
                     <ArrowRight className="h-4 w-4" />
@@ -280,8 +280,8 @@ const PricingPage = () => {
                     className={
                       "mt-7 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors " +
                       (tier.highlighted
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card"
-                        : "border border-secondary/20 bg-white text-secondary hover:bg-secondary/5") +
+                        ? "bg-primary text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover shadow-card"
+                        : "border border-secondary/20 bg-white text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover") +
                       " disabled:opacity-60 disabled:cursor-not-allowed"
                     }
                   >
@@ -515,13 +515,13 @@ const PricingPage = () => {
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
                 to="/intake"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm md:text-base font-semibold text-primary hover:bg-white/90 transition-colors"
+                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm md:text-base font-semibold text-primary hover:bg-success-green-hover hover:text-white active:bg-success-green-hover transition-colors"
               >
                 Build My Custom Plan
               </Link>
               <Link
                 to="/guide"
-                className="inline-flex items-center justify-center rounded-full border border-white/40 bg-transparent px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground hover:bg-white/10 transition-colors"
+                className="inline-flex items-center justify-center rounded-full border border-white/40 bg-transparent px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground hover:border-white hover:bg-white hover:text-primary active:bg-white/90 transition-colors"
               >
                 Read the Free Guide
               </Link>

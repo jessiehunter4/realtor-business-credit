@@ -15,14 +15,14 @@ const STATUS_LABEL: Record<string, string> = {
 
 const BADGE_CLASS: Record<string, string> = {
   not_started: "border border-border bg-muted text-muted-foreground",
-  in_progress: "bg-primary text-primary-foreground hover:bg-primary/90",
+  in_progress: "bg-primary text-primary-foreground hover:bg-success-green-hover",
   completed: "bg-success-green text-success-green-foreground hover:bg-success-green-hover",
 };
 
 const ACTIVE_BTN_CLASS: Record<string, string> = {
-  not_started: "bg-secondary text-secondary-foreground hover:bg-secondary/90 border border-transparent",
-  in_progress: "bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent",
-  completed: "bg-success-green text-success-green-foreground hover:bg-success-green-hover border border-transparent",
+  not_started: "bg-secondary text-secondary-foreground hover:bg-success-green hover:text-white active:bg-success-green-hover border border-transparent",
+  in_progress: "bg-primary text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover border border-transparent",
+  completed: "bg-success-green text-success-green-foreground hover:bg-success-green-hover active:bg-success-green-hover border border-transparent",
 };
 
 export default function FundingSection() {
@@ -77,7 +77,7 @@ export default function FundingSection() {
                       variant={f.status === s ? "default" : "outline"}
                       aria-pressed={f.status === s}
                       className={`w-full h-9 rounded-full text-xs font-medium ${
-                        f.status === s ? ACTIVE_BTN_CLASS[s] : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        f.status === s ? ACTIVE_BTN_CLASS[s] : "border border-border text-muted-foreground hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover"
                       }`}
                       disabled={savingKey === f.key}
                       onClick={() => setStatus(f, s)}

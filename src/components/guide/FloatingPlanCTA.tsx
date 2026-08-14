@@ -21,7 +21,7 @@ const FloatingPlanCTA = () => {
     >
       <Button
         asChild
-        className="h-12 md:h-14 gap-2 rounded-full bg-primary px-5 md:px-6 text-primary-foreground shadow-xl hover:bg-primary/90"
+        className="h-12 md:h-14 gap-2 rounded-full bg-primary px-5 md:px-6 text-primary-foreground shadow-xl hover:bg-success-green-hover active:bg-success-green-hover"
       >
         <Link to={href} data-analytics-id="cta-plan-guide-floating">
           <Sparkles className="h-5 w-5" />

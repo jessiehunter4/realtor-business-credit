@@ -237,8 +237,8 @@ export default function PlanItemRow({
                 size="sm"
                 className={`rounded-full text-sm font-medium h-10 px-4 ${
                   item.status === "in_progress"
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "bg-transparent text-muted-foreground border border-border hover:bg-muted hover:text-foreground"
+                    ? "bg-primary text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover"
+                    : "bg-transparent text-muted-foreground border border-border hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover"
                 }`}
                 variant={item.status === "in_progress" ? "default" : "outline"}
                 onClick={() => onStatusChange(item, "in_progress")}
@@ -249,7 +249,7 @@ export default function PlanItemRow({
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-sm font-medium h-10 px-4 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-full text-sm font-medium h-10 px-4 border-border text-muted-foreground hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover"
                 onClick={() => onStatusChange(item, "completed")}
               >
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
