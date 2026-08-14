@@ -249,7 +249,7 @@ export default function PlanItemRow({
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full text-sm font-medium h-10 px-4 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-full text-sm font-medium h-10 px-4 border-border text-muted-foreground hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover"
                 onClick={() => onStatusChange(item, "completed")}
               >
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />

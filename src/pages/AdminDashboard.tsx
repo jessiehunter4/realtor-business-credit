@@ -568,7 +568,7 @@ export default function AdminDashboard() {
         <HoverCardTrigger asChild>
           <button
             onClick={() => setDetailModal({ title: label, content })}
-            className="inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="inline-flex items-center justify-center rounded p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors active:bg-primary/20"
             title={`View ${label}`}
           >
             <Info className="h-3.5 w-3.5" />

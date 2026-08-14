@@ -297,7 +297,7 @@ const GuidePage = () => {
                 to={l.to}
                 className={({ isActive }) =>
                   cn(
-                    "px-1.5 lg:px-2.5 py-1.5 rounded-full text-xs lg:text-sm font-medium whitespace-nowrap text-secondary-foreground/80 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    "px-1.5 lg:px-2.5 py-1.5 rounded-full text-xs lg:text-sm font-medium whitespace-nowrap text-secondary-foreground/80 hover:text-primary hover:bg-primary/20 active:bg-primary/30 transition-colors",
                     isActive && "text-secondary-foreground bg-white/10"
                   )
                 }
@@ -337,7 +337,7 @@ const GuidePage = () => {
               aria-expanded={mobileMenuOpen}
               aria-controls="guide-mobile-menu"
               onClick={() => setMobileMenuOpen((o) => !o)}
-              className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-full text-secondary-foreground hover:bg-white/10 transition-colors"
+              className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-full text-secondary-foreground hover:text-primary hover:bg-primary/20 active:bg-primary/30 transition-colors"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -360,7 +360,7 @@ const GuidePage = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-primary hover:bg-primary/20 active:bg-primary/30 transition-colors",
                     isActive && "text-secondary-foreground bg-white/10"
                   )
                 }
@@ -375,7 +375,7 @@ const GuidePage = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-secondary-foreground hover:bg-white/10 transition-colors",
+                    "px-3 py-2.5 rounded-lg text-sm font-medium text-secondary-foreground/85 hover:text-primary hover:bg-primary/20 active:bg-primary/30 transition-colors",
                     isActive && "text-secondary-foreground bg-white/10"
                   )
                 }

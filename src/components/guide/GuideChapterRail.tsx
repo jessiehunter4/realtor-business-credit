@@ -34,7 +34,7 @@ const GuideChapterRail = () => {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open guide contents"
-        className="hidden lg:inline-flex fixed right-4 top-1/2 -translate-y-1/2 z-30 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold text-secondary shadow-lg hover:bg-muted transition-colors"
+        className="hidden lg:inline-flex fixed right-4 top-1/2 -translate-y-1/2 z-30 items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-semibold text-secondary shadow-lg hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
       >
         <List className="h-4 w-4 text-primary" />
         Contents
@@ -60,7 +60,7 @@ const GuideChapterRail = () => {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Close guide contents"
-          className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="rounded-full p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 active:bg-primary/20 transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
@@ -77,9 +77,9 @@ const GuideChapterRail = () => {
               aria-current={isActive ? "true" : undefined}
               className={cn(
                 "group w-full flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors border-l-[3px]",
-                isActive
-                  ? "border-primary bg-primary/10"
-                  : "border-transparent hover:bg-muted"
+                  isActive
+                    ? "border-primary bg-primary/10"
+                    : "border-transparent hover:bg-primary/10 hover:text-primary active:bg-primary/20"
               )}
             >
               <span
