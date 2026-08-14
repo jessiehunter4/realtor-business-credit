@@ -58,7 +58,7 @@ const GuideFloatingTOC = () => {
               className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition-colors ${
                 activeId === item.id
                   ? "bg-primary/10 text-primary font-semibold border-l-[3px] border-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  : "text-muted-foreground hover:bg-primary/10 hover:text-primary active:bg-primary/20"
               }`}
             >
               {item.label}

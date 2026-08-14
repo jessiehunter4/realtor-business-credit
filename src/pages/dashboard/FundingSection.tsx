@@ -77,7 +77,7 @@ export default function FundingSection() {
                       variant={f.status === s ? "default" : "outline"}
                       aria-pressed={f.status === s}
                       className={`w-full h-9 rounded-full text-xs font-medium ${
-                        f.status === s ? ACTIVE_BTN_CLASS[s] : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        f.status === s ? ACTIVE_BTN_CLASS[s] : "border border-border text-muted-foreground hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover"
                       }`}
                       disabled={savingKey === f.key}
                       onClick={() => setStatus(f, s)}
