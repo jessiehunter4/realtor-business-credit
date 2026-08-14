@@ -87,7 +87,7 @@ const SiteHeader = () => {
                   <button
                     type="button"
                     aria-label="Account menu"
-                    className="inline-flex items-center justify-center rounded-full border border-border bg-white p-1 text-secondary transition-colors hover:bg-secondary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="inline-flex items-center justify-center rounded-full border border-border bg-white p-1 text-secondary transition-colors hover:border-success-green hover:text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:bg-primary/20"
                   >
                     <Avatar className="h-9 w-9">
                       <AvatarFallback className="bg-secondary/10 text-secondary text-sm font-semibold">
@@ -123,14 +123,14 @@ const SiteHeader = () => {
             <>
               <Link
                 to="/login"
-                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:bg-secondary/5 transition-colors"
+                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
               >
                 Log in
               </Link>
               <Link
                 to="/guide"
                 data-analytics-id="cta-start-here-header"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card hover:bg-success-green-hover active:bg-success-green-hover transition-colors"
               >
                 Start Here
               </Link>
@@ -141,7 +141,7 @@ const SiteHeader = () => {
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <button
-              className="md:hidden inline-flex items-center justify-center rounded-full border border-border bg-white p-2 text-secondary"
+              className="md:hidden inline-flex items-center justify-center rounded-full border border-border bg-white p-2 text-secondary hover:border-success-green hover:text-primary hover:bg-primary/10 active:bg-primary/20 transition-colors"
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
@@ -179,14 +179,14 @@ const SiteHeader = () => {
                   <SheetClose asChild>
                     <Link
                       to={authedHome}
-                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
                     >
                       {authedLabel}
                     </Link>
                   </SheetClose>
                   <button
                     onClick={handleSignOut}
-                    className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+                    className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover transition-colors"
                   >
                     Sign out
                   </button>
@@ -196,7 +196,7 @@ const SiteHeader = () => {
                   <SheetClose asChild>
                     <Link
                       to="/login"
-                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary"
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
                     >
                       Log in
                     </Link>
@@ -204,7 +204,7 @@ const SiteHeader = () => {
                   <SheetClose asChild>
                     <Link
                       to="/guide"
-                      className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+                      className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover transition-colors"
                     >
                       Start Here
                     </Link>

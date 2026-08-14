@@ -20,9 +20,9 @@ const BADGE_CLASS: Record<string, string> = {
 };
 
 const ACTIVE_BTN_CLASS: Record<string, string> = {
-  not_started: "bg-secondary text-secondary-foreground hover:bg-secondary/90 border border-transparent",
-  in_progress: "bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent",
-  completed: "bg-success-green text-success-green-foreground hover:bg-success-green-hover border border-transparent",
+  not_started: "bg-secondary text-secondary-foreground hover:bg-success-green hover:text-white active:bg-success-green-hover border border-transparent",
+  in_progress: "bg-primary text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover border border-transparent",
+  completed: "bg-success-green text-success-green-foreground hover:bg-success-green-hover active:bg-success-green-hover border border-transparent",
 };
 
 export default function FundingSection() {
