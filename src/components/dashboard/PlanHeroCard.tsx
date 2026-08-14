@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, FileText, Pencil, Sparkles } from "lucide-react";
 import type { DashboardPlan } from "@/hooks/useDashboardData";
 
 interface Props {
@@ -54,10 +54,15 @@ export default function PlanHeroCard({ plan, firstName, taskCount = 0, taskDoneC
               {taskCount > 0 ? ` · ${pct}% complete` : ""}
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
+          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
             <Link to={`/portal/plan/${plan.id}`} className="w-full sm:w-auto">
-              <Button size="lg" className="rounded-full w-full sm:w-auto min-w-[200px]">
+              <Button size="lg" className="rounded-full w-full sm:w-auto min-w-[180px]">
                 <FileText className="h-4 w-4 mr-2" /> View Your Plan
+              </Button>
+            </Link>
+            <Link to="/dashboard/90-day" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="rounded-full w-full sm:w-auto min-w-[180px]">
+                <Pencil className="h-4 w-4 mr-2" /> Edit Your Plan
               </Button>
             </Link>
           </div>
