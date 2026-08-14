@@ -159,12 +159,28 @@ All colors MUST be HSL.
   color: #fff;
   border-radius: 999px;
   box-shadow: var(--rbc-shadow-soft);
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.btn-primary:hover,
+.btn-primary:active {
+  background: hsl(var(--success-green-hover));
+}
+.btn-primary:active {
+  transform: scale(0.98);
 }
 .btn-secondary {
-  background: var(--rbc-sky);
+  background: var(--rbc-teal);
   color: #fff;
   border-radius: 999px;
   box-shadow: var(--rbc-shadow-soft);
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.btn-secondary:hover,
+.btn-secondary:active {
+  background: hsl(var(--success-green-hover));
+}
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 .bg-hero-grad { background: var(--rbc-hero-grad); }
 .bg-accent-grad { background: var(--rbc-accent-grad); }
