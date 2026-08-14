@@ -13,7 +13,7 @@ const PartnerCTA = ({ label = "See how the funding partner program works", class
       href={PARTNER_MASTERCLASS_URL}
       target="_blank"
       rel="noopener noreferrer sponsored"
-      className="inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-6 py-3.5 text-sm md:text-base font-semibold text-secondary-foreground shadow-card hover:bg-secondary/90 transition-colors"
+      className="inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-6 py-3.5 text-sm md:text-base font-semibold text-secondary-foreground shadow-card hover:bg-success-green hover:text-white active:bg-success-green-hover transition-colors"
     >
       {label}
       <ArrowRight className="h-4 w-4" />

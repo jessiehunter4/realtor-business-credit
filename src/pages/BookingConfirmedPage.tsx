@@ -125,7 +125,7 @@ const BookingConfirmedPage = () => {
         <div className="container max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/guide"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky text-sky-foreground px-6 py-3 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-sky/90 transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-card hover:shadow-card-hover hover:bg-success-green-hover active:bg-success-green-hover transition-all"
           >
             <BookOpen className="w-4 h-4" />
             Read the Free Guide
