@@ -76,8 +76,8 @@ const StepCard = ({
           const base =
             "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-3 text-sm font-semibold transition-all";
           const styles = isPrimary
-            ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-card hover:shadow-card-hover"
-            : "border border-border bg-background text-secondary hover:bg-muted";
+            ? "bg-primary text-primary-foreground hover:bg-success-green-hover active:bg-success-green-hover shadow-card hover:shadow-card-hover"
+            : "border border-border bg-background text-secondary hover:border-success-green hover:bg-success-green hover:text-white active:bg-success-green-hover";
           return (
             <Link
               key={cta.href}

@@ -63,7 +63,7 @@ export default function IntakePricingAndReadiness({ readiness }: Props) {
                     href={active.cta.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-primary/90 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-success-green-hover active:bg-success-green-hover transition-colors"
                   >
                     <active.cta.icon className="h-4 w-4" />
                     {active.cta.label}
@@ -71,7 +71,7 @@ export default function IntakePricingAndReadiness({ readiness }: Props) {
                 ) : (
                   <Link
                     to={active.cta.href}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-primary/90 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold shadow-card hover:bg-success-green-hover active:bg-success-green-hover transition-colors"
                   >
                     <active.cta.icon className="h-4 w-4" />
                     {active.cta.label}

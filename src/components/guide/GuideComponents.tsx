@@ -174,7 +174,7 @@ export const PlanCTAButton = ({
   return (
     <Link
       to={href}
-      className={`inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 ${className}`}
+      className={`inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm md:text-base font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-success-green-hover active:bg-success-green-hover ${className}`}
     >
       {text}
       <ArrowRight className="h-4 w-4" />
