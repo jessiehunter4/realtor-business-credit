@@ -194,7 +194,7 @@ export default function NextStepPanel({ planId, contactId, initialSelection, dem
                   "cursor-pointer flex items-start gap-3 rounded-xl border p-3 transition-all duration-200 " +
                   (checked
                     ? "border-primary bg-primary/5 shadow-card"
-                    : "border-border bg-white hover:border-secondary/40 hover:bg-primary/[0.03] hover:shadow-sm")
+                    : "border-border bg-white hover:border-success-green hover:bg-success-green hover:text-white hover:shadow-sm active:bg-success-green-hover")
                 }
               >
                 <RadioGroupItem
