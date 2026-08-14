@@ -1,3 +1,7 @@
+import ChapterCheckbox from "./ChapterCheckbox";
+import { useGuideProgress } from "@/hooks/useGuideProgress";
+import { cn } from "@/lib/utils";
+
 const tocEntries = [
   { id: "introduction", label: "Welcome from Jessie · Your Three-Step RE Pro Path", sections: [] },
   { id: "chapter-1",  label: "1. Why so many real estate pros depend on personal credit", sections: [] },
@@ -17,35 +21,58 @@ const tocEntries = [
   { id: "resources",   label: "Resources & Additional Information", sections: [] },
 ];
 
-const GuideTOC = () => (
-  <section className="container mx-auto px-4 py-16">
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl md:text-3xl font-bold text-secondary text-center mb-10">
-        Table of Contents
-      </h2>
-      <nav className="space-y-2">
-        {tocEntries.map((entry) => (
-          <div key={entry.id}>
-            <a
-              href={`#${entry.id}`}
-              className="block font-bold text-secondary hover:text-primary transition-colors py-2 text-base md:text-lg"
-            >
-              {entry.label}
-            </a>
-            {entry.sections.length > 0 && (
-              <div className="pl-6 space-y-1 mb-2">
-                {entry.sections.map((sec) => (
-                  <p key={sec} className="text-sm text-muted-foreground">
-                    {sec}
-                  </p>
-                ))}
+const GuideTOC = () => {
+  const { isCompleted, toggle, completedCount, totalCount } = useGuideProgress();
+
+  return (
+    <section className="container mx-auto px-4 py-16">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-2xl md:text-3xl font-bold text-secondary text-center mb-2">
+          Table of Contents
+        </h2>
+        <p className="text-center text-sm text-muted-foreground mb-10">
+          {completedCount} of {totalCount} sections complete
+        </p>
+        <nav className="space-y-2">
+          {tocEntries.map((entry) => {
+            const done = isCompleted(entry.id);
+            return (
+              <div key={entry.id}>
+                <div className="flex items-start gap-3">
+                  <ChapterCheckbox
+                    idPrefix="toc"
+                    sectionId={entry.id}
+                    label={entry.label}
+                    checked={done}
+                    onToggle={(next) => toggle(entry.id, next)}
+                    className="mt-2"
+                  />
+                  <a
+                    href={`#${entry.id}`}
+                    className={cn(
+                      "block font-bold hover:text-primary transition-colors py-2 text-base md:text-lg",
+                      done ? "text-secondary/60" : "text-secondary",
+                    )}
+                  >
+                    {entry.label}
+                  </a>
+                </div>
+                {entry.sections.length > 0 && (
+                  <div className="pl-6 space-y-1 mb-2">
+                    {entry.sections.map((sec) => (
+                      <p key={sec} className="text-sm text-muted-foreground">
+                        {sec}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        ))}
-      </nav>
-    </div>
-  </section>
-);
+            );
+          })}
+        </nav>
+      </div>
+    </section>
+  );
+};
 
 export default GuideTOC;

@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, ChevronRight, List, X } from "lucide-react";
+import { CalendarDays, Check, ChevronRight, List, X } from "lucide-react";
 import { chapterItems } from "./guideChapters";
+import ChapterCheckbox from "./ChapterCheckbox";
+import { useGuideProgress } from "@/hooks/useGuideProgress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const GuideChapterRail = () => {
   const [activeId, setActiveId] = useState<string>("");
   const [open, setOpen] = useState(true);
+  const { isCompleted, toggle, completedCount, totalCount } = useGuideProgress();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -53,7 +56,7 @@ const GuideChapterRail = () => {
             Guide Contents
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {chapterItems.length} Chapters
+            {completedCount} of {totalCount} complete
           </p>
         </div>
         <button
@@ -69,45 +72,61 @@ const GuideChapterRail = () => {
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
         {chapterItems.map((item) => {
           const isActive = activeId === item.id;
+          const done = isCompleted(item.id);
           return (
-            <button
+            <div
               key={item.id}
-              type="button"
-              onClick={() => scrollTo(item.id)}
-              aria-current={isActive ? "true" : undefined}
               className={cn(
-                "group w-full flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors border-l-[3px]",
-                  isActive
-                    ? "border-primary bg-primary/10"
-                    : "border-transparent hover:bg-primary/10 hover:text-primary active:bg-primary/20"
+                "flex items-center gap-1 rounded-lg border-l-[3px] transition-colors",
+                isActive ? "border-primary bg-primary/10" : "border-transparent",
               )}
             >
-              <span
+              <ChapterCheckbox
+                idPrefix="rail"
+                sectionId={item.id}
+                label={item.title}
+                checked={done}
+                onToggle={(next) => toggle(item.id, next)}
+                className="ml-1.5"
+              />
+              <button
+                type="button"
+                onClick={() => scrollTo(item.id)}
+                aria-current={isActive ? "true" : undefined}
                 className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-sm font-bold",
-                  isActive
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-secondary"
+                  "group flex-1 min-w-0 flex items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-colors",
+                  !isActive && "hover:bg-primary/10 hover:text-primary active:bg-primary/20",
                 )}
               >
-                {item.number}
-              </span>
-              <span className="min-w-0">
                 <span
                   className={cn(
-                    "block truncate text-sm font-semibold",
-                    isActive ? "text-primary" : "text-secondary"
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-sm font-bold",
+                    isActive
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : done
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "border-border bg-background text-secondary",
                   )}
                 >
-                  {item.title}
+                  {done && !isActive ? <Check className="h-4 w-4" /> : item.number}
                 </span>
-                {item.subtitle && (
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {item.subtitle}
+                <span className="min-w-0">
+                  <span
+                    className={cn(
+                      "block truncate text-sm font-semibold",
+                      isActive ? "text-primary" : done ? "text-secondary/60" : "text-secondary",
+                    )}
+                  >
+                    {item.title}
                   </span>
-                )}
-              </span>
-            </button>
+                  {item.subtitle && (
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {item.subtitle}
+                    </span>
+                  )}
+                </span>
+              </button>
+            </div>
           );
         })}
       </div>

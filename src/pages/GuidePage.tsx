@@ -14,6 +14,7 @@ import { useEngagementTracker } from "@/hooks/useEngagementTracker";
 import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
+import GuideResumeCard from "@/components/guide/GuideResumeCard";
 import GuideSkim from "@/components/guide/GuideSkim";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
 import Ch01 from "@/components/guide/chapters/Ch01";
@@ -44,6 +45,7 @@ import Seo from "@/components/shared/Seo";
 import { cn } from "@/lib/utils";
 import { parseVisitorSlug } from "@/lib/visitorSlug";
 import { mergeContactIdentity } from "@/lib/contactIdentityStore";
+import { useGuideReadingPosition } from "@/hooks/useGuideProgress";
 
 const guideNavLinks = [
   { to: "/guide", label: "Guide" },
@@ -129,6 +131,9 @@ const GuidePage = () => {
   }, [accessGranted]);
   const [generating, setGenerating] = useState(false);
   const taggedMount = useRef(false);
+
+  // Track the reader's last dwelled-on section for the resume card.
+  useGuideReadingPosition(accessGranted);
 
   // Close mobile menu on Escape + lock body scroll while open
   useEffect(() => {
@@ -416,6 +421,7 @@ const GuidePage = () => {
       </div>
 
       <GuideCover visitorName={visitorName || undefined} />
+      <GuideResumeCard />
       {hasPlan && (
         <div className="container mx-auto max-w-3xl px-4 pt-4">
           <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground flex flex-wrap items-center justify-between gap-3">
