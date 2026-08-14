@@ -294,7 +294,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
           <p className="text-primary text-sm md:text-base font-semibold uppercase tracking-wider mb-3">
             Free guide · Updated 2026
           </p>
-          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-5">
+          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-bold text-secondary leading-[1.1] tracking-tight text-balance mb-8 md:mb-10">
             Business Credit Cards for Real Estate Pros:
             <span className="block text-primary mt-2">the How &amp; Why of Credit Card Stacking</span>
           </h1>
