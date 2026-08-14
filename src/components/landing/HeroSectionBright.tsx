@@ -25,11 +25,11 @@ const HeroSectionBright = ({ firstName, guideLink = "/guide", closingContext = f
 
       <div className="container mx-auto px-4 py-4 sm:py-5 md:py-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-[clamp(1.75rem,6vw,3.25rem)] font-bold text-secondary leading-[1.08] tracking-tight text-balance">
+          <h1 className="text-[clamp(1.75rem,6vw,3.25rem)] font-bold text-secondary leading-[1.08] tracking-tight text-balance mb-5 sm:mb-6 md:mb-8">
             {headline}
           </h1>
 
-          <div className="relative mt-3 sm:mt-4 w-full max-w-[min(600px,100%)] mx-auto">
+          <div className="relative mt-5 sm:mt-6 md:mt-8 w-full max-w-[min(600px,100%)] mx-auto">
             <div className="absolute -inset-3 sm:-inset-5 bg-accent-grad rounded-3xl blur-2xl opacity-50 pointer-events-none" />
             <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
