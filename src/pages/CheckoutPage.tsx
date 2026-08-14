@@ -168,7 +168,7 @@ const CheckoutPage = () => {
             type="button"
             onClick={handlePaymentClick}
             disabled={isLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold shadow-card hover:shadow-card-hover hover:bg-primary/90 transition-all disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold shadow-card hover:shadow-card-hover hover:bg-success-green-hover active:bg-success-green-hover transition-all disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isLoading ? (
               <>

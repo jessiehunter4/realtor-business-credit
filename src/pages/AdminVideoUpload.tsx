@@ -263,7 +263,7 @@ const AdminVideoUpload = () => {
                 type="file"
                 accept=".vtt,.srt,text/vtt,application/x-subrip"
                 onChange={(e) => setCaptionsFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky file:text-sky-foreground hover:file:bg-sky/90"
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-success-green-hover active:file:bg-success-green-hover"
                 disabled={captionsUploading}
               />
               {captionsFile && (

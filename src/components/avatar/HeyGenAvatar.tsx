@@ -136,7 +136,7 @@ const HeyGenAvatar = ({
             type="button"
             onClick={handleManualPlay}
             variant="secondary"
-            className="absolute inset-0 h-full w-full rounded-none flex flex-col items-center justify-center bg-secondary/80 text-secondary-foreground gap-3 hover:bg-secondary/70"
+            className="absolute inset-0 h-full w-full rounded-none flex flex-col items-center justify-center bg-secondary/80 text-secondary-foreground gap-3 hover:bg-success-green/90 hover:text-white active:bg-success-green-hover"
           >
             <div className="rounded-full bg-primary p-4">
               <Play className="h-8 w-8 text-primary-foreground" fill="currentColor" />
