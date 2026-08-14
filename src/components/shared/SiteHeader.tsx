@@ -156,7 +156,7 @@ const SiteHeader = () => {
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}
-                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:bg-secondary/5"
+                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
                   >
                     {l.label}
                   </Link>
@@ -166,7 +166,7 @@ const SiteHeader = () => {
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}
-                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:bg-secondary/5"
+                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
                   >
                     {l.label}
                   </Link>
