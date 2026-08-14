@@ -53,8 +53,8 @@ const SiteHeader = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center shrink-0" aria-label="RE Pro Business Credit home">
+      <div className="container mx-auto px-4 h-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <Link to="/" className="flex items-center shrink-0 justify-self-start" aria-label="RE Pro Business Credit home">
           <img
             src={logoAsset.url}
             alt="RE Pro Business Credit"
@@ -62,7 +62,7 @@ const SiteHeader = () => {
           />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center justify-center gap-1">
           {primaryNav.map((l) => (
             <NavLink
               key={l.to}
@@ -79,7 +79,7 @@ const SiteHeader = () => {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2 justify-self-end">
           {session ? (
             <>
               <DropdownMenu>
