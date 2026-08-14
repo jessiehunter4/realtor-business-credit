@@ -298,7 +298,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
             Business Credit Cards for Real Estate Pros:
             <span className="block text-primary mt-2">the How &amp; Why of Credit Card Stacking</span>
           </h1>
-          <div className="mt-6 mx-auto w-full max-w-[720px]">
+          <div className="mt-10 mx-auto w-full max-w-[720px]">
             <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-card-hover border border-border bg-secondary">
               <HeroVideo
                 storagePath="public/card-guide-jessie.mp4"
