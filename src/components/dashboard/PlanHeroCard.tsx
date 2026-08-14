@@ -60,7 +60,7 @@ export default function PlanHeroCard({ plan, firstName, taskCount = 0, taskDoneC
                 <FileText className="h-4 w-4 mr-2" /> View Your Plan
               </Button>
             </Link>
-            <Link to="/dashboard/90-day" className="w-full sm:w-auto">
+            <Link to={`/portal/plan/${plan.id}?edit=1`} className="w-full sm:w-auto">
               <Button size="lg" variant="outline" className="rounded-full w-full sm:w-auto min-w-[180px]">
                 <Pencil className="h-4 w-4 mr-2" /> Edit Your Plan
               </Button>
