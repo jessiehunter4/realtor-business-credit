@@ -69,8 +69,8 @@ const SiteHeader = () => {
               to={l.to}
               className={({ isActive }) =>
                 cn(
-                  "px-3 py-2 rounded-full text-sm font-medium text-secondary/80 hover:text-secondary hover:bg-secondary/5 transition-colors",
-                  isActive && "text-secondary bg-secondary/5"
+                  "px-3 py-2 rounded-full text-sm font-medium text-secondary/80 hover:text-primary hover:bg-primary/10 transition-colors",
+                  isActive && "text-primary bg-primary/10"
                 )
               }
             >
@@ -156,7 +156,7 @@ const SiteHeader = () => {
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}
-                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:bg-secondary/5"
+                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
                   >
                     {l.label}
                   </Link>
@@ -166,7 +166,7 @@ const SiteHeader = () => {
                 <SheetClose asChild key={l.to}>
                   <Link
                     to={l.to}
-                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:bg-secondary/5"
+                    className="px-3 py-3 rounded-xl text-base font-medium text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
                   >
                     {l.label}
                   </Link>
