@@ -40,6 +40,7 @@ import GuideOptInGate from "@/components/guide/GuideOptInGate";
 import ChapterPlanCTA from "@/components/guide/ChapterPlanCTA";
 import FloatingPlanCTA from "@/components/guide/FloatingPlanCTA";
 import SiteFooter from "@/components/shared/SiteFooter";
+import SkipToContent from "@/components/shared/SkipToContent";
 import StateEntityWidget from "@/components/shared/StateEntityWidget";
 import Seo from "@/components/shared/Seo";
 import { cn } from "@/lib/utils";
@@ -284,6 +285,7 @@ const GuidePage = () => {
         noindex={Boolean(slug)}
       />
       {/* Sticky CTA Bar */}
+      <SkipToContent />
       <div className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-sm border-b border-border shadow-lg">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-3.5 flex md:grid md:grid-cols-3 items-center gap-2">
           <div className="flex items-center justify-start min-w-0 flex-shrink">
@@ -295,7 +297,7 @@ const GuidePage = () => {
               <span className="sm:hidden">RE Pro Guide</span>
             </Link>
           </div>
-          <nav className="hidden md:flex items-center justify-center gap-0.5 lg:gap-1 flex-nowrap whitespace-nowrap">
+          <nav aria-label="Guide" className="hidden md:flex items-center justify-center gap-0.5 lg:gap-1 flex-nowrap whitespace-nowrap">
             {guideNavLinks.map((l) => (
               <NavLink
                 key={l.to}

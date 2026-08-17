@@ -64,7 +64,7 @@ const SiteHeader = () => {
           />
         </Link>
 
-        <nav className="hidden md:flex items-center justify-center gap-1">
+        <nav aria-label="Main" className="hidden md:flex items-center justify-center gap-1">
           {primaryNav.map((l) => (
             <NavLink
               key={l.to}
@@ -153,7 +153,7 @@ const SiteHeader = () => {
             <Link to="/" onClick={() => setOpen(false)} className="flex items-center pt-2">
               <img src={logoAsset.url} alt="RE Pro Business Credit" className="h-12 w-auto" />
             </Link>
-            <nav className="flex flex-col gap-1">
+            <nav aria-label="Mobile" className="flex flex-col gap-1">
               {primaryNav.map((l) => (
                 <SheetClose asChild key={l.to}>
                   <Link
