@@ -4,10 +4,12 @@ import { AlertCircle } from "lucide-react";
 import SiteHeader from "@/components/shared/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { productPathForTier } from "@/data/pricingTiers";
 
 export default function PaymentCancelledPage() {
   const [params] = useSearchParams();
   const tier = params.get("tier") ?? undefined;
+  const backPath = productPathForTier(tier);
 
   useEffect(() => {
     supabase.functions
@@ -35,13 +37,15 @@ export default function PaymentCancelledPage() {
             No payment was processed
           </h1>
           <p className="mt-4 text-base text-muted-foreground">
-            Your card was not charged. You can head back to pricing whenever you're
-            ready to enroll.
+            Your card was not charged. You can pick up right where you left off
+            whenever you're ready to enroll.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg">
-              <Link to="/pricing">Return to Pricing</Link>
+              <Link to={backPath}>
+                {backPath === "/pricing" ? "Return to Pricing" : "Back to your program"}
+              </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               <Link to="/dashboard">Back to Dashboard</Link>

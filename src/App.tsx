@@ -25,6 +25,7 @@ import MlsSimulatorPage from "./pages/MlsSimulatorPage";
 import AdminVideoUpload from "./pages/AdminVideoUpload";
 import BusinessCreditCardsForRealtorsPage from "./pages/BusinessCreditCardsForRealtorsPage";
 import PricingPage from "./pages/PricingPage";
+import ProgramProductPage from "./pages/ProgramProductPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import SmsOptInProofPage from "./pages/SmsOptInProofPage";
@@ -68,6 +69,7 @@ const App = () => (
           <Route path="/guide/:slug" element={<GuidePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/programs/:slug" element={<ProgramProductPage />} />
           <Route path="/intake" element={<IntakeSurveyPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/signup" element={<SignupPage />} />
