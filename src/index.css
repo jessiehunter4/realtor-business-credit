@@ -212,3 +212,47 @@ All colors MUST be HSL.
     scroll-behavior: auto !important;
   }
 }
+
+/* --- Accessibility mode (user-toggled via the floating a11y button) ---- */
+
+html.a11y-large-text {
+  font-size: 118%;
+}
+
+html.a11y-high-contrast {
+  --muted-foreground: 217 25% 30%;
+  --foreground: 217 40% 12%;
+  --border: 210 20% 65%;
+  --input: 210 20% 55%;
+}
+html.a11y-high-contrast .text-white\/80,
+html.a11y-high-contrast .text-secondary\/70,
+html.a11y-high-contrast .text-foreground\/70,
+html.a11y-high-contrast .text-muted-foreground\/70 {
+  opacity: 1;
+  color: inherit;
+}
+html.a11y-high-contrast :is(button, [role="button"], input, select, textarea) {
+  border-color: hsl(var(--input));
+}
+
+html.a11y-reduce-motion,
+html.a11y-reduce-motion * ,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.a11y-underline-links a:not([class*="btn"]):not(.no-underline) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+html.a11y-focus-highlight :focus-visible {
+  outline: 3px solid hsl(var(--secondary));
+  outline-offset: 3px;
+  border-radius: 4px;
+}

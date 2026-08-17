@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import AccessibilityToggle from "@/components/shared/AccessibilityToggle";
 import DevWorkflowTestPage from "./pages/DevWorkflowTestPage";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -58,6 +59,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AccessibilityToggle />
       <BrowserRouter>
         <ScrollMemory />
         <AuthRoleProvider>
