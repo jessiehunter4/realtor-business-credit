@@ -770,7 +770,12 @@ function IntakeSurveyForm() {
             RE Pro Business Financial Needs Analysis
           </h1>
           <p className="hidden sm:block text-sm text-muted-foreground">
-            {form.contact_name ? `Welcome, ${form.contact_name}!` : "Welcome!"} Please complete the sections below to help us prepare for your session.
+            {form.contact_name ? `Welcome, ${form.contact_name}! ` : ""}
+            {steps.length === 1
+              ? "One quick step"
+              : `${steps.length} quick steps`}{" "}
+            — {steps.slice(0, -1).map((s) => s.title).join(", ")}, and{" "}
+            {steps[steps.length - 1].title} — and we'll build your custom 90-day plan.
           </p>
         </div>
 
