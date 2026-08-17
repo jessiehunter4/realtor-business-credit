@@ -3,7 +3,7 @@ import { ArrowRight, ExternalLink, Lock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PRICING_TIERS } from "@/data/pricingTiers";
+import { PRICING_TIERS, productPathForTier } from "@/data/pricingTiers";
 import { TIER_LABELS, isUpgrade, type PaidTierId } from "@/lib/entitlementTiers";
 import { cn } from "@/lib/utils";
 import SectionHeader from "./SectionHeader";
@@ -118,7 +118,10 @@ export default function ProgramSection() {
                     ))}
                   </ul>
                   {!active ? (
-                    <Link to={t.ctaHref} className="inline-block mt-auto pt-4">
+                    <Link
+                      to={t.id === "free" ? t.ctaHref : productPathForTier(t.id)}
+                      className="inline-block mt-auto pt-4"
+                    >
                       <Button size="sm" variant="outline" className="rounded-full text-xs">
                         {upgrade ? `Upgrade to ${t.name}` : t.ctaLabel}
                       </Button>

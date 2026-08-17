@@ -4,14 +4,10 @@ import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import SiteHeader from "@/components/shared/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { TIER_LABELS, type PaidTierId } from "@/lib/entitlementTiers";
+import { PRICING_TIERS } from "@/data/pricingTiers";
 
 const REDIRECT_MS = 6000;
-
-const tierLabels: Record<string, string> = {
-  "self-paced": "Self-Paced",
-  cohort: "Cohort",
-  "one-on-one": "One-on-One",
-};
 
 type VerifyState = "verifying" | "success" | "failed";
 
@@ -19,6 +15,7 @@ type VerifyResult = {
   success?: boolean;
   status?: string;
   product?: string;
+  tierId?: PaidTierId;
   amount?: number;
   currency?: string;
   alreadyProcessed?: boolean;
@@ -40,8 +37,7 @@ export default function PaymentSuccessPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = params.get("session_id") ?? undefined;
-  const tier = params.get("tier") ?? undefined;
-  const tierLabel = tier ? tierLabels[tier] ?? tier : undefined;
+  const tierParam = params.get("tier") ?? undefined;
   const [secondsLeft, setSecondsLeft] = useState(Math.round(REDIRECT_MS / 1000));
   const [state, setState] = useState<VerifyState>("verifying");
   const [result, setResult] = useState<VerifyResult | null>(null);
@@ -84,13 +80,17 @@ export default function PaymentSuccessPage() {
         body: {
           eventType: "checkout_completed",
           pathname: "/payment-success",
-          properties: { session_id: sessionId, tier, product: result?.product },
+          properties: {
+            session_id: sessionId,
+            tier: result?.tierId ?? tierParam,
+            product: result?.product,
+          },
         },
       })
       .catch(() => {
         /* best effort */
       });
-  }, [state, sessionId, tier, result?.product]);
+  }, [state, sessionId, tierParam, result?.tierId, result?.product]);
 
   // Redirect only after a verified payment.
   useEffect(() => {
@@ -106,7 +106,14 @@ export default function PaymentSuccessPage() {
   }, [state, navigate]);
 
   const amountLabel = formatAmount(result?.amount, result?.currency);
-  const productLabel = result?.product ?? tierLabel;
+  // The verified tier from Stripe is authoritative — never the URL parameter.
+  const verifiedTier = result?.tierId;
+  const productLabel =
+    (verifiedTier ? TIER_LABELS[verifiedTier] : undefined) ?? result?.product;
+  const unlockedNote = verifiedTier
+    ? PRICING_TIERS.find((t) => t.id === verifiedTier)?.productPage
+        ?.dashboardCapabilityNote
+    : undefined;
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,6 +172,11 @@ export default function PaymentSuccessPage() {
               <p className="mt-6 text-sm text-muted-foreground">
                 Taking you to your dashboard in {secondsLeft}s.
               </p>
+              {unlockedNote && (
+                <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
+                  {unlockedNote}
+                </p>
+              )}
 
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Button asChild size="lg">
