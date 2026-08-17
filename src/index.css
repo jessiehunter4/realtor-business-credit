@@ -10,7 +10,7 @@ All colors MUST be HSL.
   :root {
     /* Brand (raw hex, from spec) */
     --rbc-navy: #0B1F3B;
-    --rbc-teal: #12B886;
+    --rbc-teal: #0d8360;
     --rbc-sky:  #3AA9FF;
     --rbc-coral:#FF6B6B;
     --rbc-amber:#FFB020;
@@ -35,7 +35,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 217 33% 20%;
 
-    --primary: 161 82% 39%;             /* teal #12B886 */
+    --primary: 161 82% 28%;             /* teal, darkened for 4.5:1 white-on-green (WCAG AA) */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 215 70% 14%;           /* navy #0B1F3B */
@@ -47,12 +47,12 @@ All colors MUST be HSL.
     --accent: 36 100% 56%;              /* amber #FFB020 */
     --accent-foreground: 215 70% 14%;
 
-    --destructive: 0 100% 71%;          /* coral #FF6B6B */
+    --destructive: 0 66% 42%;           /* coral, darkened for AA text contrast */
     --destructive-foreground: 0 0% 100%;
 
     --border: 206 41% 93%;              /* #E6EEF5 */
     --input: 206 41% 93%;
-    --ring: 161 82% 39%;
+    --ring: 161 82% 28%;
 
     --radius: 1.25rem;
 
@@ -61,8 +61,8 @@ All colors MUST be HSL.
     --navy-light: 215 50% 30%;
     --sky: 208 100% 62%;                /* #3AA9FF */
     --coral: 0 100% 71%;                /* #FF6B6B */
-    --success-green: 161 82% 39%;
-    --success-green-hover: 161 82% 33%;
+    --success-green: 161 82% 28%;
+    --success-green-hover: 161 82% 22%;
     --success-green-foreground: 0 0% 100%;
     --amber: 36 100% 56%;
     --amber-dark: 36 100% 46%;
