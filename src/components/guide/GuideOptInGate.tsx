@@ -118,6 +118,8 @@ const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) =
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
                   id="firstName"
+                  aria-required="true"
+                  autoComplete="given-name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="First name"
@@ -128,6 +130,8 @@ const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) =
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
                   id="lastName"
+                  aria-required="true"
+                  autoComplete="family-name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Last name"
@@ -140,6 +144,8 @@ const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) =
               <Input
                 id="email"
                 type="email"
+                aria-required="true"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -150,6 +156,7 @@ const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) =
               <Label htmlFor="phone">Mobile Phone</Label>
               <PhoneInput
                 id="phone"
+                aria-required="true"
                 value={phone}
                 onChange={(digits) => setPhone(digits)}
                 required
@@ -172,7 +179,7 @@ const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) =
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 };
 
