@@ -144,7 +144,7 @@ const GuideChapterRail = () => {
           </div>
           <Button asChild className="mt-3 w-full">
             <Link to="/intake">
-              Create My Plan
+              Get Started
               <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
