@@ -1,35 +1,70 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookmarkCheck, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { tocItems } from "./guideChapters";
-import { readGuideProgress } from "@/lib/guideProgress";
 import { useGuideProgress } from "@/hooks/useGuideProgress";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
+import { useContactIdentity } from "@/hooks/useContactIdentity";
 
 const labelFor = (id: string) => tocItems.find((i) => i.id === id)?.label ?? "";
+const indexFor = (id: string) => tocItems.findIndex((i) => i.id === id) + 1;
 
 const GuideResumeCard = () => {
-  // Snapshot the saved position once on mount so the card doesn't shuffle
-  // while the reader is scrolling.
-  const [snapshot] = useState(() => readGuideProgress());
-  const { completedSet, completedCount, totalCount } = useGuideProgress();
+  const { progress, syncing, completedSet, completedCount, totalCount } = useGuideProgress();
+  const { contactId } = useContactIdentity();
+
+  // Pin the resume target to the first saved position we see (local on mount,
+  // or the server copy once it merges in) so the card doesn't shuffle while
+  // the reader scrolls.
+  const [pinned, setPinned] = useState<string | null>(() => progress.lastSectionId);
+  useEffect(() => {
+    if (!pinned && progress.lastSectionId) setPinned(progress.lastSectionId);
+  }, [pinned, progress.lastSectionId]);
 
   const target = useMemo(() => {
-    if (!snapshot.lastSectionId) return null;
-    if (!completedSet.has(snapshot.lastSectionId)) {
-      return { id: snapshot.lastSectionId, isNext: false };
-    }
+    if (!pinned) return null;
+    if (!completedSet.has(pinned)) return { id: pinned, isNext: false };
     const next = tocItems.find((i) => !completedSet.has(i.id));
     return next ? { id: next.id, isNext: true } : null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snapshot.lastSectionId, completedSet]);
-
-  if (!snapshot.lastSectionId) return null;
+  }, [pinned, completedSet]);
 
   const allDone = completedCount === totalCount && totalCount > 0;
+  const visible = Boolean(pinned) || allDone;
+  const label = target ? labelFor(target.id) : "";
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const loggedShown = useRef(false);
+  useEffect(() => {
+    if (!visible || syncing || loggedShown.current) return;
+    loggedShown.current = true;
+    void postFunnelEvent({
+      contactId,
+      eventType: "guide_resume_shown",
+      metadata: { section_id: target?.id ?? null, completed: completedCount, total: totalCount },
+    }).catch(() => undefined);
+  }, [visible, syncing, contactId, target?.id, completedCount, totalCount]);
+
+  // While the first sync is in flight and we have nothing local, reserve the
+  // card's height so the page doesn't jump when it resolves.
+  if (syncing && !visible) {
+    return <div className="container mx-auto max-w-3xl px-4 pt-6" aria-hidden="true"><div className="h-[86px]" /></div>;
+  }
+
+  if (!visible) return null;
+
+  const goTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Land keyboard focus in the resumed section.
+    const heading = el.querySelector<HTMLElement>("h1, h2, h3") ?? el;
+    heading.setAttribute("tabindex", "-1");
+    window.setTimeout(() => heading.focus({ preventScroll: true }), 400);
+    void postFunnelEvent({
+      contactId,
+      eventType: "guide_resume_clicked",
+      metadata: { section_id: id },
+    }).catch(() => undefined);
   };
 
   if (allDone || !target) {
@@ -55,8 +90,6 @@ const GuideResumeCard = () => {
     );
   }
 
-  const label = labelFor(target.id);
-
   return (
     <div className="container mx-auto max-w-3xl px-4 pt-6">
       <div className="rounded-xl border border-border bg-card shadow-card-soft px-4 py-4 sm:px-5 flex flex-wrap items-center justify-between gap-3">
@@ -69,11 +102,14 @@ const GuideResumeCard = () => {
             <p className="mt-1 text-sm sm:text-base font-semibold text-secondary break-words">
               {label}
             </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Section {indexFor(target.id)} of {totalCount} · {completedCount} marked complete
+            </p>
           </div>
         </div>
         <Button
           size="sm"
-          onClick={() => scrollTo(target.id)}
+          onClick={() => goTo(target.id)}
           aria-label={`Continue reading: ${label}`}
           className="min-h-11"
         >

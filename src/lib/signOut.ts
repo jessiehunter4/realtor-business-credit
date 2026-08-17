@@ -22,6 +22,8 @@ const VISITOR_LOCAL_KEYS = [
   "rbc_intake_draft_v1",
   "rbc_intake_draft_v2",
   "rbc_intake_draft_v3",
+  "rbc_guide_progress_v1",
+  "rbc_guide_progress_v1_card",
 ];
 
 export function clearVisitorLocalStorage() {

@@ -345,6 +345,33 @@ export type Database = {
         }
         Relationships: []
       }
+      guide_progress: {
+        Row: {
+          completed: string[]
+          created_at: string
+          guide_slug: string
+          last_section_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: string[]
+          created_at?: string
+          guide_slug: string
+          last_section_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: string[]
+          created_at?: string
+          guide_slug?: string
+          last_section_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       import_batches: {
         Row: {
           agents_created: number | null
