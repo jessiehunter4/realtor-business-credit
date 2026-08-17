@@ -87,6 +87,7 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main id="main-content">
       <Seo
         title="Enroll · RE Pro Business Credit Program"
         description="Secure enrollment for the RE Pro Business Credit program — coaching, cohort, and the implementation portal."
@@ -219,6 +220,7 @@ const CheckoutPage = () => {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

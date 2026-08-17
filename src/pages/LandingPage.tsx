@@ -75,6 +75,7 @@ const LandingPage = () => {
         }}
       />
       <SiteHeader />
+      <main id="main-content">
       <HeroSectionBright firstName={firstName} guideLink={guideLink} closingContext={closingContext} />
       <MoneyWhenYouNeedItStrip />
       <HowItWorksRail />
@@ -84,6 +85,7 @@ const LandingPage = () => {
       <WhatThisIs />
       <TestimonialsBright />
       <FinalCTABright guideLink={guideLink} />
+      </main>
       <SiteFooter />
       <StickyMobileCTABar guideLink={guideLink} />
     </div>

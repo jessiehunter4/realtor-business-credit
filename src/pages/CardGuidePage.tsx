@@ -60,6 +60,7 @@ const CardGuidePage = () => {
         path="/card-guide"
       />
       <SiteHeader />
+      <main id="main-content">
       <div className="relative">
         <GuideProgressBar />
       </div>
@@ -110,6 +111,7 @@ const CardGuidePage = () => {
       <div className="h-20 sm:h-24" aria-hidden="true" />
 
       <CardGuideFloatingTOC />
+      </main>
       <SiteFooter />
     </div>
   );
