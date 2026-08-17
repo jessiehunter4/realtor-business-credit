@@ -13,6 +13,7 @@ import {
   type GuideSlug,
 } from "@/lib/guideProgress";
 import { fetchRemoteProgress, upsertRemoteProgress } from "@/lib/guideProgressRemote";
+import { postFunnelEvent } from "@/lib/logFunnelEvent";
 
 /**
  * Shared reactive view of the reader's guide progress.
@@ -75,6 +76,12 @@ export function useGuideProgress(slug: GuideSlug = DEFAULT_GUIDE_SLUG) {
       const updated = setGuideCompleted(id, next, slug);
       setProgress(updated);
       if (userId) void upsertRemoteProgress(userId, updated, slug);
+      if (next && updated.completed.length === tocItems.length) {
+        void postFunnelEvent({
+          eventType: "guide_completed",
+          metadata: { guide_slug: slug, sections: tocItems.length },
+        }).catch(() => undefined);
+      }
     },
     [userId, slug],
   );
