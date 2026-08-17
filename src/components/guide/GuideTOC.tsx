@@ -51,7 +51,7 @@ const GuideTOC = () => {
                     href={`#${entry.id}`}
                     className={cn(
                       "block font-bold hover:text-primary transition-colors py-2 text-base md:text-lg",
-                      done ? "text-secondary/60" : "text-secondary",
+                      done ? "text-secondary/70" : "text-secondary",
                     )}
                   >
                     {entry.label}

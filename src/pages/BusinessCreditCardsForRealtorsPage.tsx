@@ -250,6 +250,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main id="main-content">
       <Seo
         title="Business Credit Cards for Realtors: Card Stacking Guide"
         description="How real estate pros use a planned sequence of business credit cards as working capital — categories that fit, the order to set things up, the real costs, and the free RE Pro card guide."
@@ -332,7 +333,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
                 <Clock className="h-3.5 w-3.5" />
                 Updated for 2026
               </span>
-              <span className="text-secondary/50">•</span>
+              <span className="text-secondary/70">•</span>
               <span>5-Min Read</span>
             </div>
           </div>
@@ -775,6 +776,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
       </section>
 
       <FinalCTABright guideLink="/card-guide" />
+      </main>
       <SiteFooter />
     </div>
   );

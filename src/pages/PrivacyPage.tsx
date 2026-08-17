@@ -13,7 +13,7 @@ const PrivacyPage = () => (
       description="How RE Pro Business Credit and My Better Business Credit collect, use, store, and protect your information, including SMS and email communications."
       path="/privacy"
     />
-    <main className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
+    <main id="main-content" className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
       <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-2">Privacy Policy</h1>
       <p className="text-sm text-muted-foreground mb-10">Last updated: {LAST_UPDATED}</p>
 

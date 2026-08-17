@@ -38,7 +38,7 @@ export default function PayLaterOptions() {
         <p className="text-center text-sm font-semibold text-secondary">
           Pay later options available at checkout
         </p>
-        <p className="mt-1 text-center text-xs text-secondary/65">
+        <p className="mt-1 text-center text-xs text-secondary/70">
           Card, debit, Klarna, and Affirm are all accepted. Hover an option to see how it works.
         </p>
 
@@ -56,9 +56,9 @@ export default function PayLaterOptions() {
                   <span className="min-w-0">
                     <span className="flex items-center gap-1.5 text-sm font-semibold text-secondary">
                       {name}
-                      <Info className="h-3.5 w-3.5 text-secondary/50" />
+                      <Info className="h-3.5 w-3.5 text-secondary/70" />
                     </span>
-                    <span className="block text-xs text-secondary/65">{blurb}</span>
+                    <span className="block text-xs text-secondary/70">{blurb}</span>
                   </span>
                 </button>
               </TooltipTrigger>
@@ -74,7 +74,7 @@ export default function PayLaterOptions() {
           ))}
         </div>
 
-        <p className="mt-4 text-center text-[11px] text-secondary/55">
+        <p className="mt-4 text-center text-[11px] text-secondary/70">
           Klarna and Affirm availability, terms, and approval are determined by those providers at
           checkout and may depend on your location and purchase amount.
         </p>

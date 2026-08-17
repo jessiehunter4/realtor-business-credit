@@ -87,6 +87,7 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main id="main-content">
       <Seo
         title="Enroll · RE Pro Business Credit Program"
         description="Secure enrollment for the RE Pro Business Credit program — coaching, cohort, and the implementation portal."
@@ -142,14 +143,14 @@ const CheckoutPage = () => {
                       <CheckCircle
                         className={
                           "mt-0.5 h-5 w-5 shrink-0 " +
-                          (selectedTier === tier.id ? "text-primary" : "text-secondary/35")
+                          (selectedTier === tier.id ? "text-primary" : "text-secondary/70")
                         }
                       />
                       <span className="flex-1">
                         <span className="block text-sm font-semibold text-secondary">
                           {tier.name} · {tier.price}
                           {tier.originalPrice && (
-                            <span className="ml-1.5 text-secondary/40 line-through font-normal">{tier.originalPrice}</span>
+                            <span className="ml-1.5 text-secondary/70 line-through font-normal">{tier.originalPrice}</span>
                           )}
                         </span>
                         <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
@@ -219,6 +220,7 @@ const CheckoutPage = () => {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

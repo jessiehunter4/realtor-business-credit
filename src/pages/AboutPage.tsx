@@ -163,7 +163,7 @@ const AboutPage = () => {
       />
       <SiteHeader />
 
-      <main>
+      <main id="main-content">
         {/* Hero */}
         <section className="bg-hero-grad">
           <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700">

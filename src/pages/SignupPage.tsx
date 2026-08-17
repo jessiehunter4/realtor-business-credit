@@ -97,7 +97,7 @@ export default function SignupPage() {
     <div className="min-h-screen flex flex-col bg-hero-grad">
       <Seo title="Create your account — RE Pro Business Credit" description="Create your RE Pro Business Credit account to view your custom plan." />
       <SiteHeader />
-      <main className="flex-1 flex items-center justify-center px-4 py-16">
+      <main id="main-content" className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1

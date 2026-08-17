@@ -685,7 +685,7 @@ function IntakeSurveyForm() {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <SiteHeader />
-        <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+        <main id="main-content" className="flex-1 flex items-center justify-center p-4 md:p-8">
           {planState.status === "success" ? (
             <PlanSuccessCelebration
               planId={planState.planId}
@@ -730,7 +730,7 @@ function IntakeSurveyForm() {
               }}
             />
           )}
-        </div>
+        </main>
         <SiteFooter />
       </div>
     );
@@ -763,7 +763,7 @@ function IntakeSurveyForm() {
         path="/intake"
         noindex
       />
-      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-5">
+      <main id="main-content" className="max-w-6xl mx-auto space-y-4 sm:space-y-5">
         {/* Header */}
         <div className="text-center space-y-1">
           <h1 className="text-xl sm:text-2xl font-bold text-secondary">
@@ -1440,7 +1440,7 @@ function IntakeSurveyForm() {
         <p className="text-xs text-muted-foreground text-center">
           This is not legal, tax, or financial advice. Consult your attorney, CPA, and state licensing board for your specific situation.
         </p>
-      </div>
+      </main>
     </div>
   );
 }

@@ -58,7 +58,7 @@ const Ch04 = () => (
                   <span className="text-base md:text-lg text-foreground font-medium">{s.label}</span>
                 </div>
                 {i < bridgeSteps.length - 1 && (
-                  <ArrowRight className="mt-1 h-4 w-4 text-muted-foreground/60 rotate-90 md:rotate-0" aria-hidden />
+                  <ArrowRight className="mt-1 h-4 w-4 text-muted-foreground/70 rotate-90 md:rotate-0" aria-hidden />
                 )}
               </div>
             ))}

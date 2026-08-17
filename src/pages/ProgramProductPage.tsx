@@ -100,7 +100,7 @@ export default function ProgramProductPage() {
       />
       <SiteHeader />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Header */}
         <section className="container mx-auto max-w-5xl px-4 pt-12 pb-8 md:pt-16 md:pb-12">
           <Link
@@ -122,12 +122,12 @@ export default function ProgramProductPage() {
           <div className="mt-7 flex flex-wrap items-baseline gap-2">
             <span className="text-4xl font-bold text-secondary">{tier.price}</span>
             {tier.originalPrice && (
-              <span className="text-lg text-secondary/40 line-through">{tier.originalPrice}</span>
+              <span className="text-lg text-secondary/70 line-through">{tier.originalPrice}</span>
             )}
-            <span className="text-sm text-secondary/60">{tier.cadence}</span>
+            <span className="text-sm text-secondary/70">{tier.cadence}</span>
           </div>
           {tier.cadenceNote && (
-            <p className="mt-1 text-xs text-secondary/60">{tier.cadenceNote}</p>
+            <p className="mt-1 text-xs text-secondary/70">{tier.cadenceNote}</p>
           )}
 
           <div className="mt-7 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -189,7 +189,7 @@ export default function ProgramProductPage() {
               <h3 className="text-sm font-semibold text-secondary">Not included at this level</h3>
               <ul className="mt-3 space-y-2">
                 {tier.notIncluded.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-secondary/60">
+                  <li key={item} className="flex items-start gap-2 text-sm text-secondary/70">
                     <Minus className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                     <span>{item}</span>
                   </li>
@@ -243,7 +243,7 @@ export default function ProgramProductPage() {
               {page.refundNote && (
                 <p className="mt-3 text-sm leading-relaxed text-secondary/80">{page.refundNote}</p>
               )}
-              <p className="mt-3 flex items-center gap-2 text-xs text-secondary/60">
+              <p className="mt-3 flex items-center gap-2 text-xs text-secondary/70">
                 <Lock className="h-3.5 w-3.5" aria-hidden /> Secure Stripe checkout — we never see
                 your card details.
               </p>
@@ -281,7 +281,7 @@ export default function ProgramProductPage() {
             <div className="mt-6 flex justify-center">
               <CTA />
             </div>
-            <p className="mt-4 text-xs text-secondary/60">
+            <p className="mt-4 text-xs text-secondary/70">
               Not ready yet?{" "}
               <Link to="/pricing" className="font-semibold text-primary hover:underline">
                 Compare all programs

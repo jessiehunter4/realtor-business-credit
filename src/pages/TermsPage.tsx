@@ -13,7 +13,7 @@ const TermsPage = () => (
       description="Terms of service for the RE Pro Business Credit program by My Better Business Credit, including educational scope, payments, and limitations of liability."
       path="/terms"
     />
-    <main className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
+    <main id="main-content" className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
       <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-2">Terms of Service</h1>
       <p className="text-sm text-muted-foreground mb-10">Last updated: {LAST_UPDATED}</p>
 

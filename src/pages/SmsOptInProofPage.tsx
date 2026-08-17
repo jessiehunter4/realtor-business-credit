@@ -57,7 +57,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const SmsOptInProofPage = () => (
-  <main className="min-h-screen bg-background">
+  <main id="main-content" className="min-h-screen bg-background">
     <Seo
       title="SMS Opt-In Workflow | RE Pro Business Credit"
       description="Documentation of the SMS opt-in workflow, consent language, and message samples for RE Pro Business Credit."

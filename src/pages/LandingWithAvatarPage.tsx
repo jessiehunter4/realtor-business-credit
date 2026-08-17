@@ -19,9 +19,11 @@ const LandingWithAvatarPage = () => {
         path={`/landing-page/${slug || ""}`}
       />
       <SiteHeader />
+      <main id="main-content">
       <AvatarHeroSection firstName={visitorName || undefined} />
       <ThreeStepSection />
       <AvatarFinalCTA />
+      </main>
       <SiteFooter />
     </div>
   );

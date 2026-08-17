@@ -28,7 +28,7 @@ export default function PaymentCancelledPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="mx-auto max-w-2xl px-6 py-16 md:py-24">
+      <main id="main-content" className="mx-auto max-w-2xl px-6 py-16 md:py-24">
         <div className="rounded-2xl border bg-card p-8 md:p-12 text-center shadow-sm">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
             <AlertCircle className="h-10 w-10 text-amber-600" aria-hidden />

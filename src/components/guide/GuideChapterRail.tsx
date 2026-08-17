@@ -114,7 +114,7 @@ const GuideChapterRail = () => {
                   <span
                     className={cn(
                       "block truncate text-sm font-semibold",
-                      isActive ? "text-primary" : done ? "text-secondary/60" : "text-secondary",
+                      isActive ? "text-primary" : done ? "text-secondary/70" : "text-secondary",
                     )}
                   >
                     {item.title}

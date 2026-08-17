@@ -27,6 +27,7 @@ const SamplePlanPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <main id="main-content">
       <Seo
         title="Sample RE Pro Business Credit Plan — See What You'll Receive"
         description="A full sample of the personalized RE Pro Business Structure, Finance & Credit Plan you receive after your free Needs Analysis. Built for a fictional Sacramento broker so you know exactly what to expect."
@@ -109,6 +110,7 @@ const SamplePlanPage = () => {
         </div>
       </section>
 
+      </main>
       <SiteFooter darkNavy />
     </div>
   );

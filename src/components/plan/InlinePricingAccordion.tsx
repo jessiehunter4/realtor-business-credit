@@ -37,7 +37,7 @@ export default function InlinePricingAccordion({
     <div className="rounded-2xl border border-border bg-white p-5 md:p-6 shadow-card">
       <div className="mb-4">
         <h4 className="text-base font-semibold text-secondary">{headline}</h4>
-        <p className="text-sm text-secondary/65 mt-0.5">{subhead}</p>
+        <p className="text-sm text-secondary/70 mt-0.5">{subhead}</p>
       </div>
       <Accordion type="single" collapsible defaultValue={defaultOpen}>
         {PRICING_TIERS.map((tier) => {
@@ -67,10 +67,10 @@ export default function InlinePricingAccordion({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-secondary/60 mt-0.5">
+                    <p className="text-xs text-secondary/70 mt-0.5">
                       <span className="font-semibold text-secondary/85">{tier.price}</span>
                       {tier.originalPrice && (
-                        <span className="ml-1.5 text-secondary/40 line-through">{tier.originalPrice}</span>
+                        <span className="ml-1.5 text-secondary/70 line-through">{tier.originalPrice}</span>
                       )}
                       <span className="ml-1.5">· {tier.cadence}</span>
                     </p>
@@ -80,7 +80,7 @@ export default function InlinePricingAccordion({
               <AccordionContent>
                 <div className="pl-12 pr-2 pt-1 pb-2 space-y-3">
                   {tier.cadenceNote && (
-                    <p className="text-xs text-secondary/60 italic">{tier.cadenceNote}</p>
+                    <p className="text-xs text-secondary/70 italic">{tier.cadenceNote}</p>
                   )}
                   <p className="text-sm text-secondary/80">{tier.who}</p>
                   <ul className="space-y-1.5">
