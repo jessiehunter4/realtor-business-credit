@@ -420,6 +420,7 @@ const GuidePage = () => {
         <GuideProgressBar />
       </div>
 
+      <main id="main-content">
       <GuideCover visitorName={visitorName || undefined} />
       <GuideResumeCard />
       {hasPlan && (
@@ -469,6 +470,7 @@ const GuidePage = () => {
       <GuideResources />
       {/* Spacer so floating buttons don't cover final content on small screens */}
       <div className="h-20 sm:h-24" aria-hidden="true" />
+      </main>
 
       <GuideFloatingTOC />
       <GuideChapterRail />

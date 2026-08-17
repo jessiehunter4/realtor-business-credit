@@ -305,7 +305,7 @@ export default function AdminIntakeCoachView() {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/admin/intake")} className="shrink-0">
+            <Button variant="ghost" size="icon" aria-label="Back to intake list" onClick={() => navigate("/admin/intake")} className="shrink-0">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="min-w-0">

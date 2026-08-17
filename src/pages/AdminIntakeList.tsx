@@ -107,7 +107,7 @@ export default function AdminIntakeList() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
+          <Button variant="ghost" size="icon" aria-label="Back to admin dashboard" onClick={() => navigate("/admin")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-2xl font-bold">Intake Surveys</h1>
@@ -196,6 +196,7 @@ export default function AdminIntakeList() {
                             variant="ghost"
                             size="icon"
                             title="Coach View"
+                            aria-label="Open coach view"
                             onClick={() => navigate(`/admin/intake/${s.id}`)}
                           >
                             <Eye className="h-4 w-4" />
@@ -204,6 +205,7 @@ export default function AdminIntakeList() {
                             variant="ghost"
                             size="icon"
                             title="Copy survey link"
+                            aria-label="Copy survey link"
                             onClick={() => copyLink(s.access_token)}
                           >
                             <Copy className="h-4 w-4" />
@@ -212,6 +214,7 @@ export default function AdminIntakeList() {
                             variant="ghost"
                             size="icon"
                             title="Open survey"
+                            aria-label="Open survey in a new tab"
                             onClick={() =>
                               window.open(
                                 `/intake?token=${s.access_token}`,

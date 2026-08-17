@@ -11,7 +11,7 @@ export default function UnauthorizedPage() {
   const homeLabel = role === "admin" ? "Go to admin" : "Go to my dashboard";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-hero-grad px-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-hero-grad px-4">
       <div className="max-w-md w-full text-center bg-white rounded-3xl shadow-card border border-border/60 p-8">
         <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
           <ShieldAlert className="h-6 w-6" />
@@ -33,6 +33,6 @@ export default function UnauthorizedPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

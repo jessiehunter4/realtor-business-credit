@@ -43,6 +43,7 @@ const GuideFloatingTOC = () => {
       <SheetTrigger asChild>
         <Button
           size="icon"
+          aria-label="Open table of contents"
           className="fixed right-4 sm:right-6 z-40 h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-xl bg-secondary text-secondary-foreground hover:bg-success-green hover:text-white active:bg-success-green-hover"
           style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
         >
