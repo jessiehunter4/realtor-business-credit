@@ -132,25 +132,27 @@ const GuideChapterRail = () => {
         })}
       </div>
 
-      <div className="border-t border-border p-4">
-        <div className="rounded-xl border border-border bg-muted/40 p-4">
-          <div className="flex items-start gap-2">
-            <CalendarDays className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-            <div>
-              <p className="text-sm font-semibold text-primary">Ready to get started?</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Create your customized plan and walk away with clear next steps.
-              </p>
+      {showCta && (
+        <div className="border-t border-border p-4">
+          <div className="rounded-xl border border-border bg-muted/40 p-4">
+            <div className="flex items-start gap-2">
+              <CalendarDays className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-primary">Ready to get started?</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Create your customized plan and walk away with clear next steps.
+                </p>
+              </div>
             </div>
+            <Button asChild className="mt-3 w-full">
+              <Link to="/intake">
+                Get Started
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-          <Button asChild className="mt-3 w-full">
-            <Link to="/intake">
-              Get Started
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
         </div>
-      </div>
+      )}
     </nav>
   );
 };
