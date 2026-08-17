@@ -15,6 +15,7 @@ import { postFunnelEvent } from "@/lib/logFunnelEvent";
 import GuideCover from "@/components/guide/GuideCover";
 import GuideTOC from "@/components/guide/GuideTOC";
 import GuideResumeCard from "@/components/guide/GuideResumeCard";
+import GuideResumeFloating from "@/components/guide/GuideResumeFloating";
 import GuideSkim from "@/components/guide/GuideSkim";
 import GuideIntroduction from "@/components/guide/GuideIntroduction";
 import Ch01 from "@/components/guide/chapters/Ch01";
@@ -476,6 +477,7 @@ const GuidePage = () => {
 
       <GuideFloatingTOC />
       <GuideChapterRail />
+      <GuideResumeFloating />
       <FloatingPlanCTA />
       <SiteFooter />
     </div>
