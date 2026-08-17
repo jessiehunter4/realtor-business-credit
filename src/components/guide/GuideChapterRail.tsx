@@ -14,6 +14,8 @@ const GuideChapterRail = () => {
   const showCta = false; // hidden per request
   const visible = false; // entire rail hidden per request
 
+  if (!visible) return null;
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
