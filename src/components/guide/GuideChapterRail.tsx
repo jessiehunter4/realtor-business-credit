@@ -11,6 +11,7 @@ const GuideChapterRail = () => {
   const [activeId, setActiveId] = useState<string>("");
   const [open, setOpen] = useState(true);
   const { isCompleted, toggle, completedCount, totalCount } = useGuideProgress();
+  const showCta = false; // hidden per request
 
   useEffect(() => {
     const observer = new IntersectionObserver(
