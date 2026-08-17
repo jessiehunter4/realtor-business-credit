@@ -98,7 +98,7 @@ const GuideOptInGate = ({ onAccessGranted, visitorName }: GuideOptInGateProps) =
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
+    <main id="main-content" className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
       <Card className="w-full max-w-md border-primary/20">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
