@@ -14,8 +14,6 @@ const GuideChapterRail = () => {
   const showCta = false; // hidden per request
   const visible = false; // entire rail hidden per request
 
-  if (!visible) return null;
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -34,6 +32,8 @@ const GuideChapterRail = () => {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  if (!visible) return null;
 
   if (!open) {
     return (
