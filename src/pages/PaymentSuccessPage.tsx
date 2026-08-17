@@ -118,7 +118,7 @@ export default function PaymentSuccessPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="mx-auto max-w-2xl px-6 py-16 md:py-24">
+      <main id="main-content" className="mx-auto max-w-2xl px-6 py-16 md:py-24">
         <div className="rounded-2xl border bg-card p-8 md:p-12 text-center shadow-sm">
           {state === "verifying" && (
             <>

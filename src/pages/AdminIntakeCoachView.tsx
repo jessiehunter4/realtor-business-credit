@@ -362,7 +362,7 @@ export default function AdminIntakeCoachView() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">
+      <main id="main-content" className="container mx-auto px-4 py-6">
         <div className="max-w-3xl mx-auto mb-6">
           <StepVideoPlaceholder
             stepNumber={SECTION_VIDEO_META[activeTab as SectionKey].step}

@@ -602,7 +602,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <main id="main-content" className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Quick actions */}
         <div className="mb-6 flex flex-wrap gap-2 sm:gap-3 items-center">
           <Button size="sm" onClick={() => navigate("/admin/mls-import")}>Import MLS Data</Button>

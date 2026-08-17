@@ -170,7 +170,7 @@ const PricingPage = () => {
       />
       <SiteHeader />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Hero */}
         <section className="container mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-14 max-w-5xl text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary tracking-tight">

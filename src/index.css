@@ -184,3 +184,31 @@ All colors MUST be HSL.
 }
 .bg-hero-grad { background: var(--rbc-hero-grad); }
 .bg-accent-grad { background: var(--rbc-accent-grad); }
+
+/* --- Accessibility --------------------------------------------------- */
+
+/* Anchor targets and focused elements must clear the sticky 5rem header. */
+[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Always-visible keyboard focus indicator (WCAG 2.4.7 / 2.4.11). */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Respect reduced-motion preferences (WCAG 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

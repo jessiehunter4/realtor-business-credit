@@ -114,7 +114,7 @@ export default function AdminIntakeList() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-6">
+      <main id="main-content" className="container mx-auto px-4 py-8 space-y-6">
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <div className="flex gap-3 items-center w-full sm:w-auto">

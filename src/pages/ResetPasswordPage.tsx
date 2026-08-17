@@ -147,7 +147,7 @@ export default function ResetPasswordPage() {
       <Seo title="Reset Password — RE Pro Business Credit" description="Set a new password for your RE Pro Business Credit portal." />
       <SiteHeader />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-16">
+      <main id="main-content" className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1
