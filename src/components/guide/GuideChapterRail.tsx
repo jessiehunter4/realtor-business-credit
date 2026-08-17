@@ -12,6 +12,7 @@ const GuideChapterRail = () => {
   const [open, setOpen] = useState(true);
   const { isCompleted, toggle, completedCount, totalCount } = useGuideProgress();
   const showCta = false; // hidden per request
+  const visible = false; // entire rail hidden per request
 
   useEffect(() => {
     const observer = new IntersectionObserver(
