@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import SkipToContent from "@/components/shared/SkipToContent";
 import logoAsset from "@/assets/rbc-logo-transparent.png.asset.json";
 import { useAuthRole } from "@/hooks/useAuthRole";
 import { signOutAndClear } from "@/lib/signOut";
@@ -53,6 +54,7 @@ const SiteHeader = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+      <SkipToContent />
       <div className="container mx-auto px-4 h-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link to="/" className="flex items-center shrink-0 justify-self-start" aria-label="RE Pro Business Credit home">
           <img
