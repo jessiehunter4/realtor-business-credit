@@ -41,7 +41,7 @@ const HeroSection = ({ firstName, guideLink = "/guide", closingContext = false }
             <span className="text-2xl md:text-3xl font-bold text-white/90">Realtor</span>
             <span className="text-2xl md:text-3xl font-bold text-primary"> Business Credit</span>
           </div>
-          <p className="text-sm md:text-base text-white/60 mb-8">
+          <p className="text-sm md:text-base text-white/80 mb-8">
             My Plan. My Progress. My Better Business Credit.
           </p>
 

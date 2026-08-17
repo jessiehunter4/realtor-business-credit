@@ -206,7 +206,7 @@ export default function NextStepPanel({ planId, contactId, initialSelection, dem
                   <div className="flex items-center gap-2">
                     <Icon
                       className={
-                        "h-4 w-4 " + (checked ? "text-primary" : "text-secondary/60")
+                        "h-4 w-4 " + (checked ? "text-primary" : "text-secondary/70")
                       }
                     />
                     <span className="font-semibold text-secondary text-sm">{opt.label}</span>
@@ -218,7 +218,7 @@ export default function NextStepPanel({ planId, contactId, initialSelection, dem
         </RadioGroup>
 
         {saving && (
-          <p className="text-xs text-secondary/60 flex items-center gap-1.5">
+          <p className="text-xs text-secondary/70 flex items-center gap-1.5">
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving your choice…
           </p>
         )}

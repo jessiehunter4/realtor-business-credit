@@ -154,7 +154,7 @@ const Cell = ({ value }: { value: boolean | string }) => {
     return <Check className="mx-auto h-5 w-5 text-primary" aria-label="Included" />;
   }
   if (value === false) {
-    return <Minus className="mx-auto h-5 w-5 text-secondary/30" aria-label="Not included" />;
+    return <Minus className="mx-auto h-5 w-5 text-secondary/70" aria-label="Not included" />;
   }
   return <span className="text-sm text-secondary/80">{value}</span>;
 };
@@ -223,12 +223,12 @@ const PricingPage = () => {
                 <div className="mt-5 flex items-baseline gap-2 flex-wrap">
                   <span className="text-4xl font-bold text-secondary">{tier.price}</span>
                   {tier.originalPrice && (
-                    <span className="text-lg text-secondary/40 line-through">{tier.originalPrice}</span>
+                    <span className="text-lg text-secondary/70 line-through">{tier.originalPrice}</span>
                   )}
-                  <span className="text-sm text-secondary/60">{tier.cadence}</span>
+                  <span className="text-sm text-secondary/70">{tier.cadence}</span>
                 </div>
                 {tier.cadenceNote && (
-                  <p className="mt-1 text-xs text-secondary/55">{tier.cadenceNote}</p>
+                  <p className="mt-1 text-xs text-secondary/70">{tier.cadenceNote}</p>
                 )}
                 <ul className="mt-6 space-y-3 flex-1">
                   {tier.features.map((f) => (
@@ -238,7 +238,7 @@ const PricingPage = () => {
                     </li>
                   ))}
                   {tier.notIncluded?.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-secondary/45">
+                    <li key={f} className="flex items-start gap-2 text-sm text-secondary/70">
                       <Minus className="mt-0.5 h-4 w-4 shrink-0" aria-label="Not included" />
                       <span>{f}</span>
                     </li>
@@ -260,7 +260,7 @@ const PricingPage = () => {
             ))}
           </div>
           <PayLaterOptions />
-          <p className="mt-4 text-center text-xs text-secondary/60">
+          <p className="mt-4 text-center text-xs text-secondary/70">
             Pricing shown in USD.
           </p>
         </section>
@@ -287,7 +287,7 @@ const PricingPage = () => {
           <h2 id="compare-plans" className="text-2xl md:text-3xl font-bold text-secondary text-center">
             Compare what's included
           </h2>
-          <p className="mt-3 text-center text-sm text-secondary/65 max-w-xl mx-auto">
+          <p className="mt-3 text-center text-sm text-secondary/70 max-w-xl mx-auto">
             Every plan builds on the one before it. Pick the level of support that fits how you like to work.
           </p>
           <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-white shadow-card">
@@ -346,7 +346,7 @@ const PricingPage = () => {
           <h2 id="testimonials" className="text-2xl md:text-3xl font-bold text-secondary text-center">
             What Realtors are saying
           </h2>
-          <p className="mt-3 text-center text-sm text-secondary/65">
+          <p className="mt-3 text-center text-sm text-secondary/70">
             Sample quotes shown while we collect launch cohort testimonials.
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
@@ -366,10 +366,10 @@ const PricingPage = () => {
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-secondary">{t.name}</div>
-                    <div className="text-xs text-secondary/60">{t.role}</div>
+                    <div className="text-xs text-secondary/70">{t.role}</div>
                   </div>
                 </figcaption>
-                <p className="mt-3 text-[10px] uppercase tracking-wide text-secondary/40">
+                <p className="mt-3 text-[10px] uppercase tracking-wide text-secondary/70">
                   Sample testimonial — replace with real client quote
                 </p>
               </figure>

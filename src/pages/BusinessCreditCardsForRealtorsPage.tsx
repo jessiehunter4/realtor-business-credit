@@ -333,7 +333,7 @@ const BusinessCreditCardsForRealtorsPage = () => {
                 <Clock className="h-3.5 w-3.5" />
                 Updated for 2026
               </span>
-              <span className="text-secondary/50">•</span>
+              <span className="text-secondary/70">•</span>
               <span>5-Min Read</span>
             </div>
           </div>

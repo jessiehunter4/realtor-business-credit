@@ -101,15 +101,15 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
         <div className="text-right">
           <p className="text-white/70 text-[10px] font-sans">Prepared for</p>
           <p className="text-white font-bold text-sm">{planData.contact_name || "Agent"}</p>
-          <p className="text-white/50 text-[10px] font-sans">
+          <p className="text-white/80 text-[10px] font-sans">
             {[planData.city, planData.state].filter(Boolean).join(", ")}
             {planData.license_type ? ` · ${planData.license_type}` : ""}
           </p>
           {draftedLabel && (
-            <p className="text-white/50 text-[10px] font-sans mt-1">Drafted: {draftedLabel}</p>
+            <p className="text-white/80 text-[10px] font-sans mt-1">Drafted: {draftedLabel}</p>
           )}
           {updatedLabel && (
-            <p className="text-white/50 text-[10px] font-sans">Last updated: {updatedLabel}</p>
+            <p className="text-white/80 text-[10px] font-sans">Last updated: {updatedLabel}</p>
           )}
         </div>
       </div>
@@ -257,8 +257,8 @@ export default function PlanDocument({ planData, editMode, onEditSection, create
 
       {/* Footer */}
       <div className="bg-[#0d1b2a] px-6 sm:px-8 py-3 flex items-center justify-between">
-        <p className="text-white/40 text-[10px] font-sans">© 2026 RealtorBusinessCredit.com · My Better Business Credit</p>
-        <p className="text-white/40 text-[10px] font-sans">
+        <p className="text-white/80 text-[10px] font-sans">© 2026 RealtorBusinessCredit.com · My Better Business Credit</p>
+        <p className="text-white/80 text-[10px] font-sans">
           This plan is for educational purposes only. Not legal, tax, or financial advice.
         </p>
       </div>

@@ -16,7 +16,7 @@ const PlanMockupCard = () => {
         <div className="text-right hidden sm:block">
           <p className="text-white/70 text-[9px] font-sans">Prepared for</p>
           <p className="text-white font-bold text-[11px]">Sarah Mitchell</p>
-          <p className="text-white/50 text-[9px] font-sans">Sacramento, CA · Residential Broker</p>
+          <p className="text-white/80 text-[9px] font-sans">Sacramento, CA · Residential Broker</p>
         </div>
       </div>
 
@@ -87,8 +87,8 @@ const PlanMockupCard = () => {
 
       {/* Footer */}
       <div className="bg-[#0d1b2a] px-4 sm:px-6 py-2 flex items-center justify-between">
-        <p className="text-white/40 text-[9px] font-sans">© 2026 RealtorBusinessCredit.com</p>
-        <p className="text-white/40 text-[9px] font-sans">Page 1 of 4</p>
+        <p className="text-white/80 text-[9px] font-sans">© 2026 RealtorBusinessCredit.com</p>
+        <p className="text-white/80 text-[9px] font-sans">Page 1 of 4</p>
       </div>
     </div>
   );
