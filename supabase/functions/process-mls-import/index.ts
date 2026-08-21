@@ -1,5 +1,14 @@
+// Manual CSV MLS import (retained as a fallback alongside the Trestle API feed).
+// Parsing lives here; all downstream processing is the shared ingest service.
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { requireAdmin } from '../_shared/requireAdmin.ts';
+import {
+  ingestNormalisedRecord,
+  type AgentData,
+  type NormalisedRecord,
+  type PropertyData,
+} from '../_shared/mls/ingest.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,81 +17,6 @@ const corsHeaders = {
 
 interface CSVRow {
   [key: string]: string;
-}
-
-interface PropertyData {
-  city: string | null;
-  state: string | null;
-  zip: string | null;
-  country: string | null;
-  county: string | null;
-  price: number | null;
-  closeDate: string | null;
-  daysOnMarket: number | null;
-  streetNumber: string | null;
-  streetDirPrefix: string | null;
-  streetName: string | null;
-  streetSuffix: string | null;
-  fullAddress: string | null;
-}
-
-interface AgentData {
-  firstName: string | null;
-  lastName: string | null;
-  email: string | null;
-  phone: string | null;
-  type: string;
-  property: PropertyData;
-}
-
-/** Returns true if the agent has at least one usable contact method */
-function hasContactMethod(email: string | null, phone: string | null): boolean {
-  return Boolean(email?.trim()) || Boolean(phone?.trim());
-}
-
-/** Normalize phone to digits-only for matching */
-function normalizePhone(phone: string): string {
-  return phone.replace(/\D/g, '');
-}
-
-/** Normalize email to lowercase trimmed for matching */
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
-}
-
-/**
- * Check if a transaction is a duplicate based on property identity + 30-day close date window.
- * Property identity = normalized full address + city + state + zip.
- */
-async function isDuplicateTransaction(
-  supabaseClient: any,
-  propertyData: PropertyData
-): Promise<boolean> {
-  if (!propertyData.fullAddress || !propertyData.closeDate) {
-    // Without address or close date we can't deduplicate reliably; allow the import
-    return false;
-  }
-
-  const closeDate = new Date(propertyData.closeDate);
-  const windowStart = new Date(closeDate);
-  windowStart.setDate(windowStart.getDate() - 30);
-  const windowEnd = new Date(closeDate);
-  windowEnd.setDate(windowEnd.getDate() + 30);
-
-  const { data, error } = await supabaseClient
-    .from('transactions')
-    .select('id')
-    .eq('property_address', propertyData.fullAddress)
-    .gte('close_date', windowStart.toISOString().split('T')[0])
-    .lte('close_date', windowEnd.toISOString().split('T')[0])
-    .limit(1);
-
-  if (error) {
-    console.error('Error checking for duplicate transaction:', error);
-    return false; // On error, allow import rather than silently dropping
-  }
-
-  return data && data.length > 0;
 }
 
 Deno.serve(async (req) => {
@@ -100,17 +34,11 @@ Deno.serve(async (req) => {
     );
 
     const userId = guard.userId;
-
     const { filename, content } = await req.json();
 
-    // Create import batch record
     const { data: batch, error: batchError } = await supabaseClient
       .from('import_batches')
-      .insert({
-        filename,
-        uploaded_by: userId,
-        status: 'processing',
-      })
+      .insert({ filename, uploaded_by: userId, status: 'processing' })
       .select()
       .single();
 
@@ -118,7 +46,7 @@ Deno.serve(async (req) => {
       throw new Error('Failed to create import batch');
     }
 
-    let stats = {
+    const stats = {
       rowsProcessed: 0,
       agentsCreated: 0,
       agentsUpdated: 0,
@@ -130,113 +58,37 @@ Deno.serve(async (req) => {
     };
 
     try {
-      // Parse CSV
       const rows = parseCSV(content);
       stats.rowsProcessed = rows.length;
 
       console.log(`Processing ${rows.length} rows from ${filename}`);
-      console.log('Sample headers:', Object.keys(rows[0] || {}).slice(0, 10));
 
-      // Process each row
       for (const row of rows) {
         try {
-          // Extract property data from specific MLS columns
-          const propertyData = extractPropertyData(row);
+          const record = normaliseRow(row);
 
-          // --- TRANSACTION DEDUPLICATION ---
-          // Check for duplicate: same property + close date within ±30 days
-          const isDupe = await isDuplicateTransaction(supabaseClient, propertyData);
-          if (isDupe) {
-            console.log(`Skipping duplicate transaction: ${propertyData.fullAddress} closing ${propertyData.closeDate}`);
+          const result = await ingestNormalisedRecord(supabaseClient, record, {
+            sourceSystem: 'csv',
+            importBatchId: batch.id,
+            action: 'lead_sync',
+          });
+
+          if (result.outcome === 'skipped_duplicate') {
             stats.transactionsSkippedDuplicate++;
-            continue; // Skip entire row — no agent upsert or sync for duplicates
+            continue;
           }
+          if (result.outcome === 'created') stats.transactionsCreated++;
 
-          // Extract Listing Agent data
-          const listingAgentData: AgentData = {
-            firstName: row['ListAgentFirstName'] || null,
-            lastName: row['ListAgentLastName'] || null,
-            email: row['ListAgentEmail'] || null,
-            phone: row['ListAgentMobilePhone'] || null,
-            type: 'Listing Agent',
-            property: propertyData,
-          };
-
-          // Create/update Listing Agent
-          const listingAgent = await findOrCreateAgent(supabaseClient, listingAgentData);
-          if (listingAgent.created) {
-            stats.agentsCreated++;
-          } else if (listingAgent.updated) {
-            stats.agentsUpdated++;
-          }
-
-          // Queue sync if agent has at least one contact method (email OR phone)
-          if (hasContactMethod(listingAgentData.email, listingAgentData.phone)) {
-            await upsertContactSync(supabaseClient, listingAgent.id);
-            stats.syncRecordsCreated++;
-          } else {
-            stats.agentsSkippedNoContact++;
-          }
-
-          // --- CO-LISTING AGENT ---
-          // Only process co-listing agent if they have a real contact method (email or phone).
-          // A first name alone is NOT sufficient.
-          const coListEmail = row['CoListAgentEmail'] || null;
-          const coListPhone = row['CoListAgentMobilePhone'] || null;
-          let coListingAgentId: string | null = null;
-
-          if (hasContactMethod(coListEmail, coListPhone)) {
-            const coListingAgentData: AgentData = {
-              firstName: row['CoListAgentFirstName'] || null,
-              lastName: row['CoListAgentLastName'] || null,
-              email: coListEmail,
-              phone: coListPhone,
-              type: 'Co-Listing Agent',
-              property: propertyData,
-            };
-
-            const coListingAgent = await findOrCreateAgent(supabaseClient, coListingAgentData);
-            coListingAgentId = coListingAgent.id;
-            
-            if (coListingAgent.created) {
-              stats.coListingAgentsCreated++;
-              stats.agentsCreated++;
-            } else if (coListingAgent.updated) {
-              stats.agentsUpdated++;
-            }
-
-            // Queue sync — we already confirmed contact method exists
-            await upsertContactSync(supabaseClient, coListingAgent.id);
-            stats.syncRecordsCreated++;
-          }
-
-          // Create transaction
-          const { error: txError } = await supabaseClient
-            .from('transactions')
-            .insert({
-              import_batch_id: batch.id,
-              listing_agent_id: listingAgent.id,
-              buyer_agent_id: coListingAgentId, // Using buyer_agent_id field for co-listing agent
-              close_date: propertyData.closeDate || new Date().toISOString().split('T')[0],
-              price: propertyData.price,
-              property_address: propertyData.fullAddress,
-              property_city: propertyData.city,
-              property_state: propertyData.state,
-              property_zip: propertyData.zip,
-              mls_id: row['ListingId'] || null,
-            });
-
-          if (!txError) {
-            stats.transactionsCreated++;
-          } else {
-            console.error('Transaction insert error:', txError);
-          }
+          stats.agentsCreated += result.agentsCreated;
+          stats.agentsUpdated += result.agentsUpdated;
+          stats.coListingAgentsCreated += result.coListingAgentsCreated;
+          stats.syncRecordsCreated += result.syncRecordsCreated;
+          stats.agentsSkippedNoContact += result.agentsSkippedNoContact;
         } catch (rowError) {
           console.error('Error processing row:', rowError);
         }
       }
 
-      // Update batch with success
       await supabaseClient
         .from('import_batches')
         .update({
@@ -250,68 +102,93 @@ Deno.serve(async (req) => {
 
       console.log('Import completed:', stats);
 
-      return new Response(JSON.stringify({ 
-        success: true, 
-        batchId: batch.id,
-        stats 
-      }), {
+      return new Response(JSON.stringify({ success: true, batchId: batch.id, stats }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
-
     } catch (processingError) {
       console.error('Processing error:', processingError);
-      
-      // Update batch with error
+
       await supabaseClient
         .from('import_batches')
         .update({
           status: 'failed',
-          error_message: processingError instanceof Error ? processingError.message : String(processingError),
+          error_message:
+            processingError instanceof Error ? processingError.message : String(processingError),
         })
         .eq('id', batch.id);
 
       throw processingError;
     }
-
   } catch (error) {
     console.error('Error in process-mls-import:', error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
   }
 });
 
+/** CSV row → the shared normalised record contract. */
+function normaliseRow(row: CSVRow): NormalisedRecord {
+  const property = extractPropertyData(row);
+
+  const listingAgent: AgentData = {
+    firstName: row['ListAgentFirstName'] || null,
+    lastName: row['ListAgentLastName'] || null,
+    email: row['ListAgentEmail'] || null,
+    phone: row['ListAgentMobilePhone'] || null,
+    type: 'Listing Agent',
+    property,
+  };
+
+  const coListEmail = row['CoListAgentEmail'] || null;
+  const coListPhone = row['CoListAgentMobilePhone'] || null;
+  const coListingAgent: AgentData | null =
+    coListEmail?.trim() || coListPhone?.trim()
+      ? {
+          firstName: row['CoListAgentFirstName'] || null,
+          lastName: row['CoListAgentLastName'] || null,
+          email: coListEmail,
+          phone: coListPhone,
+          type: 'Co-Listing Agent',
+          property,
+        }
+      : null;
+
+  return {
+    mlsId: row['ListingId'] || null,
+    listingKey: null,
+    standardStatus: row['StandardStatus'] || null,
+    mlsStatusRaw: row['MlsStatus'] || row['StandardStatus'] || null,
+    property,
+    listingAgent,
+    coListingAgent,
+  };
+}
+
 function extractPropertyData(row: CSVRow): PropertyData {
-  // Extract only the 12 specific property fields from MLS
   const streetNumber = row['StreetNumberNumeric'] || null;
   const streetDirPrefix = row['StreetDirPrefix'] || null;
   const streetName = row['StreetName'] || null;
   const streetSuffix = row['StreetSuffix'] || null;
-  
-  // Build full address from components
+
   const addressParts = [streetNumber, streetDirPrefix, streetName, streetSuffix].filter(Boolean);
   const fullAddress = addressParts.length > 0 ? addressParts.join(' ') : null;
 
-  // Parse price - remove any non-numeric characters
   const rawPrice = row['CurrentPrice'] || row['ClosePrice'] || null;
   const price = rawPrice ? parseFloat(rawPrice.replace(/[^0-9.-]+/g, '')) : null;
 
-  // Parse close date
   const rawCloseDate = row['CloseDate'] || null;
   let closeDate: string | null = null;
   if (rawCloseDate) {
     try {
       const parsed = new Date(rawCloseDate);
-      if (!isNaN(parsed.getTime())) {
-        closeDate = parsed.toISOString().split('T')[0];
-      }
+      if (!isNaN(parsed.getTime())) closeDate = parsed.toISOString().split('T')[0];
     } catch {
       closeDate = null;
     }
   }
 
-  // Parse days on market
   const rawDaysOnMarket = row['DaysOnMarket'] || null;
   const daysOnMarket = rawDaysOnMarket ? parseInt(rawDaysOnMarket, 10) : null;
 
@@ -333,18 +210,16 @@ function extractPropertyData(row: CSVRow): PropertyData {
 }
 
 function parseCSV(content: string): CSVRow[] {
-  const lines = content.split('\n').filter(line => line.trim());
+  const lines = content.split('\n').filter((line) => line.trim());
   if (lines.length < 2) return [];
 
-  // Handle quoted values properly
   const parseCSVLine = (line: string): string[] => {
     const result: string[] = [];
     let current = '';
     let inQuotes = false;
-    
+
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
-      
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === ',' && !inQuotes) {
@@ -355,187 +230,21 @@ function parseCSV(content: string): CSVRow[] {
       }
     }
     result.push(current.trim());
-    
     return result;
   };
 
   const headers = parseCSVLine(lines[0]);
   console.log('CSV Headers found:', headers.length, 'columns');
-  
-  const rows: CSVRow[] = [];
 
+  const rows: CSVRow[] = [];
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
     const row: CSVRow = {};
-    
     headers.forEach((header, index) => {
       row[header] = values[index] || '';
     });
-    
     rows.push(row);
   }
 
   return rows;
-}
-
-async function upsertContactSync(supabaseClient: any, agentId: string): Promise<void> {
-  try {
-    // Check if a sync record already exists for this agent
-    const { data: existing } = await supabaseClient
-      .from('contact_syncs')
-      .select('id')
-      .eq('agent_id', agentId)
-      .maybeSingle();
-
-    if (existing) {
-      // Reset to pending so sync-to-ghl picks it up again with updated data
-      await supabaseClient
-        .from('contact_syncs')
-        .update({
-          status: 'pending',
-          retry_count: 0,
-          last_error_message: null,
-          next_retry_at: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existing.id);
-    } else {
-      await supabaseClient
-        .from('contact_syncs')
-        .insert({
-          agent_id: agentId,
-          status: 'pending',
-          retry_count: 0,
-        });
-    }
-  } catch (err) {
-    console.error('Exception upserting contact_sync:', err);
-  }
-}
-
-/**
- * Find or create an agent record.
- * 
- * DEDUPLICATION RULES (hard rules — no name-only matching):
- * 1. If email exists → match by normalized email
- * 2. If phone exists → match by normalized phone (digits-only)
- * 3. Never fall back to name-only matching
- * 4. If no match found by email or phone, create a new record
- */
-async function findOrCreateAgent(supabaseClient: any, agentData: AgentData): Promise<{ id: string; created: boolean; updated: boolean }> {
-  const { firstName, lastName, email, phone, type, property } = agentData;
-  
-  let existing = null;
-  
-  // Match by normalized email
-  if (email?.trim()) {
-    const normalized = normalizeEmail(email);
-    const { data } = await supabaseClient
-      .from('agents')
-      .select('*')
-      .eq('email', normalized)
-      .maybeSingle();
-    existing = data;
-  }
-  
-  // If no email match, try normalized phone
-  if (!existing && phone?.trim()) {
-    const normalized = normalizePhone(phone);
-    // Query agents and compare normalized phone values
-    const { data } = await supabaseClient
-      .from('agents')
-      .select('*')
-      .eq('phone', phone.trim())
-      .maybeSingle();
-    
-    // If exact match didn't work, try normalized digits comparison
-    if (!data && normalized.length >= 10) {
-      const { data: allAgentsWithPhone } = await supabaseClient
-        .from('agents')
-        .select('*')
-        .not('phone', 'is', null);
-      
-      if (allAgentsWithPhone) {
-        existing = allAgentsWithPhone.find((a: any) => 
-          a.phone && normalizePhone(a.phone) === normalized
-        ) || null;
-      }
-    } else {
-      existing = data;
-    }
-  }
-
-  // NO NAME-ONLY MATCHING — this is intentionally omitted
-
-  const fullName = [firstName, lastName].filter(Boolean).join(' ');
-
-  if (existing) {
-    // Update agent with new property info (always overwrite property details)
-    const updates: any = {
-      property_address: property.fullAddress,
-      property_city: property.city,
-      property_state: property.state,
-      property_zip: property.zip,
-      property_country: property.country,
-      property_county: property.county,
-      property_price: property.price,
-      property_close_date: property.closeDate,
-      property_days_on_market: property.daysOnMarket,
-      property_street_number: property.streetNumber,
-      property_street_dir_prefix: property.streetDirPrefix,
-      property_street_name: property.streetName,
-      property_street_suffix: property.streetSuffix,
-      updated_at: new Date().toISOString(),
-    };
-    
-    // Only update contact info if we have new data and existing is empty
-    if (firstName && !existing.first_name) updates.first_name = firstName;
-    if (lastName && !existing.last_name) updates.last_name = lastName;
-    if (email && !existing.email) updates.email = email;
-    if (phone && !existing.phone) updates.phone = phone;
-    if (fullName && fullName !== existing.full_name) updates.full_name = fullName;
-    if (type && !existing.type) updates.type = type;
-
-    await supabaseClient
-      .from('agents')
-      .update(updates)
-      .eq('id', existing.id);
-
-    return { id: existing.id, created: false, updated: true };
-  }
-
-  // Create new agent with property data
-  const { data, error } = await supabaseClient
-    .from('agents')
-    .insert({
-      first_name: firstName,
-      last_name: lastName,
-      full_name: fullName || null,
-      email: email?.trim() || null,
-      phone: phone?.trim() || null,
-      type,
-      source: 'MLS_Just_Closed_Import',
-      property_address: property.fullAddress,
-      property_city: property.city,
-      property_state: property.state,
-      property_zip: property.zip,
-      property_country: property.country,
-      property_county: property.county,
-      property_price: property.price,
-      property_close_date: property.closeDate,
-      property_days_on_market: property.daysOnMarket,
-      property_street_number: property.streetNumber,
-      property_street_dir_prefix: property.streetDirPrefix,
-      property_street_name: property.streetName,
-      property_street_suffix: property.streetSuffix,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error creating agent:', error);
-    throw error;
-  }
-  
-  return { id: data.id, created: true, updated: false };
 }
