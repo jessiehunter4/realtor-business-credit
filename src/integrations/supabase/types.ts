@@ -21,6 +21,7 @@ export type Database = {
           first_name: string | null
           full_name: string | null
           id: string
+          last_mls_sync_at: string | null
           last_name: string | null
           license_number: string | null
           office_name: string | null
@@ -41,7 +42,9 @@ export type Database = {
           property_zip: string | null
           sms_eligible: boolean
           source: string
+          source_system: string
           state: string | null
+          trestle_list_agent_key: string | null
           type: string | null
           updated_at: string
         }
@@ -51,6 +54,7 @@ export type Database = {
           first_name?: string | null
           full_name?: string | null
           id?: string
+          last_mls_sync_at?: string | null
           last_name?: string | null
           license_number?: string | null
           office_name?: string | null
@@ -71,7 +75,9 @@ export type Database = {
           property_zip?: string | null
           sms_eligible?: boolean
           source: string
+          source_system?: string
           state?: string | null
+          trestle_list_agent_key?: string | null
           type?: string | null
           updated_at?: string
         }
@@ -81,6 +87,7 @@ export type Database = {
           first_name?: string | null
           full_name?: string | null
           id?: string
+          last_mls_sync_at?: string | null
           last_name?: string | null
           license_number?: string | null
           office_name?: string | null
@@ -101,7 +108,9 @@ export type Database = {
           property_zip?: string | null
           sms_eligible?: boolean
           source?: string
+          source_system?: string
           state?: string | null
+          trestle_list_agent_key?: string | null
           type?: string | null
           updated_at?: string
         }
@@ -728,6 +737,490 @@ export type Database = {
         }
         Relationships: []
       }
+      mls_import_jobs: {
+        Row: {
+          created_at: string
+          daily_new_limit: number
+          enabled: boolean
+          id: string
+          import_new: boolean
+          interval_hours: number
+          last_run_at: string | null
+          last_run_status: string | null
+          lease_expires_at: string | null
+          lease_owner: string | null
+          max_days_on_market: number | null
+          max_price: number | null
+          min_price: number | null
+          name: string
+          next_sync_at: string | null
+          overlap_minutes: number
+          update_existing: boolean
+          updated_at: string
+          watermark_committed: string | null
+          zip_group_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          daily_new_limit?: number
+          enabled?: boolean
+          id?: string
+          import_new?: boolean
+          interval_hours?: number
+          last_run_at?: string | null
+          last_run_status?: string | null
+          lease_expires_at?: string | null
+          lease_owner?: string | null
+          max_days_on_market?: number | null
+          max_price?: number | null
+          min_price?: number | null
+          name: string
+          next_sync_at?: string | null
+          overlap_minutes?: number
+          update_existing?: boolean
+          updated_at?: string
+          watermark_committed?: string | null
+          zip_group_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          daily_new_limit?: number
+          enabled?: boolean
+          id?: string
+          import_new?: boolean
+          interval_hours?: number
+          last_run_at?: string | null
+          last_run_status?: string | null
+          lease_expires_at?: string | null
+          lease_owner?: string | null
+          max_days_on_market?: number | null
+          max_price?: number | null
+          min_price?: number | null
+          name?: string
+          next_sync_at?: string | null
+          overlap_minutes?: number
+          update_existing?: boolean
+          updated_at?: string
+          watermark_committed?: string | null
+          zip_group_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mls_import_jobs_zip_group_id_fkey"
+            columns: ["zip_group_id"]
+            isOneToOne: false
+            referencedRelation: "mls_zip_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mls_import_record_errors: {
+        Row: {
+          created_at: string
+          error_category: string | null
+          error_message: string | null
+          id: string
+          intended_action: string | null
+          listing_id: string | null
+          listing_key: string | null
+          needs_admin_action: boolean
+          next_retry_at: string | null
+          outcome: string | null
+          reason: string | null
+          retry_count: number
+          run_id: string | null
+          stage: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_category?: string | null
+          error_message?: string | null
+          id?: string
+          intended_action?: string | null
+          listing_id?: string | null
+          listing_key?: string | null
+          needs_admin_action?: boolean
+          next_retry_at?: string | null
+          outcome?: string | null
+          reason?: string | null
+          retry_count?: number
+          run_id?: string | null
+          stage?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_category?: string | null
+          error_message?: string | null
+          id?: string
+          intended_action?: string | null
+          listing_id?: string | null
+          listing_key?: string | null
+          needs_admin_action?: boolean
+          next_retry_at?: string | null
+          outcome?: string | null
+          reason?: string | null
+          retry_count?: number
+          run_id?: string | null
+          stage?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mls_import_record_errors_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "mls_import_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mls_import_runs: {
+        Row: {
+          api_request_count: number
+          completed_at: string | null
+          created_at: string
+          elapsed_ms: number | null
+          error_message: string | null
+          filters_used: Json | null
+          id: string
+          job_id: string | null
+          mode: string
+          next_run_at: string | null
+          pages_expected: number | null
+          pages_received: number | null
+          provider_wait_ms: number
+          rate_limit_responses: number
+          records_accepted: number
+          records_created: number
+          records_deferred: number
+          records_failed: number
+          records_fetched: number
+          records_filtered: number
+          records_reported: number
+          records_unchanged: number
+          records_updated: number
+          scheduled_at: string | null
+          started_at: string | null
+          status: string
+          trigger: string
+          triggered_by: string | null
+          watermark_after: string | null
+          watermark_before: string | null
+          window_end: string | null
+          window_start: string | null
+          zip_groups_used: Json | null
+        }
+        Insert: {
+          api_request_count?: number
+          completed_at?: string | null
+          created_at?: string
+          elapsed_ms?: number | null
+          error_message?: string | null
+          filters_used?: Json | null
+          id?: string
+          job_id?: string | null
+          mode: string
+          next_run_at?: string | null
+          pages_expected?: number | null
+          pages_received?: number | null
+          provider_wait_ms?: number
+          rate_limit_responses?: number
+          records_accepted?: number
+          records_created?: number
+          records_deferred?: number
+          records_failed?: number
+          records_fetched?: number
+          records_filtered?: number
+          records_reported?: number
+          records_unchanged?: number
+          records_updated?: number
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string
+          trigger: string
+          triggered_by?: string | null
+          watermark_after?: string | null
+          watermark_before?: string | null
+          window_end?: string | null
+          window_start?: string | null
+          zip_groups_used?: Json | null
+        }
+        Update: {
+          api_request_count?: number
+          completed_at?: string | null
+          created_at?: string
+          elapsed_ms?: number | null
+          error_message?: string | null
+          filters_used?: Json | null
+          id?: string
+          job_id?: string | null
+          mode?: string
+          next_run_at?: string | null
+          pages_expected?: number | null
+          pages_received?: number | null
+          provider_wait_ms?: number
+          rate_limit_responses?: number
+          records_accepted?: number
+          records_created?: number
+          records_deferred?: number
+          records_failed?: number
+          records_fetched?: number
+          records_filtered?: number
+          records_reported?: number
+          records_unchanged?: number
+          records_updated?: number
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string
+          trigger?: string
+          triggered_by?: string | null
+          watermark_after?: string | null
+          watermark_before?: string | null
+          window_end?: string | null
+          window_start?: string | null
+          zip_groups_used?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mls_import_runs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "mls_import_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mls_settings: {
+        Row: {
+          automatic_ingestion_enabled: boolean
+          circuit_breaker_recovery_seconds: number
+          circuit_breaker_threshold: number
+          created_at: string
+          id: string
+          import_new_enabled: boolean
+          max_concurrency: number
+          page_size: number
+          request_timeout_ms: number
+          retry_attempts: number
+          retry_initial_delay_ms: number
+          retry_max_delay_ms: number
+          singleton: boolean
+          timezone: string
+          update_existing_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          automatic_ingestion_enabled?: boolean
+          circuit_breaker_recovery_seconds?: number
+          circuit_breaker_threshold?: number
+          created_at?: string
+          id?: string
+          import_new_enabled?: boolean
+          max_concurrency?: number
+          page_size?: number
+          request_timeout_ms?: number
+          retry_attempts?: number
+          retry_initial_delay_ms?: number
+          retry_max_delay_ms?: number
+          singleton?: boolean
+          timezone?: string
+          update_existing_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          automatic_ingestion_enabled?: boolean
+          circuit_breaker_recovery_seconds?: number
+          circuit_breaker_threshold?: number
+          created_at?: string
+          id?: string
+          import_new_enabled?: boolean
+          max_concurrency?: number
+          page_size?: number
+          request_timeout_ms?: number
+          retry_attempts?: number
+          retry_initial_delay_ms?: number
+          retry_max_delay_ms?: number
+          singleton?: boolean
+          timezone?: string
+          update_existing_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mls_settings_audit: {
+        Row: {
+          actor: string | null
+          created_at: string
+          entity: string
+          entity_id: string | null
+          field: string | null
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          field?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          field?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+        }
+        Relationships: []
+      }
+      mls_status_history: {
+        Row: {
+          action_taken: string | null
+          changed_at: string
+          id: string
+          listing_id: string | null
+          listing_key: string | null
+          new_status: string
+          old_status: string | null
+          run_id: string | null
+          transaction_id: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          changed_at?: string
+          id?: string
+          listing_id?: string | null
+          listing_key?: string | null
+          new_status: string
+          old_status?: string | null
+          run_id?: string | null
+          transaction_id?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          changed_at?: string
+          id?: string
+          listing_id?: string | null
+          listing_key?: string | null
+          new_status?: string
+          old_status?: string | null
+          run_id?: string | null
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mls_status_history_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mls_status_policy: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          internal_status: string
+          needs_review: boolean
+          notes: string | null
+          raw_status: string
+          updated_at: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          internal_status: string
+          needs_review?: boolean
+          notes?: string | null
+          raw_status: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          internal_status?: string
+          needs_review?: boolean
+          notes?: string | null
+          raw_status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mls_zip_groups: {
+        Row: {
+          county: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          label: string
+          note: string | null
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          county?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label: string
+          note?: string | null
+          state?: string
+          updated_at?: string
+        }
+        Update: {
+          county?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string
+          note?: string | null
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mls_zips: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          group_id: string
+          id: string
+          zip: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          group_id: string
+          id?: string
+          zip: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          group_id?: string
+          id?: string
+          zip?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mls_zips_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "mls_zip_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opt_outs: {
         Row: {
           agent_id: string | null
@@ -1034,50 +1527,80 @@ export type Database = {
       transactions: {
         Row: {
           buyer_agent_id: string | null
-          close_date: string
+          close_date: string | null
+          contract_status_change_date: string | null
           created_at: string
           id: string
           import_batch_id: string | null
+          import_run_id: string | null
           listing_agent_id: string | null
+          listing_id: string | null
+          listing_key: string | null
           mls_id: string | null
+          mls_status_raw: string | null
+          modification_timestamp: string | null
+          previous_status: string | null
           price: number | null
           property_address: string | null
           property_city: string | null
           property_state: string | null
           property_type: string | null
           property_zip: string | null
+          source_system: string
+          standard_status: string | null
+          status_changed_at: string | null
           updated_at: string
         }
         Insert: {
           buyer_agent_id?: string | null
-          close_date: string
+          close_date?: string | null
+          contract_status_change_date?: string | null
           created_at?: string
           id?: string
           import_batch_id?: string | null
+          import_run_id?: string | null
           listing_agent_id?: string | null
+          listing_id?: string | null
+          listing_key?: string | null
           mls_id?: string | null
+          mls_status_raw?: string | null
+          modification_timestamp?: string | null
+          previous_status?: string | null
           price?: number | null
           property_address?: string | null
           property_city?: string | null
           property_state?: string | null
           property_type?: string | null
           property_zip?: string | null
+          source_system?: string
+          standard_status?: string | null
+          status_changed_at?: string | null
           updated_at?: string
         }
         Update: {
           buyer_agent_id?: string | null
-          close_date?: string
+          close_date?: string | null
+          contract_status_change_date?: string | null
           created_at?: string
           id?: string
           import_batch_id?: string | null
+          import_run_id?: string | null
           listing_agent_id?: string | null
+          listing_id?: string | null
+          listing_key?: string | null
           mls_id?: string | null
+          mls_status_raw?: string | null
+          modification_timestamp?: string | null
+          previous_status?: string | null
           price?: number | null
           property_address?: string | null
           property_city?: string | null
           property_state?: string | null
           property_type?: string | null
           property_zip?: string | null
+          source_system?: string
+          standard_status?: string | null
+          status_changed_at?: string | null
           updated_at?: string
         }
         Relationships: [
