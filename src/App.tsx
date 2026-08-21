@@ -14,6 +14,7 @@ import AboutPage from "./pages/AboutPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import MLSImport from "./pages/MLSImport";
+import AdminMlsAutomation from "./pages/AdminMlsAutomation";
 import IntakeSurveyPage from "./pages/IntakeSurveyPage";
 import AdminIntakeList from "./pages/AdminIntakeList";
 import AdminIntakeCoachView from "./pages/AdminIntakeCoachView";
@@ -79,6 +80,7 @@ const App = () => (
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/mls-import" element={<MLSImport />} />
+            <Route path="/admin/mls" element={<AdminMlsAutomation />} />
             <Route path="/admin/video-upload" element={<AdminVideoUpload />} />
             <Route path="/admin/intake" element={<AdminIntakeList />} />
             <Route path="/admin/intake/:id" element={<AdminIntakeCoachView />} />
